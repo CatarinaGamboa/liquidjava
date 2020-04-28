@@ -1,5 +1,5 @@
-# ReGen
+# ReGen: Evolutionary Synthesis-based Program Repair from Refined Types
 
 WIP :(
-
-ReGen: Evolutionary Synthsesis-based Program Repair from Refined Types
+        
+ReGen = **Re**pair system with **Gen**netic Programming
