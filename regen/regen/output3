@@ -1,0 +1,149 @@
+Running Symbolic PathFinder ...
+symbolic.dp=coral
+symbolic.string_dp_timeout_ms=0
+symbolic.string_dp=none
+symbolic.max_pc_length=2147483647
+symbolic.max_pc_msec=0
+symbolic.bvlength=32
+symbolic.min_int=-2147483648
+symbolic.min_long=-9223372036854775808
+symbolic.min_short=-32768
+symbolic.min_byte=-128
+symbolic.min_char=0
+symbolic.max_int=2147483647
+symbolic.max_long=9223372036854775807
+symbolic.max_short=32767
+symbolic.max_byte=127
+symbolic.max_char=65535
+symbolic.min_double=4.9E-324
+symbolic.max_double=1.7976931348623157E308
+JavaPathfinder core system v8.0 - (C) 2005-2014 United States Government. All rights reserved.
+
+
+====================================================== system under test
+demo.NumericExample.main()
+
+====================================================== search started: 05-05-2020 8:06
+New sym int a_1_SYMINT min=-2147483648, max=2147483647
+New sym int b_2_SYMINT min=-2147483648, max=2147483647
+numeric PC: constraint # = 1
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) != CONST_0 -> true
+
+### PCs: total:1 sat:1 unsat:0
+
+string analysis: SPC # = 0
+NPC constraint # = 1
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) != CONST_0
+numeric PC: constraint # = 2
+%NonLinInteger% (a_1_SYMINT / ((a_1_SYMINT + b_2_SYMINT) - CONST_2)) <= CONST_0 &&
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) != CONST_0 -> true
+
+### PCs: total:2 sat:2 unsat:0
+
+string analysis: SPC # = 0
+NPC constraint # = 2
+%NonLinInteger% (a_1_SYMINT / ((a_1_SYMINT + b_2_SYMINT) - CONST_2)) <= CONST_0 &&
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) != CONST_0
+numeric PC: constraint # = 2
+%NonLinInteger% (a_1_SYMINT / ((a_1_SYMINT + b_2_SYMINT) - CONST_2)) > CONST_0 &&
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) != CONST_0 -> true
+
+### PCs: total:3 sat:3 unsat:0
+
+string analysis: SPC # = 0
+NPC constraint # = 2
+%NonLinInteger% (a_1_SYMINT / ((a_1_SYMINT + b_2_SYMINT) - CONST_2)) > CONST_0 &&
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) != CONST_0
+>0
+numeric PC: constraint # = 2
+%NonLinInteger% (a_1_SYMINT / ((a_1_SYMINT + b_2_SYMINT) - CONST_2)) > CONST_0 &&
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) != CONST_0 -> true
+
+string analysis: SPC # = 0
+NPC constraint # = 2
+%NonLinInteger% (a_1_SYMINT[-50] / ((a_1_SYMINT[-50] + b_2_SYMINT[17]) - CONST_2)) > CONST_0 &&
+((a_1_SYMINT[-50] + b_2_SYMINT[17]) - CONST_2) != CONST_0
+*************Summary***************
+PC is:constraint # = 2
+%NonLinInteger% (a_1_SYMINT[-50] / ((a_1_SYMINT[-50] + b_2_SYMINT[17]) - CONST_2)) > CONST_0 &&
+((a_1_SYMINT[-50] + b_2_SYMINT[17]) - CONST_2) != CONST_0
+Return is:  (a_1_SYMINT[-50] / ((a_1_SYMINT[-50] + b_2_SYMINT[17]) - CONST_2))
+***********************************
+<=0
+numeric PC: constraint # = 2
+%NonLinInteger% (a_1_SYMINT / ((a_1_SYMINT + b_2_SYMINT) - CONST_2)) <= CONST_0 &&
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) != CONST_0 -> true
+
+string analysis: SPC # = 0
+NPC constraint # = 2
+%NonLinInteger% (a_1_SYMINT[0] / ((a_1_SYMINT[0] + b_2_SYMINT[0]) - CONST_2)) <= CONST_0 &&
+((a_1_SYMINT[0] + b_2_SYMINT[0]) - CONST_2) != CONST_0
+*************Summary***************
+PC is:constraint # = 2
+%NonLinInteger% (a_1_SYMINT[0] / ((a_1_SYMINT[0] + b_2_SYMINT[0]) - CONST_2)) <= CONST_0 &&
+((a_1_SYMINT[0] + b_2_SYMINT[0]) - CONST_2) != CONST_0
+Return is:  (a_1_SYMINT[0] / ((a_1_SYMINT[0] + b_2_SYMINT[0]) - CONST_2))
+***********************************
+numeric PC: constraint # = 1
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) = CONST_0 -> true
+
+### PCs: total:4 sat:4 unsat:0
+
+string analysis: SPC # = 0
+NPC constraint # = 1
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) = CONST_0
+numeric PC: constraint # = 1
+((a_1_SYMINT + b_2_SYMINT) - CONST_2) = CONST_0 -> true
+
+string analysis: SPC # = 0
+NPC constraint # = 1
+((a_1_SYMINT[15] + b_2_SYMINT[-13]) - CONST_2) = CONST_0
+Property Violated: PC is constraint # = 1
+((a_1_SYMINT[15] + b_2_SYMINT[-13]) - CONST_2) = CONST_0
+Property Violated: result is  "java.lang.ArithmeticException: div by 0..."
+****************************
+
+====================================================== error 1
+gov.nasa.jpf.vm.NoUncaughtExceptionsProperty
+java.lang.ArithmeticException: div by 0
+	at demo.NumericExample.test(demo/NumericExample.java:26)
+	at demo.NumericExample.main(demo/NumericExample.java:35)
+
+
+====================================================== snapshot #1
+thread java.lang.Thread:{id:0,name:main,status:RUNNING,priority:5,isDaemon:false,lockCount:0,suspendCount:0}
+  call stack:
+	at demo.NumericExample.test(NumericExample.java:26)
+	at demo.NumericExample.main(NumericExample.java:35)
+
+
+====================================================== Method Summaries
+Inputs: a_1_SYMINT,b_2_SYMINT
+
+demo.NumericExample.test(-50,17)  --> Return Value: 1
+demo.NumericExample.test(0,0)  --> Return Value: 0
+demo.NumericExample.test(15,-13)  --> "java.lang.ArithmeticException: div by 0..."
+
+====================================================== Method Summaries (HTML)
+<h1>Test Cases Generated by Symbolic JavaPath Finder for demo.NumericExample.test (Path Coverage) </h1>
+<table border=1>
+<tr><td>a_1_SYMINT</td><td>b_2_SYMINT</td><td>RETURN</td></tr>
+<tr><td>-50</td><td>17</td><td>Return Value: 1</td></tr>
+<tr><td>0</td><td>0</td><td>Return Value: 0</td></tr>
+<tr><td>15</td><td>-13</td><td>"java.lang.ArithmeticException: div by 0..."</td></tr>
+</table>
+
+====================================================== results
+error #1: gov.nasa.jpf.vm.NoUncaughtExceptionsProperty "java.lang.ArithmeticException: div by 0  at demo.N..."
+
+====================================================== statistics
+elapsed time:       00:00:01
+states:             new=5,visited=0,backtracked=5,end=2
+search:             maxDepth=3,constraints=0
+choice generators:  thread=1 (signal=0,lock=1,sharedRef=0,threadApi=0,reschedule=0), data=2
+heap:               new=370,released=20,maxLive=348,gcCycles=3
+instructions:       3147
+max memory:         121MB
+loaded code:        classes=65,methods=1314
+
+====================================================== search finished: 05-05-2020 8:06
