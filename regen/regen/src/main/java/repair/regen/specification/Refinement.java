@@ -1,4 +1,4 @@
-package specification;
+package repair.regen.specification;
 
 import java.lang.annotation.Target;
 import java.lang.annotation.ElementType;

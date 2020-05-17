@@ -1,8 +1,10 @@
-package specification;
+package repair.regen.utils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import repair.regen.specification.Refinement;
 
 public class Processor {
 

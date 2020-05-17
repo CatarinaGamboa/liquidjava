@@ -1,4 +1,4 @@
-package specification;
+package repair.regen.infer;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

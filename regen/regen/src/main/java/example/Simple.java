@@ -1,6 +1,6 @@
 package example;
 
-import specification.Refinement;
+import repair.regen.specification.Refinement;
 
 @Refinement("super.x > 10")
 public class Simple extends ToSimple {

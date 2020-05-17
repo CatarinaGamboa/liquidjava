@@ -3,8 +3,8 @@ package repair.regen;
 import java.util.List;
 
 import example.Simple;
-import specification.InducedRefinementsParser;
-import specification.Processor;
+import repair.regen.infer.InducedRefinementsParser;
+import repair.regen.utils.Processor;
 
 /**
  * Main class for the Repair system
