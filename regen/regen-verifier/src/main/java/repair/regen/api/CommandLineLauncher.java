@@ -2,7 +2,6 @@ package repair.regen.api;
 import repair.regen.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
-import spoon.reflect.CtModel;
 import spoon.reflect.factory.Factory;
 import spoon.support.QueueProcessingManager;
 

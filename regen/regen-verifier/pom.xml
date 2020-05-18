@@ -47,6 +47,7 @@
     <version.junit>4.12</version.junit>
     <version.memcompiler>1.3.0</version.memcompiler>
     <version.spoon>7.3.0-SNAPSHOT</version.spoon>
+    <version.z3>4.8.8</version.z3>
     <version.regen>1.0</version.regen>
     <!-- plugin versions -->
     <pVersion.compiler>3.8.0</pVersion.compiler>
@@ -58,6 +59,15 @@
       <name>Maven Repository for Spoon Snapshot</name>
       <url>http://maven.inria.fr/artifactory/spoon-public-snapshot/</url>
       <snapshots/>
+    </repository>
+    <repository>
+      <id>central</id>
+      <name>Central Repository</name>
+      <url>https://repo.maven.apache.org/maven2</url>
+      <layout>default</layout>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
     </repository>
   </repositories>
   <dependencies>
@@ -72,14 +82,23 @@
       <version>${version.spoon}</version>
     </dependency>
     <dependency>
+	  <groupId>com.microsoft.z3</groupId>
+      <artifactId>z3</artifactId>
+      <version>${version.z3}</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/com.microsoft.z3.jar</systemPath>			
+    </dependency>
+    <dependency>
+	  <groupId>modelcc</groupId>
+      <artifactId>modelcc</artifactId>
+      <version>2015</version>
+      <scope>system</scope>
+      <systemPath>${basedir}/lib/ModelCC.r2015.jar</systemPath>			
+    </dependency>
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>${version.junit}</version>
-    </dependency>
-    <dependency>
-	  <groupId>org.sosy-lab</groupId>
-	  <artifactId>javasmt-solver-z3</artifactId>
-      <version>z3-4.4.1-1558-gf96cfea</version> 
     </dependency>
   </dependencies>
 </project>

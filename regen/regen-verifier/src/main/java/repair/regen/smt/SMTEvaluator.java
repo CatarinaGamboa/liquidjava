@@ -1,24 +1,32 @@
 package repair.regen.smt;
 
-import java.util.HashMap;
+import java.util.Map;
 
-import com.microsoft.z3.Context;
+import com.microsoft.z3.Status;
 
-import spoon.reflect.declaration.CtType;
+import repair.regen.language.Expression;
+import repair.regen.language.parser.RefinementParser;
+import spoon.reflect.reference.CtTypeReference;
 
 public class SMTEvaluator {
 	
-	private Context prepareContext(HashMap<String, CtType<?>> ctx) {
-		Context z3ctx = new Context();
-		for (String name : ctx.keySet()) {
-			z3ctx.mkIntConst(name);
-		}
-		return z3ctx;
-	}
+
 	
-	public void verifySubtype(String subRef, String supRef, HashMap<String, CtType<?>> ctx) {
-		Context z3ctx = prepareContext(ctx);
+	public void verifySubtype(String subRef, String supRef, Map<String, CtTypeReference<?>> ctx) throws TypeCheckError {
 		// TODO: create a parser for our SMT-ready refinement language
-		// TODO: discharge the verification to z3
+		// TODO: discharge the verification to z3 
+		
+		String toVerify = "(" + subRef + ") && !(" + supRef + ")";
+		
+		Expression e = RefinementParser.parse(toVerify).get();
+		TranslatorToZ3 tz3 = new TranslatorToZ3(ctx);
+		Status s = tz3.verifyExpression(e);
+		if (s.equals(Status.SATISFIABLE)) {
+			throw new TypeCheckError(subRef + " not a subtype of " + supRef);
+		}
+		// TODO: Unknown should emit an error
+		
 	}
+
+
 }

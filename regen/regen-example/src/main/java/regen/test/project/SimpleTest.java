@@ -8,6 +8,9 @@ public class SimpleTest {
     	int a = 1;
     	
 		@Refinement("b > 3")
-    	int b = 2;
+    	int b = 2; // should emit error
+		
+		@Refinement("c > 1")
+    	int c = 2; // should be OK
     }
 }
