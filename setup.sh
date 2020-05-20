@@ -37,7 +37,10 @@ fi
 # -----------------------------------------------------------------------------
 # Download the jpf from the git repository
 cd ..
-git clone git@github.com:pcanelas/jpf-backup.git
+dir="jpf-backup/"
+if [ -d "$DIR" ]; then
+	git clone https://github.com/pcanelas/jpf-backup.git
+fi
 
 # Set the jpf site configuration
 echo "Need permissions to generate jpf site properties..."
@@ -51,7 +54,7 @@ jpf-nhandler = $PWD/jpf-backup/jpf-nhandler
 
 jpf-symbc = $PWD/jpf-backup/jpf-symbc
 
-extensions=${jpf-core},${jpf-nhandler},${jpf-symbc}
+extensions=\${jpf-core},\${jpf-nhandler},\${jpf-symbc}
 
 # Automatic generated jpf site properties
 
