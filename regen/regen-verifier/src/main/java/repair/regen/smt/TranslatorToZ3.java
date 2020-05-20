@@ -57,7 +57,12 @@ public class TranslatorToZ3 {
 	public Status verifyExpression(Expression e) {
 		Solver s = z3.mkSolver();
 		s.add((BoolExpr) e.eval(this));
-		return s.check();
+		Status st = s.check();
+		if (st.equals(Status.SATISFIABLE)) {
+			// Example of values
+			// System.out.println(s.getModel());
+		}
+		return st;
 	}
 
 	public Expr makeAnd(Expr eval, Expr eval2) {
