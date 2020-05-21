@@ -12,7 +12,7 @@
    <packaging>pom</packaging>
 
    <modules>
-     <module>regen</module>
+     <module>regen-api</module>
      <module>regen-verifier</module>
      <module>regen-example</module>
    </modules>
