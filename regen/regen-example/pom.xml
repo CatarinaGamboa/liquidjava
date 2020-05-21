@@ -61,5 +61,10 @@
       <artifactId>junit</artifactId>
       <version>${version.junit}</version>
     </dependency>
+    <dependency>
+      <groupId>repair</groupId>
+  	  <artifactId>regen</artifactId>
+	  <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 </project>
