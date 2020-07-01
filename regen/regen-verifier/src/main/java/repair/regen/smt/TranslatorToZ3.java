@@ -73,4 +73,12 @@ public class TranslatorToZ3 {
 		return z3.mkNot((BoolExpr) e1);
 	}
 
+	public Expr makeOr(Expr eval, Expr eval2) {
+		return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
+	}
+
+	public Expr makeBooleanLiteral(boolean value) {
+		return z3.mkBool(value);
+	}
+
 }

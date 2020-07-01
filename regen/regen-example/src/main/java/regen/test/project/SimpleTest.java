@@ -5,25 +5,21 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
     @SuppressWarnings("unused")
 	public static void main(String[] args) {
+    	
+    	@Refinement("a > 0")
     	int a = 1;
     	
-		@Refinement("b > 3")
-    	int b = 2; // should emit error
-		
-		@Refinement("c == 2 || c == 3 || c == 4")
-    	int c = 2; // should be OK
-		
-		{
-			int d = 2;
-		}
-		
-		if ( a == 1) {
-			c = 3;
-		} else {
-			c = 4;
-		}
-		
+    	@Refinement("b == 2 || b == 3 || b == 4")
+    	int b = 2;
+    	
+//		@Refinement("c > 2")
+//    	int c = 2; // should emit error
+
+    	
 		@Refinement("d > 2")
-		int d = c;
+    	int d = b; // should be okay
+		
+		
+		
     }
 }

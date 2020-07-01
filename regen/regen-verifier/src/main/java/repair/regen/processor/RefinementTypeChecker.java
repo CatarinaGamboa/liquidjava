@@ -9,6 +9,8 @@ import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
+import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 
@@ -41,20 +43,38 @@ public class RefinementTypeChecker extends CtScanner {
 	}
 	
 	
+	
+	@Override
+	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
+		super.visitCtVariableRead(variableRead);
+		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
+		String refinementFound = (String) varDecl.getMetadata("refinement");
+		if (refinementFound == null) {
+			refinementFound = "True";
+		}
+		variableRead.putMetadata("refinement", "(\\v == " + 
+					variableRead.getVariable().getSimpleName() + 
+					") && ("+ refinementFound + ")");
+	}
+
+
 	@Override
     public <T> void visitCtLiteral(CtLiteral<T> lit) {
 		if (lit.getType().getQualifiedName().contentEquals("int")) {
 			lit.putMetadata("refinement", "\\v == " + lit.getValue());
 		}
-    }
-
+    }	
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
 		super.visitCtLocalVariable(localVariable);
 		
-		String refinement = (String) localVariable.getAssignment().getMetadata("refinement");
-		String correctRefinement = refinement.replace("\\v", localVariable.getSimpleName());
+		String refinementFound = (String) localVariable.getAssignment().getMetadata("refinement");
+		if (refinementFound == null) {
+			refinementFound = "True";
+		}
+		String correctRefinement = refinementFound.replace("\\v", localVariable.getSimpleName());
 		localVariable.putMetadata("refinement", correctRefinement);
 		
 		Optional<String> expectedType = localVariable.getAnnotations().stream().filter(
@@ -82,8 +102,10 @@ public class RefinementTypeChecker extends CtScanner {
 				System.out.println("Refinement found:" + correctRefinement);
 				System.out.println("Location: " + localVariable.getPosition());
 				System.out.println("______________________________________________________");
+				System.exit(1);
 			}
 			localVariable.putMetadata("refinement", et);
+			localVariable.getAssignment().putMetadata("refinement", et);
 		});
 		
 		
