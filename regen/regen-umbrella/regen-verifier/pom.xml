@@ -90,12 +90,10 @@
       <version>${version.spoon}</version>
     </dependency>
     <dependency>
-	  <groupId>com.microsoft.z3</groupId>
-      <artifactId>z3</artifactId>
-      <version>${version.z3}</version>
-      <scope>system</scope>
-      <systemPath>${basedir}/lib/com.microsoft.z3.jar</systemPath>			
-    </dependency>
+    <groupId>io.github.tudo-aqua</groupId>
+    <artifactId>z3-turnkey</artifactId>
+    <version>4.8.7.1</version>
+</dependency>
     <dependency>
 	  <groupId>modelcc</groupId>
       <artifactId>modelcc</artifactId>
