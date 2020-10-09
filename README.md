@@ -17,3 +17,7 @@ To properly run the tool do as follows:
 3. *Optional:* The Compiler and Build Path may raise some warnings because of compliance and the execution environment, to solve these, for each **regen-XXX** project, simply select `Properties > Java Compiler > Disable: Use compliance for execution environment... > Enable: Use '--release' option > Apply`.
 
 4. Run the CommandLineLauncher in `regen-verifier.api` and done! 
+
+
+
+**NOTE**: So that ModelCC can properly work, the path you are working on cannot have white spaces!!
