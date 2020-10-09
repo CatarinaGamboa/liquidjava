@@ -45,9 +45,17 @@ public class TranslatorToZ3 {
 	public Expr makeLt(Expr e1, Expr e2) {
 		return z3.mkLt((ArithExpr) e1,(ArithExpr) e2);
 	}
+	
+	public Expr makeLtEq(Expr e1, Expr e2) {
+		return z3.mkLe((ArithExpr) e1,(ArithExpr) e2);
+	}
 
 	public Expr makeGt(Expr e1, Expr e2) {
 		return z3.mkGt((ArithExpr) e1,(ArithExpr) e2);
+	}
+	
+	public Expr makeGtEq(Expr e1, Expr e2) {
+		return z3.mkGe((ArithExpr) e1,(ArithExpr) e2);
 	}
 
 	public Expr makeImplies(Expr e1, Expr e2) {

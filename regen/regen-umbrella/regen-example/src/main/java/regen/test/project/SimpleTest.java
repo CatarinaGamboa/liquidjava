@@ -7,7 +7,9 @@ public class SimpleTest {
 	public static void main(String[] args) {
     	
     	@Refinement("a > 0")
-    	int a = 1;
+    	int a = 0+1;
+    	
+    	//a--;
     	
     	@Refinement("b == 2 || b == 3 || b == 4")
     	int b = 2;
@@ -16,7 +18,7 @@ public class SimpleTest {
 //    	int c = 2; // should emit error
 
     	
-		@Refinement("d > 2")
+		@Refinement("d >= 2")
     	int d = b; // should be okay
 		
 		

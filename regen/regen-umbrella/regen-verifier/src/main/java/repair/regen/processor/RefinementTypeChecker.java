@@ -47,6 +47,8 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
 		super.visitCtVariableRead(variableRead);
+
+		System.out.println("varibale read: " +variableRead.getVariable().getSimpleName());
 		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
 		String refinementFound = (String) varDecl.getMetadata("refinement");
 		if (refinementFound == null) {
@@ -60,6 +62,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 	@Override
     public <T> void visitCtLiteral(CtLiteral<T> lit) {
+		System.out.println("lit: "+lit.getValue());
 		if (lit.getType().getQualifiedName().contentEquals("int")) {
 			lit.putMetadata("refinement", "\\v == " + lit.getValue());
 		}
@@ -69,6 +72,7 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
 		super.visitCtLocalVariable(localVariable);
+		System.out.println("localVariable: " +localVariable.getSimpleName());
 		
 		String refinementFound = (String) localVariable.getAssignment().getMetadata("refinement");
 		if (refinementFound == null) {
