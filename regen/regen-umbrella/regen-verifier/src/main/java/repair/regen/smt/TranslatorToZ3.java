@@ -7,6 +7,7 @@ import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
+import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
@@ -29,8 +30,13 @@ public class TranslatorToZ3 {
 		}
 	}
 	
+	//Literals and Variables
 	public Expr makeIntegerLiteral(int value) {
 		return z3.mkInt(value);
+	}
+	
+	public Expr makeBooleanLiteral(boolean value) {
+		return z3.mkBool(value);
 	}
 
 	public Expr makeVariable(String name) {
@@ -38,6 +44,7 @@ public class TranslatorToZ3 {
 	}
 	
 
+	//Binary Operations
 	public Expr makeEquals(Expr e1, Expr e2) {
 		return z3.mkEq(e1, e2);
 	}
@@ -84,9 +91,27 @@ public class TranslatorToZ3 {
 	public Expr makeOr(Expr eval, Expr eval2) {
 		return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
 	}
-
-	public Expr makeBooleanLiteral(boolean value) {
-		return z3.mkBool(value);
+	
+	//Arithmetic Operations
+	public Expr makeAdd(Expr eval, Expr eval2) {
+		return z3.mkAdd((ArithExpr) eval, (ArithExpr) eval2);
 	}
+	
+	public Expr makeSub(Expr eval, Expr eval2) {
+		return z3.mkSub((ArithExpr) eval, (ArithExpr) eval2);
+	}
+	
+	public Expr makeMul(Expr eval, Expr eval2) {
+		return z3.mkMul((ArithExpr) eval, (ArithExpr) eval2);
+	}
+	
+	public Expr makeDiv(Expr eval, Expr eval2) {
+		return z3.mkDiv((ArithExpr) eval, (ArithExpr) eval2);
+	}
+	
+	public Expr makeMod(Expr eval, Expr eval2) {
+		return z3.mkMod((IntExpr) eval, (IntExpr) eval2);
+	}
+
 
 }

@@ -14,6 +14,6 @@ import repair.regen.smt.TranslatorToZ3;
 public class DivisionOperator extends BinaryOperator implements IModel {
 	@Override
 	public Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) {
-		return null;
+		return ctx.makeDiv(e1.eval(ctx), e2.eval(ctx));
 	}
 }
