@@ -30,8 +30,8 @@ public class SimpleTest {
     	@Refinement("a > 0")
     	int a = 10;
     	
-    	@Refinement("t > 0")
-    	int t = a + 1;
+    	@Refinement("t > 2")
+    	int t = 2 + b;
     
 		
 		

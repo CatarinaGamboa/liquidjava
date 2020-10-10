@@ -56,7 +56,8 @@ public class RefinementTypeChecker extends CtScanner {
 			public boolean matches(CtElement element) {
 				if(element instanceof CtVariableRead<?>) {
 					String elem_ref = (String) element.getMetadata("refinement");
-					sb.append(elem_ref.replace("\\v", element.toString()));
+					sb.append(" && "+elem_ref.replace("\\v", element.toString()));
+					
 				}
 				return true;
 			}
@@ -64,7 +65,7 @@ public class RefinementTypeChecker extends CtScanner {
 		}))
 			
 		if (operator.getType().getQualifiedName().contentEquals("int")) {
-			operator.putMetadata("refinement", "\\v == " + operator+ "&&" + sb.toString());
+			operator.putMetadata("refinement", "\\v == " + operator+ sb.toString());
 		}
 	}
 

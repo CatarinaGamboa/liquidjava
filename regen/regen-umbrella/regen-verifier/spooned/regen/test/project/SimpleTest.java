@@ -20,9 +20,8 @@ public class SimpleTest {
 
         @repair.regen.specification.Refinement("a > 0")
         int a = 10;
-        @repair.regen.specification.Refinement("t > 0")
-        int t = a + 1;// Missing info on a (a>0 and a == 10) -> Rule
-
+        @repair.regen.specification.Refinement("t > 2")
+        int t = 2 + b;
     }
 }
 
