@@ -9,12 +9,15 @@ import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
+import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
+import spoon.reflect.visitor.Filter;
 
 public class RefinementTypeChecker extends CtScanner {
 	// This class should do the following:
@@ -47,9 +50,21 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
 		super.visitCtBinaryOperator(operator);
-		System.out.println("annotations:" + operator.getAnnotations());
+		StringBuilder sb = new StringBuilder();
+		for (CtElement ct : operator.getElements(new Filter<CtElement>() {
+
+			public boolean matches(CtElement element) {
+				if(element instanceof CtVariableRead<?>) {
+					String elem_ref = (String) element.getMetadata("refinement");
+					sb.append(elem_ref.replace("\\v", element.toString()));
+				}
+				return true;
+			}
+			//TODO Add other matches
+		}))
+			
 		if (operator.getType().getQualifiedName().contentEquals("int")) {
-			operator.putMetadata("refinement", "\\v == " + operator);
+			operator.putMetadata("refinement", "\\v == " + operator+ "&&" + sb.toString());
 		}
 	}
 
@@ -58,7 +73,6 @@ public class RefinementTypeChecker extends CtScanner {
 	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
 		super.visitCtVariableRead(variableRead);
 
-		System.out.println("aqui:"+variableRead);
 		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
 		String refinementFound = (String) varDecl.getMetadata("refinement");
 		if (refinementFound == null) {
@@ -73,7 +87,6 @@ public class RefinementTypeChecker extends CtScanner {
 
 	@Override
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
-		//System.out.println("literal:"+lit);
 		if (lit.getType().getQualifiedName().contentEquals("int")) {
 			lit.putMetadata("refinement", "\\v == " + lit.getValue());
 		}
@@ -87,6 +100,8 @@ public class RefinementTypeChecker extends CtScanner {
 		if(localVariable.getAssignment() == null) return;
 
 		String refinementFound = (String) localVariable.getAssignment().getMetadata("refinement");
+		//System.out.println("****refinementFound:"+localVariable.getAssignment());
+		CtExpression<T> a = localVariable.getAssignment();
 		if (refinementFound == null) {
 			refinementFound = "True";
 		}
@@ -102,7 +117,7 @@ public class RefinementTypeChecker extends CtScanner {
 								).findAny();
 
 		expectedType.ifPresent((et) -> {
-			System.out.println("SMT subtyping:" + correctRefinement + " <: " + et);
+			//System.out.println("SMT subtyping:" + correctRefinement + " <: " + et);
 
 
 			addToContext(localVariable.getSimpleName(), localVariable.getType());
