@@ -15,6 +15,7 @@ import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.code.CtWhile;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
@@ -134,11 +135,12 @@ public class RefinementTypeChecker extends CtScanner {
 //				}
 //				
 //			}));
+
 			
 			String refinementFound = (String) assignement.getAssignment().getMetadata(REFINE_KEY);
 			if (refinementFound == null)
 				refinementFound = "True";
-			System.out.println("refinementFound:"+refinementFound);
+			//System.out.println("refinementFound:"+refinementFound);
 
 			checkVariableRefinements(refinementFound, varDecl.getSimpleName(), varDecl);
 		}
@@ -183,14 +185,9 @@ public class RefinementTypeChecker extends CtScanner {
 				printError(variable, et, correctRefinement);
 				
 			}
-//			String allM = (String) localVariable.getMetadata(REF_KEY);
-//			localVariable.putMetadata(REF_KEY, "("+allM+") && ("+et+")");
-//			System.out.println("allM: " + allM);
-//			System.out.println("et: "+et);
 			
 			variable.putMetadata(REFINE_KEY, et);
-			//localVariable.getAssignment().putMetadata(REF_KEY, et);
-			System.out.println(variable.getAllMetadata());
+			//System.out.println(variable.getAllMetadata());
 		});
 		
 	}
