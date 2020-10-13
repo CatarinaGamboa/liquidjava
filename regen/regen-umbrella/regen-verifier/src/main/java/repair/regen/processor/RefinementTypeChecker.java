@@ -1,21 +1,22 @@
 package repair.regen.processor;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
+
+import org.hamcrest.core.IsInstanceOf;
 
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtExpression;
-import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
-import spoon.reflect.code.CtWhile;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
@@ -58,23 +59,56 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
 		super.visitCtBinaryOperator(operator);
-		
 		StringBuilder sb = new StringBuilder();
+		StringBuffer op = new StringBuffer(operator.toString()); 
+		
 		for (CtElement ct : operator.getElements(new Filter<CtElement>() {
+			
 			public boolean matches(CtElement element) {
+				
 				//Variable Read
 				if(element instanceof CtVariableRead<?>) {
+					CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
+					String elemName = elemVar.getVariable().getSimpleName();
 					String elem_ref = (String) element.getMetadata(REFINE_KEY);
-					sb.append(" && "+elem_ref.replace("\\v", element.toString()));
+					
+					//same name as caller k = k +...
+					CtElement parent = operator.getParent();
+					if(parent instanceof CtAssignment) {
+						CtExpression<?> parent_var = ((CtAssignment) parent).getAssigned();
+						System.out.println(parent_var);
+						if(parent_var instanceof CtVariableWriteImpl) {
+							CtVariableWriteImpl pv = (CtVariableWriteImpl) parent_var;
+							String parentName = pv.getVariable().getSimpleName();
+							System.out.println("parentName:"+parentName+"; varName:"+elemVar.getVariable().getSimpleName());
+							if(parentName.equals(elemName)) {
+								elemName = "VV_"+parentName;
+								addToContext(elemName, pv.getType());
+								
+								//elem_ref = substituteVariable(elem_ref, parentName, elemName);
+								//String newOp = substituteVariable(op.toString(), parentName, elemName);
+								elem_ref = elem_ref.replaceAll(parentName, elemName);
+								String newOp = op.toString().replaceAll(parentName, elemName);
+								op.setLength(0);
+								op.append(newOp);
+								
+							}
+						}
+					}
+					System.out.println(op.toString());
+					System.out.println("elem_ref"+elem_ref);
+					sb.append(" && "+elem_ref.replace("\\v", elemName));
 				}
 				return true;
 			}
 			//TODO Possibly add other matches
-		}))
+
 			
-		if (operator.getType().getQualifiedName().contentEquals("int")) {
-			operator.putMetadata(REFINE_KEY, "\\v == " + operator+ sb.toString());
-		}
+		}))
+
+			if (operator.getType().getQualifiedName().contentEquals("int")) {
+				operator.putMetadata(REFINE_KEY, "\\v == " + op.toString()+ sb.toString());
+			}
 	}
 
 
@@ -100,13 +134,13 @@ public class RefinementTypeChecker extends CtScanner {
 		super.visitCtLocalVariable(localVariable);
 		//only declaration, no assignment
 		if(localVariable.getAssignment() == null) return;
-		
+
 		String refinementFound = (String) localVariable.getAssignment().getMetadata(REFINE_KEY);
-		
+
 		if (refinementFound == null) {
 			refinementFound = "True";
 		}
-		
+
 		checkVariableRefinements(refinementFound, localVariable.getSimpleName(), localVariable);
 
 	}
@@ -115,28 +149,13 @@ public class RefinementTypeChecker extends CtScanner {
 	public <T,A extends T> void visitCtAssignment(CtAssignment<T,A> assignement) {
 		super.visitCtAssignment(assignement);	
 		CtExpression<T> ex =  assignement.getAssigned();
-		
+
 		if (ex instanceof CtVariableWriteImpl) {
 			CtVariable<T> varDecl = (CtVariable<T>) ((CtVariableAccess<?>) ex)
-													.getVariable()
-													.getDeclaration();
+					.getVariable()
+					.getDeclaration();
 			getVariableMetadada(ex, varDecl);
-			
-//			for (CtElement ct : assignement.getAssignment().getElements(new Filter<CtElement>() {
-//				public boolean matches(CtElement element) {
-//					if(element instanceof CtOpera) {
-//						System.out.println("SYSO:"+((CtVariable) element).getSimpleName());
-//					}
-//					return true;
-//					if(element instanceof CtVariable<?>) {
-//						System.out.println("SYSO:"+((CtVariable) element).getSimpleName());
-//					}
-//					return true;
-//				}
-//				
-//			}));
 
-			
 			String refinementFound = (String) assignement.getAssignment().getMetadata(REFINE_KEY);
 			if (refinementFound == null)
 				refinementFound = "True";
@@ -156,8 +175,8 @@ public class RefinementTypeChecker extends CtScanner {
 				varDecl.getSimpleName() + 
 				") && ("+ refinementFound + ")");
 	}	
-	
-	
+
+
 
 	private <T> void checkVariableRefinements(String refinementFound, String simpleName, CtVariable<T> variable) {
 		String correctRefinement = refinementFound.replace("\\v", simpleName);
@@ -165,13 +184,13 @@ public class RefinementTypeChecker extends CtScanner {
 
 		Optional<String> expectedType = variable.getAnnotations().stream()
 				.filter(
-					ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
-					.contentEquals("repair.regen.specification.Refinement")
-				).map(
-						ann -> (CtLiteral<String>) ann.getAllValues().get("value")
-				).map(
-						str -> str.getValue()
-				).findAny();
+						ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
+						.contentEquals("repair.regen.specification.Refinement")
+						).map(
+								ann -> (CtLiteral<String>) ann.getAllValues().get("value")
+								).map(
+										str -> str.getValue()
+										).findAny();
 
 		expectedType.ifPresent((et) -> {
 			System.out.println("SMT subtyping:" + correctRefinement + " <: " + et);
@@ -183,16 +202,28 @@ public class RefinementTypeChecker extends CtScanner {
 				new SMTEvaluator().verifySubtype(correctRefinement, et, getContext());
 			} catch (TypeCheckError e) {
 				printError(variable, et, correctRefinement);
-				
+
 			}
-			
+
 			variable.putMetadata(REFINE_KEY, et);
 			//System.out.println(variable.getAllMetadata());
 		});
-		
+
 	}
 	
-	
+	private String substituteVariable(String phrase, String old, String nw) {
+		////////////TODO AQUI!!!!!!!!!
+		/////////// Ponto da situação - não funciona esta estratégia
+		String[] a = phrase.split("[ \\.+-/*%\\)\\(]");
+		for (int i = 0; i < a.length; i++) {
+			String j = a[i].replace(" ", "");
+			if(j.equals(old)) a[i] = nw;
+			System.out.println(j + " VS "+ old);
+		}
+		return String.join(" ", a);
+	}
+
+
 	private <T> void printError(CtVariable<T> var, String et, String correctRefinement) {
 		System.out.println("______________________________________________________");
 		System.err.println("Failed to check refinement at: ");
