@@ -10,10 +10,10 @@ import repair.regen.language.Expression;
 import repair.regen.smt.TranslatorToZ3;
 
 @Priority(value = 1)
-@Pattern(regExp = "\\*")
-public class MultiplicationOperator extends BinaryOperator implements IModel {
+@Pattern(regExp = "\\%")
+public class ModOperator extends BinaryOperator implements IModel {
 	@Override
 	public Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) {
-		return ctx.makeMul(e1.eval(ctx), e2.eval(ctx));
+		return ctx.makeMod(e1.eval(ctx), e2.eval(ctx));
 	}
 }

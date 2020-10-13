@@ -18,6 +18,7 @@ public class SMTEvaluator {
 		// TODO: discharge the verification to z3 
 		
 		String toVerify = "(" + subRef + ") && !(" + supRef + ")";
+		System.out.println(toVerify); //TODO remover
 		Optional<Expression> parseResult = RefinementParser.parse(toVerify);
 		
 		if (parseResult.isPresent()) {
