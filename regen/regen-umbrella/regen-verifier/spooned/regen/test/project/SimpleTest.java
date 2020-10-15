@@ -2,7 +2,7 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{a < 10} -> {b > 0} -> {\\v > 0}")
+    @repair.regen.specification.Refinement("{a < 10} -> {b > a} -> {\\v > 10}")
     public static int posMult(int a, int b) {
         return a * b;
     }

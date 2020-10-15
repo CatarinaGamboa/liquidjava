@@ -4,7 +4,7 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
     
-	@Refinement("{a < 10} -> {b > 0} -> {\\v > 0}")
+	@Refinement("{a < 10} -> {b > a} -> {\\v > 10}")
     public static int posMult(int a, int b) {
     	return a * b;
     }

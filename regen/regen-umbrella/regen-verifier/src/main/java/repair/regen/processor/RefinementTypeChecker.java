@@ -165,16 +165,20 @@ public class RefinementTypeChecker extends CtScanner {
 				//Checking Parameters
 				List<CtParameter<?>> params = method.getParameters();
 				List<CtExpression<?>> exps = invocation.getArguments();
+				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < params.size(); i++) {
 					CtParameter<?> param = params.get(i);
 					CtExpression<?> exp = exps.get(i);
 					String name = param.getSimpleName();
 					String refPar = (String)param.getMetadata(REFINE_KEY);
 					String refInv = ((String)exp.getMetadata(REFINE_KEY)).replace("\\v", name);
-					checkSMT(refInv, refPar, (CtVariable<?>)param);
+					String correctRef = sb.length()==0? refInv : sb.toString() + " && ("+refInv+")";
+					checkSMT(correctRef, refPar, (CtVariable<?>)param);
+					
+					sb.append(sb.length() == 0 ? refPar:" && "+refPar);
 				}
 				//Checking Return
-				invocation.putMetadata(REFINE_KEY, methodRef);
+				invocation.putMetadata(REFINE_KEY, sb.append(" && "+methodRef).toString());
 			}
 
 		}
@@ -193,14 +197,11 @@ public class RefinementTypeChecker extends CtScanner {
 			String methodRef = s.getValue();
 			List<CtParameter<?>> params = method.getParameters();
 			String[] r = methodRef.split("->");
-			StringBuilder allRefs = new StringBuilder();
 			for (int i = 0; i < params.size(); i++) {
 				CtParameter<?> param = params.get(i);
 				String name = param.getSimpleName();
 				String metRef = r[i].replace("{", "(").replace("}", ")").replace("\\v", name);
 				param.putMetadata(REFINE_KEY, metRef);
-//				allRefs.append(allRefs.length() == 0 ? metRef : " && "+metRef);
-//				param.putMetadata(REFINE_KEY, allRefs.toString());
 			}
 			method.putMetadata(REFINE_KEY, r[r.length-1].replace("{", "(").replace("}", ")"));
 			
