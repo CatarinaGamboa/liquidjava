@@ -44,7 +44,7 @@ public class TranslatorToZ3 {
 	}
 	
 
-	//Binary Operations
+	//Boolean Operations
 	public Expr makeEquals(Expr e1, Expr e2) {
 		return z3.mkEq(e1, e2);
 	}

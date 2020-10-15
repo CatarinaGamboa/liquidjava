@@ -1,29 +1,41 @@
 package repair.regen.processor;
 
+import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 
 import org.hamcrest.core.IsInstanceOf;
 
+import repair.regen.language.Variable;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtExpression;
+import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
+import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.code.CtVariableWrite;
+import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtExecutable;
+import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtVariable;
+import spoon.reflect.path.CtRole;
+import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 import spoon.reflect.visitor.Filter;
+import spoon.reflect.visitor.chain.CtFunction;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
 public class RefinementTypeChecker extends CtScanner {
@@ -66,7 +78,7 @@ public class RefinementTypeChecker extends CtScanner {
 		CtExpression<?> left = operator.getLeftHandOperand();
 		String oper = operator.toString();
 		CtElement parent = operator.getParent();
-		
+
 		if(parent instanceof CtAssignment<?, ?>) {
 			CtVariableWriteImpl<?> parentVar = (CtVariableWriteImpl<?>)((CtAssignment) parent)
 					.getAssigned();
@@ -89,6 +101,18 @@ public class RefinementTypeChecker extends CtScanner {
 		getVariableMetadada(variableRead, varDecl);
 	}
 
+	@Override
+	public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
+		super.visitCtUnaryOperator(operator);
+		System.out.println("Entrou no unary");
+		CtExpression ex = operator.getOperand();
+		if(ex instanceof CtVariableWrite) {//++, --
+			CtVariableWrite w = (CtVariableWrite) ex;
+			getVariableMetadada(ex, w.getVariable().getDeclaration());
+			System.out.println(ex.getMetadata(REFINE_KEY));
+			//TODO FINISH - maybe use getOperationRefinement
+		}
+	}
 
 	@Override
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
@@ -116,7 +140,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 	@Override
 	public <T,A extends T> void visitCtAssignment(CtAssignment<T,A> assignement) {
-		super.visitCtAssignment(assignement);	
+		super.visitCtAssignment(assignement);
 		CtExpression<T> ex =  assignement.getAssigned();
 
 		if (ex instanceof CtVariableWriteImpl) {
@@ -131,15 +155,61 @@ public class RefinementTypeChecker extends CtScanner {
 			checkVariableRefinements(refinementFound, varDecl.getSimpleName(), varDecl);
 		}
 	}
+	static int c = 0;
+	public <R> void visitCtInvocation(CtInvocation<R> invocation) {
+		super.visitCtInvocation(invocation);
+		CtExecutable<?> method = invocation.getExecutable().getDeclaration();
+		if(method != null) {
+			String methodRef = (String)method.getMetadata(REFINE_KEY);
+			System.out.println(methodRef);
+			if(methodRef != null) {
+				//Chceking Params
+				List<CtParameter<?>> params = method.getParameters();
+				List<CtExpression<?>> exps = invocation.getArguments();
+				for (int i = 0; i < params.size(); i++) {
+					CtParameter<?> param = params.get(i);
+					CtExpression<?> exp = exps.get(i);
+					String name = param.getSimpleName();
+					String refPar = (String)param.getMetadata(REFINE_KEY);
+					String refInv = ((String)exp.getMetadata(REFINE_KEY)).replace("\\v", name);
+					checkSMT(refInv, refPar, (CtVariable<?>)param);
+				}
+			}
+
+		}
+
+	}
 
 
+	public <R> void visitCtMethod(CtMethod<R> method) {
+		System.out.println("SIGNATURE:"+method.getSignature());
+		super.visitCtMethod(method);
+		for(CtAnnotation<? extends Annotation> ann :method.getAnnotations()) {
+			if( !ann.getActualAnnotation().annotationType().getCanonicalName()
+					.contentEquals("repair.regen.specification.Refinement"))
+				break;
+			CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+			String methodRef = s.getValue();
+			method.putMetadata(REFINE_KEY, s.getValue());
+			List<CtParameter<?>> params = method.getParameters();
+			String[] r = methodRef.split("->");
+			for (int i = 0; i < params.size(); i++) {
+				CtParameter<?> param = params.get(i);
+				String name = param.getSimpleName();
+				String metRef = r[i].replace("{", "(").replace("}", ")").replace("\\v", name);
+				param.putMetadata(REFINE_KEY, metRef);
+			}
+			
+			
+		}
+
+	}
 
 
 
 	private <T> void checkVariableRefinements(String refinementFound, String simpleName, CtVariable<T> variable) {
 		String correctRefinement = refinementFound.replace("\\v", simpleName);
 		variable.putMetadata(REFINE_KEY, correctRefinement);
-
 		Optional<String> expectedType = variable.getAnnotations().stream()
 				.filter(
 						ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -147,28 +217,32 @@ public class RefinementTypeChecker extends CtScanner {
 						).map(
 								ann -> (CtLiteral<String>) ann.getAllValues().get("value")
 								).map(
-										str -> str.getValue()
+										str -> str.getValue().replace("\\v", simpleName)
 										).findAny();
 
 		expectedType.ifPresent((et) -> {
-			System.out.println("SMT subtyping:" + correctRefinement + " <: " + et);
-			System.out.println("-----------------------------------------------");
-
-
-			addToContext(variable.getSimpleName(), variable.getType());
-			try {
-				new SMTEvaluator().verifySubtype(correctRefinement, et, getContext());
-			} catch (TypeCheckError e) {
-				printError(variable, et, correctRefinement);
-
-			}
-
-			variable.putMetadata(REFINE_KEY, et);
-			//System.out.println(variable.getAllMetadata());
+			checkSMT(correctRefinement, et, variable);
+			
 		});
 
 	}
-	
+
+	private <T> void checkSMT(String correctRefinement, String expectedType, CtVariable<T> variable) {
+		System.out.println("SMT subtyping:" + correctRefinement + " <: " + expectedType);
+		System.out.println("-----------------------------------------------");
+
+
+		addToContext(variable.getSimpleName(), variable.getType());
+		try {
+			new SMTEvaluator().verifySubtype(correctRefinement, expectedType, getContext());
+		} catch (TypeCheckError e) {
+			printError(variable, expectedType, correctRefinement);
+
+		}
+		variable.putMetadata(REFINE_KEY, expectedType);		
+	}
+
+
 	private <T> void getVariableMetadada(CtElement variable, CtVariable<T> varDecl) {
 		String refinementFound = (String) varDecl.getMetadata(REFINE_KEY);
 		if (refinementFound == null) {
@@ -177,8 +251,9 @@ public class RefinementTypeChecker extends CtScanner {
 		variable.putMetadata(REFINE_KEY, "(\\v == " + 
 				varDecl.getSimpleName() + 
 				") && ("+ refinementFound + ")");
+
 	}	
-	
+
 	/**
 	 * Get the String value of the operator from the enum
 	 * @param kind
@@ -190,16 +265,23 @@ public class RefinementTypeChecker extends CtScanner {
 		case MINUS: return "-";
 		case MUL: 	return "*";
 		case DIV: 	return "/";
+		case MOD: 	return "%";
+
+		case AND: 	return "&&";
+		case OR: 	return "||";
+
+		case EQ: 	return "==";
+		//TODO case NE: 	return "==";
+		case GE: 	return ">=";
+		case GT: 	return ">";
+		case LE: 	return "<=";
+		case LT: 	return "<";
 		default:
 			return null;
 			//TODO COMPLETE
 		}
 	}
 
-	private String getOperationRefinements(CtBinaryOperator<?> operator, 
-			CtExpression<?> element, StringBuilder sb) {
-		return getOperationRefinements(operator, null, element, sb);
-	}
 
 	/**
 	 * Retrieves all the refinements for the Operation including the refinements of all operands
@@ -242,11 +324,17 @@ public class RefinementTypeChecker extends CtScanner {
 			CtLiteral<?> l = (CtLiteral<?>) element;
 			return l.getValue().toString();
 		}
-			
+
 		//TODO Add cases
-		
+
 		return null;
 	}
+	private String getOperationRefinements(CtBinaryOperator<?> operator, 
+			CtExpression<?> element, StringBuilder sb) {
+		return getOperationRefinements(operator, null, element, sb);
+	}
+
+
 
 	/**
 	 * Prints the error message
