@@ -2,7 +2,7 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{a > 10} -> {b > 0} -> {\\v > 0}")
+    @repair.regen.specification.Refinement("{a < 10} -> {b > 0} -> {\\v > 0}")
     public static int posMult(int a, int b) {
         return a * b;
     }
@@ -43,7 +43,7 @@ public class SimpleTest {
         // k = z + k + 1 * k;
         @repair.regen.specification.Refinement("\\v >= 0")
         int p = 10;
-        regen.test.project.SimpleTest.posMult(4, 15);
+        p = regen.test.project.SimpleTest.posMult(7, 15);
         // //Arithmetic operation with variable - ????
         // @Refinement("a > 0")
         // int a = 10;

@@ -4,7 +4,7 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
     
-	@Refinement("{a > 10} -> {b > 0} -> {\\v > 0}")
+	@Refinement("{a < 10} -> {b > 0} -> {\\v > 0}")
     public static int posMult(int a, int b) {
     	return a * b;
     }
@@ -50,7 +50,7 @@ public class SimpleTest {
     	
     	@Refinement("\\v >= 0")
     	int p = 10;
-    	posMult(40, 15);
+    	p = posMult(7, 15);
     	
 ////Arithmetic operation with variable - ????
 //    	@Refinement("a > 0")
