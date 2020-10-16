@@ -1,62 +1,126 @@
 ## Rules for Liquid Type Checking in Java
 
+Grammar for Definition of Refinements
+
+S :: = G | F;
+
+G :: =    \v BOLP E
+
+​			| x BOLP E;
+
+E :: = c
+
+​		| x
+
+​		| E BINOP E
+
+​		| E BOLP E;
+
+F ::= "{" G "}" F'
+
+F'::= "->" F | ;
+
+
+
+BINOP ::=    + | - | * | / | %  ; 			  
+
+BOLP ::=   > | >= | < | <= |== | != ;
+
+```
+Examples:
+\v == 23
+a > 10
+a > 10 && a < 50
+a == 10+3 || a == 50
+{a > 0} -> { \v < 0}
+```
+
+
+
+
+
+​	**Γ** ::= empty
+
+​		| **Γ**,  x: {B | exp}
+
+​		//TODO add functions params and returns
+
+ 
+
+e: expressions; s: statements; c: constants; x: variables
+
 
 
 **Constant**
 
--------------------------------
+​      -------------------------------------------  	type = {int, boolean, String}
 
-​					**Γ** **|-**  c : type(c) 			type = {int,...}
+​					**Γ** **|-** c : {type | \v == c}		
+
+
 
 **Variable**
 
 ​					x : T in   **Γ** 
 
--------------------------------
+​      -----------------------------------------------    
 
 ​					**Γ** **|-**  x :  T
 
 
 
-**Declaration**
 
-**Γ** **|-** x : T1	      **Γ** **|-** e1: T			T **<:** T1
 
--------------------------------
+**Variable Declaration**
 
-​					**Γ** **|-**  U x = e1 :  T			U= {int,...}
+If @R is ommited, the Refinement of the variable is True
+
+​      **Γ** **|-** e1: T			  **Γ** **|- **T **<:** {U | e2 [v/x]}              **Γ** , x: {U | e2 [v/x]} **|-** s valid
+
+​      -------------------------------------------------------------------------------------------------------------
+
+​			               		**Γ** **|-**  @R( e2 ) U x = e1; s  valid			
 
 
 
 **Assignment**
 
-**Γ** **|-** x : T1	      **Γ** **|-** e1: T			T **<:** T1
+​           **Γ** **|-** e1 : T 	    x : {U | e2} in   **Γ** 	    **Γ** **|-**  T **<:** {U | e2}          **Γ** **|-** s valid
 
--------------------------------
+​      ------------------------------------------------------------------------------------------------------------
 
-​					**Γ** **|-**  x = e1 :  T
+​		                               			**Γ** **|-**  x = e1; s valid
+
+```
+@Refinement(a > 0)
+int a = 10;
+a = 5;
+5:{int | \v == 5} <: {a > 0}
+```
 
 
 
 **Arithmetic Operations**
 
-**Γ** **|-** e1 : T1	      **Γ** **|-** e2: T2		**Γ** , e1:T1, e2:T2 **|-** (e1 op e2) : T
+​                            **Γ** **|-** e1 : {U | e1' }	      **Γ** **|-** e2: {U | e2' }		 
 
--------------------------------
+ -------------------------------------------------------------------------------------------------------------------------- p={+,-,*,/, %, ||, &&}
 
-​					    **Γ** **|-**  e1 op e2 :  T			op={+,-,*,/, %}
-
-
+​      				    **Γ** **|-**  e1 p e2 :  {U | e1' && e2' && (\v == e1 p e2)}			
 
 
 
-**Γ** **|-** e1 : T1	      **Γ** **|-** e2: T2		**Γ** e1:T1, e2:T2  **|-**  e1 op e2 : boolean
+```java
+Ex:
+@Refinement("a > 10")
+int a = 10;
+@Refinement("b < 50")
+int b = 20;
 
--------------------------------
-
-​					             **Γ** **|-**  e1 op e2 :  boolean			op={||, &&}
-
-
+@Refinement(e1)
+int c = a + b
+"(c == a + b && a > 10 && b < 50) <: e1"
+```
 
 
 
@@ -80,23 +144,25 @@
 
 
 
-Implementação Ifs - passamos a expressao para os metadados dos filhos?
 
 
+**Function Declaration** - ???????????????????????????
 
-**While**
+```
+Ex:
+@Refinement({a > 0} -> {b < 5} -> {x > 10})
+public int foo(int a, int b){
+...
+}
 
-**Γ** **|-** e: boolean	      **Γ** , e**|-** S *valid*	
+a: {int | a > 0}
+b: {int | b < 5 && a > 0} //So the parameters can dependend on the previous ones
+x: {int | x > 10 && a > 0 && b > 0}// The same for the return of the function
+```
 
--------------------------------
+​      **Γ** **|-** e1: T		   **Γ** **|-**  p : U	  **Γ** **|- **T **<:** {U | e1 [v/p]}              **Γ** , x: {U | e2 [v/x]} **|-** s valid
 
-​					**Γ** **|-**  while (e)  S  *valid*
+​      -----------------------------------------------------------------------------------------------------------------------
 
-
-
-
-
-e: expressions
-
-S: statements
+​		               			**Γ** **|-**  @R(e1)  public  U  f (p) {s}  : U
 
