@@ -4,15 +4,15 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
     
-	@Refinement("{a < 10} -> {b > a} -> {\\v > 10}")
+	@Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
     public static int posMult(int a, int b) {
-    	return a * b;
+    	return a*b;
     }
 	
     @SuppressWarnings("unused")
 	public static void main(String[] args) {
     	
-//Original
+////Original
 //    	@Refinement("a > 0")
 //    	int a = 1;
 //    	
@@ -32,29 +32,30 @@ public class SimpleTest {
 //    	int t = a + 1;
 ////
 ////Assignment after declaration
-//    	@Refinement("(z > 0) && (z < 50)")
-//    	int z = 1;
+    	@Refinement("(z > 0) && (z < 50)")
+    	int z = 1;
 //    	@Refinement("u < 100")
 //    	int u = 10;
 //    	u = 11 + z;
 //    	u = z*2;
 //    	u = 30 + z;
-////    	u = 500; //error
+//    	u = 500; //error
     	
     	
 
-////k--
-//    	@Refinement("k > 0")
-//    	int k = 1;
-//    	k = z + k + 1 * k;
+//k--
+    	@Refinement("k > 0")
+    	int k = 1;
+    	k = z + k + 1 * k;
     	
     	@Refinement("\\v >= 0")
     	int p = 10;
-    	p = posMult(7, 15);
+    	p = posMult(10, 15-6);
     	
-////Arithmetic operation with variable - ????
-//    	@Refinement("a > 0")
-//    	int a = 10;
+//Arithmetic operation with variable - ????
+//    	@Refinement("y > 0")
+//    	int y = 15;
+//    	y = y*y;
 //    	@Refinement("t > 10")
 //    	int t = 2 + a;   	
     	

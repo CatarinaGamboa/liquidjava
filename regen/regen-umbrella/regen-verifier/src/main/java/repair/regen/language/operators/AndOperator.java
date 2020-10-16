@@ -8,7 +8,7 @@ import com.microsoft.z3.Expr;
 import repair.regen.language.Expression;
 import repair.regen.smt.TranslatorToZ3;
 
-@Priority(value=3)
+@Priority(value=10)
 @Pattern(regExp = "&&")
 public class AndOperator extends BinaryOperator {
 

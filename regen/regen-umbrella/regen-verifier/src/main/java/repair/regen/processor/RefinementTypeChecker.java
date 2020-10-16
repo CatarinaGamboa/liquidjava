@@ -20,6 +20,7 @@ import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
+import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
@@ -44,6 +45,9 @@ public class RefinementTypeChecker extends CtScanner {
 	// 1. Keep track of the context variable types
 	// 2. Do type checking and inference
 	private final String REFINE_KEY = "refinement";
+	private final String REFINE_RETURN_KEY = "refinement_return";
+	private final String REFINE_PARAMS_KEY = "refinement_params";
+	private final String RETURN_VAR = "return_var";
 	private int counter = 0;
 	private Stack<Map<String, CtTypeReference<?>>> ctx = new Stack<>();
 
@@ -155,12 +159,12 @@ public class RefinementTypeChecker extends CtScanner {
 			checkVariableRefinements(refinementFound, varDecl.getSimpleName(), varDecl);
 		}
 	}
-	static int c = 0;
+	
 	public <R> void visitCtInvocation(CtInvocation<R> invocation) {
 		super.visitCtInvocation(invocation);
 		CtExecutable<?> method = invocation.getExecutable().getDeclaration();
 		if(method != null) {
-			String methodRef = (String)method.getMetadata(REFINE_KEY);
+			String methodRef = (String)method.getMetadata(REFINE_RETURN_KEY);
 			if(methodRef != null) {
 				//Checking Parameters
 				List<CtParameter<?>> params = method.getParameters();
@@ -169,26 +173,42 @@ public class RefinementTypeChecker extends CtScanner {
 				for (int i = 0; i < params.size(); i++) {
 					CtParameter<?> param = params.get(i);
 					CtExpression<?> exp = exps.get(i);
-					String name = param.getSimpleName();
-					String refPar = (String)param.getMetadata(REFINE_KEY);
-					String refInv = ((String)exp.getMetadata(REFINE_KEY)).replace("\\v", name);
-					String correctRef = sb.length()==0? refInv : sb.toString() + " && ("+refInv+")";
+					String name = param.getSimpleName(),
+							refPar = (String)param.getMetadata(REFINE_KEY),
+							refInv = ((String)exp.getMetadata(REFINE_KEY)).replace("\\v", name),
+							correctRef = sb.length()==0? refInv : sb.toString() + " && ("+refInv+")";
 					checkSMT(correctRef, refPar, (CtVariable<?>)param);
-					
+
 					sb.append(sb.length() == 0 ? refPar:" && "+refPar);
 				}
 				//Checking Return
-				invocation.putMetadata(REFINE_KEY, sb.append(" && "+methodRef).toString());
+				String s = sb.length() == 0? methodRef:  sb.append(" && "+methodRef).toString();
+				invocation.putMetadata(REFINE_KEY, s);
 			}
 
 		}
-
+	}
+	
+	@Override
+	public <R> void visitCtReturn(CtReturn<R> ret) {
+		super.visitCtReturn(ret);
+		System.out.println(ret);
+		if(ret.getReturnedExpression() != null) {
+			CtMethod method = ret.getParent(CtMethod.class);
+			String returnVarName = "RET_"+counter++; 
+			String retRef = "("+((String)ret.getReturnedExpression().getMetadata(REFINE_KEY))
+					.replace("\\v", returnVarName)+")";
+			String expectedType = ((String) method.getMetadata(REFINE_RETURN_KEY)).replace("\\v", returnVarName);
+			String paramsRef = (String)method.getMetadata(REFINE_PARAMS_KEY);
+			String correctRef = paramsRef.length() > 0? paramsRef+" && "+retRef : retRef;
+			addToContext(returnVarName, method.getType());
+			
+			checkSMT(correctRef, expectedType, ret);
+		}
 	}
 
-
 	public <R> void visitCtMethod(CtMethod<R> method) {
-		System.out.println("SIGNATURE:"+method.getSignature());
-		super.visitCtMethod(method);
+		//super.visitCtMethod(method);
 		for(CtAnnotation<? extends Annotation> ann :method.getAnnotations()) {
 			if( !ann.getActualAnnotation().annotationType().getCanonicalName()
 					.contentEquals("repair.regen.specification.Refinement"))
@@ -197,16 +217,25 @@ public class RefinementTypeChecker extends CtScanner {
 			String methodRef = s.getValue();
 			List<CtParameter<?>> params = method.getParameters();
 			String[] r = methodRef.split("->");
+			StringBuilder sb = new StringBuilder();
+			
 			for (int i = 0; i < params.size(); i++) {
 				CtParameter<?> param = params.get(i);
 				String name = param.getSimpleName();
 				String metRef = r[i].replace("{", "(").replace("}", ")").replace("\\v", name);
 				param.putMetadata(REFINE_KEY, metRef);
+				sb.append(sb.length() == 0? metRef : " && "+metRef);
+				
+				addToContext(name, param.getType());
 			}
-			method.putMetadata(REFINE_KEY, r[r.length-1].replace("{", "(").replace("}", ")"));
+			String retRef = r[r.length-1].replace("{", "(").replace("}", ")");
+			
+			method.putMetadata(REFINE_RETURN_KEY, retRef);
+			method.putMetadata(REFINE_PARAMS_KEY, sb.toString());
+			method.putMetadata(REFINE_KEY, sb.append(" && "+ retRef).toString());
 			
 		}
-
+		super.visitCtMethod(method);
 	}
 
 
@@ -226,24 +255,26 @@ public class RefinementTypeChecker extends CtScanner {
 
 		expectedType.ifPresent((et) -> {
 			checkSMT(correctRefinement, et, variable);
-			
+
 		});
 
 	}
 
-	private <T> void checkSMT(String correctRefinement, String expectedType, CtVariable<T> variable) {
+	private <T> void checkSMT(String correctRefinement, String expectedType, CtElement element) {
 		System.out.println("SMT subtyping:" + correctRefinement + " <: " + expectedType);
 		System.out.println("-----------------------------------------------");
 
-
-		addToContext(variable.getSimpleName(), variable.getType());
+		if (element instanceof CtVariable<?>) {
+			CtVariable<?> v = (CtVariable<?>) element;
+			addToContext(v.getSimpleName(), v.getType());
+		}
 		try {
 			new SMTEvaluator().verifySubtype(correctRefinement, expectedType, getContext());
 		} catch (TypeCheckError e) {
-			printError(variable, expectedType, correctRefinement);
+			printError(element, expectedType, correctRefinement);
 
 		}
-		variable.putMetadata(REFINE_KEY, expectedType);		
+		element.putMetadata(REFINE_KEY, expectedType);		
 	}
 
 
@@ -347,7 +378,7 @@ public class RefinementTypeChecker extends CtScanner {
 	 * @param et
 	 * @param correctRefinement
 	 */
-	private <T> void printError(CtVariable<T> var, String et, String correctRefinement) {
+	private <T> void printError(CtElement var, String et, String correctRefinement) {
 		System.out.println("______________________________________________________");
 		System.err.println("Failed to check refinement at: ");
 		System.out.println();
