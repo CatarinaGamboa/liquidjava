@@ -6,8 +6,19 @@ public class SimpleTest {
     
 	@Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
     public static int posMult(int a, int b) {
-    	return a*b;
+		@Refinement("y > 30")
+		int y = 50;
+    	return y-10;
     }
+//	@Refinement("{\\v > 10}")
+//    public static int positive() {
+//    	return 100;
+//    }
+	
+	@Refinement("{d >= 0}->{i > d}->{\\v >= d && \\v <= d}")
+	private static int range(int d, int i) {
+		return d;
+	}
 	
     @SuppressWarnings("unused")
 	public static void main(String[] args) {
@@ -52,6 +63,14 @@ public class SimpleTest {
     	int p = 10;
     	p = posMult(10, 15-6);
     	
+    	@Refinement("width > 0")
+    	int width = 10;
+    	@Refinement("lesser == 0")
+    	int lesser = 0;
+
+//    	int m = width-lesser;
+//    	range(0, 20);
+    	
 //Arithmetic operation with variable - ????
 //    	@Refinement("y > 0")
 //    	int y = 15;
@@ -61,6 +80,7 @@ public class SimpleTest {
     	
 		
     }
+
     
 
 }

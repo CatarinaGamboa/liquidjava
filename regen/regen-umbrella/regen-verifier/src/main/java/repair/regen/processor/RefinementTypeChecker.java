@@ -82,15 +82,17 @@ public class RefinementTypeChecker extends CtScanner {
 		CtExpression<?> left = operator.getLeftHandOperand();
 		String oper = operator.toString();
 		CtElement parent = operator.getParent();
-
+		
 		if(parent instanceof CtAssignment<?, ?>) {
 			CtVariableWriteImpl<?> parentVar = (CtVariableWriteImpl<?>)((CtAssignment) parent)
 					.getAssigned();
 			oper = getOperationRefinements(operator, parentVar, operator, sb);
-		}else if( parent instanceof CtLocalVariable<?>) {
+		}else {// if( parent instanceof CtLocalVariable<?> || parent instanceof CtReturn<?>) {
+			
 			String varRight = getOperationRefinements(operator, right, sb);
 			String varLeft = getOperationRefinements(operator, left, sb);
 			oper =  varLeft +" "+ getOperatorFromKind(operator.getKind()) +" "+ varRight;
+		
 		}
 		if (operator.getType().getQualifiedName().contentEquals("int")) {
 			operator.putMetadata(REFINE_KEY, "\\v == " + oper+ sb.toString());
@@ -177,8 +179,12 @@ public class RefinementTypeChecker extends CtScanner {
 							refPar = (String)param.getMetadata(REFINE_KEY),
 							refInv = ((String)exp.getMetadata(REFINE_KEY)).replace("\\v", name),
 							correctRef = sb.length()==0? refInv : sb.toString() + " && ("+refInv+")";
+					if(exp instanceof CtVariableRead<?>)
+						addToContext(((CtVariableRead) exp).getVariable().getSimpleName(), 
+								((CtVariableRead) exp).getType());
+				
 					checkSMT(correctRef, refPar, (CtVariable<?>)param);
-
+					//refPar = correctRef+ " && "+refPar;//TODO CONFIRM IF THIS MAKES SENSE
 					sb.append(sb.length() == 0 ? refPar:" && "+refPar);
 				}
 				//Checking Return
@@ -269,6 +275,7 @@ public class RefinementTypeChecker extends CtScanner {
 			addToContext(v.getSimpleName(), v.getType());
 		}
 		try {
+			//System.out.println(ctx);
 			new SMTEvaluator().verifySubtype(correctRefinement, expectedType, getContext());
 		} catch (TypeCheckError e) {
 			printError(element, expectedType, correctRefinement);
@@ -347,6 +354,7 @@ public class RefinementTypeChecker extends CtScanner {
 					}
 				}
 			}
+			addToContext(elemName, elemVar.getType());
 			sb.append(" && "+elem_ref.replace("\\v", elemName));
 			return elemName;
 		}
