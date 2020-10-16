@@ -1,33 +1,30 @@
 ## Rules for Liquid Type Checking in Java
 
-Grammar for Definition of Refinements
+**Grammar for Definition of Refinements**
 
+```
 S :: = G | F;
 
-G :: =    \v BOLP E
-
-​			| x BOLP E;
+G :: =   \v BOLP E
+		| x BOLP E;
 
 E :: = c
-
-​		| x
-
-​		| E BINOP E
-
-​		| E BOLP E;
+      | x
+      | E BINOP E
+	  | E BOLP E;
 
 F ::= "{" G "}" F'
 
-F'::= "->" F | ;
+F'::= "->" F 
+      | ;
+      
+BINOP ::= + | - | * | / | %  ; 			  
+BOLP ::= > | >= | < | <= |== | != ;
+```
 
-
-
-BINOP ::=    + | - | * | / | %  ; 			  
-
-BOLP ::=   > | >= | < | <= |== | != ;
+**Examples inside @Refinement**
 
 ```
-Examples:
 \v == 23
 a > 10
 a > 10 && a < 50
@@ -37,37 +34,39 @@ a == 10+3 || a == 50
 
 
 
+​	**Context**
+
+```
+Γ ::= empty
+	| Γ,  x: {B | exp}
+	//TODO add functions params and returns
+
+e: expressions; 
+s: statements; 
+c: constants; 
+x: variables
+```
 
 
-​	**Γ** ::= empty
 
-​		| **Γ**,  x: {B | exp}
-
-​		//TODO add functions params and returns
-
- 
-
-e: expressions; s: statements; c: constants; x: variables
-
-
+**Rules**
 
 **Constant**
 
-​      -------------------------------------------  	type = {int, boolean, String}
-
-​					**Γ** **|-** c : {type | \v == c}		
+```
+ -------------------------------------------  	type = {int, boolean, String}
+    	Γ|- c : {type | \v == c}			
+```
 
 
 
 **Variable**
 
-​					x : T in   **Γ** 
-
-​      -----------------------------------------------    
-
-​					**Γ** **|-**  x :  T
-
-
+```
+     x : T in Γ 
+-----------------------------------------------    
+    Γ|-  x :  T
+```
 
 
 
@@ -75,21 +74,25 @@ e: expressions; s: statements; c: constants; x: variables
 
 If @R is ommited, the Refinement of the variable is True
 
-​      **Γ** **|-** e1: T			  **Γ** **|- **T **<:** {U | e2 [v/x]}              **Γ** , x: {U | e2 [v/x]} **|-** s valid
+```
+ Γ|- e1: T			  Γ|-T <: {U | e2 [v/x]}      Γ , x: {U | e2 [v/x]} |- s valid
+----------------------------------------------------------------------------------------
+                    Γ |- @R( e2 ) U x = e1; s  valid	
+```
 
-​      -------------------------------------------------------------------------------------------------------------
 
-​			               		**Γ** **|-**  @R( e2 ) U x = e1; s  valid			
 
 
 
 **Assignment**
 
-​           **Γ** **|-** e1 : T 	    x : {U | e2} in   **Γ** 	    **Γ** **|-**  T **<:** {U | e2}          **Γ** **|-** s valid
+```
+   Γ|- e1 : T 	    x:{U | e2} in Γ 	   Γ|- T <:{U | e2}       Γ|- s valid
+--------------------------------------------------------------------------------------
+                             Γ|- x = e1; s valid
+```
 
-​      ------------------------------------------------------------------------------------------------------------
-
-​		                               			**Γ** **|-**  x = e1; s valid
+  Example
 
 ```
 @Refinement(a > 0)
@@ -102,16 +105,15 @@ a = 5;
 
 **Arithmetic Operations**
 
-​                            **Γ** **|-** e1 : {U | e1' }	      **Γ** **|-** e2: {U | e2' }		 
+```
+        Γ|- e1 : {U | e1' }	        Γ|- e2: {U | e2' }		 
+------------------------------------------------------------ p={+,-,*,/, %, ||, &&}
+    Γ|- e1 p e2 :  {U | e1' && e2' && (\v == e1 p e2)}				
+```
 
- -------------------------------------------------------------------------------------------------------------------------- p={+,-,*,/, %, ||, &&}
-
-​      				    **Γ** **|-**  e1 p e2 :  {U | e1' && e2' && (\v == e1 p e2)}			
-
-
+Example:
 
 ```java
-Ex:
 @Refinement("a > 10")
 int a = 10;
 @Refinement("b < 50")
@@ -126,23 +128,21 @@ int c = a + b
 
 **If** 
 
-**Γ** **|-** e: boolean	      **Γ** , e**|-** S *valid*	
-
--------------------------------
-
-​					**Γ** **|-**  if (e) S  *valid*
+```
+Γ |- e: boolean	      Γ , e|- S valid	
+---------------------------------------
+     Γ |-  if (e) S  valid
+```
 
 
 
 **If-Else**
 
-**Γ** **|-** e: boolean	      **Γ** , e**|-** S1 *valid*        **Γ** , !e**|-** S2 *valid*	
-
--------------------------------
-
-​					**Γ** **|-**  if (e) S1 else S2  *valid*
-
-
+```
+Γ|- e: boolean	      Γ , e|- S1 valid        Γ, !e|- S2 valid	
+-----------------------------------------------------------------
+              Γ |-  if (e) S1 else S2  valid
+```
 
 
 
@@ -160,9 +160,9 @@ b: {int | b < 5 && a > 0} //So the parameters can dependend on the previous ones
 x: {int | x > 10 && a > 0 && b > 0}// The same for the return of the function
 ```
 
-​      **Γ** **|-** e1: T		   **Γ** **|-**  p : U	  **Γ** **|- **T **<:** {U | e1 [v/p]}              **Γ** , x: {U | e2 [v/x]} **|-** s valid
-
-​      -----------------------------------------------------------------------------------------------------------------------
-
-​		               			**Γ** **|-**  @R(e1)  public  U  f (p) {s}  : U
+```
+Γ |- e1: T   Γ|-  p : U	 ...
+-------------------------------------------------------------------------------------- 
+                    Γ|-  @R(e1)  public  U  f (p) {s}  : U
+```
 
