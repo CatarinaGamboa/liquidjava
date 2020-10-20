@@ -24,17 +24,7 @@ public class SimpleTest {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("\\v > 0")
         int a = 1;
-        a++;
-        // 61?
-        // char[] thisBuf = new char[20];
-        // @Refinement("\\v >= 0")
-        // int thisBufLen = 4;//thisBuf.length;
-        // @Refinement("\\v >= 0")
-        // int strLen = 2;
-        // @Refinement("\\v > 0")
-        // int len = thisBufLen - strLen + 1;
-        // int len = thisBuf.length - strLen;
-        // int len = size - strLen + 1;
+        // a++;
         // //Original
         // @Refinement("a > 0")
         // int a = 1;

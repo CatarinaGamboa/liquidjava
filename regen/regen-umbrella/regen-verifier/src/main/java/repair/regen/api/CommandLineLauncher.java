@@ -7,8 +7,13 @@ import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
 	public static void main(String[] args) {
+		String file = args.length == 0? "../regen-example/src/main/java/":args[0];
+		process(file);
+	}
+
+	static void process(String file) {
 		Launcher launcher = new Launcher();
-        launcher.addInputResource("../regen-example/src/main/java/");
+        launcher.addInputResource(file);
         launcher.getEnvironment().setNoClasspath(true);
         // optional
         // launcher.getEnvironment().setSourceClasspath(

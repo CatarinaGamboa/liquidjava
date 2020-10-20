@@ -349,7 +349,7 @@ public class RefinementTypeChecker extends CtScanner {
 		//TODO FILL WITH CORRECT
 		case NOT: 	return "*";
 		case POS: 	return "/";
-		case NEG: 	return "%";
+		case NEG: 	return "0 - \\v";
 		default:	return null;
 		}
 	}
