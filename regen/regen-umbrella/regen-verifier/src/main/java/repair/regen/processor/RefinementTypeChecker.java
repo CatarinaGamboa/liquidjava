@@ -329,7 +329,7 @@ public class RefinementTypeChecker extends CtScanner {
 		case OR: 	return "||";
 
 		case EQ: 	return "==";
-		//TODO case NE: 	return "==";
+		//TODO case NE: 	return "!=";
 		case GE: 	return ">=";
 		case GT: 	return ">";
 		case LE: 	return "<=";

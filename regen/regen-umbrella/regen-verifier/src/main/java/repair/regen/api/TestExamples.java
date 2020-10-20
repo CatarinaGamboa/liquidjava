@@ -35,10 +35,65 @@ public class TestExamples {
 	public void correctSimpleAssignment() {
 		testCorrect(testPath+"CorrectSimpleAssignment.java");
 	}
+	@Test
+	public void correctArithmeticBinaryOperation() {
+		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");
+	}
 
+	@Test
+	public void correctAssignementAfterDeclaration() {
+		testCorrect(testPath+"CorrectAssignementAfterDeclaration.java");
+	}
+	
+	@Test
+	public void correctFunctionDeclarations() {
+		testCorrect(testPath+"CorrectFunctionDeclarations.java");
+	}
+	
+	@Test
+	public void correctFunctionInvocation() {
+		testCorrect(testPath+"CorrectFunctionInvocation.java");
+	}
+
+	@Test
+	public void correctUnaryOperators() {
+		testCorrect(testPath+"CorrectUnaryOperators.java");
+	}
+	
 	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
+	}
+	
+	@Test
+	public void errorArithmeticBinaryOperation() {
+		testWrong(testPath+"ErrorArithmeticBinaryOperations.java");
+	}
+	
+	@Test
+	public void errorAssignementAfterDeclaration() {
+		testWrong(testPath+"ErrorAssignementAfterDeclaration.java");
+	}
+	
+	@Test
+	public void errorFunctionDeclarations() {
+		testWrong(testPath+"ErrorFunctionDeclarations.java");
+	}
+	
+
+	@Test
+	public void errorFunctionInvocation() {
+		testWrong(testPath+"ErrorFunctionInvocation.java");
+	}
+	
+	@Test
+	public void errorFunctionInvocationParams() {
+		testWrong(testPath+"ErrorFunctionInvocationParams.java");
+	}
+	
+	@Test
+	public void errorUnaryOperators() {
+		testWrong(testPath+"ErrorUnaryOperators.java");
 	}
 	
 	
