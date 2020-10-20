@@ -4,25 +4,43 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
     
-	@Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
-    public static int posMult(int a, int b) {
-		@Refinement("y > 30")
-		int y = 50;
-    	return y-10;
-    }
+//	@Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
+//    public static int posMult(int a, int b) {
+//		@Refinement("y > 30")
+//		int y = 50;
+//    	return y-10;
+//    }
 //	@Refinement("{\\v > 10}")
 //    public static int positive() {
 //    	return 100;
 //    }
+//	
+//	@Refinement("{d >= 0}->{i > d}->{\\v >= d && \\v <= d}")
+//	private static int range(int d, int i) {
+//		return d;
+//	}
 	
-	@Refinement("{d >= 0}->{i > d}->{\\v >= d && \\v <= d}")
-	private static int range(int d, int i) {
-		return d;
-	}
-	
-    @SuppressWarnings("unused")
+//	@Refinement("{x > 0} -> {\\v == 3 * x}")
+//	private static int triplePositives(int x) {
+//		return x+x+x;
+//	}
+
 	public static void main(String[] args) {
+		@Refinement("\\v > 0")
+		int a = 1;
+		a++;
     	
+    	
+    	//61?
+//    	char[] thisBuf = new char[20];
+//    	@Refinement("\\v >= 0")
+//    	int thisBufLen = 4;//thisBuf.length;
+//    	@Refinement("\\v >= 0")
+//    	int strLen = 2;
+//    	@Refinement("\\v > 0")
+//        int len = thisBufLen - strLen + 1;
+    	//int len = thisBuf.length - strLen;            
+        //int len = size - strLen + 1;    	
 ////Original
 //    	@Refinement("a > 0")
 //    	int a = 1;
@@ -43,8 +61,8 @@ public class SimpleTest {
 //    	int t = a + 1;
 ////
 ////Assignment after declaration
-    	@Refinement("(z > 0) && (z < 50)")
-    	int z = 1;
+//    	@Refinement("(z > 0) && (z < 50)")
+//    	int z = 1;
 //    	@Refinement("u < 100")
 //    	int u = 10;
 //    	u = 11 + z;
@@ -54,19 +72,19 @@ public class SimpleTest {
     	
     	
 
-//k--
-    	@Refinement("k > 0")
-    	int k = 1;
-    	k = z + k + 1 * k;
-    	
-    	@Refinement("\\v >= 0")
-    	int p = 10;
-    	p = posMult(10, 15-6);
-    	
-    	@Refinement("width > 0")
-    	int width = 10;
-    	@Refinement("lesser == 0")
-    	int lesser = 0;
+////k--
+//    	@Refinement("k > 0")
+//    	int k = 1;
+//    	k = z + k + 1 * k;
+//    	
+//    	@Refinement("\\v >= 0")
+//    	int p = 10;
+//    	p = posMult(10, 15-6);
+//    	
+//    	@Refinement("width > 0")
+//    	int width = 10;
+//    	@Refinement("lesser == 0")
+//    	int lesser = 0;
 
 //    	int m = width-lesser;
 //    	range(0, 20);

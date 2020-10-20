@@ -25,6 +25,7 @@ import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.code.CtVariableWrite;
+import spoon.reflect.code.UnaryOperatorKind;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
@@ -70,6 +71,9 @@ public class RefinementTypeChecker extends CtScanner {
 		ctx.peek().put(s,  t);
 	}
 
+	
+//--------------------- Visitors -----------------------------------
+
 	/**
 	 * Visitor for binary operations
 	 * Adds metadata to the binary operations from the operands
@@ -110,13 +114,25 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
 		super.visitCtUnaryOperator(operator);
-		System.out.println("Entrou no unary");
+		System.out.println("Entrou no unary:" + operator);
 		CtExpression ex = operator.getOperand();
 		if(ex instanceof CtVariableWrite) {//++, --
 			CtVariableWrite w = (CtVariableWrite) ex;
+			String name = w.getVariable().getSimpleName();
+			String newName = "VV_"+counter++;
+			addToContext(newName, w.getType());
 			getVariableMetadada(ex, w.getVariable().getDeclaration());
-			System.out.println(ex.getMetadata(REFINE_KEY));
-			//TODO FINISH - maybe use getOperationRefinement
+			String metadada = ((String) ex.getMetadata(REFINE_KEY));
+			String binOperation = getOperatorFromKind(operator.getKind()).replace("\\v", newName);
+			String metaOper = metadada.replace("\\v", newName).replace(name, newName);
+			String all = metaOper + " && " + "\\v == "+binOperation;
+			checkVariableRefinements(all, name, w.getVariable().getDeclaration());
+			//checkSMT(all, binOperation, element);
+			
+			
+			//a++;
+			// a = VV_0 + 1 && VV_0 > 0 && a > 0 
+			
 		}
 	}
 
@@ -244,7 +260,7 @@ public class RefinementTypeChecker extends CtScanner {
 		super.visitCtMethod(method);
 	}
 
-
+//------------------------------- Auxiliary Methods ----------------------------------------
 
 	private <T> void checkVariableRefinements(String refinementFound, String simpleName, CtVariable<T> variable) {
 		String correctRefinement = refinementFound.replace("\\v", simpleName);
@@ -321,6 +337,20 @@ public class RefinementTypeChecker extends CtScanner {
 		default:
 			return null;
 			//TODO COMPLETE
+		}
+	}
+	
+	private String getOperatorFromKind(UnaryOperatorKind kind) {
+		switch(kind) {
+		case POSTINC:	return "\\v + 1";
+		case POSTDEC: 	return "\\v - 1";
+		case PREINC:	return "\\v + 1";
+		case PREDEC: 	return "\\v - 1";
+		//TODO FILL WITH CORRECT
+		case NOT: 	return "*";
+		case POS: 	return "/";
+		case NEG: 	return "%";
+		default:	return null;
 		}
 	}
 
