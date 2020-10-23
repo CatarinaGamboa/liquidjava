@@ -14,7 +14,7 @@ public class LessOrEqualOperator extends BinaryOperator {
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) {
-		return ctx.makeGtEq(e1.eval(ctx), e2.eval(ctx));
+		return ctx.makeLtEq(e1.eval(ctx), e2.eval(ctx));
 	}
 	
 

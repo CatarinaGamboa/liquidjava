@@ -32,12 +32,14 @@ import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtVariable;
+import spoon.reflect.factory.TypeFactory;
 import spoon.reflect.path.CtRole;
 import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 import spoon.reflect.visitor.Filter;
 import spoon.reflect.visitor.chain.CtFunction;
+import spoon.support.comparator.CtLineElementComparator;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
 public class RefinementTypeChecker extends CtScanner {
@@ -68,7 +70,8 @@ public class RefinementTypeChecker extends CtScanner {
 	}
 
 	private void addToContext(String s, CtTypeReference<?> t) {
-		ctx.peek().put(s,  t);
+		if( !ctx.peek().containsKey(s))
+			ctx.peek().put(s,  t);
 	}
 
 	
@@ -151,11 +154,11 @@ public class RefinementTypeChecker extends CtScanner {
 		if(localVariable.getAssignment() == null) return;
 
 		String refinementFound = (String) localVariable.getAssignment().getMetadata(REFINE_KEY);
-
+		
+		CtExpression a = localVariable.getAssignment();
 		if (refinementFound == null) {
-			refinementFound = "True";
+			refinementFound = "true";
 		}
-
 		checkVariableRefinements(refinementFound, localVariable.getSimpleName(), localVariable);
 
 	}
@@ -172,8 +175,9 @@ public class RefinementTypeChecker extends CtScanner {
 			getVariableMetadada(ex, varDecl);
 
 			String refinementFound = (String) assignement.getAssignment().getMetadata(REFINE_KEY);
-			if (refinementFound == null)
-				refinementFound = "True";
+			if (refinementFound == null) {
+				refinementFound = "true";
+			}
 			checkVariableRefinements(refinementFound, varDecl.getSimpleName(), varDecl);
 		}
 	}
@@ -201,6 +205,7 @@ public class RefinementTypeChecker extends CtScanner {
 				
 					checkSMT(correctRef, refPar, (CtVariable<?>)param);
 					//refPar = correctRef+ " && "+refPar;//TODO CONFIRM IF THIS MAKES SENSE
+					
 					sb.append(sb.length() == 0 ? refPar:" && "+refPar);
 				}
 				//Checking Return
@@ -264,7 +269,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 	private <T> void checkVariableRefinements(String refinementFound, String simpleName, CtVariable<T> variable) {
 		String correctRefinement = refinementFound.replace("\\v", simpleName);
-		variable.putMetadata(REFINE_KEY, correctRefinement);
+		//variable.putMetadata(REFINE_KEY, correctRefinement);
 		Optional<String> expectedType = variable.getAnnotations().stream()
 				.filter(
 						ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -304,7 +309,8 @@ public class RefinementTypeChecker extends CtScanner {
 	private <T> void getVariableMetadada(CtElement variable, CtVariable<T> varDecl) {
 		String refinementFound = (String) varDecl.getMetadata(REFINE_KEY);
 		if (refinementFound == null) {
-			refinementFound = "True";
+			refinementFound = "true";
+			addToContext(varDecl.getSimpleName(), varDecl.getType());
 		}
 		variable.putMetadata(REFINE_KEY, "(\\v == " + 
 				varDecl.getSimpleName() + 

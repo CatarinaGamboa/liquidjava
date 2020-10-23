@@ -54,6 +54,11 @@ public class TestExamples {
 	public void correctFunctionInvocation() {
 		testCorrect(testPath+"CorrectFunctionInvocation.java");
 	}
+	
+	@Test
+	public void correctFunctionInInvocation() {
+		testCorrect(testPath+"CorrectFunctionInInvocation.java");
+	}
 
 	@Test
 	public void correctUnaryOperators() {
