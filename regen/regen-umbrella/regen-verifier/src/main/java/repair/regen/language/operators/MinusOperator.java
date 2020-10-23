@@ -12,6 +12,6 @@ import repair.regen.smt.TranslatorToZ3;
 public class MinusOperator extends UnaryOperator implements IModel {
 	@Override
 	public Expr eval(TranslatorToZ3 ctx, Expression e) {
-		return null;
+		return ctx.makeMinus(e.eval(ctx));
 	}
 }

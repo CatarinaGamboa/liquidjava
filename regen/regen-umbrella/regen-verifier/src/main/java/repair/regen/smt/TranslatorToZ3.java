@@ -92,6 +92,11 @@ public class TranslatorToZ3 {
 		return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
 	}
 	
+	//Unary Operations
+	public Expr makeMinus(Expr eval) {
+		return z3.mkUnaryMinus((ArithExpr) eval);
+	}
+	
 	//Arithmetic Operations
 	public Expr makeAdd(Expr eval, Expr eval2) {
 		return z3.mkAdd((ArithExpr) eval, (ArithExpr) eval2);
