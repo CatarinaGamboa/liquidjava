@@ -10,7 +10,7 @@ import repair.regen.smt.TranslatorToZ3;
 
 @Priority(value=3)
 @Pattern(regExp = "!=")
-public class NotEqualOperator {
+public class NotEqualOperator extends BinaryOperator{
 	public Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) {
 		return ctx.mkNot(ctx.makeEquals(e1.eval(ctx), e2.eval(ctx)));
 	}

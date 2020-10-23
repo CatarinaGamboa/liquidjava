@@ -3,9 +3,8 @@ package regen.test.project;
 
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        int a = 3;
-        @repair.regen.specification.Refinement("b < 10")
-        int b = a;
+        @repair.regen.specification.Refinement("b != 5")
+        int b = 5;
     }
 }
 

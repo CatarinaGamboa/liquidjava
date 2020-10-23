@@ -7,6 +7,8 @@ public class CorrectArithmeticBinaryOperations {
 		//Arithmetic Binary Operations
 		@Refinement("a == 10")
 		int a = 10;
+		@Refinement("b != 10")
+		int b = 5;
 		@Refinement("t > 0")
 		int t = a + 1;
 		@Refinement("\\v >= 9")

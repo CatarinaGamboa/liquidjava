@@ -6,6 +6,8 @@ public class CorrectArithmeticBinaryOperations {
         // Arithmetic Binary Operations
         @repair.regen.specification.Refinement("a == 10")
         int a = 10;
+        @repair.regen.specification.Refinement("b != 10")
+        int b = 5;
         @repair.regen.specification.Refinement("t > 0")
         int t = a + 1;
         @repair.regen.specification.Refinement("\\v >= 9")
