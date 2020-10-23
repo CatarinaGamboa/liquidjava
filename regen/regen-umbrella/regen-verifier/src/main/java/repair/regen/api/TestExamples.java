@@ -66,6 +66,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctNoRefinements() {
+		testCorrect(testPath+"CorrectNoRefinements.java");
+	}
+	
+	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}
@@ -101,6 +106,11 @@ public class TestExamples {
 		testWrong(testPath+"ErrorUnaryOperators.java");
 	}
 	
+//	@Test
+//	public void errorNoRefinementsVar() {
+//		testWrong(testPath+"ErrorNoRefinementsInVar.java");
+//	}
+//	
 	
 	class MySecurityManager extends SecurityManager {
 		//Handles exit(1) when the refinements are not respected

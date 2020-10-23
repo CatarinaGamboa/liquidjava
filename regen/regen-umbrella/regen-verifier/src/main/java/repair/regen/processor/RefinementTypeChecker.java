@@ -117,7 +117,6 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
 		super.visitCtUnaryOperator(operator);
-		System.out.println("Entrou no unary:" + operator);
 		CtExpression ex = operator.getOperand();
 		if(ex instanceof CtVariableWrite) {//++, --
 			CtVariableWrite w = (CtVariableWrite) ex;
@@ -219,9 +218,15 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <R> void visitCtReturn(CtReturn<R> ret) {
 		super.visitCtReturn(ret);
-		System.out.println(ret);
 		if(ret.getReturnedExpression() != null) {
+			//check if there are refinements
+			if(ret.getReturnedExpression().getMetadata(REFINE_KEY) == null)
+				ret.getReturnedExpression().putMetadata(REFINE_KEY, "true");
 			CtMethod method = ret.getParent(CtMethod.class);
+			//check if method has refinements
+			if(method.getMetadata(REFINE_KEY) == null)
+				return;
+			//Both return and the method have metadata
 			String returnVarName = "RET_"+counter++; 
 			String retRef = "("+((String)ret.getReturnedExpression().getMetadata(REFINE_KEY))
 					.replace("\\v", returnVarName)+")";
