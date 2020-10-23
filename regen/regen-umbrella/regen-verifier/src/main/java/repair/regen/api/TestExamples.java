@@ -106,6 +106,11 @@ public class TestExamples {
 		testWrong(testPath+"ErrorUnaryOperators.java");
 	}
 	
+	@Test
+	public void errorErrorUnaryOpMinus() {
+		testWrong(testPath+"ErrorUnaryOpMinus.java");
+	}
+	
 //	@Test
 //	public void errorNoRefinementsVar() {
 //		testWrong(testPath+"ErrorNoRefinementsInVar.java");
