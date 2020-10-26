@@ -2,6 +2,7 @@ package repair.regen.language.operators;
 
 import org.modelcc.IModel;
 import org.modelcc.Pattern;
+import org.modelcc.Priority;
 
 import com.microsoft.z3.Expr;
 

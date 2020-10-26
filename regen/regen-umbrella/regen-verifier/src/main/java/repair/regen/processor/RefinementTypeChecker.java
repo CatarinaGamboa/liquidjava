@@ -7,11 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Stack;
 
-import org.hamcrest.core.IsInstanceOf;
-
-import repair.regen.language.Variable;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.code.BinaryOperatorKind;
@@ -323,8 +319,8 @@ public class RefinementTypeChecker extends CtScanner {
 										str -> str.getValue().replace(WILD_VAR, simpleName)
 										).findAny();
 		expectedType.ifPresent((et) -> {
-			String a = moreRefinements(et);
-			checkSMT(correctRefinement, et, variable);
+			String a = dependentRefinements(et, simpleName);
+			checkSMT(correctRefinement+a, et, variable);
 
 		});
 
@@ -339,7 +335,7 @@ public class RefinementTypeChecker extends CtScanner {
 			CtVariable<?> v = (CtVariable<?>) element;
 			context.addVarToContext(new VariableInfo(v.getSimpleName(), v.getType(), expectedType));	
 		}
-		System.out.println("Context:\n"+context);
+		//System.out.println("Context:\n"+context);
 		try {
 			new SMTEvaluator().verifySubtype(correctRefinement, expectedType, context.getContext());
 		} catch (TypeCheckError e) {
@@ -355,22 +351,34 @@ public class RefinementTypeChecker extends CtScanner {
 		return (String) elem.getMetadata(REFINE_KEY);
 	}
 
-	private String moreRefinements(String et) {
+	private String dependentRefinements(String et, String name) {
 		System.out.println(et);
-		searchForVars(et);
-		return null;
+		StringBuilder sb = new StringBuilder();
+		List<VariableInfo> l = searchForVars(et, name);
+		for(VariableInfo vi: l) {
+			sb.append(" && " + vi.getRefinement());
+			System.out.println(vi.getRefinement());
+		}
+		//System.out.println(sb.toString());
+		return sb.toString();
 	}
 
 
-	private List<VariableInfo> searchForVars(String met) {
+	private List<VariableInfo> searchForVars(String met, String name) {
 		List<VariableInfo> l = new ArrayList<>();
-		String[] a = met.split("(&&)|<|>|(<=)|(>=)|(==)");
-		System.out.println("MET:"+met);
+		String[] a = met.split("(&&)|<|>|(<=)|(>=)|(==)|=|-|\\+|/|\\*|%|(\\|\\|)");//TODO missing OR and maybe other
 		for(String s: a) {
-			System.out.print(s+",");
+			String t = s.replace(" ", "");
+			if(!t.equals(name)) {
+				
+				VariableInfo v = context.getVariableByName(t);
+				//System.out.println(t+": variable :"+v);
+				if(v != null) {
+					l.add(v);
+				}
+			}
 		}
-		System.out.println();
-		return null;
+		return l;
 	}
 
 

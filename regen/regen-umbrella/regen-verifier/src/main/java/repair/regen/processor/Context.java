@@ -100,7 +100,7 @@ public class Context {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		System.out.println("Variables");
+		sb.append("###########Variables############");
 		for(List<VariableInfo> l : ctxVars) {
 			sb.append("{");
 			for(VariableInfo var: l) {
@@ -108,7 +108,7 @@ public class Context {
 			}
 			sb.append("}\n");
 		}
-		sb.append("\nFunctions:");
+		sb.append("\n############Functions:############\n");
 		for(FunctionInfo f : ctxFunctions)
 			sb.append(f.toString());
 		return sb.toString();

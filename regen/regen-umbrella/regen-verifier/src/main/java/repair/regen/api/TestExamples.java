@@ -71,8 +71,13 @@ public class TestExamples {
 	}
 	
 	@Test
-	public void correctCorrectFunctionCallSameVariableName() {
+	public void correctFunctionCallSameVariableName() {
 		testCorrect(testPath+"CorrectFunctionCallSameVariableName.java");
+	}
+	
+	@Test
+	public void correctDependentRefinements() {
+		testCorrect(testPath+"CorrectDependentRefinements.java");
 	}
 	
 	@Test
