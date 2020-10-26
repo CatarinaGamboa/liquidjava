@@ -18,7 +18,7 @@ public class Context {
 		ctxVars.add(new ArrayList<>());
 	}
 	
-	private Map<String, CtTypeReference<?>> getContext() {
+	public Map<String, CtTypeReference<?>> getContext() {
 		Map<String, CtTypeReference<?>> ret = new HashMap<>();
 		for(List<VariableInfo> l: ctxVars) {
 			for(VariableInfo var: l) {
@@ -31,6 +31,9 @@ public class Context {
 	public void addVarToContext(VariableInfo var) {
 		if( !ctxVars.peek().contains(var))
 			ctxVars.peek().add(var);
+	}
+	public void addVarToContext(String name, CtTypeReference<?> type, String refinements) {
+		addVarToContext(new VariableInfo(name, type, refinements));
 	}
 	
 	public void addFunctionToContext(FunctionInfo f) {
@@ -51,6 +54,19 @@ public class Context {
 			for(VariableInfo var: l) {
 				sb.append(var.toString()+"; ");
 			}
+		}
+		return sb.toString();
+	}
+	@Override
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		System.out.println("Variables");
+		for(List<VariableInfo> l : ctxVars) {
+			sb.append("{");
+			for(VariableInfo var: l) {
+				sb.append(var.toString()+"; ");
+			}
+			sb.append("}\n");
 		}
 		return sb.toString();
 	}

@@ -10,7 +10,7 @@ public class SimpleTest {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("\\v > 0")
         int a = 6;
-        @repair.regen.specification.Refinement("b > 0")
+        @repair.regen.specification.Refinement("\\v > 0")
         int b = (regen.test.project.SimpleTest.addOne(50)) + a;
     }
 }

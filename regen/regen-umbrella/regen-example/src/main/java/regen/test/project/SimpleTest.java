@@ -11,7 +11,7 @@ public class SimpleTest {
 	public static void main(String[] args) {
 		@Refinement("\\v > 0")
 		int a = 6;
-		@Refinement("b > 0")
+		@Refinement("\\v > 0")
 		int b = addOne(50) + a;
 
 	}
