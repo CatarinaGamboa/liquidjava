@@ -25,6 +25,7 @@ public class TranslatorToZ3 {
 			if (ctx.get(name).getQualifiedName().contentEquals("int")) {
 				varTranslation.put(name, z3.mkIntConst(name));
 			} else {
+				//TODO ADD OTHER TYPES
 				System.out.println("Not implemented yet!");
 			}
 		}
