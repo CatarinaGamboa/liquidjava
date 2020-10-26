@@ -28,4 +28,9 @@ public class VariableInfo {
 		return name;
 	}
 
+	@Override
+	public String toString() {
+		return "VariableInfo [name=" + name + ", type=" + type + ", refinements=" + refinements + "]";
+	}
+
 }
