@@ -1,5 +1,6 @@
 package repair.regen.smt;
 
+import java.nio.file.spi.FileSystemProvider;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -82,6 +83,8 @@ public class TranslatorToZ3 {
 	}
 
 	public Expr makeAnd(Expr eval, Expr eval2) {
+//		System.out.println("eval 1:"+ eval);
+//		System.out.println("eval 2:"+ eval2);
 		return z3.mkAnd((BoolExpr) eval, (BoolExpr) eval2);
 	}
 

@@ -9,13 +9,40 @@ import java.util.Stack;
 import spoon.reflect.reference.CtTypeReference;
 
 public class Context {
-	private Stack<List<VariableInfo>> ctxVars = new Stack<>();
-	private List<FunctionInfo> ctxFunctions = new ArrayList<>();
-	public static int counter = 0;
+	private Stack<List<VariableInfo>> ctxVars;
+	private List<FunctionInfo> ctxFunctions;
+	public int counter;
+	private static Context instance;
 	
 	
-	public Context() {
+	private Context() {
+		ctxVars = new Stack<>();
+		ctxVars.add(new ArrayList<>());//global vars
+		ctxFunctions = new ArrayList<>();
+		counter = 0;
+		
+	}
+	
+	public static Context getInstance() {
+		if(instance == null)
+			instance = new Context() ;
+		return instance;
+	}
+	
+	public void reinitializeContext() {
+		instance = new Context();
+	}
+	
+	public void enterContext() {
 		ctxVars.add(new ArrayList<>());
+	}
+	
+	public void exitContext() {
+		ctxVars.pop();
+	}
+	
+	public int getCounter() {
+		return counter++;
 	}
 	
 	public Map<String, CtTypeReference<?>> getContext() {
@@ -32,6 +59,7 @@ public class Context {
 		if( !ctxVars.peek().contains(var))
 			ctxVars.peek().add(var);
 	}
+	
 	public void addVarToContext(String name, CtTypeReference<?> type, String refinements) {
 		addVarToContext(new VariableInfo(name, type, refinements));
 	}
@@ -40,13 +68,25 @@ public class Context {
 		ctxFunctions.add(f);
 	}
 	
-	public void enterContext() {
-		ctxVars.add(new ArrayList<>());
+	public FunctionInfo getFunctionByName(String name) {
+		for(FunctionInfo fi: ctxFunctions) {
+			if(fi.getName().equals(name))
+				return fi;
+		}
+		return null;
 	}
 	
-	public void exitContext() {
-		ctxVars.pop();
+	public VariableInfo getVariableByName(String name) {
+		for(List<VariableInfo> l: ctxVars) {
+			for(VariableInfo var: l) {
+				if(var.getName().equals(name))
+					return var;
+			}
+		}
+		return null;
 	}
+	
+
 	
 	public String getAllVariables() {
 		StringBuilder sb = new StringBuilder();
@@ -68,6 +108,9 @@ public class Context {
 			}
 			sb.append("}\n");
 		}
+		sb.append("\nFunctions:");
+		for(FunctionInfo f : ctxFunctions)
+			sb.append(f.toString());
 		return sb.toString();
 	}
 	

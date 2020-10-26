@@ -17,6 +17,7 @@ public class BooleanLiteral extends LiteralExpression implements IModel {
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
+		//System.out.println("Aqui");
 		return ctx.makeBooleanLiteral(value);
 	}
 }

@@ -15,6 +15,7 @@ public class ExpressionGroup extends Expression implements IModel {
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
+//		System.out.println("IN ExpGroup"+ctx);
 		return e.eval(ctx);
 	}
 }

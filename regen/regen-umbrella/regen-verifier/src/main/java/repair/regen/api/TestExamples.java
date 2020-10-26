@@ -71,6 +71,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctCorrectFunctionCallSameVariableName() {
+		testCorrect(testPath+"CorrectFunctionCallSameVariableName.java");
+	}
+	
+	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}
@@ -115,7 +120,7 @@ public class TestExamples {
 //	public void errorNoRefinementsVar() {
 //		testWrong(testPath+"ErrorNoRefinementsInVar.java");
 //	}
-//	
+	
 	
 	class MySecurityManager extends SecurityManager {
 		//Handles exit(1) when the refinements are not respected

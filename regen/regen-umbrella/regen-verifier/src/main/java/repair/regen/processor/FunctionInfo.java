@@ -5,26 +5,24 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.eclipse.jdt.internal.core.nd.java.TypeRef;
+
+import spoon.reflect.reference.CtTypeReference;
+
 public class FunctionInfo {
-	//TODO probably change to allow overloading
-	private class Pair<K, V>{
-		private K key;
-		private V value;
-		private Pair(K key, V value) {
-			this.key = key;
-			this.value = value;
-		}
-		private K getKey() {return key;}
-		private V getValue() {return value;}
-	}
 	
 	private String name;
-	private List<Pair<String, String>> argRefinements;
+	private List<VariableInfo> argRefinements;
+	private CtTypeReference<?> type;
 	private String refReturn;
+
+	
+	private Context context;
 	private final String prefix = "FF";
 	
 	public FunctionInfo() {
 		argRefinements= new ArrayList<>();
+		context = Context.getInstance();
 	}
 	
 	
@@ -34,30 +32,69 @@ public class FunctionInfo {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public List<Pair<String, String>> getArgRefinements() {
+	public List<VariableInfo> getArgRefinements() {
 		return argRefinements;
 	}
-	public void addArgRefinements(String varName, String refinement) {
-		this.argRefinements.add(new Pair<>(varName, refinement));
+	public void addArgRefinements(String varName, CtTypeReference<?> type, String refinement) {
+		VariableInfo v = new VariableInfo(varName, type, refinement);
+		this.argRefinements.add(v);
+		if(!v.hasIncognitoName()) v.setIncognitoName(prefix+context.getCounter());
 	}
+	
+	public void addArgRefinements(VariableInfo vi) {
+		if(!vi.hasIncognitoName()) vi.setIncognitoName(prefix+context.getCounter());
+		this.argRefinements.add(vi);
+	}
+	
 	public String getRefReturn() {
 		return refReturn;
 	}
 	public void setRefReturn( String ref) {
 		this.refReturn = ref;
 	}
+	public CtTypeReference<?> getType() {
+		return type;
+	}
+	public void setType(CtTypeReference<?> type) {
+		this.type = type;
+	}
+	
 	
 	public String getRenamedRefinements() {
-		String update = refReturn;
-		for(Pair p: argRefinements) {
-			String var = (String) p.getKey();
-			String newName = prefix+RefinementTypeChecker.counter++;
-			//RefinementTypeChecker.addToContext(newName, t);
+		return getRenamedRefinements(getAllRefinements());
+	}
+	
+	private String getRenamedRefinements(String place) {
+		String update = place;
+		for(VariableInfo p: argRefinements) {
+			String var = p.getName();
+			String newName = p.getIncognitoName();
+			String newRefs = p.getRefinement().replaceAll(var, newName);
+			context.addVarToContext(newName, p.getType(), newRefs);
 			update = update.replaceAll(var, newName);
 		}
 		return update;
 	}
 
+	public String getAllRefinements() {
+		StringBuilder sb = new StringBuilder();
+		for(VariableInfo p: argRefinements) {
+			sb.append(p.getRefinement()+ " && ");
+		}
+		sb.append(refReturn);
+		return sb.toString();
+	}
+
+
+	public String getRefinementsForParamIndex(int i) {
+		StringBuilder sb = new StringBuilder();
+		for (int j = 0; j < i && j < argRefinements.size(); j++) {
+			VariableInfo vi = argRefinements.get(i);
+			sb.append(vi.getRefinement()+ " && ");
+		}
+		sb.append(argRefinements.get(i).getRefinement());
+		return getRenamedRefinements(sb.toString());
+	}
 
 	@Override
 	public int hashCode() {
