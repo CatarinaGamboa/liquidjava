@@ -117,8 +117,13 @@ public class TestExamples {
 	}
 	
 	@Test
-	public void errorErrorUnaryOpMinus() {
+	public void errorUnaryOpMinus() {
 		testWrong(testPath+"ErrorUnaryOpMinus.java");
+	}
+	
+	@Test
+	public void errorDependentRefinement() {
+		testWrong(testPath+"ErrorDependentRefinement.java");
 	}
 	
 //	@Test
