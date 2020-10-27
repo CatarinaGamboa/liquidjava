@@ -14,10 +14,12 @@ import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtExpression;
+import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtReturn;
+import spoon.reflect.code.CtStatement;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
@@ -54,8 +56,6 @@ public class RefinementTypeChecker extends CtScanner {
 
 	private Context context = Context.getInstance();
 
-
-
 	public RefinementTypeChecker() {}
 
 
@@ -66,54 +66,14 @@ public class RefinementTypeChecker extends CtScanner {
 		super.visitCtClass(ctClass);
 	}
 
-	/**
-	 * Visitor for binary operations
-	 * Adds metadata to the binary operations from the operands
-	 */
-	@Override
-	public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
-		super.visitCtBinaryOperator(operator);
-		getBinaryOpRefinements(operator);
-
+	public <R> void visitCtMethod(CtMethod<R> method) {
+		//super.visitCtMethod(method); //-- first we need the signature refinements
+		context.enterContext();
+		getMethodRefinements(method);
+		super.visitCtMethod(method);
+		context.exitContext();
 	}
-
-
-
-	@Override
-	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
-		super.visitCtVariableRead(variableRead);
-		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
-		getVariableMetadada(variableRead, varDecl);
-	}
-
-
-	@Override
-	public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
-		super.visitCtUnaryOperator(operator);
-		getUnaryOpRefinements(operator);
-
-	}
-
-
-	private <T> String getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
-			String name) {
-		String newName = "VV_"+context.getCounter();
-		getVariableMetadada(ex, w.getVariable().getDeclaration());
-		String metadada = getRefinement(ex);
-		context.addVarToContext(newName, w.getType(), metadada);
-		String binOperation = getOperatorFromKind(operator.getKind()).replace(WILD_VAR, newName);
-		String metaOper = metadada.replace(WILD_VAR, newName).replace(name, newName);
-		return metaOper + " && " + WILD_VAR+" == "+binOperation;
-	}
-
-
-	@Override
-	public <T> void visitCtLiteral(CtLiteral<T> lit) {
-		if (lit.getType().getQualifiedName().contentEquals("int")) {
-			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
-		}
-	}	
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
@@ -147,12 +107,42 @@ public class RefinementTypeChecker extends CtScanner {
 		}
 	}
 
-	public <R> void visitCtInvocation(CtInvocation<R> invocation) {
-		super.visitCtInvocation(invocation);
-		getInvocationRefinements(invocation);
+		@Override
+	public <T> void visitCtLiteral(CtLiteral<T> lit) {
+		if (lit.getType().getQualifiedName().contentEquals("int")) {
+			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
+		}
+	}	
+
+	@Override
+	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
+		super.visitCtVariableRead(variableRead);
+		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
+		getVariableMetadada(variableRead, varDecl);
+	}
+
+	/**
+	 * Visitor for binary operations
+	 * Adds metadata to the binary operations from the operands
+	 */
+	@Override
+	public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
+		super.visitCtBinaryOperator(operator);
+		getBinaryOpRefinements(operator);
 
 	}
 
+	@Override
+	public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
+		super.visitCtUnaryOperator(operator);
+		getUnaryOpRefinements(operator);
+
+	}
+
+	public <R> void visitCtInvocation(CtInvocation<R> invocation) {
+		super.visitCtInvocation(invocation);
+		getInvocationRefinements(invocation);
+	}
 
 	@Override
 	public <R> void visitCtReturn(CtReturn<R> ret) {
@@ -161,16 +151,19 @@ public class RefinementTypeChecker extends CtScanner {
 
 	}
 
-
-
-	public <R> void visitCtMethod(CtMethod<R> method) {
-		//super.visitCtMethod(method); //-- first we need the signature refinements
+	
+	@Override
+	public void visitCtIf(CtIf ifElement) {
 		context.enterContext();
-		getMethodRefinements(method);
-		super.visitCtMethod(method);
+		CtExpression<Boolean> exp = ifElement.getCondition();
+		String expRefs = getExpressionRefinements(exp);
+		context.addToPath(expRefs);
+		super.visitCtIf(ifElement);
 		context.exitContext();
 	}
 
+
+	
 	//------------------------------- Auxiliary Methods ----------------------------------------
 	//############################### Inner Visitors  ##########################################
 
@@ -217,7 +210,10 @@ public class RefinementTypeChecker extends CtScanner {
 		}
 		if (operator.getType().getQualifiedName().contentEquals("int")) {
 			operator.putMetadata(REFINE_KEY, WILD_VAR+" == " + oper+ sb.toString());
+		}else if(operator.getType().getQualifiedName().contentEquals("boolean")) {
+			operator.putMetadata(REFINE_KEY, oper+ sb.toString());
 		}
+		//TODO ADD TYPES
 	}
 
 	private <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) {
@@ -401,7 +397,25 @@ public class RefinementTypeChecker extends CtScanner {
 		//TODO Maybe add cases
 	}
 
-	
+	private String getExpressionRefinements(CtExpression element) {
+		if(element instanceof CtVariableRead<?>) {
+			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
+			String elemName = elemVar.getVariable().getSimpleName();
+			return getRefinement(element);
+		}else if(element instanceof CtBinaryOperator<?>) {
+			CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
+			visitCtBinaryOperator(binop);
+			return getRefinement(binop);
+		}else if (element instanceof CtLiteral<?>) {
+			CtLiteral<?> l = (CtLiteral<?>) element;
+			return l.getValue().toString();
+		}else if(element instanceof CtInvocation<?>) {
+			CtInvocation<?> inv = (CtInvocation<?>) element;
+			visitCtInvocation(inv);
+			return getRefinement(inv);
+		}
+		return getRefinement(element);
+	}
 
 	
 	
@@ -420,12 +434,25 @@ public class RefinementTypeChecker extends CtScanner {
 										).findAny();
 		expectedType.ifPresent((et) -> {
 			String a = dependentRefinements(et, simpleName);
-			checkSMT(correctRefinement+a, et, variable);
+			//String completeRefinement = a.length() == 0? correctRefinement:correctRefinement+" && "+ a; 
+			String completeRefinement = correctRefinement + a; 
+			checkSMT(completeRefinement, et, variable);
 
 		});
 
 	}
 
+
+	private <T> String getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
+			String name) {
+		String newName = "VV_"+context.getCounter();
+		getVariableMetadada(ex, w.getVariable().getDeclaration());
+		String metadada = getRefinement(ex);
+		context.addVarToContext(newName, w.getType(), metadada);
+		String binOperation = getOperatorFromKind(operator.getKind()).replace(WILD_VAR, newName);
+		String metaOper = metadada.replace(WILD_VAR, newName).replace(name, newName);
+		return metaOper + " && " + WILD_VAR+" == "+binOperation;
+	}
 
 	
 	
@@ -462,7 +489,15 @@ public class RefinementTypeChecker extends CtScanner {
 			sb.append(" && " + vi.getRefinement());
 			System.out.println(vi.getRefinement());
 		}
-		//System.out.println(sb.toString());
+		String pathRefs = context.getPathRefinements();
+		if(pathRefs.length() > 0)
+			sb.append(" && "+pathRefs);
+		
+//		if(pathRefs.length() != 0) {
+//			System.out.println("pathRefs:"+pathRefs+", len:"+pathRefs.length());
+//			sb.append(sb.length()==0?pathRefs:" && "+pathRefs);
+//		}
+		//System.out.println("SB:"+sb.toString());
 		return sb.toString();
 	}
 

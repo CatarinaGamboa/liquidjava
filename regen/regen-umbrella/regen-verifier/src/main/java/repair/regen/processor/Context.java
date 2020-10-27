@@ -11,6 +11,8 @@ import spoon.reflect.reference.CtTypeReference;
 public class Context {
 	private Stack<List<VariableInfo>> ctxVars;
 	private List<FunctionInfo> ctxFunctions;
+	private Stack<List<String>> ctxPathRefinements;
+	
 	public int counter;
 	private static Context instance;
 	
@@ -18,6 +20,7 @@ public class Context {
 	private Context() {
 		ctxVars = new Stack<>();
 		ctxVars.add(new ArrayList<>());//global vars
+		ctxPathRefinements = new Stack<>();
 		ctxFunctions = new ArrayList<>();
 		counter = 0;
 		
@@ -35,10 +38,12 @@ public class Context {
 	
 	public void enterContext() {
 		ctxVars.add(new ArrayList<>());
+		ctxPathRefinements.add(new ArrayList<>());
 	}
 	
 	public void exitContext() {
 		ctxVars.pop();
+		ctxPathRefinements.pop();
 	}
 	
 	public int getCounter() {
@@ -68,6 +73,11 @@ public class Context {
 		ctxFunctions.add(f);
 	}
 	
+	public void addToPath(String ref) {
+		if(!ctxPathRefinements.peek().contains(ref))
+			ctxPathRefinements.peek().add(ref);
+	}
+	
 	public FunctionInfo getFunctionByName(String name) {
 		for(FunctionInfo fi: ctxFunctions) {
 			if(fi.getName().equals(name))
@@ -86,8 +96,6 @@ public class Context {
 		return null;
 	}
 	
-
-	
 	public String getAllVariables() {
 		StringBuilder sb = new StringBuilder();
 		for(List<VariableInfo> l: ctxVars) {
@@ -97,6 +105,19 @@ public class Context {
 		}
 		return sb.toString();
 	}
+	
+	public String getPathRefinements() {
+		StringBuilder sb = new StringBuilder();
+		for(List<String> l: ctxPathRefinements) {
+			for(String ref: l) {
+				sb.append(sb.length()==0? ref : " && "+ref);
+			}
+		}
+		return sb.toString();
+	}
+	
+	
+	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
