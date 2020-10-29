@@ -131,10 +131,10 @@ public class TestExamples {
 		testWrong(testPath+"ErrorDependentRefinement.java");
 	}
 	
-//	@Test
-//	public void errorNoRefinementsVar() {
-//		testWrong(testPath+"ErrorNoRefinementsInVar.java");
-//	}
+	@Test
+	public void errorNoRefinementsVar() {
+		testWrong(testPath+"ErrorNoRefinementsInVar.java");
+	}
 	
 	
 	class MySecurityManager extends SecurityManager {
