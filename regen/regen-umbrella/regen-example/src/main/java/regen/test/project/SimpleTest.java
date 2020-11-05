@@ -1,5 +1,7 @@
 package regen.test.project;
 
+import java.util.List;
+
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
@@ -20,6 +22,7 @@ public class SimpleTest {
 		@Refinement("b < 10")
 		int b = a;
 	}
+	public void size(List<Integer> a) {}
 }
 
 
