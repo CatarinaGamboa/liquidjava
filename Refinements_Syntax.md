@@ -194,8 +194,8 @@ Add step for parsing the measure to a stub method before entering to spoon. Pars
 ```java
 class MyList{
     
-	@Refinement("measure int")//<- stating that the function is a measure and its return value
-	public void len(List xs){};//<- function name and parameters for measure
+    @Refinement("measure int")//<- stating that the function is a measure and its return value
+    public void len(List xs){};//<- function name and parameters for measure
     
     @Refinement("len(\\v) == 0")
     public List createList(){...}
