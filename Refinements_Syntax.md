@@ -1,6 +1,55 @@
 # Java Refinements 
 
-## Syntax Examples
+## Refinements in Java - Syntax
+## Introduction
+This survey aims to assess the best syntax for the implementation of Refinement Types in Java.
+Refinement types have been proposed as an incremental approach for program verification that is directly embedded in the programming language. We propose the usage of Refinement Types within the Java programming language not only as a means for program verification but also for fault localization and efficient mutation in the context of software repair.
+
+This survey is being conducted in the context of the master thesis "Æon: Extending Java with Refinements" by Catarina Gamboa, advised by professor Alcides Fonseca, at Lasige, Faculdade de Ciências da Universidade de Lisboa.
+
+All responses to this questionnaire will be anonymous and the treatment of the information obtained will be used only and exclusively in the context of the refered thesis.
+
+It takes about X minutes to complete this survey.
+We thank you in advance for your precious collaboration.
+
+
+### Familiarity with tools
+This section serves as assessment of the knowledge ground on the different technologies used in the following sections.
+
+**1.** How familiar are you with Java?
+- [ ] Very familiar
+- [ ] Vaguely familiar
+- [ ] Not familiar
+
+**2.** How familiar are you with Functional Languages (ex:Haskell)?
+- [ ] Very familiar
+- [ ] Vaguely familiar
+- [ ] Not familiar
+
+**3.** How familiar are you with JML (Java Modeling Language)?
+- [ ] Very familiar
+- [ ] Vaguely familiar
+- [ ] Not familiar
+
+**4.** How familiar are you with Refinement Types?
+- [ ] Very familiar
+- [ ] Vaguely familiar
+- [ ] Not familiar
+
+(If vaguely or not familiar with Refinement Types goes to next section, otherwise steps to the following section)
+
+### Introduction to Refinement Types
+Refinement Types extend a language with predicates (boolean expressions) over the basic types. 
+A popular syntax is {v : T | p(v) }, of which {x : Integer | x > 0} is an instance.
+
+The example bellow represents a way to apply refinements in Java, where the variable y has the type int and a refinement that only allows y to have positive values which are lesser than 50. When the variable is assigned the value 10 no errors will be shown, but if the assigned value is 100 the compiler will send a refinement type error to the developer.
+
+```java
+@Refinement("y > 0 && y < 50")
+int y = 10; //okay
+int y = 100; //okay in Java, refinement type error
+```
+In the following sections you will be presented with several syntax options for the implementation of refinements in Java.
 
 ### Wildcard Variables
 
