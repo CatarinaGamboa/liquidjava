@@ -14,6 +14,7 @@ public class GreaterOrEqualOperator extends BinaryOperator {
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) {
+		System.out.println("VEIO AQUI");
 		return ctx.makeGtEq(e1.eval(ctx), e2.eval(ctx));
 	}
 	

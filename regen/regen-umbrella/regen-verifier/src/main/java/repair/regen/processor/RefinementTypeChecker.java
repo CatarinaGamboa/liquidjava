@@ -532,7 +532,7 @@ public class RefinementTypeChecker extends CtScanner {
 			sb.append(sb.length()==0?pathRefs:" && "+pathRefs);
 		}
 		System.out.println(context.getAllVariables());
-		System.out.println("SB:"+sb.toString());
+		//System.out.println("SB:"+sb.toString());
 		return sb.toString();
 	}
 

@@ -10,10 +10,10 @@ public class SimpleTest {
 		int a = 5;
 
 		if(a > 0) {
-			@Refinement("b == 0")
+			@Refinement("b < 0")
 			int b = a;
 		} else {
-			@Refinement("b < 0")
+			@Refinement("b <= 0")
 			int b = a;
 		}
 

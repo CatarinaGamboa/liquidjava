@@ -91,6 +91,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctSimpleIfElse() {
+		testCorrect(testPath+"CorrectSimpleIfElse.java");
+	}
+	
+	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}
