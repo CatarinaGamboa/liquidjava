@@ -2,50 +2,16 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    // @Refinement("{x > 0} -> { \\v == 3 * x}")
-    // private static int triplePositive(int x) {
-    // return x+x+x;
-    // }
     public static void main(java.lang.String[] args) {
-        // @Refinement("y > 0 && y < 50")
-        // int y;
-        // y = 10; // okay
-        // y = 100; // okay in Java, refinement type error
-        // 
-        // 
-        int a = 3;
-        @repair.regen.specification.Refinement("b < 10")
-        int b = a;
+        @repair.regen.specification.Refinement("\\v < 10")
+        int a = 5;
+        @repair.regen.specification.Refinement("\\v > 0")
+        int b = 3;
+        a = (a == 2) ? 6 : 9;
+        a = (b > 2) ? 8 : -1;
+        // if(a > 0) {
+        // a = 12;
+        // }//a > 0 && a == 12 <: a < 10
     }
 }
 
-/**
- * @Refinement("y > 0 && y < 50")
- */
-/**
- * int y;
- */
-/**
- * y = 10; // okay
- */
-/**
- * y = 100; // okay in Java, refinement type error
- */
-/**
- *
- */
-/**
- *
- */
-/**
- * int c = y;
- */
-/**
- * int a = 3;
- */
-/**
- * @Refinement("b < 10")
- */
-/**
- * int b = a;
- */

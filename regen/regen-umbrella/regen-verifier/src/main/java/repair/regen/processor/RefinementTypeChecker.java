@@ -13,6 +13,7 @@ import repair.regen.smt.TypeCheckError;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
+import spoon.reflect.code.CtConditional;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtInvocation;
@@ -112,7 +113,9 @@ public class RefinementTypeChecker extends CtScanner {
 		if (lit.getType().getQualifiedName().contentEquals("int")) {
 			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
 		}
+		//TODO ADD LITERAL TYPES
 	}	
+		
 
 	@Override
 	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
@@ -155,13 +158,37 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public void visitCtIf(CtIf ifElement) {
 		context.enterContext();
+		System.out.println("got to if");
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		String expRefs = getExpressionRefinements(exp);
+		System.out.println("EXPREFS:"+expRefs);
 		context.addToPath(expRefs);
 		super.visitCtIf(ifElement);
 		context.exitContext();
 	}
 
+	@Override
+	public <T> void visitCtConditional(CtConditional<T> conditional) {
+		context.enterContext();
+		CtExpression<Boolean> cond = conditional.getCondition();
+		CtExpression<?> thenExp = conditional.getThenExpression();
+		CtExpression<?> elseExp = conditional.getElseExpression();
+		String  condRefs = getExpressionRefinements(cond),
+		 		thenRefs = getExpressionRefinements(thenExp),
+		 		elseRefs = getExpressionRefinements(elseExp);
+		System.out.println("refs:"+thenRefs+"; elserefs:"+elseRefs);
+		if(thenExp instanceof CtLiteral<?>) thenRefs = WILD_VAR+" == "+thenRefs;
+		if(elseExp instanceof CtLiteral<?>) elseRefs = WILD_VAR+" == "+elseRefs;
+		
+		String condThen = "!(" + cond + ") || ("+thenRefs+")", //!A or B
+			   notCondElse = "("+cond + ") || ("+elseRefs+")",//A or C
+			   complete = "("+condThen+") && ("+notCondElse+")";
+		
+		conditional.putMetadata(REFINE_KEY, complete);
+		System.out.println(context.getContext());
+		super.visitCtConditional(conditional);
+		context.exitContext();
+	}
 
 	
 	//------------------------------- Auxiliary Methods ----------------------------------------
@@ -247,9 +274,9 @@ public class RefinementTypeChecker extends CtScanner {
 		}
 		String metadata = getRefinement(ex);
 		String newName = "VV_"+context.getCounter();
-		String newMeta = metadata.replace(WILD_VAR, newName);
+		String newMeta = "("+metadata.replace(WILD_VAR, newName)+")";
 		String unOp = getOperatorFromKind(operator.getKind());
-		all ="("+WILD_VAR+"== "+unOp.replace(WILD_VAR, newName)+ ")";
+		all ="("+WILD_VAR+" == "+unOp.replace(WILD_VAR, newName)+ ")";
 		System.out.println(newMeta + " && "+all);
 		context.addVarToContext(newName, ex.getType(), newMeta);
 		operator.putMetadata(REFINE_KEY, newMeta + " && "+all);
@@ -406,6 +433,10 @@ public class RefinementTypeChecker extends CtScanner {
 			CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
 			visitCtBinaryOperator(binop);
 			return getRefinement(binop);
+		}else if(element instanceof CtUnaryOperator<?>) {
+			CtUnaryOperator<?> op = (CtUnaryOperator<?>) element;
+			visitCtUnaryOperator(op);
+			return getRefinement(op);
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
 			return l.getValue().toString();
@@ -493,10 +524,11 @@ public class RefinementTypeChecker extends CtScanner {
 		if(pathRefs.length() > 0)
 			sb.append(" && "+pathRefs);
 		
-//		if(pathRefs.length() != 0) {
-//			System.out.println("pathRefs:"+pathRefs+", len:"+pathRefs.length());
-//			sb.append(sb.length()==0?pathRefs:" && "+pathRefs);
-//		}
+		
+		if(pathRefs.length() != 0) {
+			System.out.println("pathRefs:"+pathRefs+", len:"+pathRefs.length());
+			sb.append(sb.length()==0?pathRefs:" && "+pathRefs);
+		}
 		//System.out.println("SB:"+sb.toString());
 		return sb.toString();
 	}

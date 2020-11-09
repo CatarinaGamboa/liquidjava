@@ -17,6 +17,7 @@ public class Variable extends Expression implements IModel {
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
+		//System.out.println("IN VAR");
 		return ctx.makeVariable(name);
 	}
 }

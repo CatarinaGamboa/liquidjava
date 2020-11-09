@@ -9,7 +9,7 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-@Priority(5)
+@Priority(1)
 @Pattern(regExp = "(true)|(false)")
 public class BooleanLiteral extends LiteralExpression implements IModel {
 	@Value
@@ -17,6 +17,7 @@ public class BooleanLiteral extends LiteralExpression implements IModel {
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
+		//System.out.println("IN BOOL");
 		return ctx.makeBooleanLiteral(value);
 	}
 }
