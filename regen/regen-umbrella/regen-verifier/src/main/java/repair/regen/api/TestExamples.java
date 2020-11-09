@@ -141,6 +141,11 @@ public class TestExamples {
 		testWrong(testPath+"ErrorNoRefinementsInVar.java");
 	}
 	
+	@Test
+	public void errorTernaryExpression() {
+		testWrong(testPath+"ErrorTernaryExpression.java");
+	}
+	
 	
 	class MySecurityManager extends SecurityManager {
 		//Handles exit(1) when the refinements are not respected
