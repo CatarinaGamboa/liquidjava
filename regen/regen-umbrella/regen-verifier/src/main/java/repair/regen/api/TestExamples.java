@@ -82,7 +82,7 @@ public class TestExamples {
 	
 	@Test
 	public void correctSimpleIfThen() {
-		testCorrect(testPath+"CorrectSimpleIfThen.java");
+		testCorrect(testPath+"CorrectIfThen.java");
 	}
 	
 	@Test
@@ -139,6 +139,11 @@ public class TestExamples {
 	@Test
 	public void errorNoRefinementsVar() {
 		testWrong(testPath+"ErrorNoRefinementsInVar.java");
+	}
+	
+	@Test
+	public void errorIfAssignment() {
+		testWrong(testPath+"ErrorIfAssignment.java");
 	}
 	
 	@Test

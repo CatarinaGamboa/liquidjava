@@ -158,22 +158,20 @@ public class RefinementTypeChecker extends CtScanner {
 	
 	@Override
 	public void visitCtIf(CtIf ifElement) {
-		context.enterContext();
-		System.out.println("got to if");
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		String expRefs = getExpressionRefinements(exp);
-		System.out.println("EXPREFS:"+expRefs);
-	
+		//THEN
+		context.enterContext();
 		List<VariableInfo> l = searchForVars(expRefs, "");
 		for(VariableInfo vi: l)
 			vi.newRefinement(expRefs);
-		
-		//context.addToPath(expRefs);
-		super.visitCtIf(ifElement);
-		for(VariableInfo vi: l) {
+		visitCtBlock(ifElement.getThenStatement());
+		for(VariableInfo vi: l) 
 			vi.removeRefinement(expRefs);
-		}
+		
+		
 		context.exitContext();
+		//super.visitCtIf(ifElement);
 	}
 
 	@Override

@@ -2,7 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
-public class CorrectSimpleIfThen {
+public class CorrectIfThen {
 	public static void main(String[] args) {
 		@Refinement("\\v < 10")
 		int a = 5;
@@ -17,7 +17,12 @@ public class CorrectSimpleIfThen {
 				@Refinement("\\v > 11")
 				int d = b+1;
 			}
+			if(a > b) {
+				@Refinement("\\v > b")
+				int c = a;
+			}
 		}
+		
 
 	}
 }
