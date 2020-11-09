@@ -13,6 +13,7 @@ import repair.regen.smt.TypeCheckError;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
+import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtConditional;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtIf;
@@ -160,18 +161,25 @@ public class RefinementTypeChecker extends CtScanner {
 	public void visitCtIf(CtIf ifElement) {
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		String expRefs = getExpressionRefinements(exp);
-		//THEN
-		context.enterContext();
 		List<VariableInfo> l = searchForVars(expRefs, "");
+		//THEN
+		insideIfBlocks(ifElement.getThenStatement(), expRefs, l);
+		//ELSE
+		if(ifElement.getElseStatement() != null) {
+			String negRefs = expRefs.replace(exp.toString(), "!("+exp.toString()+")");
+			insideIfBlocks(ifElement.getElseStatement(), negRefs, l);
+		}
+		System.out.println("EXP: "+getExpressionRefinements(exp));
+	}
+	
+	private void insideIfBlocks(CtBlock block, String expRefs, List<VariableInfo> l) {
+		context.enterContext();
 		for(VariableInfo vi: l)
 			vi.newRefinement(expRefs);
-		visitCtBlock(ifElement.getThenStatement());
+		visitCtBlock(block);
 		for(VariableInfo vi: l) 
 			vi.removeRefinement(expRefs);
-		
-		
 		context.exitContext();
-		//super.visitCtIf(ifElement);
 	}
 
 	@Override
