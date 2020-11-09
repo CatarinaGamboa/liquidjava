@@ -32,6 +32,7 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.declaration.ParentNotInitializedException;
 import spoon.reflect.factory.TypeFactory;
@@ -162,8 +163,16 @@ public class RefinementTypeChecker extends CtScanner {
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		String expRefs = getExpressionRefinements(exp);
 		System.out.println("EXPREFS:"+expRefs);
-		context.addToPath(expRefs);
+	
+		List<VariableInfo> l = searchForVars(expRefs, "");
+		for(VariableInfo vi: l)
+			vi.newRefinement(expRefs);
+		
+		//context.addToPath(expRefs);
 		super.visitCtIf(ifElement);
+		for(VariableInfo vi: l) {
+			vi.removeRefinement(expRefs);
+		}
 		context.exitContext();
 	}
 
@@ -247,7 +256,7 @@ public class RefinementTypeChecker extends CtScanner {
 			//If the variable is the same, the refinements need to be changed
 			try {
 				CtAssignment assign = operator.getParent(CtAssignment.class);
-				if(assign.getAssigned() instanceof CtVariableWrite<?>) {
+				if(assign!= null && assign.getAssigned() instanceof CtVariableWrite<?>) {
 					CtVariableWrite<?> w = (CtVariableWrite<?>) assign.getAssigned();
 					String parentName = w.getVariable().getSimpleName();
 					if(name.equals(parentName)) {
@@ -415,7 +424,6 @@ public class RefinementTypeChecker extends CtScanner {
 	private String getExpressionRefinements(CtExpression element) {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
-			String elemName = elemVar.getVariable().getSimpleName();
 			return getRefinement(element);
 		}else if(element instanceof CtBinaryOperator<?>) {
 			CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
@@ -517,7 +525,8 @@ public class RefinementTypeChecker extends CtScanner {
 			System.out.println("pathRefs:"+pathRefs+", len:"+pathRefs.length());
 			sb.append(sb.length()==0?pathRefs:" && "+pathRefs);
 		}
-		//System.out.println("SB:"+sb.toString());
+		System.out.println(context.getAllVariables());
+		System.out.println("SB:"+sb.toString());
 		return sb.toString();
 	}
 
@@ -542,6 +551,9 @@ public class RefinementTypeChecker extends CtScanner {
 
 	private <T> void getVariableMetadada(CtElement variable, CtVariable<T> varDecl) {
 		String refinementFound = getRefinement(varDecl);
+		VariableInfo vi = context.getVariableByName(varDecl.getSimpleName());
+		if(vi != null)
+			refinementFound = vi.getRefinement();
 		if (refinementFound == null) {
 			refinementFound = "true";
 			context.addVarToContext(varDecl.getSimpleName(), varDecl.getType(), refinementFound);

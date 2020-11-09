@@ -1,28 +1,33 @@
 package repair.regen.processor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import spoon.reflect.reference.CtTypeReference;
 
 public class VariableInfo {
 	private String name;
 	private CtTypeReference<?> type;
-	private String refinements;
+	private List<String> refinements;
 	private String incognitoName;
 	
-	public VariableInfo(String name, CtTypeReference<?> type, String refinements) {
+	public VariableInfo(String name, CtTypeReference<?> type, String refinement) {
 		this.name = name;
 		this.type = type;
-		this.refinements = refinements;
+		this.refinements = new ArrayList<String>();
+		this.refinements.add(refinement);
 	}
 	
 	public String getRefinement() {
-		return refinements;
+		return refinements.get(refinements.size()-1);
+		//return String.join(" && ", refinements);
 	}
 	public CtTypeReference<?> getType(){
 		return type;
 	}
 	
 	public String getRenamedRefinements() {
-		return refinements.replaceAll(name, incognitoName);
+		return getRefinement().replaceAll(name, incognitoName);
 	}
 
 	public String getName() {
@@ -39,6 +44,13 @@ public class VariableInfo {
 	
 	public boolean hasIncognitoName() {
 		return incognitoName != null;
+	}
+	
+	public void newRefinement(String toAdd) {
+		refinements.add(toAdd);
+	}
+	public void removeRefinement(String toRemove) {
+		refinements.remove(toRemove);
 	}
 	
 	@Override

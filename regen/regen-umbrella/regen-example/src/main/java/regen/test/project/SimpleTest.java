@@ -5,15 +5,22 @@ import java.util.List;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
-
-	
 	public static void main(String[] args) {
-		int a = 3;
-		@Refinement("b < 10")
-		int b = a;
-	
-//		if(a > 0) {
-//			a = 12;
-//		}//a > 0 && a == 12 <: a < 10
+		@Refinement("\\v < 10")
+		int a = 5;
+
+		if(a > 0) {
+			@Refinement("b > 0")
+			int b = a;
+			b++;
+			a = 8;
+			if(b > 10) {
+				@Refinement("\\v > 0")
+				int c = a;
+				@Refinement("\\v > 11")
+				int d = b+1;
+			}
+		}
+
 	}
 }

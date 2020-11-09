@@ -61,7 +61,7 @@ public class Context {
 	}
 	
 	public void addVarToContext(VariableInfo var) {
-		if( !ctxVars.peek().contains(var))
+		if(!hasVariable(var.getName()))
 			ctxVars.peek().add(var);
 	}
 	
@@ -94,6 +94,10 @@ public class Context {
 			}
 		}
 		return null;
+	}
+	
+	public boolean hasVariable(String name) {
+		return getVariableByName(name)!= null;
 	}
 	
 	public String getAllVariables() {
