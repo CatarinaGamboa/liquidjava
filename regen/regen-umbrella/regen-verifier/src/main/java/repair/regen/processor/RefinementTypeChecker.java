@@ -169,25 +169,13 @@ public class RefinementTypeChecker extends CtScanner {
 
 	@Override
 	public <T> void visitCtConditional(CtConditional<T> conditional) {
-		context.enterContext();
-		CtExpression<Boolean> cond = conditional.getCondition();
-		CtExpression<?> thenExp = conditional.getThenExpression();
-		CtExpression<?> elseExp = conditional.getElseExpression();
-		String  condRefs = getExpressionRefinements(cond),
-		 		thenRefs = getExpressionRefinements(thenExp),
-		 		elseRefs = getExpressionRefinements(elseExp);
-		System.out.println("refs:"+thenRefs+"; elserefs:"+elseRefs);
-		if(thenExp instanceof CtLiteral<?>) thenRefs = WILD_VAR+" == "+thenRefs;
-		if(elseExp instanceof CtLiteral<?>) elseRefs = WILD_VAR+" == "+elseRefs;
-		
-		String condThen = "!(" + cond + ") || ("+thenRefs+")", //!A or B
-			   notCondElse = "("+cond + ") || ("+elseRefs+")",//A or C
-			   complete = "("+condThen+") && ("+notCondElse+")";
-		
-		conditional.putMetadata(REFINE_KEY, complete);
-		System.out.println(context.getContext());
 		super.visitCtConditional(conditional);
-		context.exitContext();
+
+		String condRefs = getRefinement(conditional.getCondition());
+		String condThen = "!(" + condRefs + ") || ("+ getRefinement(conditional.getThenExpression())+")", //!A or B
+			   notCondElse = "("+condRefs + ") || ("+ getRefinement(conditional.getElseExpression())+")";//A or C
+		
+		conditional.putMetadata(REFINE_KEY, "("+condThen+") && ("+notCondElse+")");
 	}
 
 	

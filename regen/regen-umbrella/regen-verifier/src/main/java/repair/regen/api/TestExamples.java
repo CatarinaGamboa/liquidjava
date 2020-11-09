@@ -86,6 +86,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctTernaryExpression() {
+		testCorrect(testPath+"CorrectTernaryExpression.java");
+	}
+	
+	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}

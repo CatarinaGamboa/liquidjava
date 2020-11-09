@@ -23,7 +23,6 @@ public class TranslatorToZ3 {
 	
 	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx) {
 		for (String name : ctx.keySet()) {
-			System.out.println("VAR NAME TO SMT:"+name);
 			if (ctx.get(name).getQualifiedName().contentEquals("int")) {
 				varTranslation.put(name, z3.mkIntConst(name));
 			} else {
@@ -49,10 +48,6 @@ public class TranslatorToZ3 {
 
 	//Boolean Operations
 	public Expr makeEquals(Expr e1, Expr e2) {
-		System.out.println("mkEq 1:"+e1);
-		System.out.println("mkEq 2:"+ e2);
-		if(e1 == null)
-			System.out.println("aqui");
 		return z3.mkEq(e1, e2);
 	}
 
