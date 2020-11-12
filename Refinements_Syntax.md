@@ -192,20 +192,36 @@ class MyClass{
 }
 ```
 
+Which of the above syntaxes would you use? (possibility for multiple answers)
 
+- [ ] A
+- [ ] B
 
 ### Uninterpreted Functions
+
+To invoke functions inside the Refinements, these functions must be declared in the program as ghost functions, that are only relevant for the specification of the program properties. These functions work as uninterpreted functions, which means that only their signature is needed and not their implementation. 
+
+In this section we present possible syntaxes for the declaration and usage of ghost functions inside the class MyList.
+
+len is the ghost function, that receives a List, and returns an int value. This ghost function is then used inside the refinements of the following Java functions:
+
+	-	createList() : the refinement ensures that the len of the returned list is equal to 0
+	-	append(): the refinement ensures that the returned List has the same len as the given list, plus one
+
+Analyse the following syntax examples.
 
 **A**
 
 ```java
 @Refinement("ghost int len(List xs)")
 class MyList{
+    static final int MAX_VALUE = 50;
+    
     @Refinement("len(\\v) == 0")
     public List createList(){...}
     
     @Refinement("len(\\v) == 1 + len(xs)")
-    public void append(List xs, int k){...}
+    public List append(List xs, int k){...}
 }
 ```
 
@@ -220,7 +236,7 @@ class MyList{
     public List createList(){...}
     
     @Refinement("len(\\v) == 1 + len(xs)")
-    public void append(List xs, int k){...}
+    public List append(List xs, int k){...}
 }
 
 ```
@@ -236,6 +252,12 @@ class MyList{
     public List createList(){...}
     
     @Refinement("len(\\v) == 1 + len(xs)")
-    public void append(List xs, int k){...}
+    public List append(List xs, int k){...}
 }
 ```
+
+Which of the above syntaxes would you use? (possibility for multiple answers)
+
+- [ ] A
+- [ ] B
+- [ ] C
