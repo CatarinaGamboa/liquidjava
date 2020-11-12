@@ -199,7 +199,7 @@ class MyClass{
 **A**
 
 ```java
-@Refinement("measure int len(List xs)")
+@Refinement("ghost int len(List xs)")
 class MyList{
     @Refinement("len(\\v) == 0")
     public List createList(){...}
@@ -211,14 +211,11 @@ class MyList{
 
 **B**
 
-[Not creating the refinement in the top of the class for the measure - proposal by Chris]
-
 ```java
 class MyList{
+    static final int MAX_VALUE = 50;
     
-    @Refinement("measure len")
-    public measure int len(List xs);
-    
+    @Refinement("ghost int len(List xs)")
     @Refinement("len(\\v) == 0")
     public List createList(){...}
     
@@ -227,24 +224,13 @@ class MyList{
 }
 
 ```
-
-Add step for parsing the measure to a stub method before entering to spoon. Parsing could be made with https://comby.dev/ with something like: 
-
-`public measure :[type] :[name](:[[args]]);`
-
-**Problem**: Before the parsing this wouldn't be a valid Java Program.
-
-
 
 **C**
 
-[Inspired in the above but for a valid Java program]
-
 ```java
 class MyList{
-    
-    @Refinement("measure int")//<- stating that the function is a measure and its return value
-    public void len(List xs){};//<- function name and parameters for measure
+    @Refinement("ghost int len(List xs)")
+    static final int MAX_VALUE = 50;
     
     @Refinement("len(\\v) == 0")
     public List createList(){...}
@@ -253,6 +239,3 @@ class MyList{
     public void append(List xs, int k){...}
 }
 ```
-
-
-
