@@ -93,6 +93,9 @@ public class RefinementTypeChecker extends CtScanner {
 		//only declaration, no assignment
 		if(localVariable.getAssignment() == null) return;
 		String refinementFound = getRefinement(localVariable.getAssignment());
+		System.out.println("REFINEMENT LOCAL VAR "+localVariable.getSimpleName()+":"+refinementFound);
+		System.out.println(context.getAllVariables());
+		
 		CtExpression a = localVariable.getAssignment();
 		if (refinementFound == null)
 			refinementFound = "true";
@@ -175,7 +178,10 @@ public class RefinementTypeChecker extends CtScanner {
 	
 	@Override
 	public void visitCtIf(CtIf ifElement) {
+		System.out.println("@@@@@@@@ NEW IF @@@@@@@@@@");
 		CtExpression<Boolean> exp = ifElement.getCondition();
+		CtElement parent = exp.getParent();
+		System.out.println("PARENT:\n"+parent+"\n");
 		String expRefs = getExpressionRefinements(exp);
 		List<VariableInfo> l = searchForVars(expRefs, "");
 		//THEN
@@ -189,14 +195,20 @@ public class RefinementTypeChecker extends CtScanner {
 			CtIf elseIf = factory.createIf();
 			elseIf.setCondition(negExp);
 			elseIf.setThenStatement(elseStatements);
-			ifElement.insertAfter(elseIf);
-			//ifElement.updateAllParentsBelow();
+			
+			ifElement.insertAfter(elseIf);			
 			
 			visitCtIf(elseIf);
-//			String negRefs = expRefs.replace(exp.toString(), "!("+exp.toString()+")");
+//			ifElement.updateAllParentsBelow();
+//			String negExpRefs = getExpressionRefinements(negExp);
+//			insideIfBlocks(ifElement.getElseStatement(), negExpRefs, l);
+//			
+//			ifElement.updateAllParentsBelow();
+			
 //			insideIfBlocks(ifElement.getElseStatement(), negRefs, l);
 		}
-		System.out.println("EXP: "+getExpressionRefinements(exp));
+		System.out.println("--------------End if-------------"/*+getExpressionRefinements(exp)*/);
+		System.out.println(context.getAllVariables());
 	}
 	
 	private void insideIfBlocks(CtBlock block, String expRefs, List<VariableInfo> l) {
@@ -309,7 +321,13 @@ public class RefinementTypeChecker extends CtScanner {
 		String newName = "VV_"+context.getCounter();
 		String newMeta = "("+metadata.replace(WILD_VAR, newName)+")";
 		String unOp = getOperatorFromKind(operator.getKind());
-		all ="("+WILD_VAR+" == "+unOp.replace(WILD_VAR, newName)+ ")";
+		
+		CtElement p = operator.getParent();
+		String opS = unOp.replace(WILD_VAR, newName);
+		if(p instanceof CtIf)
+			all = unOp.replace(WILD_VAR, newName);
+		else
+			all ="("+WILD_VAR+" == " + opS + ")";
 		System.out.println(newMeta + " && "+all);
 		context.addVarToContext(newName, ex.getType(), newMeta);
 		operator.putMetadata(REFINE_KEY, newMeta + " && "+all);
@@ -575,10 +593,9 @@ public class RefinementTypeChecker extends CtScanner {
 		for(String s: a) {
 			String t = s.replace(" ", "");
 			if(!t.equals(name)) {
-
 				VariableInfo v = context.getVariableByName(t);
 				//System.out.println(t+": variable :"+v);
-				if(v != null) {
+				if(v != null && !l.contains(v)) {
 					l.add(v);
 				}
 			}
