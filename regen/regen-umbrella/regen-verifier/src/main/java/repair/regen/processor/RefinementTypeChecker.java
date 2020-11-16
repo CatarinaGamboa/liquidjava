@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.UnaryOperator;
 
 import repair.regen.language.operators.BinaryOperator;
 import repair.regen.smt.SMTEvaluator;
@@ -47,6 +48,8 @@ import spoon.reflect.visitor.CtScanner;
 import spoon.reflect.visitor.Filter;
 import spoon.reflect.visitor.chain.CtFunction;
 import spoon.support.comparator.CtLineElementComparator;
+import spoon.support.reflect.code.CtLocalVariableImpl;
+import spoon.support.reflect.code.CtUnaryOperatorImpl;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
 public class RefinementTypeChecker extends CtScanner {
@@ -121,6 +124,8 @@ public class RefinementTypeChecker extends CtScanner {
 		@Override
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
 		if (lit.getType().getQualifiedName().contentEquals("int")) {
+			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
+		}else if (lit.getType().getQualifiedName().contentEquals("boolean")) {
 			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
 		}
 		//TODO ADD LITERAL TYPES
@@ -264,7 +269,8 @@ public class RefinementTypeChecker extends CtScanner {
 			operator.putMetadata(REFINE_KEY, WILD_VAR+" == " + oper+ sb.toString());
 		}else if(operator.getType().getQualifiedName().contentEquals("boolean")) {
 			operator.putMetadata(REFINE_KEY, oper+ sb.toString());
-			//operator.putMetadata(REFINE_KEY, WILD_VAR+" == (" + oper+")"+ sb.toString());
+			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?>)
+				operator.putMetadata(REFINE_KEY, WILD_VAR+" == (" + oper+")"+ sb.toString());
 		}
 		//TODO ADD TYPES
 	}
@@ -476,7 +482,6 @@ public class RefinementTypeChecker extends CtScanner {
 	private <T> String getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
 			String name) {
 		String newName = "VV_"+context.getCounter();
-		//TODO AQUIAQUI
 		CtVariable varDecl = w.getVariable().getDeclaration();
 		if(varDecl != null)	getVariableMetadada(ex, w.getVariable().getDeclaration());
 		else getVariableMetadada(ex, w.getVariable());
@@ -565,7 +570,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 	private List<VariableInfo> searchForVars(String met, String name) {
 		List<VariableInfo> l = new ArrayList<>();
-		String[] a = met.split("(&&)|<|>|(<=)|(>=)|(==)|=|-|\\+|/|\\*|%|(\\|\\|)");//TODO missing OR and maybe other
+		String[] a = met.split("&&|<|>|(<=)|(>=)|(==)|=|-|\\+|/|\\*|%|(\\|\\||\\(|\\))");//TODO missing OR and maybe other
 		for(String s: a) {
 			String t = s.replace(" ", "");
 			if(!t.equals(name)) {

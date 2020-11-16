@@ -10,13 +10,17 @@ public class SimpleTest {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("\\v < 10")
         int a = 5;
-        if (a < 0) {
-            @repair.regen.specification.Refinement("b < 0")
-            int b = a;
-        } else {
-            @repair.regen.specification.Refinement("b >= 0")
-            int b = a;
-        }
+        @repair.regen.specification.Refinement("\\v == true")
+        boolean k = a < 11;
+        @repair.regen.specification.Refinement("\\v == true")
+        boolean t = !(a == 12);
+        // if(a < 0) {
+        // @Refinement("b < 0")
+        // int b = a;
+        // } else {
+        // @Refinement("b >= 0")
+        // int b = a;
+        // }
         // @Refinement("\\v > 10")
         // int a = 11;
         // if(a > three()) {

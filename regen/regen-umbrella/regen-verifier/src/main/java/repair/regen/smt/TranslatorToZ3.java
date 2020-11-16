@@ -34,6 +34,8 @@ public class TranslatorToZ3 {
 				System.out.println("Not implemented yet!");
 			}
 		}
+		varTranslation.put("true", z3.mkBool(true));
+		varTranslation.put("false", z3.mkBool(false));
 	}
 	
 	//Literals and Variables
