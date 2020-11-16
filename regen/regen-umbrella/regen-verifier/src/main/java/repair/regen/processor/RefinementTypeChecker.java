@@ -237,7 +237,7 @@ public class RefinementTypeChecker extends CtScanner {
 			//Both return and the method have metadata
 			String returnVarName = "RET_"+context.getCounter(); 
 			String retRef = "("+getRefinement(ret.getReturnedExpression())
-			.replace(WILD_VAR, returnVarName)+")";
+								.replace(WILD_VAR, returnVarName)+")";
 			//String expectedType = fi.getAllRefinements().replace(WILD_VAR, returnVarName);
 			String expectedType = ((String) method.getMetadata(REFINE_RETURN_KEY)).replace(WILD_VAR, returnVarName);
 			String paramsRef = (String)method.getMetadata(REFINE_PARAMS_KEY);
@@ -269,7 +269,8 @@ public class RefinementTypeChecker extends CtScanner {
 			operator.putMetadata(REFINE_KEY, WILD_VAR+" == " + oper+ sb.toString());
 		}else if(operator.getType().getQualifiedName().contentEquals("boolean")) {
 			operator.putMetadata(REFINE_KEY, oper+ sb.toString());
-			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?>)
+			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
+				parent instanceof CtReturn<?>)
 				operator.putMetadata(REFINE_KEY, WILD_VAR+" == (" + oper+")"+ sb.toString());
 		}
 		//TODO ADD TYPES

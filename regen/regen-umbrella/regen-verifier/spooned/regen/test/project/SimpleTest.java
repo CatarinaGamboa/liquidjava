@@ -7,6 +7,11 @@ public class SimpleTest {
         return 3;
     }
 
+    @repair.regen.specification.Refinement("{true}->{ \\v == (n > 10) }")
+    public static boolean greaterThanTen(int n) {
+        return n > 10;
+    }
+
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("\\v < 10")
         int a = 5;
@@ -14,6 +19,8 @@ public class SimpleTest {
         boolean k = a < 11;
         @repair.regen.specification.Refinement("\\v == true")
         boolean t = !(a == 12);
+        @repair.regen.specification.Refinement("\\v == false")
+        boolean m = regen.test.project.SimpleTest.greaterThanTen(a);
         // if(a < 0) {
         // @Refinement("b < 0")
         // int b = a;

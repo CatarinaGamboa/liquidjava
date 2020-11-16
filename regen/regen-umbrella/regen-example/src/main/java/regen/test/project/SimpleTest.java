@@ -10,6 +10,11 @@ public class SimpleTest {
 		return 3;
 	}
 	
+	@Refinement("{true}->{ \\v == (n > 10) }")
+	public static boolean greaterThanTen(int n) {
+		return n > 10;
+	}
+	
 	public static void main(String[] args) {
 
 		@Refinement("\\v < 10")
@@ -20,6 +25,10 @@ public class SimpleTest {
 		
 		@Refinement("\\v == true")
 		boolean t = !(a == 12);
+		
+		@Refinement("\\v == false")
+		boolean m = greaterThanTen(a);
+		
 		
 		
 //		if(a < 0) {
