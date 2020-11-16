@@ -23,7 +23,7 @@ public class CommandLineLauncher {
         
         final Factory factory = launcher.getFactory();
 		final ProcessingManager processingManager = new QueueProcessingManager(factory);
-		final RefinementProcessor processor = new RefinementProcessor();
+		final RefinementProcessor processor = new RefinementProcessor(factory);
 		processingManager.addProcessor(processor);
 		processingManager.process(factory.Package().getRootPackage());
 

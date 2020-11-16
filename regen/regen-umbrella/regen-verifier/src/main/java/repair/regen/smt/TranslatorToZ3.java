@@ -25,7 +25,11 @@ public class TranslatorToZ3 {
 		for (String name : ctx.keySet()) {
 			if (ctx.get(name).getQualifiedName().contentEquals("int")) {
 				varTranslation.put(name, z3.mkIntConst(name));
-			} else {
+			}else if (ctx.get(name).getQualifiedName().contentEquals("boolean")) {
+				varTranslation.put(name, z3.mkBoolConst(name));
+			}
+			else {
+				System.out.println(name + ":"+ctx.get(name).getQualifiedName());
 				//TODO ADD OTHER TYPES
 				System.out.println("Not implemented yet!");
 			}
