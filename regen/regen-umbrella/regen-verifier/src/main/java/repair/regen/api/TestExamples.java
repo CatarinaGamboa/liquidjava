@@ -96,6 +96,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctBooleanLitAndInvocations() {
+		testCorrect(testPath+"CorrectBooleanLitAndInvocations.java");
+	}
+	
+	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}
@@ -154,6 +159,16 @@ public class TestExamples {
 	@Test
 	public void errorTernaryExpression() {
 		testWrong(testPath+"ErrorTernaryExpression.java");
+	}
+	
+	@Test
+	public void errorBooleanLiteral() {
+		testWrong(testPath+"ErrorBooleanLiteral.java");
+	}
+	
+	@Test
+	public void errorBooleanFunInvocation() {
+		testWrong(testPath+"ErrorBooleanFunInvocation.java");
 	}
 	
 	

@@ -379,7 +379,7 @@ public class RefinementTypeChecker extends CtScanner {
 								((CtVariableRead) exp).getType(), refPar);
 					}
 					checkSMT(correctRef, refPar, (CtVariable<?>)method.getParameters().get(i));
-					sb.append(sb.length() == 0 ? refPar:" && "+refPar);
+					sb.append(sb.length() == 0 ? refInv:" && "+refInv);
 				}
 
 				//Checking Return

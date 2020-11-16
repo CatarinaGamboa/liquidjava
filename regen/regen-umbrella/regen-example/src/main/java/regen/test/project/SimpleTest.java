@@ -26,7 +26,7 @@ public class SimpleTest {
 		@Refinement("\\v == true")
 		boolean t = !(a == 12);
 		
-		@Refinement("\\v == false")
+		@Refinement("\\v == true")
 		boolean m = greaterThanTen(a);
 		
 		

@@ -19,7 +19,7 @@ public class SimpleTest {
         boolean k = a < 11;
         @repair.regen.specification.Refinement("\\v == true")
         boolean t = !(a == 12);
-        @repair.regen.specification.Refinement("\\v == false")
+        @repair.regen.specification.Refinement("\\v == true")
         boolean m = regen.test.project.SimpleTest.greaterThanTen(a);
         // if(a < 0) {
         // @Refinement("b < 0")
