@@ -21,12 +21,14 @@ This section serves as assessment of the knowledge ground on the different techn
 - [ ] Vaguely familiar
 - [ ] Not familiar
 
-**2.** How familiar are you with Functional Languages (ex:Haskell)?
+**2.** How familiar are you with Functional Languages (ex:Haskell, Scala)?
+
 - [ ] Very familiar
 - [ ] Vaguely familiar
 - [ ] Not familiar
 
 **3.** How familiar are you with JML (Java Modeling Language)?
+
 - [ ] Very familiar
 - [ ] Vaguely familiar
 - [ ] Not familiar
@@ -173,10 +175,10 @@ Analyse the following syntax examples.
 **A**
 
 ```java
-@Refinement("type PtGrade = (\\v >= 0 && \\v <= 20)")
+@Refinement("PtGrade refines Integer | \\v >= 0 && \\v <= 20")
 class MyClass{
     ...
-    @Refinement(positiveGrade == PtGrade && positiveGrade >= 10)
+    @Refinement("positiveGrade == PtGrade && positiveGrade >= 10")
     int positiveGrade = 12;
 }
 ```
@@ -184,10 +186,23 @@ class MyClass{
 **B**
 
 ```java
+@Refinement("PtGrade refines Integer where (\\v >= 0 && \\v <= 20)")
+class MyClass{
+    ...
+    @Refinement("positiveGrade == PtGrade && positiveGrade >= 10")
+    int positiveGrade = 12;
+}
+```
+
+
+
+**C**
+
+```java
 @Refinement("type PtGrade(int x) { x >= 0 && x <= 20}")
 class MyClass{
     ...
-    @Refinement(PtGrade(positiveGrade) && positiveGrade >= 10)
+    @Refinement("PtGrade(positiveGrade) && positiveGrade >= 10")
     int positiveGrade = 12;
 }
 ```
