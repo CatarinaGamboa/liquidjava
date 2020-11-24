@@ -108,7 +108,7 @@ Analyse the following examples with syntax possibilities.
 int positiveGrade = 10;
 @Refinement("excellentGrade == 19 || excellentGrade == 20")
 int excellentGrade = 19;
-@Refinement("goodGrade > positive && goodGrade < excellentGrade")
+@Refinement("goodGrade > positiveGrade && goodGrade < excellentGrade")
 int goodGrade = 17;
 ```
 
@@ -119,7 +119,7 @@ int goodGrade = 17;
 int positiveGrade = 10;
 @Refinement("{y | y == 19 || y == 20}")
 int excellentGrade = 19;
-@Refinement("{x | x > positive && x < excellentGrade}")
+@Refinement("{x | x > positiveGrade && x < excellentGrade}")
 int goodGrade = 17;
 ```
 
