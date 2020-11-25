@@ -26,6 +26,7 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
 			pkg.accept(new RefinementTypeChecker(factory));
 		}
 		
+		
 	}
 
 

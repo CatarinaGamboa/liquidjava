@@ -207,6 +207,29 @@ class MyClass{
 }
 ```
 
+**D**
+
+File *PtGrade.java*
+
+```java
+@Refinement("{int x | x >= 0 && x <= 20}")
+@Retention(RetentionPolicy.CLASS)
+@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.LOCAL_VARIABLE, 
+		  ElementType.PARAMETER, ElementType.TYPE })
+public @interface PtGrade {}
+```
+
+File *MyClass.java*
+
+```java
+class MyClass{
+    ...
+    @PtGrade int positiveGrade = 12;
+}
+```
+
+
+
 Which of the above syntaxes would you use? (possibility for multiple answers)
 
 - [ ] A

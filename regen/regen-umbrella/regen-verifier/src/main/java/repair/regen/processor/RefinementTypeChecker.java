@@ -13,6 +13,7 @@ import repair.regen.language.operators.BinaryOperator;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.code.BinaryOperatorKind;
+import spoon.reflect.code.CtAnnotationFieldAccess;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtBlock;
@@ -30,9 +31,12 @@ import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.code.CtVariableWrite;
 import spoon.reflect.code.UnaryOperatorKind;
 import spoon.reflect.declaration.CtAnnotation;
+import spoon.reflect.declaration.CtAnnotationMethod;
+import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
+import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;
@@ -67,16 +71,40 @@ public class RefinementTypeChecker extends CtScanner {
 	private Factory factory;
 
 	public RefinementTypeChecker(Factory factory) {
-		this.factory = factory;
+		this.factory = factory;		
 	}
 
 
 	//--------------------- Visitors -----------------------------------
 	@Override
 	public <T> void visitCtClass(CtClass<T> ctClass) {
+		System.out.println("CTCLASS:"+ctClass.getSimpleName());
 		context.reinitializeContext();
 		super.visitCtClass(ctClass);
 	}
+	@Override
+	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
+		//VISITS THE ANNOTATION
+//		System.out.println("ANNOTATION:"+annotation.getType());
+//		System.out.println("ANNOTATION:"+annotation.getMetadata(REFINE_KEY));
+		super.visitCtAnnotation(annotation);
+	}
+
+	@Override
+	public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
+		//VISITS CREATION OF ANNOTATIONS
+		//Probably will have to use the context to store annotations
+//		System.out.println("AnnTYpe:"+annotationType);
+//		for(CtAnnotation ann : annotationType.getAnnotations())
+//			if( ann.getActualAnnotation().annotationType().getCanonicalName()
+//				.contentEquals("repair.regen.specification.Refinement")) {
+//				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+//				annotationType.putMetadata(REFINE_KEY, s);
+//			}
+			
+		super.visitCtAnnotationType(annotationType);
+	}
+
 
 	public <R> void visitCtMethod(CtMethod<R> method) {
 		//super.visitCtMethod(method); //-- first we need the signature refinements
@@ -343,7 +371,7 @@ public class RefinementTypeChecker extends CtScanner {
 		for(CtAnnotation<? extends Annotation> ann :method.getAnnotations()) {
 			if( !ann.getActualAnnotation().annotationType().getCanonicalName()
 					.contentEquals("repair.regen.specification.Refinement"))
-				break;
+				continue;
 			CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 			String methodRef = s.getValue();
 			List<CtParameter<?>> params = method.getParameters();
