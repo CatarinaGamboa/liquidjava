@@ -1,10 +1,13 @@
 package regen.test.project;
 
+import repair.regen.specification.Refinement;
+
 public class SimpleTest {
 
 	public static void main(String[] args) {
-		@Positive
-		int a = 5;
+		@Refinement("b > 0")
+		int b = 8;
+		b = -b;
 	}
 }
 

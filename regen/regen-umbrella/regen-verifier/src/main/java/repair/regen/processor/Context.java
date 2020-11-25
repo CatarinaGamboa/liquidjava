@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
 
 public class Context {
@@ -26,6 +27,7 @@ public class Context {
 		
 	}
 	
+	//SINGLETON
 	public static Context getInstance() {
 		if(instance == null)
 			instance = new Context() ;
@@ -68,6 +70,36 @@ public class Context {
 	public void addVarToContext(String name, CtTypeReference<?> type, String refinements) {
 		addVarToContext(new VariableInfo(name, type, refinements));
 	}
+	
+	public void addRefinementToVariableInContext(CtVariable<?> variable, String et) {
+		String name = variable.getSimpleName();
+		if(hasVariable(name)){
+			VariableInfo vi = getVariableByName(name);
+			String oldRef = vi.getRefinement();
+			vi.newRefinement(oldRef = oldRef.length()==0? et : oldRef+" && ("+et+")");
+		}else {
+			addVarToContext(name, variable.getType(), et);
+		}
+	}
+	
+	public void newRefinementToVariableInContext(CtVariable<?> variable, String et) {
+		String name = variable.getSimpleName();
+		if(hasVariable(name)){
+			VariableInfo vi = getVariableByName(name);
+			vi.newRefinement("("+et+")");
+		}else
+			addVarToContext(name, variable.getType(), et);
+	}
+	
+	public String getVariableRefinements(String varName) {
+		return hasVariable(varName)?getVariableByName(varName).getRefinement() : ""; 
+	}
+	
+	public void removeRefinementFromVariableInContext(CtVariable<?> variable, String et) {
+		VariableInfo vi = getVariableByName(variable.getSimpleName());
+		vi.removeRefinement(et);
+	}
+	
 	
 	public void addFunctionToContext(FunctionInfo f) {
 		ctxFunctions.add(f);

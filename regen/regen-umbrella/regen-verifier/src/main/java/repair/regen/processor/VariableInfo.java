@@ -19,7 +19,9 @@ public class VariableInfo {
 	}
 	
 	public String getRefinement() {
-		return refinements.get(refinements.size()-1);
+		if(refinements.size() > 0)
+			return refinements.get(refinements.size()-1);
+		return "";
 		//return String.join(" && ", refinements);
 	}
 	public CtTypeReference<?> getType(){
