@@ -82,14 +82,23 @@ public class Context {
 		}
 	}
 	
-	public void newRefinementToVariableInContext(CtVariable<?> variable, String et) {
+	
+	public void newRefinementToVariableInContext(CtVariable<?> variable, String expectedType) {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
 			VariableInfo vi = getVariableByName(name);
-			vi.newRefinement("("+et+")");
+			vi.newRefinement("("+expectedType+")");
 		}else
-			addVarToContext(name, variable.getType(), et);
+			addVarToContext(name, variable.getType(), expectedType);
 	}
+	
+	public void newRefinementToVariableInContext(String variableName, String expectedType) {
+		if(hasVariable(variableName)){
+			VariableInfo vi = getVariableByName(variableName);
+			vi.newRefinement("("+expectedType+")");
+		}
+	}
+	
 	
 	public String getVariableRefinements(String varName) {
 		return hasVariable(varName)?getVariableByName(varName).getRefinement() : ""; 
@@ -97,6 +106,10 @@ public class Context {
 	
 	public void removeRefinementFromVariableInContext(CtVariable<?> variable, String et) {
 		VariableInfo vi = getVariableByName(variable.getSimpleName());
+		vi.removeRefinement(et);
+	}
+	public void removeRefinementFromVariableInContext(String variableName, String et) {
+		VariableInfo vi = getVariableByName(variableName);
 		vi.removeRefinement(et);
 	}
 	

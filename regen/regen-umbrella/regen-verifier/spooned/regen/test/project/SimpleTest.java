@@ -2,10 +2,9 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("b > 0")
-        int b = 8;
-        b = -b;
+    @repair.regen.specification.Refinement("{d >= 0}->{i > d}->{\\v >= d && \\v < i}")
+    private static int range(int d, int i) {
+        return i + 1;
     }
 }
 

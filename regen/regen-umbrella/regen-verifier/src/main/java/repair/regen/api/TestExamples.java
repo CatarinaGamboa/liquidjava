@@ -56,10 +56,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectNoRefinements.java");//passVC
 	}
 	
-//	@Test
-//	public void correctFunctionDeclarations() {
-//		testCorrect(testPath+"CorrectFunctionDeclarations.java");
-//	}
+	@Test
+	public void correctFunctionDeclarations() {
+		testCorrect(testPath+"CorrectFunctionDeclarations.java");
+	}
 //	
 //	@Test
 //	public void correctFunctionInvocation() {
@@ -134,12 +134,12 @@ public class TestExamples {
 		testWrong(testPath+"ErrorNoRefinementsInVar.java");
 	}
 	
-//	@Test
-//	public void errorFunctionDeclarations() {
-//		testWrong(testPath+"ErrorFunctionDeclarations.java");
-//	}
-//	
-//
+	@Test
+	public void errorFunctionDeclarations() {
+		testWrong(testPath+"ErrorFunctionDeclarations.java");
+	}
+	
+
 //	@Test
 //	public void errorFunctionInvocation() {
 //		testWrong(testPath+"ErrorFunctionInvocation.java");

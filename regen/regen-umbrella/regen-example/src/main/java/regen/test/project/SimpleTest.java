@@ -4,10 +4,9 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
 
-	public static void main(String[] args) {
-		@Refinement("b > 0")
-		int b = 8;
-		b = -b;
+	@Refinement("{d >= 0}->{i > d}->{\\v >= d && \\v < i}")
+	private static int range(int d, int i) {
+		return i+1;
 	}
 }
 
