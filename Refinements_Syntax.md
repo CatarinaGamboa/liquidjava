@@ -225,7 +225,8 @@ File *MyClass.java*
 ```java
 class MyClass{
     ...
-    @PtGrade int positiveGrade = 12;
+    @PtGrade @Refinement("positiveGrade >= 10") 
+    int positiveGrade = 12;
 }
 ```
 
