@@ -214,8 +214,9 @@ File *PtGrade.java*
 ```java
 @Refinement("{int x | x >= 0 && x <= 20}")
 @Retention(RetentionPolicy.CLASS)
-@Target({ ElementType.METHOD, ElementType.FIELD, ElementType.LOCAL_VARIABLE, 
-		  ElementType.PARAMETER, ElementType.TYPE })
+@Target({ ElementType.METHOD, ElementType.FIELD, 
+	  ElementType.LOCAL_VARIABLE, 
+          ElementType.PARAMETER, ElementType.TYPE })
 public @interface PtGrade {}
 ```
 
