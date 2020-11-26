@@ -2,9 +2,13 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{d >= 0}->{i > d}->{\\v >= d && \\v < i}")
-    private static int range(int d, int i) {
-        return i + 1;
+    public static void main(java.lang.String[] args) {
+        @repair.regen.specification.Refinement("\\v < 10")
+        int smaller = 5;
+        @repair.regen.specification.Refinement("bigger > 20")
+        int bigger = 50;
+        @repair.regen.specification.Refinement("\\v > smaller  && \\v < bigger")
+        int middle = 15;
     }
 }
 

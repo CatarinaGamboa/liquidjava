@@ -75,6 +75,10 @@ public class FunctionInfo {
 		}
 		return update;
 	}
+	
+	public String getRenamedReturn() {
+		return getRenamedRefinements(this.refReturn);
+	}
 
 	public String getAllRefinements() {
 		StringBuilder sb = new StringBuilder();

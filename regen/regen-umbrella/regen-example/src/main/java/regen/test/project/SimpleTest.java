@@ -3,11 +3,16 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
-
-	@Refinement("{d >= 0}->{i > d}->{\\v >= d && \\v < i}")
-	private static int range(int d, int i) {
-		return i+1;
+	public static void main(String[] args) {
+		@Refinement("\\v < 10")
+		int smaller = 5;
+		@Refinement("bigger > 20")
+		int bigger = 50;
+		@Refinement("\\v > smaller  && \\v < bigger")
+		int middle = 15;
 	}
+
+
 }
 
 

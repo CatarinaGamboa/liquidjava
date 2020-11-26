@@ -395,37 +395,50 @@ public class RefinementTypeChecker extends CtScanner {
 		CtExecutable<?> method = invocation.getExecutable().getDeclaration();
 		if(method != null) {
 			FunctionInfo f = context.getFunctionByName(method.getSimpleName());
-			String methodRef = f.getRenamedRefinements();
+			String methodRef = f.getRenamedReturn();
+			String metRef = f.getRenamedReturn();
+			List<String> saveVars = new ArrayList<>();
+			for(String v: variables)
+				saveVars.add(v);
 
 			if(methodRef != null) {
 				//Checking Parameters
 				List<CtExpression<?>> exps = invocation.getArguments();
 				List<VariableInfo> params = f.getArgRefinements();
-				StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < params.size(); i++) {
 					VariableInfo pinfo = params.get(i);
 					CtExpression<?> exp = exps.get(i);
 					String newParamName = pinfo.getIncognitoName();
 					String refPar = f.getRefinementsForParamIndex(i);
-					String refInv = (getRefinement(exp)).replace(WILD_VAR, newParamName),
-							correctRef = sb.length()==0? refInv : sb.toString() + " && ("+refInv+")";
+					String refInv = (getRefinement(exp)).replace(WILD_VAR, newParamName);
 					System.out.println("ref par:"+refPar);
+					
 					context.addVarToContext(newParamName, pinfo.getType(), refInv);
+					context.newRefinementToVariableInContext(newParamName, refInv);
 					addRefinementVariable(newParamName);
+					for(String s:saveVars)
+						addRefinementVariable(s);
+					
 					if(exp instanceof CtVariableRead<?>) {
 						String name = ((CtVariableRead) exp).getVariable().getSimpleName();
 						context.addVarToContext(name,
 								((CtVariableRead) exp).getType(), refPar);
 						addRefinementVariable(name);
+						metRef = metRef.replaceAll(newParamName, name);
 					}
-					checkSMT(correctRef, refPar, (CtVariable<?>)method.getParameters().get(i));
-					sb.append(sb.length() == 0 ? refInv:" && "+refInv);
+					checkSMT(refInv, refPar, (CtVariable<?>)method.getParameters().get(i));
+					saveVars.add(newParamName);
 				}
 
+				
+				for(VariableInfo vi:params) 
+					addRefinementVariable(vi.getIncognitoName());
+				for(String s: saveVars)
+					addRefinementVariable(s);
 				//Checking Return
-				String s = sb.length() == 0? methodRef:  sb.append(" && "+methodRef).toString();
+				String s = methodRef;// sb.length() == 0? methodRef:  sb.append(" && "+methodRef).toString();
 				//String s = methodRef;
-				invocation.putMetadata(REFINE_KEY, s);
+				invocation.putMetadata(REFINE_KEY, metRef);
 			}
 		}
 	}
@@ -629,6 +642,7 @@ public class RefinementTypeChecker extends CtScanner {
 				//System.out.println(t+": variable :"+v);
 				if(v != null && !l.contains(v)) {
 					l.add(v);
+					addRefinementVariable(t);
 				}
 			}
 		}

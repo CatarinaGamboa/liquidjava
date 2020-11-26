@@ -60,27 +60,27 @@ public class TestExamples {
 	public void correctFunctionDeclarations() {
 		testCorrect(testPath+"CorrectFunctionDeclarations.java");
 	}
-//	
-//	@Test
-//	public void correctFunctionInvocation() {
-//		testCorrect(testPath+"CorrectFunctionInvocation.java");
-//	}
-//	
-//	@Test
-//	public void correctFunctionInInvocation() {
-//		testCorrect(testPath+"CorrectFunctionInInvocation.java");
-//	}
-//
-//	
-//	@Test
-//	public void correctFunctionCallSameVariableName() {
-//		testCorrect(testPath+"CorrectFunctionCallSameVariableName.java");
-//	}
-//	
-//	@Test
-//	public void correctDependentRefinements() {
-//		testCorrect(testPath+"CorrectDependentRefinements.java");
-//	}
+	
+	@Test
+	public void correctFunctionInvocation() {
+		testCorrect(testPath+"CorrectFunctionInvocation.java");
+	}
+	
+	@Test
+	public void correctFunctionInInvocation() {
+		testCorrect(testPath+"CorrectFunctionInInvocation.java");
+	}
+
+	
+	@Test
+	public void correctFunctionCallSameVariableName() {
+		testCorrect(testPath+"CorrectFunctionCallSameVariableName.java");
+	}
+	
+	@Test
+	public void correctDependentRefinements() {
+		testCorrect(testPath+"CorrectDependentRefinements.java");
+	}
 //	
 //	@Test
 //	public void correctSimpleIfThen() {
@@ -96,11 +96,11 @@ public class TestExamples {
 //	public void correctSimpleIfElse() {
 //		testCorrect(testPath+"CorrectSimpleIfElse.java");
 //	}
-//	
-//	@Test
-//	public void correctBooleanLitAndInvocations() {
-//		testCorrect(testPath+"CorrectBooleanLitAndInvocations.java");
-//	}
+	
+	@Test
+	public void correctBooleanLitAndInvocations() {
+		testCorrect(testPath+"CorrectBooleanLitAndInvocations.java");
+	}
 	
 	@Test
 	public void errorSimpleAssignment() {
@@ -140,22 +140,21 @@ public class TestExamples {
 	}
 	
 
-//	@Test
-//	public void errorFunctionInvocation() {
-//		testWrong(testPath+"ErrorFunctionInvocation.java");
-//	}
+	@Test
+	public void errorFunctionInvocation() {
+		testWrong(testPath+"ErrorFunctionInvocation.java");
+	}
 	
-//	@Test
-//	public void errorFunctionInvocationParams() {
-//		testWrong(testPath+"ErrorFunctionInvocationParams.java");
-//	}
-//	
-//	@Test
-//	public void errorDependentRefinement() {
-//		testWrong(testPath+"ErrorDependentRefinement.java");
-//	}
-//
-//	
+	@Test
+	public void errorFunctionInvocationParams() {
+		testWrong(testPath+"ErrorFunctionInvocationParams.java");
+	}
+	
+	@Test
+	public void errorDependentRefinement() {
+		testWrong(testPath+"ErrorDependentRefinement.java");
+	}
+
 //	@Test
 //	public void errorIfAssignment() {
 //		testWrong(testPath+"ErrorIfAssignment.java");
@@ -166,15 +165,15 @@ public class TestExamples {
 //		testWrong(testPath+"ErrorTernaryExpression.java");
 //	}
 //	
-//	@Test
-//	public void errorBooleanLiteral() {
-//		testWrong(testPath+"ErrorBooleanLiteral.java");
-//	}
-//	
-//	@Test
-//	public void errorBooleanFunInvocation() {
-//		testWrong(testPath+"ErrorBooleanFunInvocation.java");
-//	}
+	@Test
+	public void errorBooleanLiteral() {
+		testWrong(testPath+"ErrorBooleanLiteral.java");
+	}
+	
+	@Test
+	public void errorBooleanFunInvocation() {
+		testWrong(testPath+"ErrorBooleanFunInvocation.java");
+	}
 	
 	
 	class MySecurityManager extends SecurityManager {
