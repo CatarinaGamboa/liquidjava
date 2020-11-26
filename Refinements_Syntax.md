@@ -212,7 +212,7 @@ class MyClass{
 File *PtGrade.java*
 
 ```java
-@Refinement("{int x | x >= 0 && x <= 20}")
+@Refinement(" int x | x >= 0 && x <= 20 ")
 @Retention(RetentionPolicy.CLASS)
 @Target({ ElementType.METHOD, ElementType.FIELD, 
 	  ElementType.LOCAL_VARIABLE, 
