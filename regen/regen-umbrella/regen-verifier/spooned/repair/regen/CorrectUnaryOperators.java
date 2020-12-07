@@ -19,6 +19,8 @@ public class CorrectUnaryOperators {
         b = -(-10);
         b = +3;
         b = +s;
+        @repair.regen.specification.Refinement("\\v <= 0")
+        int c = 5 * (-10);
     }
 }
 

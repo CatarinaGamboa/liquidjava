@@ -48,7 +48,7 @@ public class VCChecker {
 		StringBuilder sbSMT = new StringBuilder();
 
 		for(String var:getVariables()) {
-			//			System.out.println("var:"+var);
+			//System.out.println("var:"+var);
 			VariableInfo vi = context.getVariableByName(var);
 			String ref = vi.getRefinement();
 			sb.append("forall "+var+":"+ref+" -> ");

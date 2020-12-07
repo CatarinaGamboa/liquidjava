@@ -371,7 +371,7 @@ public class RefinementTypeChecker extends CtScanner {
 		System.out.println(newMeta + " && "+all);
 		context.addVarToContext(newName, ex.getType(), newMeta);
 		addRefinementVariable(newName);
-		operator.putMetadata(REFINE_KEY, newMeta + " && "+all);
+		operator.putMetadata(REFINE_KEY, all);
 
 	}
 
@@ -515,7 +515,9 @@ public class RefinementTypeChecker extends CtScanner {
 
 		}else if (element instanceof CtUnaryOperator<?>) {
 			String a = (String) element.getMetadata(REFINE_KEY);
-			System.out.println("«««««««««««««««««««««««««"+a);
+			String b = a.replace(WILD_VAR, "").replace("(", "").replace(")", "")
+					.replace("==", "").replace(" ", "");
+			return b;
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
 			return l.getValue().toString();
@@ -729,7 +731,7 @@ public class RefinementTypeChecker extends CtScanner {
 		case OR: 	return "||";
 
 		case EQ: 	return "==";
-		//TODO case NE: 	return "!=";
+		case NE: 	return "!=";
 		case GE: 	return ">=";
 		case GT: 	return ">";
 		case LE: 	return "<=";
