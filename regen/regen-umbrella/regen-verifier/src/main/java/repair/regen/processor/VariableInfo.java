@@ -18,6 +18,10 @@ public class VariableInfo {
 		this.refinements.add(refinement);
 	}
 	
+	/**
+	 * Gets last refinement
+	 * @return
+	 */
 	public String getRefinement() {
 		if(refinements.size() > 0)
 			return refinements.get(refinements.size()-1);

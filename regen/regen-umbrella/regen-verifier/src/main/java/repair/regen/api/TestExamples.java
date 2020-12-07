@@ -81,12 +81,12 @@ public class TestExamples {
 	public void correctDependentRefinements() {
 		testCorrect(testPath+"CorrectDependentRefinements.java");
 	}
-//	
-//	@Test
-//	public void correctSimpleIfThen() {
-//		testCorrect(testPath+"CorrectIfThen.java");
-//	}
-//	
+	
+	@Test
+	public void correctSimpleIfThen() {
+		testCorrect(testPath+"CorrectIfThen.java");
+	}
+	
 //	@Test
 //	public void correctTernaryExpression() {
 //		testCorrect(testPath+"CorrectTernaryExpression.java");
@@ -155,10 +155,10 @@ public class TestExamples {
 		testWrong(testPath+"ErrorDependentRefinement.java");
 	}
 
-//	@Test
-//	public void errorIfAssignment() {
-//		testWrong(testPath+"ErrorIfAssignment.java");
-//	}
+	@Test
+	public void errorIfAssignment() {
+		testWrong(testPath+"ErrorIfAssignment.java");
+	}
 //	
 //	@Test
 //	public void errorTernaryExpression() {

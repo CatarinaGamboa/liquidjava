@@ -92,6 +92,11 @@ public class Context {
 			addVarToContext(name, variable.getType(), expectedType);
 	}
 	
+	/**
+	 * The variable with name variableName will have a new refinement
+	 * @param variableName
+	 * @param expectedType
+	 */
 	public void newRefinementToVariableInContext(String variableName, String expectedType) {
 		if(hasVariable(variableName)){
 			VariableInfo vi = getVariableByName(variableName);

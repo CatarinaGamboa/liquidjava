@@ -12,12 +12,7 @@ public class ErrorIfAssignment {
 			int b = a;
 			b++;
 			a = 10;
-			if(b > 10) {
-				@Refinement("\\v > 0")
-				int c = a;
-				@Refinement("\\v > 11")
-				int d = b+1;
-			}
+
 		}
 
 	}
