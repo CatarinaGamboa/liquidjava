@@ -513,6 +513,9 @@ public class RefinementTypeChecker extends CtScanner {
 			String left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand(), sb);
 			return left +" "+ getOperatorFromKind(binop.getKind()) +" "+ right;
 
+		}else if (element instanceof CtUnaryOperator<?>) {
+			String a = (String) element.getMetadata(REFINE_KEY);
+			System.out.println("«««««««««««««««««««««««««"+a);
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
 			return l.getValue().toString();

@@ -92,10 +92,10 @@ public class TestExamples {
 //		testCorrect(testPath+"CorrectTernaryExpression.java");
 //	}
 //	
-//	@Test
-//	public void correctSimpleIfElse() {
-//		testCorrect(testPath+"CorrectSimpleIfElse.java");
-//	}
+	@Test
+	public void correctSimpleIfElse() {
+		testCorrect(testPath+"CorrectSimpleIfElse.java");
+	}
 	
 	@Test
 	public void correctBooleanLitAndInvocations() {
