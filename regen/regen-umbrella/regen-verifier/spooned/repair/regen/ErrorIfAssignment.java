@@ -10,12 +10,6 @@ public class ErrorIfAssignment {
             int b = a;
             b++;
             a = 10;
-            if (b > 10) {
-                @repair.regen.specification.Refinement("\\v > 0")
-                int c = a;
-                @repair.regen.specification.Refinement("\\v > 11")
-                int d = b + 1;
-            }
         }
     }
 }

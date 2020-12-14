@@ -23,5 +23,8 @@ public class CorrectUnaryOperators {
 		b = +3;
 		b = +s;
 		
+		@Refinement("\\v <= 0")
+		int c = 5 * (-10);	
+		
 	}
 }

@@ -94,7 +94,7 @@ If @R is ommited, the Refinement of the variable is True
 
   Example
 
-```
+```java
 @Refinement(a > 0)
 int a = 10;
 a = 5;

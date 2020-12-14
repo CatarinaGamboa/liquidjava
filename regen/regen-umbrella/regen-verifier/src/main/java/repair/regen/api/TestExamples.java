@@ -33,16 +33,27 @@ public class TestExamples {
 	
 	@Test
 	public void correctSimpleAssignment() {
-		testCorrect(testPath+"CorrectSimpleAssignment.java");
+		testCorrect(testPath+"CorrectSimpleAssignment.java");//passVC
 	}
 	@Test
 	public void correctArithmeticBinaryOperation() {
-		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");
+		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");//passVC
 	}
 
 	@Test
 	public void correctAssignementAfterDeclaration() {
-		testCorrect(testPath+"CorrectAssignementAfterDeclaration.java");
+		testCorrect(testPath+"CorrectAssignementAfterDeclaration.java");//passVC
+	}
+	
+
+	@Test
+	public void correctUnaryOperators() {
+		testCorrect(testPath+"CorrectUnaryOperators.java");//passVC
+	}
+	
+	@Test
+	public void correctNoRefinements() {
+		testCorrect(testPath+"CorrectNoRefinements.java");//passVC
 	}
 	
 	@Test
@@ -60,15 +71,6 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectFunctionInInvocation.java");
 	}
 
-	@Test
-	public void correctUnaryOperators() {
-		testCorrect(testPath+"CorrectUnaryOperators.java");
-	}
-	
-	@Test
-	public void correctNoRefinements() {
-		testCorrect(testPath+"CorrectNoRefinements.java");
-	}
 	
 	@Test
 	public void correctFunctionCallSameVariableName() {
@@ -85,11 +87,11 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectIfThen.java");
 	}
 	
-	@Test
-	public void correctTernaryExpression() {
-		testCorrect(testPath+"CorrectTernaryExpression.java");
-	}
-	
+//	@Test
+//	public void correctTernaryExpression() {
+//		testCorrect(testPath+"CorrectTernaryExpression.java");
+//	}
+//	
 	@Test
 	public void correctSimpleIfElse() {
 		testCorrect(testPath+"CorrectSimpleIfElse.java");
@@ -98,6 +100,11 @@ public class TestExamples {
 	@Test
 	public void correctBooleanLitAndInvocations() {
 		testCorrect(testPath+"CorrectBooleanLitAndInvocations.java");
+	}
+	
+	@Test
+	public void correctRecursion() {
+		testCorrect(testPath+"CorrectRecursion.java");
 	}
 	
 	@Test
@@ -113,6 +120,23 @@ public class TestExamples {
 	@Test
 	public void errorAssignementAfterDeclaration() {
 		testWrong(testPath+"ErrorAssignementAfterDeclaration.java");
+	}
+
+	
+	@Test
+	public void errorUnaryOperators() {
+		testWrong(testPath+"ErrorUnaryOperators.java");
+	}
+	
+	@Test
+	public void errorUnaryOpMinus() {
+		testWrong(testPath+"ErrorUnaryOpMinus.java");
+	}
+	
+	
+	@Test
+	public void errorNoRefinementsVar() {
+		testWrong(testPath+"ErrorNoRefinementsInVar.java");
 	}
 	
 	@Test
@@ -132,43 +156,39 @@ public class TestExamples {
 	}
 	
 	@Test
-	public void errorUnaryOperators() {
-		testWrong(testPath+"ErrorUnaryOperators.java");
-	}
-	
-	@Test
-	public void errorUnaryOpMinus() {
-		testWrong(testPath+"ErrorUnaryOpMinus.java");
-	}
-	
-	@Test
 	public void errorDependentRefinement() {
 		testWrong(testPath+"ErrorDependentRefinement.java");
 	}
-	
-	@Test
-	public void errorNoRefinementsVar() {
-		testWrong(testPath+"ErrorNoRefinementsInVar.java");
-	}
-	
+
 	@Test
 	public void errorIfAssignment() {
 		testWrong(testPath+"ErrorIfAssignment.java");
 	}
 	
 	@Test
-	public void errorTernaryExpression() {
-		testWrong(testPath+"ErrorTernaryExpression.java");
+	public void errorIfAssignment2() {
+		testWrong(testPath+"ErrorIfAssignment2.java");
 	}
-	
+//	
+//	@Test
+//	public void errorTernaryExpression() {
+//		testWrong(testPath+"ErrorTernaryExpression.java");
+//	}
+//	
 	@Test
 	public void errorBooleanLiteral() {
 		testWrong(testPath+"ErrorBooleanLiteral.java");
 	}
 	
+	
 	@Test
 	public void errorBooleanFunInvocation() {
 		testWrong(testPath+"ErrorBooleanFunInvocation.java");
+	}
+	
+	@Test
+	public void errorRecursion1() {
+		testWrong(testPath+"ErrorRecursion1.java");
 	}
 	
 	

@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
+import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
 
 public class Context {
 	private Stack<List<VariableInfo>> ctxVars;
 	private List<FunctionInfo> ctxFunctions;
-	private Stack<List<String>> ctxPathRefinements;
 	
 	public int counter;
 	private static Context instance;
@@ -20,12 +20,12 @@ public class Context {
 	private Context() {
 		ctxVars = new Stack<>();
 		ctxVars.add(new ArrayList<>());//global vars
-		ctxPathRefinements = new Stack<>();
 		ctxFunctions = new ArrayList<>();
 		counter = 0;
 		
 	}
 	
+	//SINGLETON
 	public static Context getInstance() {
 		if(instance == null)
 			instance = new Context() ;
@@ -38,12 +38,10 @@ public class Context {
 	
 	public void enterContext() {
 		ctxVars.add(new ArrayList<>());
-		ctxPathRefinements.add(new ArrayList<>());
 	}
 	
 	public void exitContext() {
 		ctxVars.pop();
-		ctxPathRefinements.pop();
 	}
 	
 	public int getCounter() {
@@ -69,13 +67,56 @@ public class Context {
 		addVarToContext(new VariableInfo(name, type, refinements));
 	}
 	
-	public void addFunctionToContext(FunctionInfo f) {
-		ctxFunctions.add(f);
+	public void addRefinementToVariableInContext(CtVariable<?> variable, String et) {
+		String name = variable.getSimpleName();
+		if(hasVariable(name)){
+			VariableInfo vi = getVariableByName(name);
+			String oldRef = vi.getRefinement();
+			vi.newRefinement(oldRef = oldRef.length()==0? et : oldRef+" && ("+et+")");
+		}else {
+			addVarToContext(name, variable.getType(), et);
+		}
 	}
 	
-	public void addToPath(String ref) {
-		if(!ctxPathRefinements.peek().contains(ref))
-			ctxPathRefinements.peek().add(ref);
+	
+	public void newRefinementToVariableInContext(CtVariable<?> variable, String expectedType) {
+		String name = variable.getSimpleName();
+		if(hasVariable(name)){
+			VariableInfo vi = getVariableByName(name);
+			vi.newRefinement("("+expectedType+")");
+		}else
+			addVarToContext(name, variable.getType(), expectedType);
+	}
+	
+	/**
+	 * The variable with name variableName will have a new refinement
+	 * @param variableName
+	 * @param expectedType
+	 */
+	public void newRefinementToVariableInContext(String variableName, String expectedType) {
+		if(hasVariable(variableName)){
+			VariableInfo vi = getVariableByName(variableName);
+			vi.newRefinement("("+expectedType+")");
+		}
+	}
+	
+	
+	public String getVariableRefinements(String varName) {
+		return hasVariable(varName)?getVariableByName(varName).getRefinement() : ""; 
+	}
+	
+	public void removeRefinementFromVariableInContext(CtVariable<?> variable, String et) {
+		VariableInfo vi = getVariableByName(variable.getSimpleName());
+		vi.removeRefinement(et);
+	}
+	public void removeRefinementFromVariableInContext(String variableName, String et) {
+		VariableInfo vi = getVariableByName(variableName);
+		vi.removeRefinement(et);
+	}
+	
+	
+	public void addFunctionToContext(FunctionInfo f) {
+		ctxFunctions.add(f);
 	}
 	
 	public FunctionInfo getFunctionByName(String name) {
@@ -109,18 +150,7 @@ public class Context {
 		}
 		return sb.toString();
 	}
-	
-	public String getPathRefinements() {
-		StringBuilder sb = new StringBuilder();
-		for(List<String> l: ctxPathRefinements) {
-			for(String ref: l) {
-				sb.append(sb.length()==0? ref : " && "+ref);
-			}
-		}
-		return sb.toString();
-	}
-	
-	
+		
 	
 	@Override
 	public String toString() {
