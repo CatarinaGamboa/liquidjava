@@ -50,7 +50,8 @@ public class RefinementTypeChecker extends CtScanner {
 
 	private Context context = Context.getInstance();
 	private VCChecker vcChecker = new VCChecker();
-	//private List<String> variables = new ArrayList<>();
+	private Utils utils = new Utils();
+
 	private Factory factory;
 
 	public RefinementTypeChecker(Factory factory) {
@@ -109,7 +110,7 @@ public class RefinementTypeChecker extends CtScanner {
 		getMethodRefinements(method);
 		super.visitCtMethod(method);
 		exitContexts();
-		
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -117,16 +118,20 @@ public class RefinementTypeChecker extends CtScanner {
 	public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
 		super.visitCtLocalVariable(localVariable);
 		//only declaration, no assignment
-		if(localVariable.getAssignment() == null) return;
-		String refinementFound = getRefinement(localVariable.getAssignment());
-		System.out.println("REFINEMENT LOCAL VAR "+localVariable.getSimpleName()+":"+refinementFound);
-		System.out.println(context.getAllVariables());
+		if(localVariable.getAssignment() == null) {
+			Optional<String> a = getRefinementFromAnnotation(localVariable);
+			context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), 
+					a.isPresent()? a.get() : "true");
+		}else {
+			String refinementFound = getRefinement(localVariable.getAssignment());
+			System.out.println("REFINEMENT LOCAL VAR "+localVariable.getSimpleName()+":"+refinementFound);
+			System.out.println(context.getAllVariables());
 
-		CtExpression a = localVariable.getAssignment();
-		if (refinementFound == null)
-			refinementFound = "true";
-		checkVariableRefinements(refinementFound, localVariable.getSimpleName(), localVariable);
-
+			CtExpression a = localVariable.getAssignment();
+			if (refinementFound == null)
+				refinementFound = "true";
+			checkVariableRefinements(refinementFound, localVariable.getSimpleName(), localVariable);
+		}
 	}
 
 	@Override
@@ -147,6 +152,7 @@ public class RefinementTypeChecker extends CtScanner {
 				refinementFound = "true";
 			}
 			checkVariableRefinements(refinementFound, name, varDecl);
+			
 		}
 	}
 
@@ -203,14 +209,15 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public void visitCtIf(CtIf ifElement) {
 		CtExpression<Boolean> exp = ifElement.getCondition();
+		
+		enterContexts();
 		String expRefs = getExpressionRefinements(exp);
-
-
 		String freshVarName = "fresh_"+context.getCounter();
+		vcChecker.setPathVariables(freshVarName);		
+		exitContexts();
 		context.addVarToContext(freshVarName, factory.Type().INTEGER_PRIMITIVE, 
 				expRefs.replace(WILD_VAR, freshVarName));
 		vcChecker.addRefinementVariable(freshVarName);
-
 		enterContexts();
 		visitCtBlock(ifElement.getThenStatement());
 		exitContexts();
@@ -223,34 +230,8 @@ public class RefinementTypeChecker extends CtScanner {
 			exitContexts();
 		}
 		//end
+		vcChecker.removePathVariable(freshVarName);
 		vcChecker.renewVariables();
-
-		//		List<VariableInfo> l = searchForVars(expRefs, "");
-		//		//THEN
-		//		insideIfBlocks(ifElement.getThenStatement(), expRefs, l);
-		//		//ELSE
-		//		if(ifElement.getElseStatement() != null) {
-		//			CtBlock elseStatements = ifElement.getElseStatement();
-		//			CtUnaryOperator<Boolean> negExp = factory.createUnaryOperator();
-		//			negExp.setKind(UnaryOperatorKind.NOT);
-		//			negExp.setOperand(exp);
-		//			CtIf elseIf = factory.createIf();
-		//			elseIf.setCondition(negExp);
-		//			elseIf.setThenStatement(elseStatements);
-		//			
-		//			ifElement.insertAfter(elseIf);			
-		//			
-		//			visitCtIf(elseIf);
-		////			ifElement.updateAllParentsBelow();
-		////			String negExpRefs = getExpressionRefinements(negExp);
-		////			insideIfBlocks(ifElement.getElseStatement(), negExpRefs, l);
-		////			
-		////			ifElement.updateAllParentsBelow();
-		//			
-		////			insideIfBlocks(ifElement.getElseStatement(), negRefs, l);
-		//		}
-		//		System.out.println("--------------End if-------------"/*+getExpressionRefinements(exp)*/);
-		//		System.out.println(context.getAllVariables());
 	}
 
 
@@ -602,12 +583,23 @@ public class RefinementTypeChecker extends CtScanner {
 			addRefinementVariable(simpleName);
 			//context.addRefinementToVariableInContext(variable, correctRefinement);
 			context.newRefinementToVariableInContext(variable, correctRefinement);
-			checkSMT(completeRefinement, et, variable);
+			checkSMTVariable(completeRefinement, et, variable, simpleName);
 			context.removeRefinementFromVariableInContext(variable, correctRefinement);
 			context.addRefinementToVariableInContext(variable, et);
 		});
 	}
 
+
+	public Optional<String> getRefinementFromAnnotation(CtElement element) {
+		Optional<String> ref = Optional.empty();
+		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) 
+			if( ann.getActualAnnotation().annotationType().getCanonicalName()
+					.contentEquals("repair.regen.specification.Refinement")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				ref = Optional.of(s.getValue());
+			}
+		return ref;
+	}
 
 
 	//############################### SMT CHECKING  ##########################################
@@ -629,6 +621,13 @@ public class RefinementTypeChecker extends CtScanner {
 		element.putMetadata(REFINE_KEY, expectedType);	
 		renewVariables();
 	}
+	private void checkSMTVariable(String completeRefinement, String expectedType, 
+			CtVariable<?> element, String simpleName) {
+		vcChecker.processSubtyping(expectedType, simpleName, element);
+		element.putMetadata(REFINE_KEY, expectedType);	
+		renewVariables();
+		
+	}
 
 
 	//############################### Get Metadata ##########################################
@@ -644,35 +643,17 @@ public class RefinementTypeChecker extends CtScanner {
 			sb.append(" && " + vi.getRefinement());
 			System.out.println(vi.getRefinement());
 		}
-		String pathRefs = context.getPathRefinements();
-		if(pathRefs.length() > 0)
-			sb.append(" && "+pathRefs);
-
-		if(pathRefs.length() != 0) {
-			System.out.println("pathRefs:"+pathRefs+", len:"+pathRefs.length());
-			sb.append(sb.length()==0?pathRefs:" && "+pathRefs);
-		}
 		System.out.println(context.getAllVariables());
 		//System.out.println("SB:"+sb.toString());
 		return sb.toString();
 	}
 
 
-	private List<VariableInfo> searchForVars(String met, String name) {
-		List<VariableInfo> l = new ArrayList<>();
-		String[] a = met.split("&&|<|>|(<=)|(>=)|(==)|=|-|\\+|/|\\*|%|(\\|\\||\\(|\\))");//TODO missing OR and maybe other
-		for(String s: a) {
-			String t = s.replace(" ", "");
-			if(!t.equals(name)) {
-				VariableInfo v = context.getVariableByName(t);
-				//System.out.println(t+": variable :"+v);
-				if(v != null && !l.contains(v)) {
-					l.add(v);
-					addRefinementVariable(t);
-				}
-			}
-		}
-		return l;
+	private List<VariableInfo> searchForVars(String string, String differentFrom) {
+		List<VariableInfo> vis = utils.searchForVars(string, differentFrom);
+		for(VariableInfo vi: vis)
+			addRefinementVariable(vi.getName());
+		return vis;
 	}
 
 

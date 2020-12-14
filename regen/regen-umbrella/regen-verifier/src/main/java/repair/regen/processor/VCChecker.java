@@ -1,7 +1,12 @@
 package repair.regen.processor;
 
+import java.awt.dnd.peer.DropTargetPeer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
@@ -9,13 +14,17 @@ import spoon.reflect.declaration.CtElement;
 
 public class VCChecker {
 	private Context context;
+	private Utils utils;
 	private List<List<String>> allVariables;
+	private Map<String, List<String>> pathVariables;
 	private List<String> variables;//pointer for last list of allVariables
 
 	public VCChecker() {
 		context = Context.getInstance();
+		utils = new Utils();
 		allVariables = new ArrayList<>();
 		allVariables.add(new ArrayList<String>());
+		pathVariables = new HashMap<>();
 	}
 
 	public void renewVariables() {
@@ -34,6 +43,16 @@ public class VCChecker {
 					all.add(s);
 		return all;
 	}
+	
+	public List<String> getLastContextVariables(){
+		return variables;
+	}
+	public void setPathVariables(String key) {
+		pathVariables.put(key, variables);
+		}
+	public void removePathVariable(String key) {
+		pathVariables.remove(key);
+	}
 	public void enterContext() {
 		allVariables.add(new ArrayList<String>());
 		variables = allVariables.get(allVariables.size()-1);
@@ -44,22 +63,47 @@ public class VCChecker {
 	}
 
 	public void processSubtyping(String expectedType, CtElement element) {
+		process(expectedType, element, getVariables());
+	}
+	
+	public void processSubtyping(String expectedType, String name, CtElement element) {
+		if(pathVariables.isEmpty())
+			processSubtyping(expectedType, element);
+		else {
+			List<String> pathRemove = new ArrayList<>();
+			for(String k:pathVariables.keySet()) {
+				for(String s: pathVariables.get(k))
+					if(s.equals(name))
+						pathRemove.add(k);
+			}
+			List<String> toSend = getVariables().stream()
+					.filter(a->!pathRemove.contains(a))
+					.collect(Collectors.toList());
+			process(expectedType, element, toSend);
+		}
+	}
+	
+	private void process(String expectedType, CtElement element, List<String> vars) {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sbSMT = new StringBuilder();
-
-		for(String var:getVariables()) {
-			//System.out.println("var:"+var);
+	
+		for(String var:vars) {
 			VariableInfo vi = context.getVariableByName(var);
 			String ref = vi.getRefinement();
 			sb.append("forall "+var+":"+ref+" -> ");
 			sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
 		}
 		sb.append(expectedType);
-		System.out.println("----------------------------VC--------------------------------");
-		System.out.println("VC:"+sb.toString());
-		System.out.println("SMT subtyping:" + sbSMT.toString() + " <: " + expectedType);
-		System.out.println("--------------------------------------------------------------");
+		printVCs(sb.toString(), sbSMT.toString(), expectedType);
 		smtChecking(sbSMT.toString(), expectedType, element);
+	}
+
+	private void printVCs(String string, String stringSMT, String expectedType) {
+		System.out.println("----------------------------VC--------------------------------");
+		System.out.println("VC:"+string);
+		System.out.println("SMT subtyping:" + stringSMT + " <: " + expectedType);
+		System.out.println("--------------------------------------------------------------");
+		
 	}
 
 	private void smtChecking(String correctRefinement, String expectedType, CtElement element) {

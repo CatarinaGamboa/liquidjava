@@ -159,6 +159,11 @@ public class TestExamples {
 	public void errorIfAssignment() {
 		testWrong(testPath+"ErrorIfAssignment.java");
 	}
+	
+	@Test
+	public void errorIfAssignment2() {
+		testWrong(testPath+"ErrorIfAssignment2.java");
+	}
 //	
 //	@Test
 //	public void errorTernaryExpression() {
