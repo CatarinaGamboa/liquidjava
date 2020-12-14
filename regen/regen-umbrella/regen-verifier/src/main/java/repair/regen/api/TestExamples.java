@@ -103,6 +103,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctRecursion() {
+		testCorrect(testPath+"CorrectRecursion.java");
+	}
+	
+	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}
@@ -175,9 +180,15 @@ public class TestExamples {
 		testWrong(testPath+"ErrorBooleanLiteral.java");
 	}
 	
+	
 	@Test
 	public void errorBooleanFunInvocation() {
 		testWrong(testPath+"ErrorBooleanFunInvocation.java");
+	}
+	
+	@Test
+	public void errorRecursion1() {
+		testWrong(testPath+"ErrorRecursion1.java");
 	}
 	
 	
