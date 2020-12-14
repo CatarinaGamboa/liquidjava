@@ -4,19 +4,15 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
 
-	@Refinement("{k >= 0} -> {\\v == 0}")
-	public static int untilZero(int k) {
-		if(k == 0)
-			return 0;
-		else
-			return untilZero(k-1);
+	@Refinement("{\\v == 3}")
+	public static int three() {
+		return 3;
 	}
 	public static void main(String[] args) {
-		@Refinement("b < 3")
-		int b = untilZero(5);
-
+		@Refinement("\\v < 10")
+		int a = 5;
+		a = (a == 2)? 6+three() : 4*three();
 	}
-
 
 }
 

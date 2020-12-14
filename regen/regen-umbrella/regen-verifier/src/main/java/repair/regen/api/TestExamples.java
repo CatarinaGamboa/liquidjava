@@ -87,11 +87,11 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectIfThen.java");
 	}
 	
-//	@Test
-//	public void correctTernaryExpression() {
-//		testCorrect(testPath+"CorrectTernaryExpression.java");
-//	}
-//	
+	@Test
+	public void correctTernaryExpression() {
+		testCorrect(testPath+"CorrectTernaryExpression.java");
+	}
+	
 	@Test
 	public void correctSimpleIfElse() {
 		testCorrect(testPath+"CorrectSimpleIfElse.java");
@@ -169,12 +169,12 @@ public class TestExamples {
 	public void errorIfAssignment2() {
 		testWrong(testPath+"ErrorIfAssignment2.java");
 	}
-//	
-//	@Test
-//	public void errorTernaryExpression() {
-//		testWrong(testPath+"ErrorTernaryExpression.java");
-//	}
-//	
+	
+	@Test
+	public void errorTernaryExpression() {
+		testWrong(testPath+"ErrorTernaryExpression.java");
+	}
+	
 	@Test
 	public void errorBooleanLiteral() {
 		testWrong(testPath+"ErrorBooleanLiteral.java");
