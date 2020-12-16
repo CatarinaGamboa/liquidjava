@@ -35,6 +35,10 @@ public class VariableInfo {
 	public String getRenamedRefinements() {
 		return getRefinement().replaceAll(name, incognitoName);
 	}
+	
+	public String getRenamedRefinements(String toReplace) {
+		return getRefinement().replaceAll(name, toReplace);
+	}
 
 	public String getName() {
 		return name;

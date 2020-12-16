@@ -17,7 +17,6 @@ public class VCChecker {
 	private Utils utils;
 	private List<List<String>> allVariables;
 	private Map<String, List<String>> pathVariables;
-	private List<String> variables;//pointer for last list of allVariables
 
 	public VCChecker() {
 		context = Context.getInstance();
@@ -28,7 +27,11 @@ public class VCChecker {
 	}
 
 	public void renewVariables() {
-		variables = new ArrayList<>();
+		int size = allVariables.size();
+		if(size > 0) {
+			allVariables.remove(size-1);
+			allVariables.add(new ArrayList<>());
+		}
 	}
 	public void addRefinementVariable(String varName) {
 		List<String> variables = allVariables.get(allVariables.size()-1);
@@ -43,32 +46,30 @@ public class VCChecker {
 					all.add(s);
 		return all;
 	}
-	
+
 	public List<String> getLastContextVariables(){
-		return variables;
+		return allVariables.get(allVariables.size()-1);
 	}
 	public void setPathVariables(String key) {
-		pathVariables.put(key, variables);
-		}
+		pathVariables.put(key, allVariables.get(allVariables.size()-1));
+	}
 	public void removePathVariable(String key) {
 		pathVariables.remove(key);
 	}
 	public void enterContext() {
 		allVariables.add(new ArrayList<String>());
-		variables = allVariables.get(allVariables.size()-1);
 	}
 	public void exitContext() {
 		allVariables.remove(allVariables.size()-1);
-		variables = allVariables.get(allVariables.size()-1);
 	}
 
 	public void processSubtyping(String expectedType, CtElement element) {
 		process(expectedType, element, getVariables());
 	}
-	
+
 	public void processSubtyping(String expectedType, String name, CtElement element) {
 		if(pathVariables.isEmpty())
-			processSubtyping(expectedType, element);
+			process(expectedType, element, getVariables());
 		else {
 			List<String> pathRemove = new ArrayList<>();
 			for(String k:pathVariables.keySet()) {
@@ -82,11 +83,11 @@ public class VCChecker {
 			process(expectedType, element, toSend);
 		}
 	}
-	
+
 	private void process(String expectedType, CtElement element, List<String> vars) {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sbSMT = new StringBuilder();
-	
+
 		for(String var:vars) {
 			VariableInfo vi = context.getVariableByName(var);
 			String ref = vi.getRefinement();
@@ -103,7 +104,7 @@ public class VCChecker {
 		System.out.println("VC:"+string);
 		System.out.println("SMT subtyping:" + stringSMT + " <: " + expectedType);
 		System.out.println("--------------------------------------------------------------");
-		
+
 	}
 
 	private void smtChecking(String correctRefinement, String expectedType, CtElement element) {
