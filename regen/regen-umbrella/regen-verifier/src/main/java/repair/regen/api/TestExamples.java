@@ -108,6 +108,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctChainedVariableReferences() {
+		testCorrect(testPath+"CorrectChainedVariableReferences.java");
+	}
+	
+	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}

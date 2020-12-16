@@ -106,7 +106,24 @@ public class VCChecker {
 
 	private List<String> getAllVariablesInRefinements(List<String> vars) {
 		List<String> newVars = new ArrayList();
+		for (String var:getVariables()) 
+			newVars.add(var);
+		for (String var:getVariables())
+			recAuxGetVars(var, newVars);
 		return newVars;
+	}
+
+	private void recAuxGetVars(String varName, List<String> newVars) {
+		String ref = context.getVariableRefinements(varName);
+		List<VariableInfo>vis = utils.searchForVars(ref, varName);
+		if(vis.isEmpty())
+			return;
+		for(VariableInfo vi: vis) {
+			if(!newVars.contains(vi.getName())) {
+				newVars.add(vi.getName());
+				recAuxGetVars(vi.getName(), newVars);
+			}
+		}
 	}
 
 	private void printVCs(String string, String stringSMT, String expectedType) {
