@@ -2,19 +2,20 @@ package regen.test.project;
 
 
 public class SimpleTest {
+    @repair.regen.specification.Refinement("{true}->{ \\v == (n > 10) }")
+    public static boolean greaterThanTen(int n) {
+        return n > 10;
+    }
+
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("\\v < 10")
         int a = 5;
-        @repair.regen.specification.Refinement("\\v > a && \\v < 20")
-        int b = 18;
-        @repair.regen.specification.Refinement("\\v > b && \\v < 60")
-        int c = 40;
-        @repair.regen.specification.Refinement("true")
-        int d = c;
-        @repair.regen.specification.Refinement("\\v > c")
-        int e = 80;
-        @repair.regen.specification.Refinement("\\v > (c+c)")
-        int f = 8000;
+        @repair.regen.specification.Refinement("\\v == true")
+        boolean k = a < 11;
+        @repair.regen.specification.Refinement("\\v == true")
+        boolean o = !(a == 12);
+        @repair.regen.specification.Refinement("\\v == false")
+        boolean m = regen.test.project.SimpleTest.greaterThanTen(a);
     }
 }
 

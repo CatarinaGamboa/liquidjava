@@ -13,7 +13,7 @@ public class CorrectBooleanLitAndInvocations {
         @repair.regen.specification.Refinement("\\v == true")
         boolean k = a < 11;
         @repair.regen.specification.Refinement("\\v == true")
-        boolean t = !(a == 12);
+        boolean o = !(a == 12);
         @repair.regen.specification.Refinement("\\v == false")
         boolean m = repair.regen.CorrectBooleanLitAndInvocations.greaterThanTen(a);
     }

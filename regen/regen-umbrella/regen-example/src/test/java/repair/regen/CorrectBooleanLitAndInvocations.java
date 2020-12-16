@@ -17,7 +17,7 @@ public class CorrectBooleanLitAndInvocations {
 		boolean k = (a < 11);
 
 		@Refinement("\\v == true")
-		boolean t = !(a == 12);
+		boolean o = !(a == 12);
 
 		@Refinement("\\v == false")
 		boolean m = greaterThanTen(a);
