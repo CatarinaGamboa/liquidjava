@@ -38,12 +38,14 @@ public class VCChecker {
 		if(!variables.contains(varName))
 			variables.add(varName);
 	}
+	
 	public List<String> getVariables() {
 		List<String> all = new ArrayList<>();
 		for(List<String> l : allVariables)
 			for(String s : l)
 				if(!all.contains(s))
 					all.add(s);
+		
 		return all;
 	}
 
@@ -88,15 +90,23 @@ public class VCChecker {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sbSMT = new StringBuilder();
 
-		for(String var:vars) {
+		List<String> vars2 = getAllVariablesInRefinements(vars);
+		for(String var:vars2) {
 			VariableInfo vi = context.getVariableByName(var);
-			String ref = vi.getRefinement();
-			sb.append("forall "+var+":"+ref+" -> ");
-			sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
+			if(vi != null) {
+				String ref = vi.getRefinement();
+				sb.append("forall "+var+":"+ref+" -> ");
+				sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
+			}
 		}
 		sb.append(expectedType);
 		printVCs(sb.toString(), sbSMT.toString(), expectedType);
 		smtChecking(sbSMT.toString(), expectedType, element);
+	}
+
+	private List<String> getAllVariablesInRefinements(List<String> vars) {
+		List<String> newVars = new ArrayList();
+		return newVars;
 	}
 
 	private void printVCs(String string, String stringSMT, String expectedType) {

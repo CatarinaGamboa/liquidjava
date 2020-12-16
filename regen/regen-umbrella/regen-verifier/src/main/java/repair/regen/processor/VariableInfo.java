@@ -8,6 +8,7 @@ import spoon.reflect.reference.CtTypeReference;
 public class VariableInfo {
 	private String name;
 	private CtTypeReference<?> type;
+	private String mainRefinement;
 	private List<String> refinements;
 	private String incognitoName;
 	
@@ -16,6 +17,13 @@ public class VariableInfo {
 		this.type = type;
 		this.refinements = new ArrayList<String>();
 		this.refinements.add(refinement);
+	}
+	
+	public void setMainRefinement(String main) {
+		mainRefinement = main;
+	}
+	public String getMainRefinement() {
+		return mainRefinement == null?"true":mainRefinement;
 	}
 	
 	/**
@@ -65,7 +73,8 @@ public class VariableInfo {
 	
 	@Override
 	public String toString() {
-		return "VariableInfo [name=" + name + ", type=" + type + ", refinements=" + refinements + "]";
+		return "VariableInfo [name=" + name + ", type=" + type + ", refinements=" +
+				refinements + ", mainRefinement=" + mainRefinement+ "]";
 	}
 
 }

@@ -104,14 +104,17 @@ public class RefinementTypeChecker extends CtScanner {
 			context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), 
 					a.isPresent()? a.get() : "true");
 		}else {
+			String varName = localVariable.getSimpleName();
 			String refinementFound = getRefinement(localVariable.getAssignment());
-			System.out.println("REFINEMENT LOCAL VAR "+localVariable.getSimpleName()+":"+refinementFound);
-			System.out.println(context.getAllVariables());
 
 			CtExpression a = localVariable.getAssignment();
 			if (refinementFound == null)
 				refinementFound = "true";
-			checkVariableRefinements(refinementFound, localVariable.getSimpleName(), localVariable);
+			context.addVarToContext(varName, localVariable.getType(), 
+					"true");
+			checkVariableRefinements(refinementFound,varName, localVariable);
+			context.removeRefinementFromVariableInContext(varName, "true");
+			context.addMainRefinementVariable(varName, context.getVariableRefinements(varName));
 		}
 	}
 
@@ -133,7 +136,7 @@ public class RefinementTypeChecker extends CtScanner {
 				refinementFound = "true";
 			}
 			checkVariableRefinements(refinementFound, name, varDecl);
-			
+
 		}
 	}
 
@@ -190,7 +193,7 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public void visitCtIf(CtIf ifElement) {
 		CtExpression<Boolean> exp = ifElement.getCondition();
-		
+
 		enterContexts();
 		String expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
@@ -308,7 +311,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 	private <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) {
 		CtExpression ex = operator.getOperand();
-		String name, all;
+		String name = FRESH, all;
 		if(ex instanceof CtVariableWrite) {
 			CtVariableWrite w = (CtVariableWrite) ex;
 			name = w.getVariable().getSimpleName();
@@ -335,8 +338,9 @@ public class RefinementTypeChecker extends CtScanner {
 				System.out.println("Parent not initialized");
 			}
 		}
+		
 		String metadata = getRefinement(ex);
-		String newName = FRESH+context.getCounter();
+		String newName = name+"__"+context.getCounter();
 		String newMeta = "("+metadata.replace(WILD_VAR, newName)+")";
 		String unOp = getOperatorFromKind(operator.getKind());
 
@@ -472,7 +476,7 @@ public class RefinementTypeChecker extends CtScanner {
 				if(parent_var instanceof CtVariableWriteImpl) {
 					String parentName = parentVar.getVariable().getSimpleName();
 					if(parentName.equals(elemName)) {
-						elemName = FRESH+context.getCounter();//+parentName;
+						elemName = parentName+"__"+context.getCounter();//+parentName;
 						elem_ref = elem_ref.replaceAll(parentName, elemName);
 						context.addVarToContext(elemName, parentVar.getType(), elem_ref);
 						addRefinementVariable(elemName);
@@ -543,7 +547,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 	private <T> String getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
 			String name) {
-		String newName = FRESH+context.getCounter();
+		String newName = name+"__"+context.getCounter();
 		CtVariable varDecl = w.getVariable().getDeclaration();
 		//		if(varDecl != null)	getPutVariableMetadada(ex, w.getVariable().getDeclaration());
 		//		else getVariableMetadada(ex, w.getVariable());
@@ -559,8 +563,6 @@ public class RefinementTypeChecker extends CtScanner {
 
 	//############################### SMT Evaluation ##########################################
 	private <T> void checkVariableRefinements(String refinementFound, String simpleName, CtVariable<T> variable) {
-		String newName = simpleName+"_"+context.getCounter()+"_";
-		String correctRefinement = refinementFound.replace(WILD_VAR, newName);
 		Optional<String> expectedType = variable.getAnnotations().stream()
 				.filter(
 						ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -571,18 +573,19 @@ public class RefinementTypeChecker extends CtScanner {
 										str -> str.getValue().replace(WILD_VAR, simpleName)
 										).findAny();
 		expectedType.ifPresent((et) -> {
-			String a = dependentRefinements(et, newName);
-			//String completeRefinement = a.length() == 0? correctRefinement:correctRefinement+" && "+ a; 
-			String completeRefinement = correctRefinement + a; 
-			String etCorrect = et.replaceAll(simpleName, newName);
-			//FOR VCS
-			context.addVarToContext(newName, variable.getType(), completeRefinement);
+			//create new variable for validation
+			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
+			String newName = simpleName+"_"+context.getCounter()+"_";
+			String correctRefinement = refinementFound.replace(WILD_VAR, simpleName);
+			String correctNewRefinement = refinementFound.replace(WILD_VAR, newName);
+			String etNew = et.replaceAll(simpleName, newName);
+			addReferencedVars(etNew, newName);
+
+			//Substitute variable in verification
+			context.addVarToContext(newName, variable.getType(), correctNewRefinement);
 			addRefinementVariable(newName);
-			addRefinementVariable(simpleName);
-			//context.addRefinementToVariableInContext(variable, correctRefinement);
-			context.newRefinementToVariableInContext(variable, correctRefinement);
-			checkSMTVariable(completeRefinement, etCorrect, variable, simpleName);
-			context.removeRefinementFromVariableInContext(variable, correctRefinement);
+			//smt check
+			checkSMTVariable(correctNewRefinement, etNew, variable, simpleName);
 			context.addRefinementToVariableInContext(variable, et);
 		});
 	}
@@ -611,7 +614,7 @@ public class RefinementTypeChecker extends CtScanner {
 		vcChecker.processSubtyping(expectedType, simpleName, element);
 		element.putMetadata(REFINE_KEY, expectedType);	
 		renewVariables();
-		
+
 	}
 
 
@@ -620,21 +623,7 @@ public class RefinementTypeChecker extends CtScanner {
 		return (String) elem.getMetadata(REFINE_KEY);
 	}
 
-	private String dependentRefinements(String et, String name) {
-		System.out.println(et);
-		StringBuilder sb = new StringBuilder();
-		List<VariableInfo> l = searchForVars(et, name);
-		for(VariableInfo vi: l) {
-			sb.append(" && " + vi.getRefinement());
-			System.out.println(vi.getRefinement());
-		}
-		System.out.println(context.getAllVariables());
-		//System.out.println("SB:"+sb.toString());
-		return sb.toString();
-	}
-
-
-	private List<VariableInfo> searchForVars(String string, String differentFrom) {
+	private List<VariableInfo> addReferencedVars(String string, String differentFrom) {
 		List<VariableInfo> vis = utils.searchForVars(string, differentFrom);
 		for(VariableInfo vi: vis)
 			addRefinementVariable(vi.getName());

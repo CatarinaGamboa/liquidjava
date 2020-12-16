@@ -72,7 +72,7 @@ public class Context {
 		if(hasVariable(name)){
 			VariableInfo vi = getVariableByName(name);
 			String oldRef = vi.getRefinement();
-			vi.newRefinement(oldRef = oldRef.length()==0? et : oldRef+" && ("+et+")");
+			vi.newRefinement(et);
 		}else {
 			addVarToContext(name, variable.getType(), et);
 		}
@@ -113,6 +113,17 @@ public class Context {
 		VariableInfo vi = getVariableByName(variableName);
 		vi.removeRefinement(et);
 	}
+	
+	public void addMainRefinementVariable(String name, String refinement) {
+		VariableInfo vi = getVariableByName(name);
+		vi.setMainRefinement(refinement);
+	}
+
+	public String getMainRefinementVariable(String name) {
+		VariableInfo vi = getVariableByName(name);
+		return vi.getMainRefinement();
+	}
+
 	
 	
 	public void addFunctionToContext(FunctionInfo f) {
