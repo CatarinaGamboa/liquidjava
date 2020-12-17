@@ -95,31 +95,31 @@ For the following sections we will be using "\\\v" as the wildcard variable.
 In this section we present syntax examples for refinements in variables.
 The refinements in this example are related to a grading system from 0 to 20, where the refinements express the following conditions:
 
-- positiveGrade is an int greater or equal to 10;
+- negativeGrade is an int smaller than 10;
 - excellentGrade is an int equal to 19 or to 20;
-- goodGrade is an int with a value between positive and excellentGrade.
+- goodGrade is an int with a value between negativeGrade and excellentGrade.
 
 Analyse the following examples with syntax possibilities.
 
 **A**
 
 ```java
-@Refinement("positiveGrade >= 10")
-int positiveGrade = 10;
+@Refinement("negativeGrade < 10")
+int negativeGrade = 8;
 @Refinement("excellentGrade == 19 || excellentGrade == 20")
 int excellentGrade = 19;
-@Refinement("goodGrade > positiveGrade && goodGrade < excellentGrade")
+@Refinement("goodGrade > negativeGrade && goodGrade < excellentGrade")
 int goodGrade = 17;
 ```
 
 **B**
 
 ```java
-@Refinement("{x | x >= 10}")
-int positiveGrade = 10;
+@Refinement("{x | x < 10}")
+int negativeGrade = 10;
 @Refinement("{y | y == 19 || y == 20}")
 int excellentGrade = 19;
-@Refinement("{x | x > positiveGrade && x < excellentGrade}")
+@Refinement("{x | x > negativeGrade && x < excellentGrade}")
 int goodGrade = 17;
 ```
 
