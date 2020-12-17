@@ -116,7 +116,7 @@ int goodGrade = 17;
 
 ```java
 @Refinement("{x | x < 10}")
-int negativeGrade = 10;
+int negativeGrade = 8;
 @Refinement("{y | y == 19 || y == 20}")
 int excellentGrade = 19;
 @Refinement("{x | x > negativeGrade && x < excellentGrade}")
