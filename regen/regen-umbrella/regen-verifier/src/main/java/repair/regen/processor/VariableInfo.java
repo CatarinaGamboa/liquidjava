@@ -2,6 +2,7 @@ package repair.regen.processor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import spoon.reflect.reference.CtTypeReference;
 
@@ -12,11 +13,14 @@ public class VariableInfo {
 	private List<String> refinements;
 	private String incognitoName;
 	
+	private List<VariableInfo> instances;
+	
 	public VariableInfo(String name, CtTypeReference<?> type, String refinement) {
 		this.name = name;
 		this.type = type;
 		this.refinements = new ArrayList<String>();
 		this.refinements.add(refinement);
+		this.instances = new ArrayList<>();
 	}
 	
 	public void setMainRefinement(String main) {
@@ -71,10 +75,24 @@ public class VariableInfo {
 		refinements.remove(toRemove);
 	}
 	
+	public void addInstance(VariableInfo vi) {
+		instances.add(vi);
+	}
+	public void removeLastInstance() {
+		if(instances.size() > 0)
+			instances.remove(instances.size()-1);
+	}
+	public Optional<VariableInfo> getLastInstance() {
+		if(instances.size() > 0)
+			return Optional.of(instances.get(instances.size()-1));
+		return Optional.empty();
+	}
+	
 	@Override
 	public String toString() {
 		return "VariableInfo [name=" + name + ", type=" + type + ", refinements=" +
-				refinements + ", mainRefinement=" + mainRefinement+ "]";
+				refinements + ", mainRefinement=" + mainRefinement+ 
+				", instances=" + instances + "]";
 	}
 
 }

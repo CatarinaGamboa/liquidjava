@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Stack;
 
 import spoon.reflect.declaration.CtVariable;
@@ -160,6 +161,18 @@ public class Context {
 			}
 		}
 		return sb.toString();
+	}
+	
+	public void addRefinementInstanceToVariable(String name, String name2) {
+		if(!hasVariable(name) || !hasVariable(name2)) return;
+		
+		VariableInfo vi1 = getVariableByName(name);
+		vi1.addInstance(getVariableByName(name2));
+	}
+	
+	public Optional<VariableInfo> getLastVariableInstance(String name) {
+		if(!hasVariable(name)) return Optional.empty();
+		return getVariableByName(name).getLastInstance();
 	}
 		
 	

@@ -578,11 +578,12 @@ public class RefinementTypeChecker extends CtScanner {
 			String newName = simpleName+"_"+context.getCounter()+"_";
 			String correctRefinement = refinementFound.replace(WILD_VAR, simpleName);
 			String correctNewRefinement = refinementFound.replace(WILD_VAR, newName);
-			String etNew = et.replaceAll(simpleName, newName);
+			String etNew = et.replaceAll(simpleName, newName);//TODO: Change replaceAll for better
 			addReferencedVars(etNew, newName);
 
 			//Substitute variable in verification
 			context.addVarToContext(newName, variable.getType(), correctNewRefinement);
+			context.addRefinementInstanceToVariable(simpleName, newName);
 			addRefinementVariable(newName);
 			//smt check
 			checkSMTVariable(correctNewRefinement, etNew, variable, simpleName);
