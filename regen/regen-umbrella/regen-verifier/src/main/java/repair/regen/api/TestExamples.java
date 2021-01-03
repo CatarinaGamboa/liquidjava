@@ -113,6 +113,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctReadSpecificAssignment() {
+		testCorrect(testPath+"CorrectReadSpecificAssignment.java");
+	}
+	
+	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}
@@ -191,10 +196,17 @@ public class TestExamples {
 		testWrong(testPath+"ErrorBooleanFunInvocation.java");
 	}
 	
+	
+	@Test
+	public void errorIfSpecificValueAssignment() {
+		testWrong(testPath+"ErrorIfSpecificValueAssignment.java");
+	}
+
 	@Test
 	public void errorRecursion1() {
 		testWrong(testPath+"ErrorRecursion1.java");
 	}
+
 	
 	
 	class MySecurityManager extends SecurityManager {

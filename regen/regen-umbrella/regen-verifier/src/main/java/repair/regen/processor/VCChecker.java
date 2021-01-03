@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -48,6 +49,13 @@ public class VCChecker {
 		
 		return all;
 	}
+	
+	private void removeFromAllVariables(String s1) {
+		for(List<String> l : allVariables)
+			if(l.contains(s1))
+				l.remove(s1);
+		
+	}
 
 	public List<String> getLastContextVariables(){
 		return allVariables.get(allVariables.size()-1);
@@ -55,15 +63,33 @@ public class VCChecker {
 	public void setPathVariables(String key) {
 		pathVariables.put(key, allVariables.get(allVariables.size()-1));
 	}
+	
 	public void removePathVariable(String key) {
 		pathVariables.remove(key);
 	}
+	public void removeFreshVariableThatIncludes(String otherVar) {
+		//Remove from path
+		List<String> toRemove = new ArrayList<>();
+		for(Entry<String, List<String>> e : pathVariables.entrySet()) {
+			String pathName = e.getKey();
+			for(String s: e.getValue()) 
+				if(s.equals(otherVar) && !toRemove.contains(pathName)) 
+					toRemove.add(pathName);
+		}
+		for(String s:toRemove) {
+			pathVariables.remove(s);
+			removeFromAllVariables(s);
+		}
+		
+	}
+
 	public void enterContext() {
 		allVariables.add(new ArrayList<String>());
 	}
 	public void exitContext() {
 		allVariables.remove(allVariables.size()-1);
 	}
+	
 
 	public void processSubtyping(String expectedType, CtElement element) {
 		process(expectedType, element, getVariables());

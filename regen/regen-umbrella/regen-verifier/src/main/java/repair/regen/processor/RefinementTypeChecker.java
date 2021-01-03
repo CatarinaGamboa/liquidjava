@@ -134,6 +134,7 @@ public class RefinementTypeChecker extends CtScanner {
 			if (refinementFound == null) {
 				refinementFound = "true";
 			}
+			vcChecker.removeFreshVariableThatIncludes(name);
 			checkVariableRefinements(refinementFound, name, varDecl);
 
 		}
@@ -294,7 +295,6 @@ public class RefinementTypeChecker extends CtScanner {
 					.getAssigned();
 			oper = getOperationRefinements(operator, parentVar, operator, sb);
 		}else {
-
 			String varRight = getOperationRefinements(operator, right, sb);
 			String varLeft = getOperationRefinements(operator, left, sb);
 			oper =  varLeft +" "+ getOperatorFromKind(operator.getKind()) +" "+ varRight;
