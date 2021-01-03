@@ -128,8 +128,7 @@ public class RefinementTypeChecker extends CtScanner {
 			CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
 			String name = var.getSimpleName();
 
-			if(varDecl != null)	getPutVariableMetadada(ex, varDecl);
-			else getVariableMetadada(ex, var);
+			getPutVariableMetadada(ex, varDecl);
 
 			String refinementFound = getRefinement(assignement.getAssignment());
 			if (refinementFound == null) {
@@ -155,7 +154,10 @@ public class RefinementTypeChecker extends CtScanner {
 	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
 		super.visitCtVariableRead(variableRead);
 		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
-		addRefinementVariable(varDecl.getSimpleName());
+		String name = varDecl.getSimpleName();
+		addRefinementVariable(name);
+		Optional<VariableInfo> ovi = context.getLastVariableInstance(name);
+		if(ovi.isPresent()) addRefinementVariable(ovi.get().getName());
 		getPutVariableMetadada(variableRead, varDecl);
 	}
 
@@ -642,17 +644,23 @@ public class RefinementTypeChecker extends CtScanner {
 		String refinementFound = getRefinement(varDecl);
 		String name = varDecl.getSimpleName();
 
-		String ref = getVariableMetadata(refinementFound, name, varDecl.getType());
-		variable.putMetadata(REFINE_KEY, "("+WILD_VAR+" == " + 
-				varDecl.getSimpleName()+ ")");//&& ("+ ref + ")");
+		String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";
+		Optional<VariableInfo> vi = context.getLastVariableInstance(name);
+		if(vi.isPresent()) {
+			ref = ref + "&& ("+WILD_VAR+" == "+vi.get().getName()+")";
+		}
+		
+		variable.putMetadata(REFINE_KEY, ref);//&& ("+ ref + ")");
+		
+		
 
 	}
-	private <T> void getVariableMetadada(CtElement elem,CtVariableReference variable) {
-		String name = variable.getSimpleName();
-		String ref = getVariableMetadata(null, name, variable.getType());
-		elem.putMetadata(REFINE_KEY, "("+WILD_VAR+" == " + 
-				name + ") ");//&& ("+ ref + ")");
-	}
+//	private <T> void getVariableMetadada(CtElement elem,CtVariableReference variable) {
+//		String name = variable.getSimpleName();
+//		String ref = getVariableMetadata(null, name, variable.getType());
+//		elem.putMetadata(REFINE_KEY, "("+WILD_VAR+" == " + 
+//				name + ") ");//&& ("+ ref + ")");
+//	}
 
 	private String getVariableMetadata(String ref, String name, CtTypeReference type) {
 		String refinementFound = ref;
