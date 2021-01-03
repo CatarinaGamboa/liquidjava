@@ -201,6 +201,11 @@ public class TestExamples {
 	public void errorIfSpecificValueAssignment() {
 		testWrong(testPath+"ErrorIfSpecificValueAssignment.java");
 	}
+	
+	@Test
+	public void errorSpecificValuesIf() {
+		testWrong(testPath+"ErrorSpecificValuesIf.java");
+	}
 
 	@Test
 	public void errorRecursion1() {
