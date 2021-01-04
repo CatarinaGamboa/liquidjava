@@ -33,6 +33,7 @@ import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.reflect.visitor.CtScanner;
+import spoon.support.reflect.code.CtIfImpl;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
 public class RefinementTypeChecker extends CtScanner {
@@ -157,8 +158,8 @@ public class RefinementTypeChecker extends CtScanner {
 		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
 		String name = varDecl.getSimpleName();
 		addRefinementVariable(name);
-		Optional<VariableInfo> ovi = context.getLastVariableInstance(name);
-		if(ovi.isPresent()) addRefinementVariable(ovi.get().getName());
+//		Optional<VariableInfo> ovi = context.getLastVariableInstance(name);
+//		if(ovi.isPresent()) addRefinementVariable(ovi.get().getName());
 		getPutVariableMetadada(variableRead, varDecl);
 	}
 
@@ -471,10 +472,8 @@ public class RefinementTypeChecker extends CtScanner {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			String elemName = elemVar.getVariable().getSimpleName();
 			String elem_ref = context.getVariableRefinements(elemName);
-			elem_ref = getRefinement(elemVar);
-			String newName = elemName+"_"+context.getCounter()+"_";
-			String newElem_ref = elem_ref.replace(WILD_VAR, newName);
-
+			
+			String returnName = elemName;
 			//same name as caller k = k +...
 			CtElement parent = operator.getParent();
 			if(parent instanceof CtAssignment) {
@@ -488,15 +487,21 @@ public class RefinementTypeChecker extends CtScanner {
 						addRefinementVariable(elemName);
 					}
 				}
+			}else if(parent != null && !(parent instanceof CtIfImpl)) {
+				elem_ref = getRefinement(elemVar);
+				String newName = elemName+"_"+context.getCounter()+"_";
+				String newElem_ref = elem_ref.replace(WILD_VAR, newName);
+				context.addVarToContext(newName, elemVar.getType(), newElem_ref);
+				addRefinementVariable(newName);
+				returnName = newName;
 			}
 			
 			context.addVarToContext(elemName, elemVar.getType(), elem_ref);
 			addRefinementVariable(elemName);
-			context.addVarToContext(newName, elemVar.getType(), newElem_ref);
-			addRefinementVariable(newName);
+			
 			//sb.append(" && "+elem_ref.replace(WILD_VAR, elemName));
 			//return elemName;
-			return newName;
+			return returnName;
 		}
 
 		else if(element instanceof CtBinaryOperator<?>) {
@@ -653,9 +658,11 @@ public class RefinementTypeChecker extends CtScanner {
 		String name = varDecl.getSimpleName();
 
 		String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";
-		Optional<VariableInfo> vi = context.getLastVariableInstance(name);
-		if(vi.isPresent()) {
-			ref = ref + "&& ("+WILD_VAR+" == "+vi.get().getName()+")";
+		Optional<VariableInfo> ovi = context.getLastVariableInstance(name);
+		if(ovi.isPresent()) {
+			VariableInfo vi = ovi.get();
+			addRefinementVariable(vi.getName());
+			ref = ref + "&& ("+WILD_VAR+" == "+vi.getName()+")";
 		}
 		
 		variable.putMetadata(REFINE_KEY, ref);//&& ("+ ref + ")");
