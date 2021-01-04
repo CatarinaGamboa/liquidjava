@@ -198,10 +198,11 @@ public class RefinementTypeChecker extends CtScanner {
 		CtExpression<Boolean> exp = ifElement.getCondition();
 
 		enterContexts();
+		
 		String expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
 		vcChecker.setPathVariables(freshVarName);		
-		exitContexts();
+		
 		context.addVarToContext(freshVarName, factory.Type().INTEGER_PRIMITIVE, 
 				expRefs.replace(WILD_VAR, freshVarName));
 		vcChecker.addRefinementVariable(freshVarName);
@@ -219,6 +220,7 @@ public class RefinementTypeChecker extends CtScanner {
 		//end
 		vcChecker.removePathVariable(freshVarName);
 		vcChecker.renewVariables();
+		exitContexts();
 	}
 
 
@@ -297,7 +299,7 @@ public class RefinementTypeChecker extends CtScanner {
 		}else {
 			String varRight = getOperationRefinements(operator, right, sb);
 			String varLeft = getOperationRefinements(operator, left, sb);
-			oper =  varLeft +" "+ getOperatorFromKind(operator.getKind()) +" "+ varRight;
+			oper =  "("+varLeft +" "+ getOperatorFromKind(operator.getKind()) +" "+ varRight+")";
 
 		}
 		if (operator.getType().getQualifiedName().contentEquals("int")) {
@@ -469,7 +471,9 @@ public class RefinementTypeChecker extends CtScanner {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			String elemName = elemVar.getVariable().getSimpleName();
 			String elem_ref = context.getVariableRefinements(elemName);
-			//getRefinement(element);
+			elem_ref = getRefinement(elemVar);
+			String newName = elemName+"_"+context.getCounter()+"_";
+			String newElem_ref = elem_ref.replace(WILD_VAR, newName);
 
 			//same name as caller k = k +...
 			CtElement parent = operator.getParent();
@@ -485,10 +489,14 @@ public class RefinementTypeChecker extends CtScanner {
 					}
 				}
 			}
+			
 			context.addVarToContext(elemName, elemVar.getType(), elem_ref);
 			addRefinementVariable(elemName);
+			context.addVarToContext(newName, elemVar.getType(), newElem_ref);
+			addRefinementVariable(newName);
 			//sb.append(" && "+elem_ref.replace(WILD_VAR, elemName));
-			return elemName;
+			//return elemName;
+			return newName;
 		}
 
 		else if(element instanceof CtBinaryOperator<?>) {

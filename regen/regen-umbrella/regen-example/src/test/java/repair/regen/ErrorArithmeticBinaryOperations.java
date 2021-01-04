@@ -7,6 +7,6 @@ public class ErrorArithmeticBinaryOperations {
 		@Refinement("\\v < 100")
 		int y = 50;
 		@Refinement("\\v > 0")
-		int z = y - 3;
+		int z = y - 51;
 	}
 }
