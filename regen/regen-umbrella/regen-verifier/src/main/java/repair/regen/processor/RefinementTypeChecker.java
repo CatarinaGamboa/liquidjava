@@ -345,7 +345,7 @@ public class RefinementTypeChecker extends CtScanner {
 		}
 		
 		String metadata = getRefinement(ex);
-		String newName = name+"__"+context.getCounter();
+		String newName = name+"_"+context.getCounter()+"_";
 		String newMeta = "("+metadata.replace(WILD_VAR, newName)+")";
 		String unOp = getOperatorFromKind(operator.getKind());
 
@@ -474,20 +474,10 @@ public class RefinementTypeChecker extends CtScanner {
 			String elem_ref = context.getVariableRefinements(elemName);
 			
 			String returnName = elemName;
-			//same name as caller k = k +...
+
 			CtElement parent = operator.getParent();
-			if(parent instanceof CtAssignment) {
-				CtExpression<?> parent_var = ((CtAssignment) parent).getAssigned();
-				if(parent_var instanceof CtVariableWriteImpl) {
-					String parentName = parentVar.getVariable().getSimpleName();
-					if(parentName.equals(elemName)) {
-						elemName = parentName+"__"+context.getCounter();//+parentName;
-						elem_ref = elem_ref.replaceAll(parentName, elemName);
-						context.addVarToContext(elemName, parentVar.getType(), elem_ref);
-						addRefinementVariable(elemName);
-					}
-				}
-			}else if(parent != null && !(parent instanceof CtIfImpl)) {
+			//No need for specific values
+			if(parent != null && !(parent instanceof CtIfImpl)) {
 				elem_ref = getRefinement(elemVar);
 				String newName = elemName+"_"+context.getCounter()+"_";
 				String newElem_ref = elem_ref.replace(WILD_VAR, newName);
@@ -498,9 +488,6 @@ public class RefinementTypeChecker extends CtScanner {
 			
 			context.addVarToContext(elemName, elemVar.getType(), elem_ref);
 			addRefinementVariable(elemName);
-			
-			//sb.append(" && "+elem_ref.replace(WILD_VAR, elemName));
-			//return elemName;
 			return returnName;
 		}
 
@@ -530,7 +517,6 @@ public class RefinementTypeChecker extends CtScanner {
 			innerRefs = innerRefs.replace("\\v", newName);
 			context.addVarToContext(newName, fi.getType(), innerRefs);
 			addRefinementVariable(newName);
-			//sb.append(" && "+innerRefs);//Add refinements
 			return newName;//Return variable that represents the invocation
 		}
 		return getRefinement(element);

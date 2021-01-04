@@ -199,12 +199,17 @@ public class TestExamples {
 	
 	@Test
 	public void errorIfSpecificValueAssignment() {
-		testWrong(testPath+"ErrorIfSpecificValueAssignment.java");
+		testWrong(testPath+"ErrorSpecificValuesIf2.java");
 	}
 	
 	@Test
 	public void errorSpecificValuesIf() {
 		testWrong(testPath+"ErrorSpecificValuesIf.java");
+	}
+	
+	@Test
+	public void errorSpecificArithmetic() {
+		testWrong(testPath+"ErrorSpecificArithmetic.java");
 	}
 
 	@Test
