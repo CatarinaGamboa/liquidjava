@@ -117,6 +117,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectReadSpecificAssignment.java");
 	}
 	
+	public void correctSpecificFunctionInvocation() {
+		testCorrect(testPath+"CorrectSpecificFunctionInvocation.java");
+	}
+	
 	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");

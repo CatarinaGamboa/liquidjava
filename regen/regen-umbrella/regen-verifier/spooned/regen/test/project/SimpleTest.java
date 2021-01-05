@@ -2,20 +2,24 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{n >= 0} -> {\\v >= 0}")
-    public int fibonnaci(int n) {
-        if (n <= 2)
-            return n;
-        else
-            return (fibonnaci((n - 1))) + (fibonnaci((n - 2)));
-
+    @repair.regen.specification.Refinement("{a > 10}->{ \\v > 0}")
+    public static int doubleBiggerThanTen(int a) {
+        return a * 2;
     }
 
     public static void main(java.lang.String[] args) {
-        // @Refinement("\\v > 5")
-        // int a = 10;
-        // @Refinement("\\v > a")
-        // int b = 11;
+        // EXAMPLE VARIABLE INSIDE REFINEMENT
+        // @Refinement("\\v < 10")
+        // int a = 6;
+        // if(a > 0) {
+        // a = -2;
+        // @Refinement("b < a")
+        // int b = -3;
+        // 
+        // }
+        @repair.regen.specification.Refinement("a > 0")
+        int a = 50;
+        int b = regen.test.project.SimpleTest.doubleBiggerThanTen(a);
     }
 }
 
