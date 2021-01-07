@@ -275,8 +275,8 @@ public class RefinementTypeChecker extends CtScanner {
 
 			//Both return and the method have metadata
 			String returnVarName = "RET_"+context.getCounter(); 
-			String retRef = "("+getRefinement(ret.getReturnedExpression())
-			.replace(WILD_VAR, returnVarName)+")";
+			String retRef = String.format("(%s)", getRefinement(ret.getReturnedExpression())
+													.replace(WILD_VAR, returnVarName));
 			String expectedType = fi.getRefReturn().replace(WILD_VAR, returnVarName);
 
 			context.addVarToContext(returnVarName, method.getType(), retRef);
@@ -288,7 +288,6 @@ public class RefinementTypeChecker extends CtScanner {
 	}
 
 	private <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) {
-		StringBuilder sb = new StringBuilder(); 
 		CtExpression<?> right = operator.getRightHandOperand();
 		CtExpression<?> left = operator.getLeftHandOperand();
 		String oper = operator.toString();
@@ -296,20 +295,21 @@ public class RefinementTypeChecker extends CtScanner {
 		if(parent instanceof CtAssignment<?, ?>) {
 			CtVariableWriteImpl<?> parentVar = (CtVariableWriteImpl<?>)((CtAssignment) parent)
 					.getAssigned();
-			oper = getOperationRefinements(operator, parentVar, operator, sb);
+			oper = getOperationRefinements(operator, parentVar, operator);
 		}else {
-			String varRight = getOperationRefinements(operator, right, sb);
-			String varLeft = getOperationRefinements(operator, left, sb);
-			oper =  "("+varLeft +" "+ getOperatorFromKind(operator.getKind()) +" "+ varRight+")";
+			String varRight = getOperationRefinements(operator, right);
+			String varLeft = getOperationRefinements(operator, left);
+			oper = String.format("(%s %s %s)", 
+					varLeft, getOperatorFromKind(operator.getKind()),varRight);
 
 		}
 		if (operator.getType().getQualifiedName().contentEquals("int")) {
-			operator.putMetadata(REFINE_KEY, WILD_VAR+" == " + oper+ sb.toString());
+			operator.putMetadata(REFINE_KEY, WILD_VAR+" == " + oper);
 		}else if(operator.getType().getQualifiedName().contentEquals("boolean")) {
-			operator.putMetadata(REFINE_KEY, oper+ sb.toString());
+			operator.putMetadata(REFINE_KEY, oper);
 			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
 					parent instanceof CtReturn<?>)
-				operator.putMetadata(REFINE_KEY, WILD_VAR+" == (" + oper+")"+ sb.toString());
+				operator.putMetadata(REFINE_KEY, WILD_VAR+" == (" + oper+")");
 		}
 		//TODO ADD TYPES
 	}
@@ -454,8 +454,8 @@ public class RefinementTypeChecker extends CtScanner {
 
 
 	private String getOperationRefinements(CtBinaryOperator<?> operator, 
-			CtExpression<?> element, StringBuilder sb) {
-		return getOperationRefinements(operator, null, element, sb);
+			CtExpression<?> element) {
+		return getOperationRefinements(operator, null, element);
 	}
 
 	/**
@@ -463,11 +463,10 @@ public class RefinementTypeChecker extends CtScanner {
 	 * @param operator Binary Operator that started the operation
 	 * @param parentVar Parent of Binary Operator, usually a CtAssignment or CtLocalVariable
 	 * @param element CtExpression that represent an Binary Operation or one of the operands
-	 * @param sb StringBuilder that joins the refinements of all the elements in the operation
 	 * @return
 	 */
 	private String getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWriteImpl<?> parentVar, 
-			CtExpression<?> element, StringBuilder sb) {
+			CtExpression<?> element) {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			String elemName = elemVar.getVariable().getSimpleName();
@@ -493,8 +492,8 @@ public class RefinementTypeChecker extends CtScanner {
 
 		else if(element instanceof CtBinaryOperator<?>) {
 			CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
-			String right = getOperationRefinements(operator, parentVar, binop.getRightHandOperand(), sb);
-			String left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand(), sb);
+			String right = getOperationRefinements(operator, parentVar, binop.getRightHandOperand());
+			String left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand());
 			return left +" "+ getOperatorFromKind(binop.getKind()) +" "+ right;
 
 		}else if (element instanceof CtUnaryOperator<?>) {

@@ -15,12 +15,12 @@ public class SimpleTest {
 		int a = 6;
 		
 		if(a > 3) {
-			a = 9;
-		}else {
-			@Refinement("b > 8")
-			int b = a;
-		
-		}
+			a = 7 + 1;
+		}//else {
+//			@Refinement("b > 8")
+//			int b = a;
+//		
+//		}
 //		@Refinement("b > 8")
 //		int b = a;
 		

@@ -12,11 +12,13 @@ public class SimpleTest {
         @repair.regen.specification.Refinement("\\v < 10")
         int a = 6;
         if (a > 3) {
-            a = 9;
-        } else {
-            @repair.regen.specification.Refinement("b > 8")
-            int b = a;
-        }
+            a = 7 + 1;
+        }// else {
+
+        // @Refinement("b > 8")
+        // int b = a;
+        // 
+        // }
         // @Refinement("b > 8")
         // int b = a;
     }
