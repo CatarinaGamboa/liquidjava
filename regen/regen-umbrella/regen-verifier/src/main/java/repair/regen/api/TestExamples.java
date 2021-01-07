@@ -217,6 +217,15 @@ public class TestExamples {
 	}
 
 	@Test
+	public void errorSpecificVarInRefinement() {
+		testWrong(testPath+"ErrorSpecificVarInRefinement.java");
+	}
+	@Test
+	public void errorSpecificVarInRefinementIf() {
+		testWrong(testPath+"ErrorSpecificVarInRefinementIf.java");
+	}
+	
+	@Test
 	public void errorRecursion1() {
 		testWrong(testPath+"ErrorRecursion1.java");
 	}

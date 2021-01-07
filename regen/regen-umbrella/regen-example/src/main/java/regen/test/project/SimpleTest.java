@@ -3,26 +3,26 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
-	
-	@Refinement("{a > 10}->{ \\v > 0}")
-	public static int doubleBiggerThanTen(int a){
-		return a*2;
-	}
-	
+//	
+//	@Refinement("{a > 10}->{ \\v > 0}")
+//	public static int doubleBiggerThanTen(int a){
+//		return a*2;
+//	}
+//	
 	public static void main(String[] args) {	
-		//EXAMPLE VARIABLE INSIDE REFINEMENT
-//		@Refinement("\\v < 10")
-//		int a = 6;
-//		if(a > 0) {
-//		    a = -2;
-//		    @Refinement("b < a")
-//		    int b = -3;
-//
-//		}
+
+		@Refinement("\\v < 10")
+		int a = 6;
 		
-	@Refinement("a > 0")
-	int a = 50;
-	int b = doubleBiggerThanTen(a);
+		if(a > 3) {
+			a = 9;
+		}else {
+			@Refinement("b > 8")
+			int b = a;
+		
+		}
+//		@Refinement("b > 8")
+//		int b = a;
 		
 		
 	}
