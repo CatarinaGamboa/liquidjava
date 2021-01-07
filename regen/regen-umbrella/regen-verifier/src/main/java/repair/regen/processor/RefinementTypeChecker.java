@@ -41,18 +41,22 @@ public class RefinementTypeChecker extends CtScanner {
 
 	// 1. Keep track of the context variable types
 	// 2. Do type checking and inference
-	private final String REFINE_KEY = "refinement";
-	private final String WILD_VAR = "\\v";
-	private final String FRESH = "FRESH_";
+	final String REFINE_KEY = "refinement";
+	final String WILD_VAR = "\\v";
+	final String FRESH = "FRESH_";
 
-	private Context context = Context.getInstance();
-	private VCChecker vcChecker = new VCChecker();
-	private Utils utils = new Utils();
+	Context context = Context.getInstance();
+	VCChecker vcChecker = new VCChecker();
+	Utils utils = new Utils();
 
 	private Factory factory;
+	
+	//Auxiliar TypeCheckers
+	OperationsChecker otc;
 
 	public RefinementTypeChecker(Factory factory) {
-		this.factory = factory;		
+		this.factory = factory;
+		otc = new OperationsChecker(this);
 	}
 
 	//--------------------- Visitors -----------------------------------
@@ -170,14 +174,14 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
 		super.visitCtBinaryOperator(operator);
-		getBinaryOpRefinements(operator);
+		otc.getBinaryOpRefinements(operator);
 
 	}
 
 	@Override
 	public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
 		super.visitCtUnaryOperator(operator);
-		getUnaryOpRefinements(operator);
+		otc.getUnaryOpRefinements(operator);
 
 	}
 
@@ -246,7 +250,7 @@ public class RefinementTypeChecker extends CtScanner {
 	private void renewVariables() {
 		vcChecker.renewVariables();
 	}
-	private void addRefinementVariable(String varName) {
+	void addRefinementVariable(String varName) {
 		vcChecker.addRefinementVariable(varName);
 	}
 	private void enterContexts() {
@@ -287,80 +291,6 @@ public class RefinementTypeChecker extends CtScanner {
 		}
 	}
 
-	private <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) {
-		CtExpression<?> right = operator.getRightHandOperand();
-		CtExpression<?> left = operator.getLeftHandOperand();
-		String oper = operator.toString();
-		CtElement parent = operator.getParent();
-		if(parent instanceof CtAssignment<?, ?>) {
-			CtVariableWriteImpl<?> parentVar = (CtVariableWriteImpl<?>)((CtAssignment) parent)
-					.getAssigned();
-			oper = getOperationRefinements(operator, parentVar, operator);
-		}else {
-			String varRight = getOperationRefinements(operator, right);
-			String varLeft = getOperationRefinements(operator, left);
-			oper = String.format("(%s %s %s)", 
-					varLeft, getOperatorFromKind(operator.getKind()),varRight);
-
-		}
-		if (operator.getType().getQualifiedName().contentEquals("int")) {
-			operator.putMetadata(REFINE_KEY, WILD_VAR+" == " + oper);
-		}else if(operator.getType().getQualifiedName().contentEquals("boolean")) {
-			operator.putMetadata(REFINE_KEY, oper);
-			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
-					parent instanceof CtReturn<?>)
-				operator.putMetadata(REFINE_KEY, WILD_VAR+" == (" + oper+")");
-		}
-		//TODO ADD TYPES
-	}
-
-	private <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) {
-		CtExpression ex = operator.getOperand();
-		String name = FRESH, all;
-		if(ex instanceof CtVariableWrite) {
-			CtVariableWrite w = (CtVariableWrite) ex;
-			name = w.getVariable().getSimpleName();
-			all = getRefinementUnaryVariableWrite(ex, operator, w, name);
-			checkVariableRefinements(all, name, w.getVariable().getDeclaration());
-			return;
-
-		}else if (ex instanceof CtVariableRead){
-			CtVariableRead var = (CtVariableRead) ex;
-			name = var.getVariable().getSimpleName();
-			//If the variable is the same, the refinements need to be changed
-			try {
-				CtAssignment assign = operator.getParent(CtAssignment.class);
-				if(assign!= null && assign.getAssigned() instanceof CtVariableWrite<?>) {
-					CtVariableWrite<?> w = (CtVariableWrite<?>) assign.getAssigned();
-					String parentName = w.getVariable().getSimpleName();
-					if(name.equals(parentName)) {
-						all = getRefinementUnaryVariableWrite(ex, operator, w, name);
-						operator.putMetadata(REFINE_KEY, all);
-						return;
-					}
-				}
-			}catch(ParentNotInitializedException e) {
-				System.out.println("Parent not initialized");
-			}
-		}
-		
-		String metadata = getRefinement(ex);
-		String newName = name+"_"+context.getCounter()+"_";
-		String newMeta = "("+metadata.replace(WILD_VAR, newName)+")";
-		String unOp = getOperatorFromKind(operator.getKind());
-
-		CtElement p = operator.getParent();
-		String opS = unOp.replace(WILD_VAR, newName);
-		if(p instanceof CtIf)
-			all = unOp.replace(WILD_VAR, newName);
-		else
-			all ="("+WILD_VAR+" == " + opS + ")";
-		System.out.println(newMeta + " && "+all);
-		context.addVarToContext(newName, ex.getType(), newMeta);
-		addRefinementVariable(newName);
-		operator.putMetadata(REFINE_KEY, all);
-
-	}
 
 	private <R> void getMethodRefinements(CtMethod<R> method) {
 		FunctionInfo f = new FunctionInfo();
@@ -453,75 +383,6 @@ public class RefinementTypeChecker extends CtScanner {
 
 
 
-	private String getOperationRefinements(CtBinaryOperator<?> operator, 
-			CtExpression<?> element) {
-		return getOperationRefinements(operator, null, element);
-	}
-
-	/**
-	 * Retrieves all the refinements for the Operation including the refinements of all operands
-	 * @param operator Binary Operator that started the operation
-	 * @param parentVar Parent of Binary Operator, usually a CtAssignment or CtLocalVariable
-	 * @param element CtExpression that represent an Binary Operation or one of the operands
-	 * @return
-	 */
-	private String getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWriteImpl<?> parentVar, 
-			CtExpression<?> element) {
-		if(element instanceof CtVariableRead<?>) {
-			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
-			String elemName = elemVar.getVariable().getSimpleName();
-			String elem_ref = context.getVariableRefinements(elemName);
-			
-			String returnName = elemName;
-
-			CtElement parent = operator.getParent();
-			//No need for specific values
-			if(parent != null && !(parent instanceof CtIfImpl)) {
-				elem_ref = getRefinement(elemVar);
-				String newName = elemName+"_"+context.getCounter()+"_";
-				String newElem_ref = elem_ref.replace(WILD_VAR, newName);
-				context.addVarToContext(newName, elemVar.getType(), newElem_ref);
-				addRefinementVariable(newName);
-				returnName = newName;
-			}
-			
-			context.addVarToContext(elemName, elemVar.getType(), elem_ref);
-			addRefinementVariable(elemName);
-			return returnName;
-		}
-
-		else if(element instanceof CtBinaryOperator<?>) {
-			CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
-			String right = getOperationRefinements(operator, parentVar, binop.getRightHandOperand());
-			String left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand());
-			return left +" "+ getOperatorFromKind(binop.getKind()) +" "+ right;
-
-		}else if (element instanceof CtUnaryOperator<?>) {
-			String a = (String) element.getMetadata(REFINE_KEY);
-			String b = a.replace(WILD_VAR, "").replace("(", "").replace(")", "")
-					.replace("==", "").replace(" ", "");
-			return b;
-		}else if (element instanceof CtLiteral<?>) {
-			CtLiteral<?> l = (CtLiteral<?>) element;
-			return l.getValue().toString();
-
-		}else if(element instanceof CtInvocation<?>) {
-			CtInvocation<?> inv = (CtInvocation<?>) element;
-			CtExecutable<?> method = inv.getExecutable().getDeclaration();
-			//Get function refinements with non_used variables
-			FunctionInfo fi = context.getFunctionByName(method.getSimpleName());
-			String innerRefs = fi.getRenamedRefinements();
-			//Substitute \\v by the variable that we send
-			String newName = FRESH+context.getCounter();
-			innerRefs = innerRefs.replace("\\v", newName);
-			context.addVarToContext(newName, fi.getType(), innerRefs);
-			addRefinementVariable(newName);
-			return newName;//Return variable that represents the invocation
-		}
-		return getRefinement(element);
-		//TODO Maybe add cases
-	}
-
 	private String getExpressionRefinements(CtExpression element) {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
@@ -545,24 +406,9 @@ public class RefinementTypeChecker extends CtScanner {
 		return getRefinement(element);
 	}
 
-	private <T> String getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
-			String name) {
-		String newName = name+"__"+context.getCounter();
-		CtVariable varDecl = w.getVariable().getDeclaration();
-		//		if(varDecl != null)	getPutVariableMetadada(ex, w.getVariable().getDeclaration());
-		//		else getVariableMetadada(ex, w.getVariable());
-
-		String metadada = context.getVariableRefinements(varDecl.getSimpleName());
-		addRefinementVariable(newName);
-		String binOperation = getOperatorFromKind(operator.getKind()).replace(WILD_VAR, newName);
-		String metaOper = metadada.replace(WILD_VAR, newName).replace(name, newName);
-		context.addVarToContext(newName, w.getType(), metaOper);
-		return WILD_VAR+" == "+binOperation;
-	}
-
 
 	//############################### SMT Evaluation ##########################################
-	private <T> void checkVariableRefinements(String refinementFound, String simpleName, CtVariable<T> variable) {
+	<T> void checkVariableRefinements(String refinementFound, String simpleName, CtVariable<T> variable) {
 		Optional<String> expectedType = variable.getAnnotations().stream()
 				.filter(
 						ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -620,7 +466,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 
 	//############################### Get Metadata ##########################################
-	private String getRefinement(CtElement elem) {
+	String getRefinement(CtElement elem) {
 		return (String) elem.getMetadata(REFINE_KEY);
 	}
 
@@ -674,50 +520,4 @@ public class RefinementTypeChecker extends CtScanner {
 		}
 		return refinementFound;
 	}
-
-
-	//############################### Operations Auxiliaries ##########################################
-
-	/**
-	 * Get the String value of the operator from the enum
-	 * @param kind
-	 * @return
-	 */
-	private String getOperatorFromKind(BinaryOperatorKind kind) {
-		switch(kind) {
-		case PLUS:	return "+";
-		case MINUS: return "-";
-		case MUL: 	return "*";
-		case DIV: 	return "/";
-		case MOD: 	return "%";
-
-		case AND: 	return "&&";
-		case OR: 	return "||";
-
-		case EQ: 	return "==";
-		case NE: 	return "!=";
-		case GE: 	return ">=";
-		case GT: 	return ">";
-		case LE: 	return "<=";
-		case LT: 	return "<";
-		default:
-			return null;
-			//TODO COMPLETE
-		}
-	}
-
-	private String getOperatorFromKind(UnaryOperatorKind kind) {
-		switch(kind) {
-		case POSTINC:	return WILD_VAR+" + 1";
-		case POSTDEC: 	return WILD_VAR+" - 1";
-		case PREINC:	return WILD_VAR+" + 1";
-		case PREDEC: 	return WILD_VAR+" - 1";
-		//TODO FILL WITH CORRECT
-		case NOT: 	return "!"+WILD_VAR;
-		case POS: 	return "0 + "+ WILD_VAR;
-		case NEG: 	return "-"+WILD_VAR;
-		default:	return null;
-		}
-	}
-
 }
