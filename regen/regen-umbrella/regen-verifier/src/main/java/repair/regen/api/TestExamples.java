@@ -52,6 +52,12 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctLongUsage() {
+		testCorrect(testPath+"CorrectLongUsage.java");//passVC
+	}
+	
+	
+	@Test
 	public void correctNoRefinements() {
 		testCorrect(testPath+"CorrectNoRefinements.java");//passVC
 	}
@@ -87,11 +93,11 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectIfThen.java");
 	}
 	
-	@Test
-	public void correctTernaryExpression() {
-		testCorrect(testPath+"CorrectTernaryExpression.java");
-	}
-	
+//	@Test
+//	public void correctTernaryExpression() {
+//		testCorrect(testPath+"CorrectTernaryExpression.java");
+//	}
+//	
 	@Test
 	public void correctSimpleIfElse() {
 		testCorrect(testPath+"CorrectSimpleIfElse.java");
@@ -145,6 +151,16 @@ public class TestExamples {
 	@Test
 	public void errorUnaryOpMinus() {
 		testWrong(testPath+"ErrorUnaryOpMinus.java");
+	}
+	
+	@Test
+	public void errorLongUsage1() {
+		testWrong(testPath+"ErrorLongUsage1.java");
+	}
+	
+	@Test
+	public void errorLongUsage2() {
+		testWrong(testPath+"ErrorLongUsage2.java");
 	}
 	
 	

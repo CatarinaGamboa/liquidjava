@@ -150,6 +150,8 @@ public class RefinementTypeChecker extends CtScanner {
 			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
 		}else if (lit.getType().getQualifiedName().contentEquals("boolean")) {
 			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
+		}else if (lit.getType().getQualifiedName().contentEquals("long")) {
+			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
 		}
 		//TODO ADD LITERAL TYPES
 	}	

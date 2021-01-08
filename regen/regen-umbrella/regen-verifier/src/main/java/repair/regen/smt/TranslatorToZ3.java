@@ -26,6 +26,8 @@ public class TranslatorToZ3 {
 				varTranslation.put(name, z3.mkIntConst(name));
 			}else if (ctx.get(name).getQualifiedName().contentEquals("boolean")) {
 				varTranslation.put(name, z3.mkBoolConst(name));
+			}else if (ctx.get(name).getQualifiedName().contentEquals("long")) {
+				varTranslation.put(name, z3.mkRealConst(name));
 			}
 			else {
 				System.out.println(name + ":"+ctx.get(name).getQualifiedName());
@@ -40,6 +42,11 @@ public class TranslatorToZ3 {
 	//Literals and Variables
 	public Expr makeIntegerLiteral(int value) {
 		return z3.mkInt(value);
+	}
+	
+	public Expr makeLongLiteral(long value) {
+		return z3.mkInt(value);
+		//return z3.mkReal(value);
 	}
 	
 	public Expr makeBooleanLiteral(boolean value) {

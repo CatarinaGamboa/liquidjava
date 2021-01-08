@@ -56,9 +56,10 @@ class OperationsChecker {
 					varLeft, getOperatorFromKind(operator.getKind()),varRight);
 
 		}
-		if (operator.getType().getQualifiedName().contentEquals("int")) {
+		String type = operator.getType().getQualifiedName(); 
+		if (type.contentEquals("int") || type.contentEquals("long")) {
 			operator.putMetadata(rtc.REFINE_KEY, rtc.WILD_VAR+" == " + oper);
-		}else if(operator.getType().getQualifiedName().contentEquals("boolean")) {
+		}else if(type.contentEquals("boolean")) {
 			operator.putMetadata(rtc.REFINE_KEY, oper);
 			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
 					parent instanceof CtReturn<?>)

@@ -8,13 +8,13 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-@Priority(7)
-public class IntegerLiteral extends LiteralExpression implements IModel {
+@Priority(10)
+public class RealLiteral extends LiteralExpression implements IModel {
 	@Value
 	int value;
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
-		return ctx.makeIntegerLiteral(value);
+		return ctx.makeLongLiteral(value);
 	}
 }
