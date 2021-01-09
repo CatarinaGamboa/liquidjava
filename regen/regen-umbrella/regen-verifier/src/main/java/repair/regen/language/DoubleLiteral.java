@@ -7,7 +7,7 @@ import org.modelcc.Value;
 import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
-@Priority(7)
+@Priority(10)
 public class DoubleLiteral  extends LiteralExpression implements IModel {
 	@Value
 	double value;

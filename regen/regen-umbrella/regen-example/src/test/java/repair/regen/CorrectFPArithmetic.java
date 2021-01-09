@@ -36,6 +36,10 @@ public class CorrectFPArithmetic {
 		
 		@Refinement("\\v < -1.0")
 		double p3 = p;
+		
+		@Refinement("\\v < -5.5")
+		double d = (-a) - 2.0;
+
 	}
 
 }

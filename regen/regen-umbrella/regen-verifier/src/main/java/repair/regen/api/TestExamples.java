@@ -168,6 +168,23 @@ public class TestExamples {
 		testWrong(testPath+"ErrorLongUsage2.java");
 	}
 	
+	@Test
+	public void errorArithmeticFP1() {
+		testWrong(testPath+"ErrorArithmeticFP1.java");
+	}
+	@Test
+	public void errorArithmeticFP2() {
+		testWrong(testPath+"ErrorArithmeticFP2.java");
+	}
+	@Test
+	public void errorArithmeticFP3() {
+		testWrong(testPath+"ErrorArithmeticFP3.java");
+	}
+	@Test
+	public void errorArithmeticFP4() {
+		testWrong(testPath+"ErrorArithmeticFP4.java");
+	}
+	
 	
 	@Test
 	public void errorNoRefinementsVar() {
