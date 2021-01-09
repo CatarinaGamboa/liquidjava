@@ -7,14 +7,13 @@ import org.modelcc.Value;
 import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
-
-@Priority(10)
-public class RealLiteral extends LiteralExpression implements IModel {
+@Priority(7)
+public class DoubleLiteral  extends LiteralExpression implements IModel {
 	@Value
-	long value;
+	double value;
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
-		return ctx.makeLongLiteral(value);
+		return ctx.makeDoubleLiteral(value);
 	}
 }

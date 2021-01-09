@@ -13,11 +13,11 @@ public class RefinementParser {
 	@SuppressWarnings("unchecked")
 	public static Optional<Expression> parse(String code) {
 		try {
-			// System.out.println("Parsing: " + code);
+			//System.out.println("Parsing: " + code);
 			LanguageModel m = JavaModelReader.read(Expression.class);
 			Parser<Expression> parser = ParserFactory.create(m, ParserFactory.WHITESPACE);
 			Expression modeled = parser.parse(code);
-			// System.out.println("modeled: " + modeled);
+			//System.out.println("modeled: " + modeled);
 			return Optional.of(modeled);
 		} catch (Exception e) {
 			System.out.println("Could not parse: " + code);

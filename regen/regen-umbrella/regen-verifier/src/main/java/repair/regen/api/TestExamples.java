@@ -56,6 +56,11 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectLongUsage.java");//passVC
 	}
 	
+	@Test
+	public void correctFPArithmetic() {
+		testCorrect(testPath+"CorrectFPArithmetic.java");//passVC
+	}
+	
 	
 	@Test
 	public void correctNoRefinements() {
@@ -83,10 +88,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectFunctionCallSameVariableName.java");
 	}
 	
-	@Test
-	public void correctDependentRefinements() {
-		testCorrect(testPath+"CorrectDependentRefinements.java");
-	}
+//	@Test
+//	public void correctDependentRefinements() {
+//		testCorrect(testPath+"CorrectDependentRefinements.java");
+//	}
 	
 	@Test
 	public void correctSimpleIfThen() {

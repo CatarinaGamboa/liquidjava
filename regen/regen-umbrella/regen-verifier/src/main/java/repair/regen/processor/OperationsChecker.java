@@ -57,7 +57,8 @@ class OperationsChecker {
 
 		}
 		String type = operator.getType().getQualifiedName(); 
-		if (type.contentEquals("int") || type.contentEquals("long")) {
+		if (type.contentEquals("int") || type.contentEquals("long") || 
+				type.contentEquals("double")) {
 			operator.putMetadata(rtc.REFINE_KEY, rtc.WILD_VAR+" == " + oper);
 		}else if(type.contentEquals("boolean")) {
 			operator.putMetadata(rtc.REFINE_KEY, oper);
