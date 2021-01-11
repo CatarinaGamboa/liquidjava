@@ -33,38 +33,38 @@ public class TestExamples {
 	
 	@Test
 	public void correctSimpleAssignment() {
-		testCorrect(testPath+"CorrectSimpleAssignment.java");//passVC
+		testCorrect(testPath+"CorrectSimpleAssignment.java");
 	}
-	@Test
-	public void correctArithmeticBinaryOperation() {
-		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");//passVC
-	}
+//	@Test
+//	public void correctArithmeticBinaryOperation() {
+//		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");//TODO REVIEW TEST
+//	}
 
 	@Test
 	public void correctAssignementAfterDeclaration() {
-		testCorrect(testPath+"CorrectAssignementAfterDeclaration.java");//passVC
+		testCorrect(testPath+"CorrectAssignementAfterDeclaration.java");
 	}
 	
 
 	@Test
 	public void correctUnaryOperators() {
-		testCorrect(testPath+"CorrectUnaryOperators.java");//passVC
+		testCorrect(testPath+"CorrectUnaryOperators.java");
 	}
 	
 	@Test
 	public void correctLongUsage() {
-		testCorrect(testPath+"CorrectLongUsage.java");//passVC
+		testCorrect(testPath+"CorrectLongUsage.java");
 	}
 	
 	@Test
 	public void correctFPArithmetic() {
-		testCorrect(testPath+"CorrectFPArithmetic.java");//passVC
+		testCorrect(testPath+"CorrectFPArithmetic.java");
 	}
 	
 	
 	@Test
 	public void correctNoRefinements() {
-		testCorrect(testPath+"CorrectNoRefinements.java");//passVC
+		testCorrect(testPath+"CorrectNoRefinements.java");
 	}
 	
 	@Test
@@ -88,10 +88,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectFunctionCallSameVariableName.java");
 	}
 	
-//	@Test
-//	public void correctDependentRefinements() {
-//		testCorrect(testPath+"CorrectDependentRefinements.java");
-//	}
+	@Test
+	public void correctDependentRefinements() {
+		testCorrect(testPath+"CorrectDependentRefinements.java");
+	}
 	
 	@Test
 	public void correctSimpleIfThen() {
@@ -100,7 +100,7 @@ public class TestExamples {
 	
 //	@Test
 //	public void correctTernaryExpression() {
-//		testCorrect(testPath+"CorrectTernaryExpression.java");
+//		testCorrect(testPath+"CorrectTernaryExpression.java");//TODO REVIEW TEST
 //	}
 //	
 	@Test
@@ -224,7 +224,7 @@ public class TestExamples {
 	
 	@Test
 	public void errorTernaryExpression() {
-		testWrong(testPath+"ErrorTernaryExpression.java");
+		testWrong(testPath+"ErrorTernaryExpression.java"); //TODO REVIEW TEST
 	}
 	
 	@Test

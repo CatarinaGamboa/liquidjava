@@ -13,8 +13,13 @@ public class IntegerLiteral extends LiteralExpression implements IModel {
 	@Value
 	int value;
 
+	public void setValue(int val) {
+		value = val;
+	}
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
+		System.out.println("Is in integer with value:"+value);
 		return ctx.makeIntegerLiteral(value);
 	}
 }

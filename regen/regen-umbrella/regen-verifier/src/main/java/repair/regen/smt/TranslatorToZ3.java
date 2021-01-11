@@ -10,6 +10,7 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPExpr;
 import com.microsoft.z3.FPSort;
 import com.microsoft.z3.IntExpr;
+import com.microsoft.z3.IntNum;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
@@ -79,38 +80,40 @@ public class TranslatorToZ3 {
 
 	//#####################Boolean Operations#####################
 	public Expr makeEquals(Expr e1, Expr e2) {
-		if(e1 instanceof FPExpr && e2 instanceof FPExpr)
-			return z3.mkFPEq((FPExpr) e1, (FPExpr) e2);
-		else
-			return z3.mkEq(e1, e2);
+		if(e1 instanceof FPExpr || e2 instanceof FPExpr) 
+			return z3.mkFPEq(toFP(e1), toFP(e2));
+		
+		return z3.mkEq(e1, e2);
 	}
 
+
+
 	public Expr makeLt(Expr e1, Expr e2) {
-		if(e1 instanceof FPExpr && e2 instanceof FPExpr)
-			return z3.mkFPLt((FPExpr) e1, (FPExpr) e2);
-		else
-			return z3.mkLt((ArithExpr) e1,(ArithExpr) e2);
+		if(e1 instanceof FPExpr || e2 instanceof FPExpr) 		
+			return z3.mkFPLt(toFP(e1), toFP(e2));
+		
+		return z3.mkLt((ArithExpr) e1,(ArithExpr) e2);
 	}
 
 	public Expr makeLtEq(Expr e1, Expr e2) {
-		if(e1 instanceof FPExpr && e2 instanceof FPExpr)
-			return z3.mkFPLEq((FPExpr) e1, (FPExpr) e2);
-		else
-			return z3.mkLe((ArithExpr) e1,(ArithExpr) e2);
+		if(e1 instanceof FPExpr || e2 instanceof FPExpr)
+			return z3.mkFPLEq(toFP(e1), toFP(e2));
+
+		return z3.mkLe((ArithExpr) e1,(ArithExpr) e2);
 	}
 
 	public Expr makeGt(Expr e1, Expr e2) {
-		if(e1 instanceof FPExpr && e2 instanceof FPExpr)
-			return z3.mkFPGt((FPExpr) e1, (FPExpr) e2);
-		else
-			return z3.mkGt((ArithExpr) e1,(ArithExpr) e2);
+		if(e1 instanceof FPExpr || e2 instanceof FPExpr) 
+			return z3.mkFPGt(toFP(e1), toFP(e2));
+		
+		return z3.mkGt((ArithExpr) e1,(ArithExpr) e2);		
 	}
 
 	public Expr makeGtEq(Expr e1, Expr e2) {
-		if(e1 instanceof FPExpr && e2 instanceof FPExpr)
-			return z3.mkFPGEq((FPExpr) e1, (FPExpr) e2);
-		else
-			return z3.mkGe((ArithExpr) e1,(ArithExpr) e2);
+		if(e1 instanceof FPExpr || e2 instanceof FPExpr) 
+			return z3.mkFPGEq(toFP(e1), toFP(e2));
+		
+		return z3.mkGe((ArithExpr) e1,(ArithExpr) e2);
 	}
 
 	public Expr makeImplies(Expr e1, Expr e2) {
@@ -139,43 +142,57 @@ public class TranslatorToZ3 {
 
 	//#####################Arithmetic Operations#####################
 	public Expr makeAdd(Expr eval, Expr eval2) {
-		if(eval instanceof FPExpr && eval2 instanceof FPExpr) 
-			return z3.mkFPAdd(z3.mkFPRoundNearestTiesToEven(), 
-					(FPExpr) eval, (FPExpr)eval2);
-		else
-			return z3.mkAdd((ArithExpr) eval, (ArithExpr) eval2);
+		if(eval instanceof FPExpr || eval2 instanceof FPExpr) 
+			return z3.mkFPAdd(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
+		
+		return z3.mkAdd((ArithExpr) eval, (ArithExpr) eval2);
 
 	}
 
 	public Expr makeSub(Expr eval, Expr eval2) {
-		if(eval instanceof FPExpr && eval2 instanceof FPExpr) 
-			return z3.mkFPSub(z3.mkFPRoundNearestTiesToEven(), 
-					(FPExpr) eval, (FPExpr)eval2);
-		else
-			return z3.mkSub((ArithExpr) eval, (ArithExpr) eval2);
+		if(eval instanceof FPExpr || eval2 instanceof FPExpr) 
+			return z3.mkFPSub(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
+		
+		return z3.mkSub((ArithExpr) eval, (ArithExpr) eval2);
 	}
 
 	public Expr makeMul(Expr eval, Expr eval2) {
-		if(eval instanceof FPExpr && eval2 instanceof FPExpr)
-			return z3.mkFPMul(z3.mkFPRoundNearestTiesToEven(), 
-					(FPExpr) eval, (FPExpr)eval2);
-		else
-			return z3.mkMul((ArithExpr) eval, (ArithExpr) eval2);
+		if(eval instanceof FPExpr || eval2 instanceof FPExpr) 
+			return z3.mkFPMul(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
+		
+
+		return z3.mkMul((ArithExpr) eval, (ArithExpr) eval2);
 	}
 
 	public Expr makeDiv(Expr eval, Expr eval2) {
-		if(eval instanceof FPExpr && eval2 instanceof FPExpr)  {
-			return z3.mkFPDiv(z3.mkFPRoundNearestTiesToEven(), 
-					(FPExpr) eval, (FPExpr)eval2);
-		}else
-			return z3.mkDiv((ArithExpr) eval, (ArithExpr) eval2);
+		if(eval instanceof FPExpr || eval2 instanceof FPExpr)
+			return z3.mkFPDiv(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
+		
+		return z3.mkDiv((ArithExpr) eval, (ArithExpr) eval2);
 	}
 
 	public Expr makeMod(Expr eval, Expr eval2) {
-		if(eval instanceof FPExpr && eval2 instanceof FPExpr)
-			return z3.mkFPRem((FPExpr) eval, (FPExpr)eval2);
-		else
-			return z3.mkMod((IntExpr) eval, (IntExpr) eval2);
+		if(eval instanceof FPExpr || eval2 instanceof FPExpr)
+			return z3.mkFPRem(toFP(eval), toFP(eval2));
+		return z3.mkMod((IntNum) eval, (IntNum) eval2);
+	}
+
+	private FPExpr toFP(Expr e) {
+		FPExpr f;
+		if(e instanceof FPExpr)
+			f = (FPExpr) e;
+		else if(e instanceof IntNum) 
+			f = z3.mkFP(((IntNum) e).getInt(), z3.mkFPSort64());
+		else if(e instanceof IntExpr) {
+			IntExpr ee= (IntExpr) e;
+			System.out.println("is int:"+ ee.isInt());
+			
+			f = null;
+		}else {
+			f = null;
+			System.out.println("Not implemented!!");
+		}
+		return f;
 	}
 
 }
