@@ -112,9 +112,9 @@ class OperationsChecker {
 		CtElement p = operator.getParent();
 		String opS = unOp.replace(rtc.WILD_VAR, newName);
 		if(p instanceof CtIf)
-			all = unOp.replace(rtc.WILD_VAR, newName);
+			all = "("+unOp.replace(rtc.WILD_VAR, newName)+")";
 		else
-			all ="("+rtc.WILD_VAR+" == " + opS + ")";
+			all ="("+rtc.WILD_VAR+" == (" + opS + "))";
 		System.out.println(newMeta + " && "+all);
 		context.addVarToContext(newName, ex.getType(), newMeta);
 		rtc.addRefinementVariable(newName);
@@ -176,7 +176,7 @@ class OperationsChecker {
 			String a = (String) element.getMetadata(rtc.REFINE_KEY);
 			String b = a.replace(rtc.WILD_VAR, "").replace("(", "").replace(")", "")
 					.replace("==", "").replace(" ", "");
-			return b;
+			return String.format("(%s)",b);
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
 			return l.getValue().toString();

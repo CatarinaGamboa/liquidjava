@@ -15,16 +15,12 @@ public class RealLiteral extends LiteralExpression implements IModel {
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
-		//return ctx.makeIntegerLiteral((int)val);
-		System.out.println("Was going to double with value "+value);
 		if(value == Math.floor(value) && !Double.isInfinite(value)) {
+			//Integer came to Real by mistake
 			IntegerLiteral i = new IntegerLiteral();
 			i.setValue((int)value);
-			System.out.println("come to int");
 			return i.eval(ctx);
 		}
-		System.out.println("come to double");
 		return ctx.makeDoubleLiteral(value);
-		//return null;//ctx.makeLongLiteral(value);
 	}
 }
