@@ -9,8 +9,10 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPExpr;
 import com.microsoft.z3.FPSort;
+import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
+import com.microsoft.z3.RealExpr;
 import com.microsoft.z3.Solver;
 import com.microsoft.z3.Status;
 
@@ -174,7 +176,7 @@ public class TranslatorToZ3 {
 	public Expr makeMod(Expr eval, Expr eval2) {
 		if(eval instanceof FPExpr || eval2 instanceof FPExpr)
 			return z3.mkFPRem(toFP(eval), toFP(eval2));
-		return z3.mkMod((IntNum) eval, (IntNum) eval2);
+		return z3.mkMod((IntExpr) eval, (IntExpr) eval2);
 	}
 
 	private FPExpr toFP(Expr e) {
@@ -185,9 +187,9 @@ public class TranslatorToZ3 {
 			f = z3.mkFP(((IntNum) e).getInt(), z3.mkFPSort64());
 		else if(e instanceof IntExpr) {
 			IntExpr ee= (IntExpr) e;
-			System.out.println("is int:"+ ee.isInt());
-			
-			f = null;
+			RealExpr re = z3.mkInt2Real(ee);
+			f = z3.mkFPToFP(z3.mkFPRoundNearestTiesToEven(), re, z3.mkFPSort64());
+			//f = null;
 		}else {
 			f = null;
 			System.out.println("Not implemented!!");

@@ -16,6 +16,7 @@ public class RefinementParser {
 			//System.out.println("Parsing: " + code);
 			LanguageModel m = JavaModelReader.read(Expression.class);
 			Parser<Expression> parser = ParserFactory.create(m, ParserFactory.WHITESPACE);
+	
 			Expression modeled = parser.parse(code);
 			//System.out.println("modeled: " + modeled);
 			return Optional.of(modeled);
