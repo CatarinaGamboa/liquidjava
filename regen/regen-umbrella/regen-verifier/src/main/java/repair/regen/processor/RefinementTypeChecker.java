@@ -49,7 +49,7 @@ public class RefinementTypeChecker extends CtScanner {
 	VCChecker vcChecker = new VCChecker();
 	Utils utils = new Utils();
 
-	private Factory factory;
+	Factory factory;
 	
 	//Auxiliar TypeCheckers
 	OperationsChecker otc;
@@ -154,8 +154,13 @@ public class RefinementTypeChecker extends CtScanner {
 			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
 		}else if (lit.getType().getQualifiedName().contentEquals("double")) {
 			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
-		}
+		}else if(lit.getType().getQualifiedName().contentEquals("java.lang.String")){
+			//Only taking care of strings inside refinements
+		}else {
+			System.out.println(String.format("Literal of type %s not implemented:",
+					lit.getType().getQualifiedName()));
 		//TODO ADD LITERAL TYPES
+		}
 	}	
 
 

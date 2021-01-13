@@ -128,7 +128,8 @@ public class Context {
 	
 	
 	public void addFunctionToContext(FunctionInfo f) {
-		ctxFunctions.add(f);
+		if(!ctxFunctions.contains(f))
+			ctxFunctions.add(f);
 	}
 	
 	public FunctionInfo getFunctionByName(String name) {

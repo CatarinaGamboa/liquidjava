@@ -3,18 +3,19 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
-
+	
 	public static void main(String[] args) {
-		@Refinement("\\v > 5.0")
-		double a = 5.5;
-		@Refinement("\\v < -5.5")
-		double d = (-a) - 2.0;
-//		
-//		@Refinement("\\v == 30")
-//		int o = 30;
-//		@Refinement("\\v == x1 || \\v == o ")
-//		int x9 = 20;
+		
+	
 
+		@Refinement("b > 0")
+		int b = Math.abs(6);
+		
+//		@Refinement("b > 0")
+//		int b = Math.addExact(6, 2);
+		
+		
+		
 		//		b = (a < 100)? three(): three()-1;
 		//		@Refinement("c < 100")
 		//		int c = (a < 100)? three(): a;
