@@ -15,8 +15,10 @@ package regen.test.project;
 // int b = a;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("b < 0")
+        @repair.regen.specification.Refinement("b > 0")
         int b = java.lang.Math.abs(6);
+        @repair.regen.specification.Refinement("\\v < 0")
+        double c = java.lang.Math.random();
         // @Refinement("b > 0")
         // int b = Math.addExact(6, 2);
         // b = (a < 100)? three(): three()-1;

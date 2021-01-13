@@ -11,6 +11,8 @@ public class SimpleTest {
 		@Refinement("b > 0")
 		int b = Math.abs(6);
 		
+		@Refinement("\\v >= 0")
+		double c = Math.random();
 //		@Refinement("b > 0")
 //		int b = Math.addExact(6, 2);
 		
