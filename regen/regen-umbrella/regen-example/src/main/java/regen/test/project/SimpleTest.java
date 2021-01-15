@@ -3,32 +3,21 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
-
-
-	@Refinement("{\\v == 2}")
-	private static int getTwo() {
-		return 1+1;
-	}
-	
 	public static void main(String[] args) {
 
-//		@Refinement("\\v == 6")
-//		int a = Math.abs(6);
-
-		@Refinement("\\v < 1")
-		int b = getZero();
-		
 		@Refinement("\\v > 0")
-		int c = getOne();
-		c = getZero();
-		
+		double a = Math.abs(15.3);
+		@Refinement("\\v > 10")
+		long b = Math.abs(-13);
+		@Refinement("\\v > 10")
+		float c = Math.abs(-13f);
 
-		//		@Refinement("\\v > 0")
-		//		double e = Math.sqrt(6);		
-		//		@Refinement("\\v >= 0")
-		//		double c = Math.random();
-		//		@Refinement("b > 0")
-		//		int b = Math.addExact(6, 2);
+//				@Refinement("\\v > 0")
+//				double e = Math.sqrt(6);		
+//				@Refinement("\\v >= 0")
+//				double c = Math.random();
+//				@Refinement("b > 0")
+//				int b = Math.addExact(6, 2);
 
 
 
@@ -39,17 +28,5 @@ public class SimpleTest {
 
 	}
 
-
-	@Refinement("{\\v == 0}")
-	private static int getZero() {
-		return 0;
-	}
-	
-	@Refinement("{\\v == 1}")
-	private static int getOne() {
-		@Refinement("\\v == 0")
-		int a = getZero();
-		return a+1;
-	}
 
 }

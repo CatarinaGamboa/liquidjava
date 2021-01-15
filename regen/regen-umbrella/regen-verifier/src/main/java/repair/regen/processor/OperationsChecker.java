@@ -1,5 +1,8 @@
 package repair.regen.processor;
 
+import java.util.Arrays;
+import java.util.List;
+
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -57,14 +60,16 @@ class OperationsChecker {
 
 		}
 		String type = operator.getType().getQualifiedName(); 
-		if (type.contentEquals("int") || type.contentEquals("long") || 
-				type.contentEquals("double")) {
-			operator.putMetadata(rtc.REFINE_KEY, rtc.WILD_VAR+" == " + oper);
-		}else if(type.contentEquals("boolean")) {
+		List<String> types = Arrays.asList(rtc.implementedTypes);
+		if(type.contentEquals("boolean")) {
 			operator.putMetadata(rtc.REFINE_KEY, oper);
 			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
 					parent instanceof CtReturn<?>)
 				operator.putMetadata(rtc.REFINE_KEY, rtc.WILD_VAR+" == (" + oper+")");
+		}else if (types.contains(type)) {
+			operator.putMetadata(rtc.REFINE_KEY, rtc.WILD_VAR+" == " + oper);
+		}else {
+			System.out.println("Literal type not implemented");
 		}
 		//TODO ADD TYPES
 	}

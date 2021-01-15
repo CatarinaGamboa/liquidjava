@@ -1,11 +1,10 @@
 package repair.regen.processor;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConditional;
@@ -18,22 +17,15 @@ import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
-import spoon.reflect.code.CtVariableWrite;
-import spoon.reflect.code.UnaryOperatorKind;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtVariable;
-import spoon.reflect.declaration.ParentNotInitializedException;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.reflect.visitor.CtScanner;
-import spoon.support.reflect.code.CtIfImpl;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
 public class RefinementTypeChecker extends CtScanner {
@@ -54,6 +46,8 @@ public class RefinementTypeChecker extends CtScanner {
 	//Auxiliar TypeCheckers
 	OperationsChecker otc;
 	MethodsFunctionsChecker mfc;
+	
+	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double"}; 
 
 	public RefinementTypeChecker(Factory factory) {
 		this.factory = factory;
@@ -146,13 +140,8 @@ public class RefinementTypeChecker extends CtScanner {
 
 	@Override
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
-		if (lit.getType().getQualifiedName().contentEquals("int")) {
-			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
-		}else if (lit.getType().getQualifiedName().contentEquals("boolean")) {
-			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
-		}else if (lit.getType().getQualifiedName().contentEquals("long")) {
-			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
-		}else if (lit.getType().getQualifiedName().contentEquals("double")) {
+		List<String> types = Arrays.asList(implementedTypes);
+		if (types.contains(lit.getType().getQualifiedName())) {
 			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
 		}else if(lit.getType().getQualifiedName().contentEquals("java.lang.String")){
 			//Only taking care of strings inside refinements

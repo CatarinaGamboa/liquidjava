@@ -18,19 +18,22 @@ public class RefinementsLibrary {
 //	int function(@Refinement("")int b)
 
 	private void addMathMethods() {
-		map.put("java.lang.Math.abs(int)", 
-			"{true}->{(\\v == arg0 || \\v == -arg0) && \\v > 0}");
+		String ref_abs = "{true}->{(\\v == arg0 || \\v == -arg0) && \\v > 0}"; 
+		map.put("java.lang.Math.abs(int)", ref_abs);
+		map.put("java.lang.Math.abs(float)", ref_abs);
+		map.put("java.lang.Math.abs(double)", ref_abs);
+		map.put("java.lang.Math.abs(long)", ref_abs);
+		
+		
 		
 		map.put("java.lang.Math.random()", 
-				"{\\v > 0 && \\v < 1.0}");//TODO maybe improve
+				"{\\v > 0.0 && \\v < 1.0}");
 		
 		map.put("java.lang.Math.sqrt(double)", 
 				"{true}->{\\v > 0}");//TODO maybe improve
 		
 		
-//		@Refinement(“\\v >= 0”)
-//		random()
-//
+
 //		@Refinement(“\\v >= 0”)
 //		Sqrt( @Refinement(“a > 0”) double a)
 		

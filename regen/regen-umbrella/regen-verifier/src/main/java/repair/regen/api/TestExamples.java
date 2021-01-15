@@ -35,10 +35,10 @@ public class TestExamples {
 	public void correctSimpleAssignment() {
 		testCorrect(testPath+"CorrectSimpleAssignment.java");
 	}
-//	@Test
-//	public void correctArithmeticBinaryOperation() {
-//		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");//TODO REVIEW TEST
-//	}
+	@Test
+	public void correctArithmeticBinaryOperation() {
+		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");
+	}
 
 	@Test
 	public void correctAssignementAfterDeclaration() {
@@ -54,6 +54,11 @@ public class TestExamples {
 	@Test
 	public void correctLongUsage() {
 		testCorrect(testPath+"CorrectLongUsage.java");
+	}
+	
+	@Test
+	public void correctPrimitiveNumbersTypes() {
+		testCorrect(testPath+"CorrectPrimitiveNumbersTypes.java");
 	}
 	
 	@Test
@@ -102,7 +107,7 @@ public class TestExamples {
 //	public void correctTernaryExpression() {
 //		testCorrect(testPath+"CorrectTernaryExpression.java");//TODO REVIEW TEST
 //	}
-//	
+	
 	@Test
 	public void correctSimpleIfElse() {
 		testCorrect(testPath+"CorrectSimpleIfElse.java");
@@ -235,7 +240,7 @@ public class TestExamples {
 	
 	@Test
 	public void errorTernaryExpression() {
-		testWrong(testPath+"ErrorTernaryExpression.java"); //TODO REVIEW TEST
+		testWrong(testPath+"ErrorTernaryExpression.java");
 	}
 	
 	@Test

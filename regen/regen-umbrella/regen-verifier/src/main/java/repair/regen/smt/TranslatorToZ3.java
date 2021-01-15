@@ -8,12 +8,11 @@ import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPExpr;
-import com.microsoft.z3.FPSort;
-import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 import com.microsoft.z3.RealExpr;
 import com.microsoft.z3.Solver;
+import com.microsoft.z3.Sort;
 import com.microsoft.z3.Status;
 
 import repair.regen.language.Expression;
@@ -29,10 +28,15 @@ public class TranslatorToZ3 {
 		for (String name : ctx.keySet()) {
 			if (ctx.get(name).getQualifiedName().contentEquals("int")) {
 				varTranslation.put(name, z3.mkIntConst(name));
+			}else if (ctx.get(name).getQualifiedName().contentEquals("short")) {
+				varTranslation.put(name, z3.mkIntConst(name));
 			}else if (ctx.get(name).getQualifiedName().contentEquals("boolean")) {
 				varTranslation.put(name, z3.mkBoolConst(name));
 			}else if (ctx.get(name).getQualifiedName().contentEquals("long")) {
 				varTranslation.put(name, z3.mkRealConst(name));
+			}else if (ctx.get(name).getQualifiedName().contentEquals("float")) {
+				FPExpr k = (FPExpr)z3.mkConst(name, z3.mkFPSort64());
+				varTranslation.put(name, k);
 			}else if (ctx.get(name).getQualifiedName().contentEquals("double")) {
 				FPExpr k = (FPExpr)z3.mkConst(name, z3.mkFPSort64());
 				varTranslation.put(name, k);
@@ -181,15 +185,16 @@ public class TranslatorToZ3 {
 
 	private FPExpr toFP(Expr e) {
 		FPExpr f;
-		if(e instanceof FPExpr)
+		if(e instanceof FPExpr) {
 			f = (FPExpr) e;
-		else if(e instanceof IntNum) 
+		}else if(e instanceof IntNum) 
 			f = z3.mkFP(((IntNum) e).getInt(), z3.mkFPSort64());
 		else if(e instanceof IntExpr) {
 			IntExpr ee= (IntExpr) e;
 			RealExpr re = z3.mkInt2Real(ee);
 			f = z3.mkFPToFP(z3.mkFPRoundNearestTiesToEven(), re, z3.mkFPSort64());
-			//f = null;
+		}else if(e instanceof RealExpr) {
+			f = z3.mkFPToFP(z3.mkFPRoundNearestTiesToEven(), (RealExpr)e, z3.mkFPSort64());
 		}else {
 			f = null;
 			System.out.println("Not implemented!!");
