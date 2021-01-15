@@ -5,19 +5,23 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
 	public static void main(String[] args) {
 
-		@Refinement("\\v > 0")
-		double a = Math.abs(15.3);
-		@Refinement("\\v > 10")
-		long b = Math.abs(-13);
-		@Refinement("\\v > 10")
-		float c = Math.abs(-13f);
+		@Refinement("a > 0")
+		double a = Math.PI;
 
-//				@Refinement("\\v > 0")
-//				double e = Math.sqrt(6);		
-//				@Refinement("\\v >= 0")
-//				double c = Math.random();
-//				@Refinement("b > 0")
-//				int b = Math.addExact(6, 2);
+		
+		//See error NaN
+//		@Refinement("\\v > 4")
+//		int d = Math.abs(-6);
+//
+//		@Refinement("\\v == -6")
+//		int e = -Math.abs(-d);
+		
+		//See error NaN
+//		@Refinement("true")
+//		double b = 0/0;
+//		@Refinement("\\v > 5")
+//		double c = b;
+
 
 
 

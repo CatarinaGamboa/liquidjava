@@ -56,10 +56,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectLongUsage.java");
 	}
 	
-	@Test
-	public void correctPrimitiveNumbersTypes() {
-		testCorrect(testPath+"CorrectPrimitiveNumbersTypes.java");
-	}
+//	@Test
+//	public void correctPrimitiveNumbersTypes() {
+//		testCorrect(testPath+"CorrectPrimitiveNumbersTypes.java");
+//	} //Takes a long time
 	
 	@Test
 	public void correctFPArithmetic() {
@@ -139,9 +139,16 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectReadSpecificAssignment.java");
 	}
 	
+	@Test
 	public void correctSpecificFunctionInvocation() {
 		testCorrect(testPath+"CorrectSpecificFunctionInvocation.java");
 	}
+	
+	@Test
+	public void correctInvocationFromMathLibrary() {
+		testCorrect(testPath+"CorrectInvocationFromMathLibrary.java");
+	}
+	
 	
 	@Test
 	public void errorSimpleAssignment() {

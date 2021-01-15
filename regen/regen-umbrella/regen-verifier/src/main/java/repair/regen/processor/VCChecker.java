@@ -119,7 +119,7 @@ public class VCChecker {
 			VariableInfo vi = context.getVariableByName(var);
 			if(vi != null) {
 				String ref = vi.getRefinement();
-				sb.append("forall "+var+":"+ref+" -> ");
+				sb.append("forall "+var+":"+ref+" -> \n");
 				sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
 			}
 		}

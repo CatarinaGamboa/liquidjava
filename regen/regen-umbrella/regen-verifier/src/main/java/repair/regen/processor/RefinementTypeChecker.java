@@ -9,6 +9,7 @@ import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConditional;
 import spoon.reflect.code.CtExpression;
+import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
@@ -47,7 +48,7 @@ public class RefinementTypeChecker extends CtScanner {
 	OperationsChecker otc;
 	MethodsFunctionsChecker mfc;
 	
-	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double"}; 
+	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double"}; //TODO add types
 
 	public RefinementTypeChecker(Factory factory) {
 		this.factory = factory;
@@ -103,6 +104,7 @@ public class RefinementTypeChecker extends CtScanner {
 					a.isPresent()? a.get() : "true");
 		}else {
 			String varName = localVariable.getSimpleName();
+			CtExpression<?> e = localVariable.getAssignment();
 			String refinementFound = getRefinement(localVariable.getAssignment());
 
 			CtExpression a = localVariable.getAssignment();
@@ -148,9 +150,17 @@ public class RefinementTypeChecker extends CtScanner {
 		}else {
 			System.out.println(String.format("Literal of type %s not implemented:",
 					lit.getType().getQualifiedName()));
-		//TODO ADD LITERAL TYPES
 		}
 	}	
+	
+	
+	@Override
+	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
+		if(fieldRead.getTarget().toString().equals("java.lang.Math")) {
+			System.out.println("Inside Math field");
+		}
+		super.visitCtFieldRead(fieldRead);
+	}
 
 
 	@Override
