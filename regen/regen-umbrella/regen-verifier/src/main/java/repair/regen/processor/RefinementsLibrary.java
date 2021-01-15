@@ -5,19 +5,27 @@ import java.util.Optional;
 
 import org.eclipse.jdt.internal.core.nd.AbstractTypeFactory;
 
+import repair.regen.specification.Refinement;
+
 public class RefinementsLibrary {
 	private HashMap<String, String> map = new HashMap<>();
 	
 	public RefinementsLibrary() {
 		addMathMethods();
 	}
+	
+//	@Refinement("")
+//	int function(@Refinement("")int b)
 
 	private void addMathMethods() {
 		map.put("java.lang.Math.abs(int)", 
-			"{true}->{\\v > 0}");//TODO maybe improve
+			"{true}->{(\\v == arg0 || \\v == -arg0) && \\v > 0}");
 		
 		map.put("java.lang.Math.random()", 
-				"{\\v > 0}");//TODO maybe improve
+				"{\\v > 0 && \\v < 1.0}");//TODO maybe improve
+		
+		map.put("java.lang.Math.sqrt(double)", 
+				"{true}->{\\v > 0}");//TODO maybe improve
 		
 		
 //		@Refinement(“\\v >= 0”)

@@ -16,8 +16,8 @@ import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
-import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
+import spoon.support.reflect.declaration.CtMethodImpl;
 
 public class MethodsFunctionsChecker {
 
@@ -49,9 +49,19 @@ public class MethodsFunctionsChecker {
 				}
 //				handleFunctionRefinements(FunctionInfo f, String methodRef, List<CtParameter<?>> params)
 			}
-		}else if(context.getFunctionByName(method.getSimpleName()) != null) {
-			checkInvocationRefinements(invocation, method.getSimpleName());
-			
+		}else {
+			if(context.getFunctionByName(method.getSimpleName()) != null) {
+				checkInvocationRefinements(invocation, method.getSimpleName());
+			}else {
+				CtExecutable cet = invocation.getExecutable().getDeclaration();
+				if(cet instanceof CtMethod) {
+					CtMethod met = (CtMethod) cet;
+					rtc.visitCtMethod(met);
+					checkInvocationRefinements(invocation, method.getSimpleName());
+				}
+//				rtc.visitCtMethod(method);
+				
+			}
 		}
 	}
 	

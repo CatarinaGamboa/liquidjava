@@ -9,5 +9,18 @@ public class CorrectInvokeFromAnnotatedLibrary {
 		
 		@Refinement("\\v >= 0")
 		double c = Math.random();
+		
+
+		@Refinement("\\v == 6")
+		int a = Math.abs(6);
+
+		@Refinement("\\v > 4")
+		int d = Math.abs(-6);
+
+		@Refinement("\\v == -6")
+		int e = -Math.abs(-d);
+
+		@Refinement("\\v < 0")
+		double f = -Math.random();
 	}
 }
