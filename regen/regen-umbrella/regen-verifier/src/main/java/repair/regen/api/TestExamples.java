@@ -119,6 +119,12 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctMethodInvocation() {
+		testCorrect(testPath+"CorrectMethodInvocation.java");
+	}
+	
+	
+	@Test
 	public void correctChainedVariableReferences() {
 		testCorrect(testPath+"CorrectChainedVariableReferences.java");
 	}
@@ -200,6 +206,11 @@ public class TestExamples {
 	@Test
 	public void errorFunctionInvocation() {
 		testWrong(testPath+"ErrorFunctionInvocation.java");
+	}
+	
+	@Test
+	public void errorFunctionInvocation1() {
+		testWrong(testPath+"ErrorFunctionInvocation1.java");
 	}
 	
 	@Test

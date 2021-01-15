@@ -2,6 +2,11 @@ package regen.test.project;
 
 
 public class SimpleTest {
+    @repair.regen.specification.Refinement("{\\v == 2}")
+    private static int getTwo() {
+        return 1 + 1;
+    }
+
     public static void main(java.lang.String[] args) {
         // @Refinement("\\v == 6")
         // int a = Math.abs(6);
@@ -9,6 +14,7 @@ public class SimpleTest {
         int b = regen.test.project.SimpleTest.getZero();
         @repair.regen.specification.Refinement("\\v > 0")
         int c = regen.test.project.SimpleTest.getOne();
+        c = regen.test.project.SimpleTest.getZero();
         // @Refinement("\\v > 0")
         // double e = Math.sqrt(6);
         // @Refinement("\\v >= 0")

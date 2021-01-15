@@ -4,6 +4,12 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
 
+
+	@Refinement("{\\v == 2}")
+	private static int getTwo() {
+		return 1+1;
+	}
+	
 	public static void main(String[] args) {
 
 //		@Refinement("\\v == 6")
@@ -14,6 +20,7 @@ public class SimpleTest {
 		
 		@Refinement("\\v > 0")
 		int c = getOne();
+		c = getZero();
 		
 
 		//		@Refinement("\\v > 0")
