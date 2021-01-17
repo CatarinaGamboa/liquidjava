@@ -5,13 +5,10 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
 	public static void main(String[] args) {
 
-		@Refinement("\\v > 4")
-		int d = Math.abs(-6);
-		@Refinement("\\v == -6") //TODO REVIEW
-		int e = -Math.abs(-d);
-
-
-		
+		@Refinement("a == 11")
+		int a = Math.addExact(5, 6);
+		@Refinement("b > 10")
+		long b = Math.addExact(5l, 6l);
 		//See error NaN
 //		@Refinement("\\v > 4")
 //		int d = Math.abs(-6);
