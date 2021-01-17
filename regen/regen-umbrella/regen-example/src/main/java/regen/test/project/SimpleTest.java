@@ -5,8 +5,11 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
 	public static void main(String[] args) {
 
-		@Refinement("a > 0")
-		double a = Math.PI;
+		@Refinement("\\v > 4")
+		int d = Math.abs(-6);
+		@Refinement("\\v == -6") //TODO REVIEW
+		int e = -Math.abs(-d);
+
 
 		
 		//See error NaN

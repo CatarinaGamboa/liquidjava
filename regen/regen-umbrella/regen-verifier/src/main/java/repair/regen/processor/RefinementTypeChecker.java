@@ -22,9 +22,11 @@ import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.reflect.visitor.CtScanner;
 import spoon.support.reflect.code.CtVariableWriteImpl;
@@ -41,6 +43,7 @@ public class RefinementTypeChecker extends CtScanner {
 	Context context = Context.getInstance();
 	VCChecker vcChecker = new VCChecker();
 	Utils utils = new Utils();
+	RefinementsLibrary lib = new RefinementsLibrary(WILD_VAR);
 
 	Factory factory;
 	
@@ -157,7 +160,11 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
 		if(fieldRead.getTarget().toString().equals("java.lang.Math")) {
-			System.out.println("Inside Math field");
+			String var = fieldRead.getVariable().toString();
+			if(lib.getRefinement(var).isPresent()) {
+				System.out.println(lib.getRefinement(var).get());
+				fieldRead.putMetadata(REFINE_KEY, lib.getRefinement(var).get());
+			}
 		}
 		super.visitCtFieldRead(fieldRead);
 	}

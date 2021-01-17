@@ -48,6 +48,7 @@ public class TranslatorToZ3 {
 		}
 		varTranslation.put("true", z3.mkBool(true));
 		varTranslation.put("false", z3.mkBool(false));
+		
 	}
 
 	public Status verifyExpression(Expression e) {

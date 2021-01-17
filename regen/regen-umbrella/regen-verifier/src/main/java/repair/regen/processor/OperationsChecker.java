@@ -3,6 +3,8 @@ package repair.regen.processor;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.jdt.internal.compiler.ast.Wildcard;
+
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -165,7 +167,8 @@ class OperationsChecker {
 				rtc.addRefinementVariable(newName);
 				returnName = newName;
 			}
-
+			
+			elem_ref = elem_ref.replace(rtc.WILD_VAR, elemName);
 			context.addVarToContext(elemName, elemVar.getType(), elem_ref);
 			rtc.addRefinementVariable(elemName);
 			return returnName;

@@ -28,7 +28,7 @@ public class MethodsFunctionsChecker {
 	public MethodsFunctionsChecker(RefinementTypeChecker rtc) {
 		this.rtc = rtc; 
 		context = rtc.context;
-		lib = new RefinementsLibrary();
+		lib = rtc.lib;
 		
 	}
 

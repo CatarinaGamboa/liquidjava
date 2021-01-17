@@ -3,8 +3,11 @@ package regen.test.project;
 
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("a > 0")
-        double a = java.lang.Math.PI;
+        @repair.regen.specification.Refinement("\\v > 4")
+        int d = java.lang.Math.abs((-6));
+        // TODO REVIEW
+        @repair.regen.specification.Refinement("\\v == -6")
+        int e = -(java.lang.Math.abs((-d)));
         // See error NaN
         // @Refinement("\\v > 4")
         // int d = Math.abs(-6);
