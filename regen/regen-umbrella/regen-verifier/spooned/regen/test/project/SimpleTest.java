@@ -3,10 +3,9 @@ package regen.test.project;
 
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("a == 11")
-        int a = java.lang.Math.addExact(5, 6);
-        @repair.regen.specification.Refinement("b > 10")
-        long b = java.lang.Math.addExact(5L, 6L);
+        @repair.regen.specification.Refinement("a < 4")
+        double a = java.lang.Math.acos(0.5);
+        java.lang.System.out.println(a);
         // See error NaN
         // @Refinement("\\v > 4")
         // int d = Math.abs(-6);

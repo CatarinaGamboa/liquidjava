@@ -20,7 +20,8 @@ public class RefinementsLibrary {
 //	int function(@Refinement("")int b)
 
 	private void addMathMethods() {
-		map.put("java.lang.Math.PI", WILD_VAR +" == 3.141592653589793");
+		double pi = 3.141592653589793;
+		map.put("java.lang.Math.PI", WILD_VAR +" == "+pi);
 		map.put("java.lang.Math.E", WILD_VAR+" == 2.7182818284590452354");
 		
 		String ref_abs = String.format("{true}->{(%s == arg0 || %s == -arg0) && %s > 0}", WILD_VAR, WILD_VAR, WILD_VAR); 
@@ -29,6 +30,7 @@ public class RefinementsLibrary {
 		map.put("java.lang.Math.abs(double)", ref_abs);
 		map.put("java.lang.Math.abs(long)", ref_abs);
 		
+		map.put("java.lang.Math.acos(double)", String.format("{true}->{%s >= 0.0 && %s <= "+pi+"}", WILD_VAR,WILD_VAR));
 		//acos(double a)
 		
 		String addExact = String.format("{true}->{true}->{%s == (arg0 + arg1)}", WILD_VAR);
