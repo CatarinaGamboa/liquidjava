@@ -3,9 +3,16 @@ package regen.test.project;
 
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("a < 4")
-        double a = java.lang.Math.acos(0.5);
-        java.lang.System.out.println(a);
+        // @Refinement("\\v < 4")
+        // double a5 = Math.acos(0.5);
+        @repair.regen.specification.Refinement("\\v < 2")
+        double a6 = java.lang.Math.asin(0.5);
+        @repair.regen.specification.Refinement("(\\v == -5)")
+        float a7 = java.lang.Math.copySign((-5), (-500));
+        @repair.regen.specification.Refinement("\\v == 5")
+        float a8 = java.lang.Math.copySign((-5), 6);
+        @repair.regen.specification.Refinement("\\v == -656")
+        float a9 = java.lang.Math.copySign(656, a7);
         // See error NaN
         // @Refinement("\\v > 4")
         // int d = Math.abs(-6);

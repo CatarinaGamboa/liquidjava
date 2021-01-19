@@ -5,10 +5,21 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
 	public static void main(String[] args) {
 
-		@Refinement("a < 4")
-		double a = Math.acos(0.5);
+//		@Refinement("\\v < 4")
+//		double a5 = Math.acos(0.5);
+		@Refinement("\\v < 2")
+		double a6 = Math.asin(0.5);
 		
-		System.out.println(a);
+			
+		@Refinement("(\\v == -5)")
+		float a7 = Math.copySign(-5, -500);
+
+		@Refinement("\\v == 5")
+		float a8 = Math.copySign(-5, 6);
+		@Refinement("\\v == -656")
+		float a9 = Math.copySign(656, a7);
+		
+		
 		//See error NaN
 //		@Refinement("\\v > 4")
 //		int d = Math.abs(-6);
