@@ -26,15 +26,15 @@ public class TranslatorToZ3 {
 
 	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx) {
 		for (String name : ctx.keySet()) {
-			if (ctx.get(name).getQualifiedName().contentEquals("int")) {
+			if (ctx.get(name).getQualifiedName().contentEquals("int"))
 				varTranslation.put(name, z3.mkIntConst(name));
-			}else if (ctx.get(name).getQualifiedName().contentEquals("short")) {
+			else if (ctx.get(name).getQualifiedName().contentEquals("short")) 
 				varTranslation.put(name, z3.mkIntConst(name));
-			}else if (ctx.get(name).getQualifiedName().contentEquals("boolean")) {
+			else if (ctx.get(name).getQualifiedName().contentEquals("boolean")) 
 				varTranslation.put(name, z3.mkBoolConst(name));
-			}else if (ctx.get(name).getQualifiedName().contentEquals("long")) {
+			else if (ctx.get(name).getQualifiedName().contentEquals("long"))
 				varTranslation.put(name, z3.mkRealConst(name));
-			}else if (ctx.get(name).getQualifiedName().contentEquals("float")) {
+			else if (ctx.get(name).getQualifiedName().contentEquals("float")) {
 				FPExpr k = (FPExpr)z3.mkConst(name, z3.mkFPSort64());
 				varTranslation.put(name, k);
 			}else if (ctx.get(name).getQualifiedName().contentEquals("double")) {
@@ -140,6 +140,11 @@ public class TranslatorToZ3 {
 	public Expr makeOr(Expr eval, Expr eval2) {
 		return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
 	}
+	
+//	public Expr makeIf(Expr eval, Expr eval2) {
+//		z3.mkI
+//		return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
+//	}
 
 	//##################### Unary Operations #####################
 	public Expr makeMinus(Expr eval) {

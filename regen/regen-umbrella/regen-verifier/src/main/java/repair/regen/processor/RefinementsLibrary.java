@@ -56,10 +56,18 @@ public class RefinementsLibrary {
 		//java.lang.Math.cbrt(double) only makes sense if the power is specified
 		//java.lang.Math.ceil(double) makes sense to add cast in the a specification?
 		
+		//implicacao
+		//power sim
+		//if then else para z3 - ite ? :
 		//(\\v == arg0 || \\v == -arg0) && (if arg1 > 0 then \\v > 0 else \\v < 0)
+//		map.put("java.lang.Math.copySign(float,float)", 
+//				String.format("{true}->{true}->"
+//						+ "{((%s == arg0) || (%s == -arg0)) && ((!(arg1 > 0) || (%s > 0)) && ((arg1 > 0) || (%s < 0)))}", 
+//						WILD_VAR, WILD_VAR, WILD_VAR, WILD_VAR));
+		
 		map.put("java.lang.Math.copySign(float,float)", 
 				String.format("{true}->{true}->"
-						+ "{((%s == arg0) || (%s == -arg0)) && ((!(arg1 > 0) || (%s > 0)) && ((arg1 > 0) || (%s < 0)))}", 
+						+ "{(((%s == arg0) || (%s == (-arg0))) && (((arg1 > 0) --> (%s > 0)) && ((arg1 <= 0) --> (%s < 0))))}", 
 						WILD_VAR, WILD_VAR, WILD_VAR, WILD_VAR));
 		
 		

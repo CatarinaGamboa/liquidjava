@@ -37,27 +37,16 @@ public class MethodsFunctionsChecker {
 		CtExecutable<?> method = invocation.getExecutable().getDeclaration();
 		if(method == null) {
 			Method m = invocation.getExecutable().getActualMethod();
-			if(m != null) {
-				String name = m.toGenericString();
-				int lastSpaceI = name.lastIndexOf(" ");
-				name = name.substring(lastSpaceI+1);
-				Optional<String> ref = lib.getRefinement(name);
-				if(ref.isPresent()) {
-					String metRef = handleFunctionRefinements(ref.get(), m);
-					System.out.println(metRef);
-					checkInvocationRefinements(invocation, m.getName());
-				}
-//				handleFunctionRefinements(FunctionInfo f, String methodRef, List<CtParameter<?>> params)
-			}
+			if(m != null) searchMethodInLibrary(m, invocation);
 		}else {
-			if(context.getFunctionByName(method.getSimpleName()) != null) {
+			if(context.getFunctionByName(method.getSimpleName()) != null) {//inside context
 				checkInvocationRefinements(invocation, method.getSimpleName());
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
 				if(cet instanceof CtMethod) {
-					CtMethod met = (CtMethod) cet;
-					rtc.visitCtMethod(met);
-					checkInvocationRefinements(invocation, method.getSimpleName());
+//					CtMethod met = (CtMethod) cet;
+//					rtc.visitCtMethod(met);
+//					checkInvocationRefinements(invocation, method.getSimpleName());
 				}
 //				rtc.visitCtMethod(method);
 				
@@ -67,6 +56,21 @@ public class MethodsFunctionsChecker {
 	
 
 
+
+
+	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
+			String name = m.toGenericString();
+			int lastSpaceI = name.lastIndexOf(" ");
+			name = name.substring(lastSpaceI+1);
+			Optional<String> ref = lib.getRefinement(name);
+			if(ref.isPresent()) {
+				String metRef = handleFunctionRefinements(ref.get(), m);
+				System.out.println(metRef);
+				checkInvocationRefinements(invocation, m.getName());
+			}
+//			handleFunctionRefinements(FunctionInfo f, String methodRef, List<CtParameter<?>> params)
+		
+	}
 
 
 	private CtTypeReference<?> getType(Class<?> type) {
@@ -152,14 +156,15 @@ public class MethodsFunctionsChecker {
 	 * @return
 	 */
 	private String handleFunctionRefinements(FunctionInfo f, String methodRef, List<CtParameter<?>> params) {
-		String[] r = methodRef.split("->");
+		String[] r = methodRef.split("}\\s*->\\s*\\{");
+		
 		StringBuilder sb = new StringBuilder();
 
 		//For syntax {param1} -> {param2} -> ... -> {return}
 		for (int i = 0; i < params.size(); i++) {
 			CtParameter<?> param = params.get(i);
 			String name = param.getSimpleName();
-			String metRef = r[i].replace("{", "(").replace("}", ")").replace(rtc.WILD_VAR, name);
+			String metRef = "("+r[i].replace("{", "").replace("}", "").replace(rtc.WILD_VAR, name)+")";
 			param.putMetadata(rtc.REFINE_KEY, metRef);
 			sb.append(sb.length() == 0? metRef : " && "+metRef);
 
@@ -167,7 +172,7 @@ public class MethodsFunctionsChecker {
 			context.addVarToContext(name, param.getType(), metRef);
 			rtc.addRefinementVariable(name);
 		}
-		String retRef = r[r.length-1].replace("{", "(").replace("}", ")");
+		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
 		f.setRefReturn(retRef);
 		context.addFunctionToContext(f);
 		
@@ -181,14 +186,15 @@ public class MethodsFunctionsChecker {
 		f.setType(getType(method.getReturnType()));
 		f.setRefReturn("true");
 		
-		String[] r = methodRef.split("->");
+		String[] r = methodRef.split("}\\s*->\\s*\\{");
+		
 		StringBuilder sb = new StringBuilder();
 		
 		//For syntax {param1} -> {param2} -> ... -> {return}
 		for (int i = 0; i < params.length; i++) {
 			Parameter param = params[i];
 			String name = param.getName();
-			String metRef = r[i].replace("{", "(").replace("}", ")").replace(rtc.WILD_VAR, name);
+			String metRef = "("+r[i].replace("{", "").replace("}", "").replace(rtc.WILD_VAR, name)+")";
 			//param.putMetadata(rtc.REFINE_KEY, metRef);
 			sb.append(sb.length() == 0? metRef : " && "+metRef);
 
@@ -196,7 +202,7 @@ public class MethodsFunctionsChecker {
 			context.addVarToContext(name, getType(param.getType()), metRef);
 			rtc.addRefinementVariable(name);
 		}
-		String retRef = r[r.length-1].replace("{", "(").replace("}", ")");
+		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
 		f.setRefReturn(retRef);
 		context.addFunctionToContext(f);
 		return sb.append(" && "+ retRef).toString();

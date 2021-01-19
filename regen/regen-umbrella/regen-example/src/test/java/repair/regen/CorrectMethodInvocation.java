@@ -9,16 +9,6 @@ public class CorrectMethodInvocation {
 		return 1+1;
 	}
 	
-	public static void main(String[] args) {
-		@Refinement("\\v < 1")
-		int b = getZero();
-		
-		@Refinement("\\v > 0")
-		int c = getOne();
-		c = getTwo();
-	}
-
-
 	@Refinement("{\\v == 0}")
 	private static int getZero() {
 		return 0;
@@ -30,5 +20,17 @@ public class CorrectMethodInvocation {
 		int a = getZero();
 		return a+1;
 	}
+	
+	public static void main(String[] args) {
+		@Refinement("\\v < 1")
+		int b = getZero();
+		
+		@Refinement("\\v > 0")
+		int c = getOne();
+		c = getTwo();
+	}
+
+
+
 
 }

@@ -2,17 +2,39 @@ package regen.test.project;
 
 
 public class SimpleTest {
+    @repair.regen.specification.Refinement("{true}->{((arg0 < 0) --> (\\v == (-arg0*2))) && ((arg0 >= 0) --> (\\v == arg0*2))}")
+    private static int getPositiveDouble(int arg0) {
+        if (arg0 < 0)
+            return (-arg0) * 2;
+        else
+            return arg0 * 2;
+
+    }
+
     public static void main(java.lang.String[] args) {
         // @Refinement("\\v < 4")
         // double a5 = Math.acos(0.5);
-        @repair.regen.specification.Refinement("\\v < 2")
-        double a6 = java.lang.Math.asin(0.5);
-        @repair.regen.specification.Refinement("(\\v == -5)")
-        float a7 = java.lang.Math.copySign((-5), (-500));
-        @repair.regen.specification.Refinement("\\v == 5")
-        float a8 = java.lang.Math.copySign((-5), 6);
-        @repair.regen.specification.Refinement("\\v == -656")
-        float a9 = java.lang.Math.copySign(656, a7);
+        // @Refinement("\\v < 2")
+        // double a6 = Math.asin(a5);
+        // if a > 0 then b > 0
+        @repair.regen.specification.Refinement("\\v > 5")
+        int x = 10;
+        @repair.regen.specification.Refinement("(x > 50) --> (y > 50)")
+        int y = x;
+        @repair.regen.specification.Refinement("y > 1 --> z > 2")
+        int z = y * 2;
+        @repair.regen.specification.Refinement("\\v == 12")
+        int z0 = regen.test.project.SimpleTest.getPositiveDouble(6);
+        // @Refinement("z > 0 --> \\v > 0")
+        // int z1 = getPositiveDouble(z);
+        // @Refinement("(\\v == -5)")
+        // float a7 = Math.copySign(-5, -500);
+        // 
+        // @Refinement("\\v == 5")
+        // float a8 = Math.copySign(-5, 6);
+        // @Refinement("\\v == -656")
+        // float a9 = Math.copySign(656, a7);
+        // //
         // See error NaN
         // @Refinement("\\v > 4")
         // int d = Math.abs(-6);

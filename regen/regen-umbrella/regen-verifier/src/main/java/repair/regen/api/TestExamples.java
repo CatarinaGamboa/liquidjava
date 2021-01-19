@@ -51,6 +51,12 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectUnaryOperators.java");
 	}
 	
+	
+	@Test
+	public void correctImplies() {
+		testCorrect(testPath+"CorrectImplies.java");
+	}
+	
 	@Test
 	public void correctLongUsage() {
 		testCorrect(testPath+"CorrectLongUsage.java");
