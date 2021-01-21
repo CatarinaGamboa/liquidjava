@@ -2,24 +2,24 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{true}->{((arg0 < 0) --> (\\v == (-arg0*2))) && ((arg0 >= 0) --> (\\v == arg0*2))}")
-    private static int getPositiveDouble(int arg0) {
-        if (arg0 < 0)
-            return (-arg0) * 2;
-        else
-            return arg0 * 2;
-
+    @repair.regen.specification.Refinement("{true}->{\\v == b*2}")
+    private static int multTwo(int b) {
+        return b * 2;
     }
 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("\\v > 5")
-        int a7 = 10;
-        @repair.regen.specification.Refinement("\\v > 4")
-        int a8 = java.lang.Math.decrementExact(a7);
-        @repair.regen.specification.Refinement("\\v == 9")
-        int a9 = java.lang.Math.decrementExact(a7);
-        @repair.regen.specification.Refinement("\\v == 8")
-        int a10 = java.lang.Math.decrementExact(a7);
+        @repair.regen.specification.Refinement("\\v < 6")
+        int z = 5;
+        @repair.regen.specification.Refinement("\\v > 6")
+        int x = regen.test.project.SimpleTest.multTwo(z);
+        @repair.regen.specification.Refinement("\\v == 20")
+        int y = regen.test.project.SimpleTest.multTwo(x);
+        // @Refinement("\\v > 5")
+        // int prim = 10;
+        // @Refinement("\\v > 6")
+        // int seg = Math.incrementExact(prim);
+        // @Refinement("\\v == 12")
+        // int ter = Math.incrementExact(seg);
         // SEE ERROR
         // @Refinement("\\v > 5")
         // int x = 10;

@@ -59,7 +59,16 @@ public class CorrectInvocationFromMathLibrary {
 		int a8 = Math.decrementExact(a7);
 		@Refinement("\\v == 9")
 		int a9 = Math.decrementExact(a7);
+		@Refinement("\\v > 4")
+		long a10 = Math.decrementExact(a7);
+		@Refinement("\\v == 9")
+		long a11 = Math.decrementExact(a7);
 
 
+		@Refinement("\\v > 6")
+		int a12 = Math.incrementExact(a7);
+		@Refinement("\\v == 11")
+		int a13 = Math.incrementExact(a7);
+		
 	}
 }

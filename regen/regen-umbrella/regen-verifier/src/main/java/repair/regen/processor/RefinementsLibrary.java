@@ -75,6 +75,15 @@ public class RefinementsLibrary {
 		map.put("java.lang.Math.decrementExact(int)", 
 				String.format("{true}->{%s == (arg0 - 1)}",	WILD_VAR));
 		
+		map.put("java.lang.Math.decrementExact(long)", 
+				String.format("{true}->{%s == (arg0 - 1)}",	WILD_VAR));
+		
+		map.put("java.lang.Math.incrementExact(int)", 
+				String.format("{true}->{%s == (arg0 + 1)}",	WILD_VAR));
+		
+		map.put("java.lang.Math.incrementExact(long)", 
+				String.format("{true}->{%s == (arg0 + 1)}",	WILD_VAR));
+		
 		
 		//		@Refinement(“\\v >= 0”)
 //		Sqrt( @Refinement(“a > 0”) double a)

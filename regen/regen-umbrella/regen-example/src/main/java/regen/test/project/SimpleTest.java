@@ -3,28 +3,29 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
-	@Refinement("{true}->{((arg0 < 0) --> (\\v == (-arg0*2))) && ((arg0 >= 0) --> (\\v == arg0*2))}")
-	private static int getPositiveDouble(int arg0) {
-		if(arg0 < 0)
-			return -arg0*2;
-		else
-			return arg0*2;
-	}
 	
+	@Refinement("{true}->{\\v == b*2}")
+	private static int multTwo(int b) {
+		return b*2;
+	}
+
 	public static void main(String[] args) {
-
-		@Refinement("\\v > 5")
-		int a7 = 10;
+		@Refinement("\\v < 6")
+		int z = 5;
 		
-		@Refinement("\\v > 4")
-		int a8 = Math.decrementExact(a7);
+		@Refinement("\\v > 6")
+		int x = multTwo(z);
 		
-		@Refinement("\\v == 9")
-		int a9 = Math.decrementExact(a7);
-
+		@Refinement("\\v == 20")
+		int y = multTwo(x);
 		
-
-		
+//		@Refinement("\\v > 5")
+//		int prim = 10;
+//		@Refinement("\\v > 6")
+//		int seg = Math.incrementExact(prim);
+//		@Refinement("\\v == 12")
+//		int ter = Math.incrementExact(seg);
+	
 		//SEE ERROR
 //		@Refinement("\\v > 5")
 //		int x = 10;
