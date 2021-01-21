@@ -70,5 +70,12 @@ public class CorrectInvocationFromMathLibrary {
 		@Refinement("\\v == 11")
 		int a13 = Math.incrementExact(a7);
 		
+		@Refinement("\\v > 5")
+		int prim = 10;
+		@Refinement("\\v > 6")
+		int seg = Math.incrementExact(prim);
+		@Refinement("\\v == 12")
+		int ter = Math.incrementExact(seg);
+		
 	}
 }

@@ -2,52 +2,17 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{a < 0 }->{\\v > 0}")
-    public static int toPositive(int a) {
-        return -a;
-    }
+    @repair.regen.specification.Refinement("{true}->{\\v >= 0 && (\\v==2*z || \\v==(-2*z))}")
+    private static int getPositiveDouble(int z) {
+        if (z < 0)
+            return (-z) * 2;
+        else
+            return z * 2;
 
-    @repair.regen.specification.Refinement("{a > 0 }->{\\v < 0}")
-    public static int toNegative(int a) {
-        return -a;
     }
 
     public static void main(java.lang.String[] args) {
-        // EXAMPLE 2
-        @repair.regen.specification.Refinement("\\v < 10")
-        int ex_a = 5;
-        if (ex_a < 0) {
-            @repair.regen.specification.Refinement("\\v >= 10")
-            int ex_b = (regen.test.project.SimpleTest.toPositive(ex_a)) * 10;
-        }// else {
-
-        // if(ex_a != 0) {
-        // @Refinement("\\v < 0")
-        // int ex_d = toNegative(ex_a);
-        // }
-        // @Refinement("\\v < ex_a")
-        // int ex_c = -10;
-        // 
-        // }
-        // public static void main(String[] args) {
-        // 
-        // @Refinement("\\v < 6")
-        // int z = 5;
-        // 
-        // @Refinement("\\v > 6")
-        // int x = multTwo(z);
-        // 
-        // @Refinement("\\v == 20")
-        // int y = multTwo(x);
-        // 
-        // 
-        // @Refinement("\\v > 5")
-        // int prim = 10;
-        // @Refinement("\\v > 6")
-        // int seg = Math.incrementExact(prim);
-        // @Refinement("\\v == 12")
-        // int ter = Math.incrementExact(seg);
-        // SEE ERROR
+        // SEE ERROR still error
         // @Refinement("\\v > 5")
         // int x = 10;
         // 
@@ -79,7 +44,9 @@ public class SimpleTest {
         // double b = 0/0;
         // @Refinement("\\v > 5")
         // double c = b;
-        // b = (a < 100)? three(): three()-1;
+        // @Refinement("true")
+        // int a = 10;
+        // int b = (a < 100)? three(): three()-1;
         // @Refinement("c < 100")
         // int c = (a < 100)? three(): a;
         // c = (a < 100)? three()*3 : a*5;

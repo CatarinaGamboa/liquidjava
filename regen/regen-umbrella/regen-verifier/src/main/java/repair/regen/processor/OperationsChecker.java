@@ -32,12 +32,10 @@ import spoon.support.reflect.code.CtVariableWriteImpl;
  */
 class OperationsChecker {
 
-	private Context context;
 	private RefinementTypeChecker rtc;
 
 	public OperationsChecker(RefinementTypeChecker rtc) {
 		this.rtc = rtc; 
-		context = rtc.context;
 	}
 
 	/**
@@ -112,7 +110,7 @@ class OperationsChecker {
 		}
 
 		String metadata = rtc.getRefinement(ex);
-		String newName = name+"_"+context.getCounter()+"_";
+		String newName = name+"_"+rtc.context.getCounter()+"_";
 		String newMeta = "("+metadata.replace(rtc.WILD_VAR, newName)+")";
 		String unOp = getOperatorFromKind(operator.getKind());
 
@@ -123,7 +121,7 @@ class OperationsChecker {
 		else
 			all ="("+rtc.WILD_VAR+" == (" + opS + "))";
 		System.out.println(newMeta + " && "+all);
-		context.addVarToContext(newName, ex.getType(), newMeta);
+		rtc.context.addVarToContext(newName, ex.getType(), newMeta);
 		rtc.addRefinementVariable(newName);
 		operator.putMetadata(rtc.REFINE_KEY, all);
 
@@ -153,7 +151,7 @@ class OperationsChecker {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			String elemName = elemVar.getVariable().getSimpleName();
-			String elem_ref = context.getVariableRefinements(elemName);
+			String elem_ref = rtc.context.getVariableRefinements(elemName);
 
 			String returnName = elemName;
 
@@ -161,15 +159,15 @@ class OperationsChecker {
 			//No need for specific values
 			if(parent != null && !(parent instanceof CtIfImpl)) {
 				elem_ref = rtc.getRefinement(elemVar);
-				String newName = elemName+"_"+context.getCounter()+"_";
+				String newName = elemName+"_"+rtc.context.getCounter()+"_";
 				String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
-				context.addVarToContext(newName, elemVar.getType(), newElem_ref);
+				rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
 				rtc.addRefinementVariable(newName);
 				returnName = newName;
 			}
 			
 			elem_ref = elem_ref.replace(rtc.WILD_VAR, elemName);
-			context.addVarToContext(elemName, elemVar.getType(), elem_ref);
+			rtc.context.addVarToContext(elemName, elemVar.getType(), elem_ref);
 			rtc.addRefinementVariable(elemName);
 			return returnName;
 		}
@@ -193,15 +191,16 @@ class OperationsChecker {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
 			CtExecutable<?> method = inv.getExecutable().getDeclaration();
 			//Get function refinements with non_used variables
-			FunctionInfo fi = context.getFunctionByName(method.getSimpleName());
+			
+			FunctionInfo fi = rtc.context.getFunctionByName(method.getSimpleName());
 			String innerRefs = fi.getRenamedRefinements();
 			//Substitute \\v by the variable that we send
-			String newName = rtc.FRESH + context.getCounter();
+			String newName = rtc.FRESH + rtc.context.getCounter();
 			
 			//ERRO AQUI!!!!!!!!NO INNERREFS
 			
 			innerRefs = innerRefs.replace("\\v", newName);
-			context.addVarToContext(newName, fi.getType(), innerRefs);
+			rtc.context.addVarToContext(newName, fi.getType(), innerRefs);
 			rtc.addRefinementVariable(newName);
 			return newName;//Return variable that represents the invocation
 		}
@@ -221,14 +220,14 @@ class OperationsChecker {
 	 */
 	private <T> String getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
 			String name) {
-		String newName = name+"__"+context.getCounter();
+		String newName = name+"__"+rtc.context.getCounter();
 		CtVariable<T> varDecl = w.getVariable().getDeclaration();
 
-		String metadada = context.getVariableRefinements(varDecl.getSimpleName());
+		String metadada = rtc.context.getVariableRefinements(varDecl.getSimpleName());
 		rtc.addRefinementVariable(newName);
 		String operation = getOperatorFromKind(operator.getKind()).replace(rtc.WILD_VAR, newName);
 		String metaOper = metadada.replace(rtc.WILD_VAR, newName).replace(name, newName);
-		context.addVarToContext(newName, w.getType(), metaOper);
+		rtc.context.addVarToContext(newName, w.getType(), metaOper);
 		return rtc.WILD_VAR+" == "+operation;
 	}
 

@@ -1,11 +1,8 @@
 package repair.regen.processor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
-
-import org.eclipse.jdt.internal.core.nd.java.TypeRef;
+import java.util.Optional;
 
 import spoon.reflect.reference.CtTypeReference;
 
@@ -72,7 +69,9 @@ public class FunctionInfo {
 		String update = place;
 		for(VariableInfo p: argRefinements) {
 			String var = p.getName();
-			String newName = p.getIncognitoName();
+			Optional<VariableInfo> ovi = p.getLastInstance();
+			String newName = ovi.isPresent()? ovi.get().getName():var;
+						
 			String newRefs = p.getRefinement().replaceAll(var, newName);
 			context.addVarToContext(newName, p.getType(), newRefs);
 			update = update.replaceAll(var, newName);

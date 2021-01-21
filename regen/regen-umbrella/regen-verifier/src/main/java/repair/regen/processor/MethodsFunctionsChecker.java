@@ -23,13 +23,11 @@ import spoon.support.reflect.declaration.CtMethodImpl;
 
 public class MethodsFunctionsChecker {
 
-	private Context context;
 	private RefinementTypeChecker rtc;
 	private RefinementsLibrary lib;
 
 	public MethodsFunctionsChecker(RefinementTypeChecker rtc) {
 		this.rtc = rtc; 
-		context = rtc.context;
 		lib = rtc.lib;
 		
 	}
@@ -41,7 +39,7 @@ public class MethodsFunctionsChecker {
 			Method m = invocation.getExecutable().getActualMethod();
 			if(m != null) searchMethodInLibrary(m, invocation);
 		}else {
-			if(context.getFunctionByName(method.getSimpleName()) != null) {//inside context
+			if(rtc.context.getFunctionByName(method.getSimpleName()) != null) {//inside rtc.context
 				checkInvocationRefinements(invocation, method.getSimpleName());
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
@@ -66,7 +64,7 @@ public class MethodsFunctionsChecker {
 			name = name.substring(lastSpaceI+1);
 			Optional<String> ref = lib.getRefinement(name);
 			if(ref.isPresent()) {
-				String metRef = handleFunctionRefinements(ref.get(), m);
+				String metRef = handleFunctionRefinements(ref.get(), m);//maybe here error?
 				System.out.println(metRef);
 				checkInvocationRefinements(invocation, m.getName());
 			}
@@ -81,7 +79,7 @@ public class MethodsFunctionsChecker {
 
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName) {
-		FunctionInfo f = context.getFunctionByName(methodName);
+		FunctionInfo f = rtc.context.getFunctionByName(methodName);
 		String methodRef = f.getRenamedReturn();
 		String metRef = f.getRenamedReturn();
 		
@@ -100,7 +98,7 @@ public class MethodsFunctionsChecker {
 				VariableInfo pinfo = params.get(i);
 				CtExpression<?> exp = exps.get(i);
 				String paramOriginalName = pinfo.getName();
-				String newParamName = paramOriginalName+"_"+context.getCounter()+"_";//pinfo.getIncognitoName();
+				String newParamName = paramOriginalName+"_"+rtc.context.getCounter()+"_";//pinfo.getIncognitoName();
 				newNames.put(paramOriginalName, newParamName);
 				
 				String refPar = f.getRefinementsForParamIndex(i).replace(paramOriginalName, newParamName);
@@ -111,8 +109,8 @@ public class MethodsFunctionsChecker {
 						refPar = refPar.replace(entry, newNames.get(entry));
 				}
 
-				context.addVarToContext(newParamName, pinfo.getType(), refInv);
-				context.newRefinementToVariableInContext(newParamName, refInv);
+				VariableInfo vi = rtc.context.addVarToContext(newParamName, pinfo.getType(), refInv);
+				rtc.context.newRefinementToVariableInContext(newParamName, refInv);
 				rtc.addRefinementVariable(newParamName);
 				for(String s:saveVars)
 					rtc.addRefinementVariable(s);
@@ -121,13 +119,14 @@ public class MethodsFunctionsChecker {
 
 				if(exp instanceof CtVariableRead<?>) {
 					String name = ((CtVariableRead) exp).getVariable().getSimpleName();
-					context.addVarToContext(name,
+					rtc.context.addVarToContext(name,
 							((CtVariableRead) exp).getType(), refPar);
 					rtc.addRefinementVariable(name);
 					metRef = metRef.replace(newParamName, name);
 				}
 				rtc.checkSMT(refInv, refPar, invocation/*(CtVariable<?>)method.getParameters().get(i)*/);
 				saveVars.add(newParamName);
+				pinfo.addInstance(vi);
 			}
 
 
@@ -149,7 +148,7 @@ public class MethodsFunctionsChecker {
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
 		f.setRefReturn("true");
-		context.addFunctionToContext(f);
+		rtc.context.addFunctionToContext(f);
 		for(CtAnnotation<? extends Annotation> ann :method.getAnnotations()) {
 			if( !ann.getActualAnnotation().annotationType().getCanonicalName()
 					.contentEquals("repair.regen.specification.Refinement"))
@@ -185,12 +184,12 @@ public class MethodsFunctionsChecker {
 			sb.append(sb.length() == 0? metRef : " && "+metRef);
 
 			f.addArgRefinements(name,param.getType(), metRef);
-			context.addVarToContext(name, param.getType(), metRef);
+			rtc.context.addVarToContext(name, param.getType(), metRef);
 			rtc.addRefinementVariable(name);
 		}
 		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
 		f.setRefReturn(retRef);
-		context.addFunctionToContext(f);
+		rtc.context.addFunctionToContext(f);
 		
 		return sb.append(" && "+ retRef).toString();
 	}
@@ -215,12 +214,12 @@ public class MethodsFunctionsChecker {
 			sb.append(sb.length() == 0? metRef : " && "+metRef);
 
 			f.addArgRefinements(name,getType(param.getType()), metRef);
-			context.addVarToContext(name, getType(param.getType()), metRef);
+			rtc.context.addVarToContext(name, getType(param.getType()), metRef);
 			rtc.addRefinementVariable(name);
 		}
 		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
 		f.setRefReturn(retRef);
-		context.addFunctionToContext(f);
+		rtc.context.addFunctionToContext(f);
 		return sb.append(" && "+ retRef).toString();
 	}
 
@@ -235,21 +234,21 @@ public class MethodsFunctionsChecker {
 			//check if method has refinements
 			if(rtc.getRefinement(method) == null)
 				return;
-			FunctionInfo fi = context.getFunctionByName(method.getSimpleName());
+			FunctionInfo fi = rtc.context.getFunctionByName(method.getSimpleName());
 			for(VariableInfo vi:fi.getArgRefinements())
 				rtc.addRefinementVariable(vi.getName());
 
 			//Both return and the method have metadata
-			String returnVarName = "RET_"+context.getCounter(); 
+			String returnVarName = "RET_"+rtc.context.getCounter(); 
 			String retRef = String.format("(%s)", rtc.getRefinement(ret.getReturnedExpression())
 					.replace(rtc.WILD_VAR, returnVarName));
 			String expectedType = fi.getRefReturn().replace(rtc.WILD_VAR, returnVarName);
 
-			context.addVarToContext(returnVarName, method.getType(), retRef);
+			rtc.context.addVarToContext(returnVarName, method.getType(), retRef);
 			rtc.addRefinementVariable(returnVarName);
 			rtc.checkSMT(retRef, expectedType, ret);
-			context.removeRefinementFromVariableInContext(returnVarName, retRef);
-			context.newRefinementToVariableInContext(returnVarName, expectedType);
+			rtc.context.removeRefinementFromVariableInContext(returnVarName, retRef);
+			rtc.context.newRefinementToVariableInContext(returnVarName, expectedType);
 		}
 	}
 

@@ -34,7 +34,10 @@ public class Context {
 	}
 	
 	public void reinitializeContext() {
-		instance = new Context();
+		ctxVars = new Stack<>();
+		ctxVars.add(new ArrayList<>());//global vars
+		ctxFunctions = new ArrayList<>();
+		counter = 0;
 	}
 	
 	public void enterContext() {
@@ -64,8 +67,10 @@ public class Context {
 			ctxVars.peek().add(var);
 	}
 	
-	public void addVarToContext(String name, CtTypeReference<?> type, String refinements) {
-		addVarToContext(new VariableInfo(name, type, refinements));
+	public VariableInfo addVarToContext(String name, CtTypeReference<?> type, String refinements) {
+		VariableInfo vi =new VariableInfo(name, type, refinements);
+		addVarToContext(vi);
+		return vi;
 	}
 	
 	public void addRefinementToVariableInContext(CtVariable<?> variable, String et) {
