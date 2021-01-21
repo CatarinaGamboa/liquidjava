@@ -45,6 +45,21 @@ public class CorrectInvocationFromMathLibrary {
 		int a3 = Math.addExact(5, 6);
 		@Refinement("\\v > 10")
 		long b3 = Math.addExact(5l, 6l);
+		
+		
+		@Refinement("\\v < 4")
+		double a5 = Math.acos(0.5);
+		@Refinement("\\v < 2")
+		double a6 = Math.asin(a5);
+		
+		//decrementExact
+		@Refinement("\\v > 5")
+		int a7 = 10;
+		@Refinement("\\v > 4")
+		int a8 = Math.decrementExact(a7);
+		@Refinement("\\v == 9")
+		int a9 = Math.decrementExact(a7);
+
 
 	}
 }

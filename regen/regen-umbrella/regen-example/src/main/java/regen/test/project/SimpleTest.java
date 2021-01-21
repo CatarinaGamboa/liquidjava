@@ -13,27 +13,31 @@ public class SimpleTest {
 	
 	public static void main(String[] args) {
 
-//		@Refinement("\\v < 4")
-//		double a5 = Math.acos(0.5);
-//		@Refinement("\\v < 2")
-//		double a6 = Math.asin(a5);
-		
-		//if a > 0 then b > 0
 		@Refinement("\\v > 5")
-		int x = 10;
+		int a7 = 10;
 		
-		@Refinement("(x > 50) --> (y > 50)")
-		int y = x;
+		@Refinement("\\v > 4")
+		int a8 = Math.decrementExact(a7);
 		
-		@Refinement("y > 1 --> z > 2")
-		int z = y*2;
+		@Refinement("\\v == 9")
+		int a9 = Math.decrementExact(a7);
+
 		
-		@Refinement("\\v == 12")
-		int z0 = getPositiveDouble(6);
+
 		
+		//SEE ERROR
+//		@Refinement("\\v > 5")
+//		int x = 10;
+//		
+//		@Refinement("(x > 50) --> (y > 50)")
+//		int y = x;
+//		
+//		@Refinement("y > 1 --> z > 2")
+//		int z = y*2;
+//
 //		@Refinement("z > 0 --> \\v > 0")
 //		int z1 = getPositiveDouble(z);
-		
+//		
 		
 //		@Refinement("(\\v == -5)")
 //		float a7 = Math.copySign(-5, -500);

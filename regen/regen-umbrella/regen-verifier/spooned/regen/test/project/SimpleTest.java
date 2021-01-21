@@ -12,21 +12,27 @@ public class SimpleTest {
     }
 
     public static void main(java.lang.String[] args) {
-        // @Refinement("\\v < 4")
-        // double a5 = Math.acos(0.5);
-        // @Refinement("\\v < 2")
-        // double a6 = Math.asin(a5);
-        // if a > 0 then b > 0
         @repair.regen.specification.Refinement("\\v > 5")
-        int x = 10;
-        @repair.regen.specification.Refinement("(x > 50) --> (y > 50)")
-        int y = x;
-        @repair.regen.specification.Refinement("y > 1 --> z > 2")
-        int z = y * 2;
-        @repair.regen.specification.Refinement("\\v == 12")
-        int z0 = regen.test.project.SimpleTest.getPositiveDouble(6);
+        int a7 = 10;
+        @repair.regen.specification.Refinement("\\v > 4")
+        int a8 = java.lang.Math.decrementExact(a7);
+        @repair.regen.specification.Refinement("\\v == 9")
+        int a9 = java.lang.Math.decrementExact(a7);
+        @repair.regen.specification.Refinement("\\v == 8")
+        int a10 = java.lang.Math.decrementExact(a7);
+        // SEE ERROR
+        // @Refinement("\\v > 5")
+        // int x = 10;
+        // 
+        // @Refinement("(x > 50) --> (y > 50)")
+        // int y = x;
+        // 
+        // @Refinement("y > 1 --> z > 2")
+        // int z = y*2;
+        // 
         // @Refinement("z > 0 --> \\v > 0")
         // int z1 = getPositiveDouble(z);
+        // 
         // @Refinement("(\\v == -5)")
         // float a7 = Math.copySign(-5, -500);
         // 
