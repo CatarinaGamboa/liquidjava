@@ -37,6 +37,25 @@ public class CorrectInvocationFromMathLibrary {
         int a3 = java.lang.Math.addExact(5, 6);
         @repair.regen.specification.Refinement("\\v > 10")
         long b3 = java.lang.Math.addExact(5L, 6L);
+        @repair.regen.specification.Refinement("\\v < 4")
+        double a5 = java.lang.Math.acos(0.5);
+        @repair.regen.specification.Refinement("\\v < 2")
+        double a6 = java.lang.Math.asin(a5);
+        // decrementExact
+        @repair.regen.specification.Refinement("\\v > 5")
+        int a7 = 10;
+        @repair.regen.specification.Refinement("\\v > 4")
+        int a8 = java.lang.Math.decrementExact(a7);
+        @repair.regen.specification.Refinement("\\v == 9")
+        int a9 = java.lang.Math.decrementExact(a7);
+        @repair.regen.specification.Refinement("\\v > 4")
+        long a10 = java.lang.Math.decrementExact(a7);
+        @repair.regen.specification.Refinement("\\v == 9")
+        long a11 = java.lang.Math.decrementExact(a7);
+        @repair.regen.specification.Refinement("\\v > 6")
+        int a12 = java.lang.Math.incrementExact(a7);
+        @repair.regen.specification.Refinement("\\v == 11")
+        int a13 = java.lang.Math.incrementExact(a7);
     }
 }
 

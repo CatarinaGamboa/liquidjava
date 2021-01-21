@@ -101,7 +101,7 @@ public class FunctionInfo {
 			sb.append(vi.getRefinement()+ " && ");
 		}
 		sb.append(argRefinements.get(i).getRefinement());
-		return getRenamedRefinements(sb.toString());
+		return sb.toString();//getRenamedRefinements();
 	}
 
 	@Override

@@ -4,7 +4,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Optional;
 
 import spoon.reflect.code.CtExpression;
@@ -82,9 +84,13 @@ public class MethodsFunctionsChecker {
 		FunctionInfo f = context.getFunctionByName(methodName);
 		String methodRef = f.getRenamedReturn();
 		String metRef = f.getRenamedReturn();
+		
+		String metRefOriginal = f.getRefReturn(); 
 		List<String> saveVars = new ArrayList<>();
 		for(String v: rtc.vcChecker.getVariables())
 			saveVars.add(v);
+		
+		HashMap<String, String> newNames = new HashMap<>();
 
 		if(methodRef != null) {
 			//Checking Parameters
@@ -93,37 +99,47 @@ public class MethodsFunctionsChecker {
 			for (int i = 0; i < params.size(); i++) {
 				VariableInfo pinfo = params.get(i);
 				CtExpression<?> exp = exps.get(i);
-				String newParamName = pinfo.getIncognitoName();
-				String refPar = f.getRefinementsForParamIndex(i);
+				String paramOriginalName = pinfo.getName();
+				String newParamName = paramOriginalName+"_"+context.getCounter()+"_";//pinfo.getIncognitoName();
+				newNames.put(paramOriginalName, newParamName);
+				
+				String refPar = f.getRefinementsForParamIndex(i).replace(paramOriginalName, newParamName);
 				String refInv = (rtc.getRefinement(exp)).replace(rtc.WILD_VAR, newParamName);
-				System.out.println("ref par:"+refPar);
+				
+				for(String entry: newNames.keySet()) {
+					if(!entry.equals(paramOriginalName) && refPar.contains(entry))
+						refPar = refPar.replace(entry, newNames.get(entry));
+				}
 
 				context.addVarToContext(newParamName, pinfo.getType(), refInv);
 				context.newRefinementToVariableInContext(newParamName, refInv);
 				rtc.addRefinementVariable(newParamName);
 				for(String s:saveVars)
 					rtc.addRefinementVariable(s);
+				
+				metRefOriginal = metRefOriginal.replace(pinfo.getName(), newParamName);
 
 				if(exp instanceof CtVariableRead<?>) {
 					String name = ((CtVariableRead) exp).getVariable().getSimpleName();
 					context.addVarToContext(name,
 							((CtVariableRead) exp).getType(), refPar);
 					rtc.addRefinementVariable(name);
-					metRef = metRef.replaceAll(newParamName, name);
+					metRef = metRef.replace(newParamName, name);
 				}
 				rtc.checkSMT(refInv, refPar, invocation/*(CtVariable<?>)method.getParameters().get(i)*/);
 				saveVars.add(newParamName);
 			}
 
 
-			for(VariableInfo vi:params) 
-				rtc.addRefinementVariable(vi.getIncognitoName());
+//			for(VariableInfo vi:params) 
+//				rtc.addRefinementVariable(vi.getIncognitoName());
 			for(String s: saveVars)
 				rtc.addRefinementVariable(s);
+			
 			//Checking Return
 			String s = methodRef;// sb.length() == 0? methodRef:  sb.append(" && "+methodRef).toString();
 			//String s = methodRef;
-			invocation.putMetadata(rtc.REFINE_KEY, metRef);
+			invocation.putMetadata(rtc.REFINE_KEY, metRefOriginal);
 		}
 	}
 

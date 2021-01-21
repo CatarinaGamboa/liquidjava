@@ -4,21 +4,48 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
 	
-	@Refinement("{true}->{\\v == b*2}")
-	private static int multTwo(int b) {
-		return b*2;
+	@Refinement("{a < 0 }->{\\v > 0}")
+	public static int toPositive(int a) {
+		return -a;
 	}
-
+	
+	@Refinement("{a > 0 }->{\\v < 0}")
+	public static int toNegative(int a) {
+		return -a;
+	}
+	
 	public static void main(String[] args) {
-		@Refinement("\\v < 6")
-		int z = 5;
-		
-		@Refinement("\\v > 6")
-		int x = multTwo(z);
-		
-		@Refinement("\\v == 20")
-		int y = multTwo(x);
-		
+		//EXAMPLE 2
+		@Refinement("\\v < 10")
+		int ex_a = 5;
+		if(ex_a < 0) {
+			@Refinement("\\v >= 10")
+			int ex_b = toPositive(ex_a)*10;
+		}//else {
+//			if(ex_a != 0) {
+//				@Refinement("\\v < 0")
+//				int ex_d = toNegative(ex_a);
+//			}
+//			@Refinement("\\v < ex_a")
+//			int ex_c = -10;
+//			
+//		}
+
+	
+	
+
+//	public static void main(String[] args) {
+//		
+//		@Refinement("\\v < 6")
+//		int z = 5;
+//		
+//		@Refinement("\\v > 6")
+//		int x = multTwo(z);
+//		
+//		@Refinement("\\v == 20")
+//		int y = multTwo(x);
+//
+//		
 //		@Refinement("\\v > 5")
 //		int prim = 10;
 //		@Refinement("\\v > 6")

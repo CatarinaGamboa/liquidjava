@@ -15,9 +15,27 @@ public class CorrectFunctionInInvocation {
 		return 10;
     }
 	
+	
+	@Refinement("{true}->{\\v == b*2}")
+	private static int multTwo(int b) {
+		return b*2;
+	}
+	
 	public static void main(String[] args) {
     	@Refinement("\\v >= 0")
     	int p = 10;
     	p = posMult(ten(), 4);
+    	
+		@Refinement("\\v < 6")
+		int z = 5;
+		
+		@Refinement("\\v > 6")
+		int x = multTwo(z);
+		
+		@Refinement("\\v == 20")
+		int y = multTwo(x);
+
 	}
+	
+	
 }

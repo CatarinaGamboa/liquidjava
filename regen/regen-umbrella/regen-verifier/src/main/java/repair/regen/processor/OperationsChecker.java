@@ -197,6 +197,9 @@ class OperationsChecker {
 			String innerRefs = fi.getRenamedRefinements();
 			//Substitute \\v by the variable that we send
 			String newName = rtc.FRESH + context.getCounter();
+			
+			//ERRO AQUI!!!!!!!!NO INNERREFS
+			
 			innerRefs = innerRefs.replace("\\v", newName);
 			context.addVarToContext(newName, fi.getType(), innerRefs);
 			rtc.addRefinementVariable(newName);

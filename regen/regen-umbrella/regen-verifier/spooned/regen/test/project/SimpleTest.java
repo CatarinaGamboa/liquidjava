@@ -2,18 +2,45 @@ package regen.test.project;
 
 
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{true}->{\\v == b*2}")
-    private static int multTwo(int b) {
-        return b * 2;
+    @repair.regen.specification.Refinement("{a < 0 }->{\\v > 0}")
+    public static int toPositive(int a) {
+        return -a;
+    }
+
+    @repair.regen.specification.Refinement("{a > 0 }->{\\v < 0}")
+    public static int toNegative(int a) {
+        return -a;
     }
 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("\\v < 6")
-        int z = 5;
-        @repair.regen.specification.Refinement("\\v > 6")
-        int x = regen.test.project.SimpleTest.multTwo(z);
-        @repair.regen.specification.Refinement("\\v == 20")
-        int y = regen.test.project.SimpleTest.multTwo(x);
+        // EXAMPLE 2
+        @repair.regen.specification.Refinement("\\v < 10")
+        int ex_a = 5;
+        if (ex_a < 0) {
+            @repair.regen.specification.Refinement("\\v >= 10")
+            int ex_b = (regen.test.project.SimpleTest.toPositive(ex_a)) * 10;
+        }// else {
+
+        // if(ex_a != 0) {
+        // @Refinement("\\v < 0")
+        // int ex_d = toNegative(ex_a);
+        // }
+        // @Refinement("\\v < ex_a")
+        // int ex_c = -10;
+        // 
+        // }
+        // public static void main(String[] args) {
+        // 
+        // @Refinement("\\v < 6")
+        // int z = 5;
+        // 
+        // @Refinement("\\v > 6")
+        // int x = multTwo(z);
+        // 
+        // @Refinement("\\v == 20")
+        // int y = multTwo(x);
+        // 
+        // 
         // @Refinement("\\v > 5")
         // int prim = 10;
         // @Refinement("\\v > 6")
