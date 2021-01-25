@@ -212,7 +212,7 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public void visitCtIf(CtIf ifElement) {
 		CtExpression<Boolean> exp = ifElement.getCondition();
-
+		context.variablesSetBeforeIf();
 		enterContexts();
 		
 		String expRefs = getExpressionRefinements(exp);
@@ -222,21 +222,27 @@ public class RefinementTypeChecker extends CtScanner {
 		context.addVarToContext(freshVarName, factory.Type().INTEGER_PRIMITIVE, 
 				expRefs.replace(WILD_VAR, freshVarName));
 		vcChecker.addRefinementVariable(freshVarName);
+		
+		//VISIT THEN
 		enterContexts();
 		visitCtBlock(ifElement.getThenStatement());
+		context.variablesSetThenIf();
 		exitContexts();
 
+		//VISIT ELSE
 		if(ifElement.getElseStatement() != null) {
 			context.getVariableByName(freshVarName);
 			context.newRefinementToVariableInContext(freshVarName, "!("+expRefs+")");
 			enterContexts();
 			visitCtBlock(ifElement.getElseStatement());
+			context.variablesSetElseIf();
 			exitContexts();
 		}
 		//end
 		vcChecker.removePathVariable(freshVarName);
 		vcChecker.renewVariables();
 		exitContexts();
+		context.variablesCombineFromIf();
 	}
 
 

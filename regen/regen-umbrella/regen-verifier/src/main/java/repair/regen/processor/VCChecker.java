@@ -164,7 +164,9 @@ public class VCChecker {
 		} catch (TypeCheckError e) {
 			printError(element, expectedType, correctRefinement);
 
-		}
+		}//catch(NullPointerException e) {
+		//	printErrorUnknownVariable(element, expectedType, correctRefinement);
+		//}
 
 	}
 
@@ -183,6 +185,18 @@ public class VCChecker {
 		System.out.println();
 		System.out.println("Type expected:" + et);
 		System.out.println("Refinement found:" + correctRefinement);
+		System.out.println("Location: " + var.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(1);
+	}
+	private <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement) {
+		System.out.println("______________________________________________________");
+		System.err.println("Encountered unknown variable");
+		System.out.println();
+		System.out.println(var);
+		System.out.println();
+		//System.out.println("Type expected:" + et);
+		//System.out.println("Refinement found:" + correctRefinement);
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);

@@ -155,6 +155,11 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectInvocationFromMathLibrary.java");
 	}
 	
+	@Test
+	public void correctUsingAfterIf() {
+		testCorrect(testPath+"CorrectUsingAfterIf.java");
+	}
+	
 	
 	@Test
 	public void errorSimpleAssignment() {
@@ -272,6 +277,12 @@ public class TestExamples {
 	public void errorIfSpecificValueAssignment() {
 		testWrong(testPath+"ErrorSpecificValuesIf2.java");
 	}
+	
+	@Test
+	public void errorAfterIf() {
+		testWrong(testPath+"ErrorAfterIf.java");
+	}
+	
 	
 	@Test
 	public void errorSpecificValuesIf() {
