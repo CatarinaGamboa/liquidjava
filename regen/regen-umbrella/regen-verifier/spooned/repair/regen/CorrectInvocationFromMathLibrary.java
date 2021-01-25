@@ -23,6 +23,14 @@ public class CorrectInvocationFromMathLibrary {
         long b1 = java.lang.Math.abs((-13));
         @repair.regen.specification.Refinement("\\v > 10")
         float c1 = java.lang.Math.abs((-13.0F));
+        @repair.regen.specification.Refinement("\\v > 4")
+        int d1 = java.lang.Math.abs((-6));
+        @repair.regen.specification.Refinement("\\v == -6")
+        int e1 = -(java.lang.Math.abs((-d1)));
+        @repair.regen.specification.Refinement("\\v == -6")
+        int f1 = -(java.lang.Math.abs(e1));
+        @repair.regen.specification.Refinement("\\v == -6")
+        int f2 = -(java.lang.Math.abs(f1));
         // Constants
         @repair.regen.specification.Refinement("\\v > 3")
         double a2 = java.lang.Math.PI;
@@ -56,6 +64,12 @@ public class CorrectInvocationFromMathLibrary {
         int a12 = java.lang.Math.incrementExact(a7);
         @repair.regen.specification.Refinement("\\v == 11")
         int a13 = java.lang.Math.incrementExact(a7);
+        @repair.regen.specification.Refinement("\\v > 5")
+        int prim = 10;
+        @repair.regen.specification.Refinement("\\v > 6")
+        int seg = java.lang.Math.incrementExact(prim);
+        @repair.regen.specification.Refinement("\\v == 12")
+        int ter = java.lang.Math.incrementExact(seg);
     }
 }
 

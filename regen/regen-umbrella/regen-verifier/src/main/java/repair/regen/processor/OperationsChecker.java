@@ -65,9 +65,9 @@ class OperationsChecker {
 			operator.putMetadata(rtc.REFINE_KEY, oper);
 			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
 					parent instanceof CtReturn<?>)
-				operator.putMetadata(rtc.REFINE_KEY, rtc.WILD_VAR+" == (" + oper+")");
+				operator.putMetadata(rtc.REFINE_KEY, "("+rtc.WILD_VAR+" == (" + oper+"))");
 		}else if (types.contains(type)) {
-			operator.putMetadata(rtc.REFINE_KEY, rtc.WILD_VAR+" == " + oper);
+			operator.putMetadata(rtc.REFINE_KEY, "("+rtc.WILD_VAR+" == " + oper+")");
 		}else {
 			System.out.println("Literal type not implemented");
 		}
@@ -228,7 +228,7 @@ class OperationsChecker {
 		String operation = getOperatorFromKind(operator.getKind()).replace(rtc.WILD_VAR, newName);
 		String metaOper = metadada.replace(rtc.WILD_VAR, newName).replace(name, newName);
 		rtc.context.addVarToContext(newName, w.getType(), metaOper);
-		return rtc.WILD_VAR+" == "+operation;
+		return "("+rtc.WILD_VAR+" == "+operation+")";
 	}
 
 	//############################### Operations Auxiliaries ##########################################

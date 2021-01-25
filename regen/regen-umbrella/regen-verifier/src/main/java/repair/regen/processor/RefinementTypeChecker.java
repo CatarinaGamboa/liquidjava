@@ -113,11 +113,10 @@ public class RefinementTypeChecker extends CtScanner {
 			CtExpression a = localVariable.getAssignment();
 			if (refinementFound == null)
 				refinementFound = "true";
-			context.addVarToContext(varName, localVariable.getType(), 
-					"true");
+			context.addVarToContext(varName, localVariable.getType(), "true");
 			checkVariableRefinements(refinementFound,varName, localVariable);
 			context.removeRefinementFromVariableInContext(varName, "true");
-			context.addMainRefinementVariable(varName, context.getVariableRefinements(varName));
+			context.addMainRefinementVariable(varName, "("+context.getVariableRefinements(varName)+")");
 		}
 	}
 
@@ -147,7 +146,7 @@ public class RefinementTypeChecker extends CtScanner {
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
 		List<String> types = Arrays.asList(implementedTypes);
 		if (types.contains(lit.getType().getQualifiedName())) {
-			lit.putMetadata(REFINE_KEY, WILD_VAR+" == " + lit.getValue());
+			lit.putMetadata(REFINE_KEY,"("+ WILD_VAR+" == " + lit.getValue()+")");
 		}else if(lit.getType().getQualifiedName().contentEquals("java.lang.String")){
 			//Only taking care of strings inside refinements
 		}else {
@@ -323,7 +322,7 @@ public class RefinementTypeChecker extends CtScanner {
 			addRefinementVariable(newName);
 			//smt check
 			checkSMTVariable(correctNewRefinement, etNew, variable, simpleName);
-			context.addRefinementToVariableInContext(variable, et);
+			context.addRefinementToVariableInContext(variable, "("+et+")");
 		});
 	}
 	

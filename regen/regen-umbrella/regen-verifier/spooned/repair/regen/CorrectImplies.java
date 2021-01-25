@@ -20,6 +20,8 @@ public class CorrectImplies {
         int z = y * 2;
         @repair.regen.specification.Refinement("\\v == 12")
         int z0 = repair.regen.CorrectImplies.getPositiveDouble(6);
+        // @Refinement("z > 0 --> \\v > 0") //works but takes 1min to run
+        // int z1 = getPositiveDouble(z);
     }
 }
 

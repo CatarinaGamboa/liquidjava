@@ -60,6 +60,7 @@ public class RefinementsLibrary {
 		//power sim
 		//if then else para z3 - ite ? :
 		//(\\v == arg0 || \\v == -arg0) && (if arg1 > 0 then \\v > 0 else \\v < 0)
+		//
 //		map.put("java.lang.Math.copySign(float,float)", 
 //				String.format("{true}->{true}->"
 //						+ "{((%s == arg0) || (%s == -arg0)) && ((!(arg1 > 0) || (%s > 0)) && ((arg1 > 0) || (%s < 0)))}", 
@@ -67,7 +68,7 @@ public class RefinementsLibrary {
 		
 		map.put("java.lang.Math.copySign(float,float)", 
 				String.format("{true}->{true}->"
-						+ "{(((%s == arg0) || (%s == (-arg0))) && (((arg1 > 0) --> (%s > 0)) && ((arg1 <= 0) --> (%s < 0))))}", 
+						+ "{(((%s == arg0) || (%s == (-arg0))) && (((arg1 > 0) --> (%s > 0)) && ((arg1 <= 0) --> (%s <= 0))))}", 
 						WILD_VAR, WILD_VAR, WILD_VAR, WILD_VAR));
 		
 		

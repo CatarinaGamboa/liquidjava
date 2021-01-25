@@ -23,5 +23,9 @@ public class CorrectImplies {
 		
 		@Refinement("\\v == 12")
 		int z0 = getPositiveDouble(6);
+		
+//		@Refinement("z > 0 --> \\v > 0") //works but takes 1min to run
+//		int z1 = getPositiveDouble(z);
+				
 	}
 }

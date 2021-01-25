@@ -29,6 +29,15 @@ public class CorrectInvocationFromMathLibrary {
 		@Refinement("\\v > 10")
 		float c1 = Math.abs(-13f);
 		
+		@Refinement("\\v > 4")
+		int d1 = Math.abs(-6);
+		@Refinement("\\v == -6")
+		int e1 = -Math.abs(-d1);
+		@Refinement("\\v == -6")
+		int f1 = -Math.abs(e1);
+		@Refinement("\\v == -6")
+		int f2 = -Math.abs(f1);
+		
 		
 		// Constants
 		@Refinement("\\v > 3")
