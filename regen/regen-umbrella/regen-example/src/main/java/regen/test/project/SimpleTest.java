@@ -6,7 +6,16 @@ public class SimpleTest {
 
 
 	public static void main(String[] args) {
-
+		@Refinement("k > 0 && k < 100")
+		int k = 5;
+		if(k > 7) {
+			k = 9;
+		}
+		@Refinement("\\v < 10")
+		int m = k;
+		k = 50;
+		@Refinement("\\v == 50")
+		int m2 = k;
 		//small error
 //		@Refinement("\\v < 100")
 //		int ielse = 90;

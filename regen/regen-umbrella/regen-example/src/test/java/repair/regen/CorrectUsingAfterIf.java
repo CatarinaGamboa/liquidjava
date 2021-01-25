@@ -58,18 +58,20 @@ public class CorrectUsingAfterIf {
 		else
 			initializedInElse = 8;
 		@Refinement("\\v == 40")
-		int world = initializedInThen*5;
+		int world = initializedInElse*5;
 		
-		//Example 6
-		@Refinement("\\v < 100")
-		int changedInElse = 90;
+
+		//Example 7
+		@Refinement("k > 0 && k < 100")
+		int k = 5;
+		if(k > 7) {
+			k = 9;
+		}
 		@Refinement("\\v < 10")
-		int changedInThen = 7;		
-		if(changedInThen > 6)
-			changedInThen = changedInThen-8;
-		else
-			changedInElse = 5;
-		
+		int m = k;
+		k = 50;
+		@Refinement("\\v == 50")
+		int m2 = k;
 
 	}
 }

@@ -283,6 +283,10 @@ public class TestExamples {
 		testWrong(testPath+"ErrorAfterIf.java");
 	}
 	
+	@Test
+	public void errorAfterIf2() {
+		testWrong(testPath+"ErrorAfterIf2.java");
+	}
 	
 	@Test
 	public void errorSpecificValuesIf() {
