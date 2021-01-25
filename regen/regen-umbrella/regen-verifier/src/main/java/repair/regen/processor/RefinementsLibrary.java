@@ -52,27 +52,21 @@ public class RefinementsLibrary {
 		map.put("java.lang.Math.atan2(double,double)", 
 				String.format("{true}->{true}->{%s >= ("+(-pi)+") && %s <= ("+pi+")}", WILD_VAR, WILD_VAR));//NAN special case
 		
-		//square root e power - makes sense to create this functions in specificationn language?
-		//java.lang.Math.cbrt(double) only makes sense if the power is specified
-		//java.lang.Math.ceil(double) makes sense to add cast in the a specification?
-		
-		//implicacao
-		//power sim
-		//if then else para z3 - ite ? :
-		//(\\v == arg0 || \\v == -arg0) && (if arg1 > 0 then \\v > 0 else \\v < 0)
-		//
+
 //		map.put("java.lang.Math.copySign(float,float)", 
 //				String.format("{true}->{true}->"
 //						+ "{((%s == arg0) || (%s == -arg0)) && ((!(arg1 > 0) || (%s > 0)) && ((arg1 > 0) || (%s < 0)))}", 
 //						WILD_VAR, WILD_VAR, WILD_VAR, WILD_VAR));
 		
+		//if arg1 > 0 then \\v > 0 else \\v <= 0
+		String cond = "(arg0 > 0)";
 		map.put("java.lang.Math.copySign(float,float)", 
 				String.format("{true}->{true}->"
-						+ "{(((%s == arg0) || (%s == (-arg0))) && (((arg1 > 0) --> (%s > 0)) && ((arg1 <= 0) --> (%s <= 0))))}", 
+						+"{((arg1 > 0) --> (%s > 0)) && (!(arg1 > 0)-->!(%s > 0)) && ((%s == arg0) || (%s == (-arg0)))}",
+						//+ "{(((%s == arg0) || (%s == (-arg0))) && (((arg1 > 0) --> (%s > 0)) && ((arg1 <= 0) --> (%s <= 0))))}", 
 						WILD_VAR, WILD_VAR, WILD_VAR, WILD_VAR));
 		
-		
-		
+
 		map.put("java.lang.Math.decrementExact(int)", 
 				String.format("{true}->{%s == (arg0 - 1)}",	WILD_VAR));
 		
@@ -85,9 +79,28 @@ public class RefinementsLibrary {
 		map.put("java.lang.Math.incrementExact(long)", 
 				String.format("{true}->{%s == (arg0 + 1)}",	WILD_VAR));
 		
+		map.put("java.lang.Math.max(int,int)", String.format("{true}->{true}->"
+						+ "{((arg0 > arg1)-->(%s == arg0)) && ((arg0 <= arg1)-->(%s == arg1))}",
+						WILD_VAR, WILD_VAR));
+//		max(int a, int b)
+//		Returns the greater of two int values.
 		
-		//		@Refinement(“\\v >= 0”)
-//		Sqrt( @Refinement(“a > 0”) double a)
+//		min(int a, int b)
+//		Returns the smaller of two int values.
+		
+//		multiplyExact(int x, int y)
+//		Returns the product of the arguments, throwing an exception if the result overflows an int.
+		
+		
+//		negateExact(int a)
+//		Returns the negation of the argument, throwing an exception if the result overflows an int.
+		
+//		subtractExact(int x, int y)
+//		Returns the difference of the arguments, throwing an exception if the result overflows an int
+
+//		power sim
+//		if then else para z3 - ite ? :
+//		(\\v == arg0 || \\v == -arg0) && (if arg1 > 0 then \\v > 0 else \\v < 0)
 		
 	}
 	public Optional<String> getRefinement(String met) {

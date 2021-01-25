@@ -10,6 +10,10 @@ public class CorrectInvocationFromMathLibrary {
         double c = java.lang.Math.random();
         @repair.regen.specification.Refinement("\\v < 0")
         double f = -(java.lang.Math.random());
+        @repair.regen.specification.Refinement("true")
+        double r1 = java.lang.Math.random();
+        @repair.regen.specification.Refinement("m2 > 0")
+        double r2 = r1 * 5;
         // Math.abs(...)
         @repair.regen.specification.Refinement("b > 0")
         int b = java.lang.Math.abs(6);
@@ -60,6 +64,7 @@ public class CorrectInvocationFromMathLibrary {
         long a10 = java.lang.Math.decrementExact(a7);
         @repair.regen.specification.Refinement("\\v == 9")
         long a11 = java.lang.Math.decrementExact(a7);
+        // incrementExact
         @repair.regen.specification.Refinement("\\v > 6")
         int a12 = java.lang.Math.incrementExact(a7);
         @repair.regen.specification.Refinement("\\v == 11")
@@ -70,6 +75,15 @@ public class CorrectInvocationFromMathLibrary {
         int seg = java.lang.Math.incrementExact(prim);
         @repair.regen.specification.Refinement("\\v == 12")
         int ter = java.lang.Math.incrementExact(seg);
+        // max
+        @repair.regen.specification.Refinement("\\v == 5")
+        int m1 = java.lang.Math.max(4, 5);
+        @repair.regen.specification.Refinement("\\v > 5")
+        int m2 = java.lang.Math.max(100, m1);
+        @repair.regen.specification.Refinement("\\v == 100")
+        int m3 = java.lang.Math.max(100, m2);
+        @repair.regen.specification.Refinement("\\v == -100")
+        int m4 = java.lang.Math.max((-1000), (-m2));
     }
 }
 

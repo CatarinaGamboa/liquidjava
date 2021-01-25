@@ -293,6 +293,20 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void errorMathMax() {
+		testWrong(testPath+"ErrorMathMax.java");
+	}
+	@Test
+	public void errorRandom() {
+		testWrong(testPath+"ErrorRandom.java");
+	}
+	@Test
+	public void errorMathAbs() {
+		testWrong(testPath+"ErrorMathAbs.java");
+	}
+	
+	
+	@Test
 	public void errorRecursion1() {
 		testWrong(testPath+"ErrorRecursion1.java");
 	}

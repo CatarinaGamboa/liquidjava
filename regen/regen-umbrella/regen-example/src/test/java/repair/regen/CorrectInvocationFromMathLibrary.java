@@ -11,9 +11,13 @@ public class CorrectInvocationFromMathLibrary {
 		//Math.random()
 		@Refinement("\\v >= 0")
 		double c = Math.random();
-		
 		@Refinement("\\v < 0")
 		double f = -Math.random();
+		@Refinement("true")
+		double r1 = Math.random();		
+		@Refinement("\\v > 0")
+		double r2 = r1*5;
+
 		
 		//Math.abs(...)
 		@Refinement("b > 0")
@@ -73,7 +77,7 @@ public class CorrectInvocationFromMathLibrary {
 		@Refinement("\\v == 9")
 		long a11 = Math.decrementExact(a7);
 
-
+		//incrementExact
 		@Refinement("\\v > 6")
 		int a12 = Math.incrementExact(a7);
 		@Refinement("\\v == 11")
@@ -85,6 +89,18 @@ public class CorrectInvocationFromMathLibrary {
 		int seg = Math.incrementExact(prim);
 		@Refinement("\\v == 12")
 		int ter = Math.incrementExact(seg);
+		
+		
+		//max
+		@Refinement("\\v == 5")
+		int m1 = Math.max(4, 5);
+		@Refinement("\\v > 5")
+		int m2 = Math.max(100, m1);
+		@Refinement("\\v == 100")
+		int m3 = Math.max(100, m2);
+		@Refinement("\\v == -100")
+		int m4 = Math.max(-1000, -m2);
+
 		
 	}
 }

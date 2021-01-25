@@ -10,19 +10,15 @@ public class SimpleTest {
 		//SEE ERROR still error
 
 
-		//		@Refinement("(\\v == -5)")
-		//		float prim = Math.copySign(-5, -500);
-		//		@Refinement("\\v == -656")
-		//		float ter = Math.copySign(656, prim);
-		@Refinement("\\v > 4")
-		int d = Math.abs(-6);
-		@Refinement("\\v == -6")
-		int e = -Math.abs(-d);
-		@Refinement("\\v == -6")
-		int f = -Math.abs(e);
-		@Refinement("\\v == -6")
-		int f6 = -Math.abs(f);
+//		@Refinement("(\\v == -5)")
+//		float prim = Math.copySign(-5, -500);
+//		@Refinement("\\v == -656")
+//		float ter = Math.copySign(656, prim);
 
+		@Refinement("\\v < 0")
+		int y1 = Math.addExact(5, -6);
+		@Refinement("\\v == -5")
+		int a3 = Math.addExact(-6, y1);
 
 		//See error NaN
 		//		@Refinement("true")
