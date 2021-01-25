@@ -8,14 +8,12 @@ public class SimpleTest {
         // float prim = Math.copySign(-5, -500);
         // @Refinement("\\v == -656")
         // float ter = Math.copySign(656, prim);
-        @repair.regen.specification.Refinement("\\v == 4")
-        int m1 = java.lang.Math.min(4, 5);
-        @repair.regen.specification.Refinement("\\v < 5")
-        int m2 = java.lang.Math.min(100, m1);
-        @repair.regen.specification.Refinement("\\v == 4")
-        int m3 = java.lang.Math.min(100, m2);
-        @repair.regen.specification.Refinement("\\v == -1")
-        int m4 = java.lang.Math.min((-1), (-m2));
+        @repair.regen.specification.Refinement("\\v < -40")
+        int subE = java.lang.Math.subtractExact((-40), 5);
+        @repair.regen.specification.Refinement("\\v > 0")
+        int subEx = java.lang.Math.subtractExact(0, subE);
+        @repair.regen.specification.Refinement("\\v == 0")
+        int subExa = java.lang.Math.subtractExact(subEx, subEx);
         // See error NaN
         // @Refinement("true")
         // double b = 0/0;

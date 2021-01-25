@@ -308,6 +308,10 @@ public class TestExamples {
 	public void errorMathMin() {
 		testWrong(testPath+"ErrorMathMin.java");
 	}
+	@Test
+	public void errorMathMultiplyExact() {
+		testWrong(testPath+"ErrorMathMultiplyExact.java");
+	}
 	
 	
 	@Test

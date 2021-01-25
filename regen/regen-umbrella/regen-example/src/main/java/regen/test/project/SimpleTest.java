@@ -16,7 +16,6 @@ public class SimpleTest {
 //		float ter = Math.copySign(656, prim);
 
 
-
 		//See error NaN
 		//		@Refinement("true")
 		//		double b = 0/0;

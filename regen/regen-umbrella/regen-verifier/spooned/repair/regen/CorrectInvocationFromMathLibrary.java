@@ -12,7 +12,7 @@ public class CorrectInvocationFromMathLibrary {
         double f = -(java.lang.Math.random());
         @repair.regen.specification.Refinement("true")
         double r1 = java.lang.Math.random();
-        @repair.regen.specification.Refinement("m2 > 0")
+        @repair.regen.specification.Refinement("\\v > 0")
         double r2 = r1 * 5;
         // Math.abs(...)
         @repair.regen.specification.Refinement("b > 0")
@@ -84,6 +84,36 @@ public class CorrectInvocationFromMathLibrary {
         int m3 = java.lang.Math.max(100, m2);
         @repair.regen.specification.Refinement("\\v == -100")
         int m4 = java.lang.Math.max((-1000), (-m2));
+        // min
+        @repair.regen.specification.Refinement("\\v == 4")
+        int m5 = java.lang.Math.min(4, 5);
+        @repair.regen.specification.Refinement("\\v < 5")
+        int m6 = java.lang.Math.min(100, m5);
+        @repair.regen.specification.Refinement("\\v == 4")
+        int m7 = java.lang.Math.min(100, m6);
+        @repair.regen.specification.Refinement("\\v == -1000")
+        int m8 = java.lang.Math.min((-1000), (-m6));
+        // multiplyExact
+        @repair.regen.specification.Refinement("\\v == 40")
+        int mul = java.lang.Math.multiplyExact(5, 8);
+        @repair.regen.specification.Refinement("\\v == -mul")
+        int mul1 = java.lang.Math.multiplyExact(mul, (-1));
+        @repair.regen.specification.Refinement("\\v > mul")
+        int mul2 = java.lang.Math.multiplyExact(mul1, mul1);
+        // negateExact
+        @repair.regen.specification.Refinement("\\v == 40")
+        int negE = java.lang.Math.negateExact((-40));
+        @repair.regen.specification.Refinement("\\v < 0")
+        int negEx = java.lang.Math.negateExact(negE);
+        @repair.regen.specification.Refinement("\\v > 39")
+        int negExa = java.lang.Math.negateExact(negEx);
+        // subtractExact
+        @repair.regen.specification.Refinement("\\v < -40")
+        int subE = java.lang.Math.subtractExact((-40), 5);
+        @repair.regen.specification.Refinement("\\v > 0")
+        int subEx = java.lang.Math.subtractExact(0, subE);
+        @repair.regen.specification.Refinement("\\v == 0")
+        int subExa = java.lang.Math.subtractExact(subEx, subEx);
     }
 }
 

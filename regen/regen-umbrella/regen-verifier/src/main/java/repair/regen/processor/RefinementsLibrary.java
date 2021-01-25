@@ -85,21 +85,18 @@ public class RefinementsLibrary {
 		map.put("java.lang.Math.min(int,int)", String.format("{true}->{true}->"
 				+ "{((arg0 < arg1)-->(%s == arg0)) && ((arg0 >= arg1)-->(%s == arg1))}",
 				WILD_VAR, WILD_VAR));
+		
+		
+		map.put("java.lang.Math.multiplyExact(int,int)", 
+				String.format("{true}->{true}->{%s == (arg0 * arg1)}",	WILD_VAR));
+
+		map.put("java.lang.Math.negateExact(int)", 
+				String.format("{true}->{%s == (-arg0)}",	WILD_VAR));
+
+		map.put("java.lang.Math.subtractExact(int,int)", 
+				String.format("{true}->{true}->{%s == (arg0 - arg1)}",	WILD_VAR));
 
 		
-//		min(int a, int b)
-//		Returns the smaller of two int values.
-		
-//		multiplyExact(int x, int y)
-//		Returns the product of the arguments, throwing an exception if the result overflows an int.
-		
-		
-//		negateExact(int a)
-//		Returns the negation of the argument, throwing an exception if the result overflows an int.
-		
-//		subtractExact(int x, int y)
-//		Returns the difference of the arguments, throwing an exception if the result overflows an int
-
 //		power sim
 //		if then else para z3 - ite ? :
 //		(\\v == arg0 || \\v == -arg0) && (if arg1 > 0 then \\v > 0 else \\v < 0)

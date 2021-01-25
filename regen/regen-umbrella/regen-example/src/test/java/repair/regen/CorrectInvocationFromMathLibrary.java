@@ -110,7 +110,30 @@ public class CorrectInvocationFromMathLibrary {
 		int m7 = Math.min(100, m6);
 		@Refinement("\\v == -1000")
 		int m8 = Math.min(-1000, -m6);
+		
+		//multiplyExact
+		@Refinement("\\v == 40")
+		int mul = Math.multiplyExact(5, 8);
+		@Refinement("\\v == -mul")
+		int mul1 = Math.multiplyExact(mul, -1);
+		@Refinement("\\v > mul")
+		int mul2 = Math.multiplyExact(mul1, mul1);
+		
+		//negateExact
+		@Refinement("\\v == 40")
+		int negE = Math.negateExact(-40);
+		@Refinement("\\v < 0")
+		int negEx = Math.negateExact(negE);
+		@Refinement("\\v > 39")
+		int negExa = Math.negateExact(negEx);
 
+		//subtractExact
+		@Refinement("\\v < -40")
+		int subE = Math.subtractExact(-40, 5);
+		@Refinement("\\v > 0")
+		int subEx = Math.subtractExact(0, subE);
+		@Refinement("\\v == 0")
+		int subExa = Math.subtractExact(subEx, subEx);
 		
 	}
 }
