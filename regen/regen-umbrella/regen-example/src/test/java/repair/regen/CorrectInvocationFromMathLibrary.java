@@ -100,6 +100,16 @@ public class CorrectInvocationFromMathLibrary {
 		int m3 = Math.max(100, m2);
 		@Refinement("\\v == -100")
 		int m4 = Math.max(-1000, -m2);
+		
+		//min
+		@Refinement("\\v == 4")
+		int m5 = Math.min(4, 5);
+		@Refinement("\\v < 5")
+		int m6 = Math.min(100, m5);
+		@Refinement("\\v == 4")
+		int m7 = Math.min(100, m6);
+		@Refinement("\\v == -1000")
+		int m8 = Math.min(-1000, -m6);
 
 		
 	}

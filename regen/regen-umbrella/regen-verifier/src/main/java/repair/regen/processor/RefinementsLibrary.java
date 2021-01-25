@@ -82,8 +82,10 @@ public class RefinementsLibrary {
 		map.put("java.lang.Math.max(int,int)", String.format("{true}->{true}->"
 						+ "{((arg0 > arg1)-->(%s == arg0)) && ((arg0 <= arg1)-->(%s == arg1))}",
 						WILD_VAR, WILD_VAR));
-//		max(int a, int b)
-//		Returns the greater of two int values.
+		map.put("java.lang.Math.min(int,int)", String.format("{true}->{true}->"
+				+ "{((arg0 < arg1)-->(%s == arg0)) && ((arg0 >= arg1)-->(%s == arg1))}",
+				WILD_VAR, WILD_VAR));
+
 		
 //		min(int a, int b)
 //		Returns the smaller of two int values.

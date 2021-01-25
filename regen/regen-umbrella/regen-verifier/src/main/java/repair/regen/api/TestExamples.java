@@ -304,6 +304,10 @@ public class TestExamples {
 	public void errorMathAbs() {
 		testWrong(testPath+"ErrorMathAbs.java");
 	}
+	@Test
+	public void errorMathMin() {
+		testWrong(testPath+"ErrorMathMin.java");
+	}
 	
 	
 	@Test
