@@ -20,17 +20,16 @@ package regen.test.project;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("k > 0 && k < 100")
-        int k = 5;
-        if (k > 7) {
-            k = 9;
-        }
-        @repair.regen.specification.Refinement("\\v < 10")
-        int m = k;
-        k = 50;
-        @repair.regen.specification.Refinement("\\v == 50")
-        int m2 = k;
-        // small error
+        @repair.regen.specification.Refinement("y < 100")
+        int y = 50;
+        if (y > 2)
+            y = 3;
+        else
+            y = 6;
+
+        @repair.regen.specification.Refinement("z < 7")
+        int z = y;
+        // see error
         // @Refinement("\\v < 100")
         // int ielse = 90;
         // 
