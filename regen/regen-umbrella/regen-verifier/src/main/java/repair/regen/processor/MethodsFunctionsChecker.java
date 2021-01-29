@@ -126,7 +126,8 @@ public class MethodsFunctionsChecker {
 				}
 				rtc.checkSMT(refInv, refPar, invocation/*(CtVariable<?>)method.getParameters().get(i)*/);
 				saveVars.add(newParamName);
-				pinfo.addInstance(vi);
+				rtc.context.addRefinementInstanceToVariable(pinfo.getName(), vi.getName());
+				//pinfo.addInstance(vi);
 			}
 
 

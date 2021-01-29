@@ -91,6 +91,7 @@ public class VariableInfo {
 	}
 	
 	public void addInstance(VariableInfo vi) {
+		System.out.println("add instance in variableInfo");
 		instances.peek().add(vi);
 	}
 	

@@ -10,9 +10,11 @@ public class Utils {
 	public List<VariableInfo> searchForVars(String string){return searchForVars(string, "");} 
 	public List<VariableInfo> searchForVars(String string, String differentFrom) {
 		List<VariableInfo> l = new ArrayList<>();
-		String[] a = string.split("&&|<|>|(<=)|(>=)|(==)|=|-|\\+|/|\\*|%|(\\|\\||\\(|\\))");//TODO missing OR and maybe other
+		String[] a = string.split("&&|<|>|(<=)|(>=)|(==)|=|-|\\+|/|\\*|%|(\\|\\||\\(|\\)) ");//TODO missing OR and maybe other
 		for(String s: a) {
 			String t = s.replace(" ", "");
+			t = t.replace("(", "");
+			t = t.replace(")", "");
 			if(!t.equals(differentFrom)) {
 				VariableInfo v = context.getVariableByName(t);
 				//System.out.println(t+": variable :"+v);

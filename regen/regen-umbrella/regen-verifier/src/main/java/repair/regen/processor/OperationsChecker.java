@@ -161,7 +161,8 @@ class OperationsChecker {
 				elem_ref = rtc.getRefinement(elemVar);
 				String newName = elemName+"_"+rtc.context.getCounter()+"_";
 				String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
-				rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
+				VariableInfo newVi = rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
+				rtc.context.addSpecificVariable(newVi);
 				rtc.addRefinementVariable(newName);
 				returnName = newName;
 			}

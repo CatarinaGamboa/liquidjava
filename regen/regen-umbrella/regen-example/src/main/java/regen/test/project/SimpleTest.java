@@ -5,31 +5,20 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
 
 
-	public static void main(String[] args) {
-		@Refinement("y < 100")
-		int y = 50;
-		if(y > 2)
-		    y = 3;
-		else
-		    y = 6;
-
-		@Refinement("z < 7")
-		int z = y;
-		
-		
+	public static void main(String[] args) {		
 		//see error
-//		@Refinement("\\v < 100")
-//		int ielse = 90;
-//		
-//		@Refinement("\\v < 10")
-//		int then = 7;		
-//		if(then > 6)
-//			then = then-8;
-//		else
-//			ielse = 5;
-//		
-//		@Refinement("\\v == 7 || \\v == 5")
-//		int some = then;
+		@Refinement("\\v < 100")
+		int ielse = 90;
+		
+		@Refinement("\\v < 10")
+		int then = 7;		
+		if(then > 6)
+			then = then-8;
+		else
+			ielse = 5;
+		
+		@Refinement("\\v == 7 || \\v == 5")
+		int some = then;
 //		@Refinement("\\v == 7 || \\v==-1")
 //		int thing = changedInElse;
 		

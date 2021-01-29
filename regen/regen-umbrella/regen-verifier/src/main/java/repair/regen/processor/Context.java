@@ -13,7 +13,8 @@ import spoon.reflect.reference.CtTypeReference;
 public class Context {
 	private Stack<List<VariableInfo>> ctxVars;
 	private List<FunctionInfo> ctxFunctions;
-
+	private List<VariableInfo> ctxSpecificVars;
+	
 	public int counter;
 	private static Context instance;
 
@@ -22,6 +23,7 @@ public class Context {
 		ctxVars = new Stack<>();
 		ctxVars.add(new ArrayList<>());//global vars
 		ctxFunctions = new ArrayList<>();
+		ctxSpecificVars = new ArrayList<>();
 		counter = 0;
 
 	}
@@ -37,6 +39,7 @@ public class Context {
 		ctxVars = new Stack<>();
 		ctxVars.add(new ArrayList<>());//global vars
 		ctxFunctions = new ArrayList<>();
+		ctxSpecificVars = new ArrayList<>();
 		counter = 0;
 	}
 
@@ -67,6 +70,8 @@ public class Context {
 				ret.put(var.getName(), var.getType());
 			}
 		}
+		for(VariableInfo var: ctxSpecificVars)
+			ret.put(var.getName(), var.getType());
 		return ret;
 	}
 
@@ -155,8 +160,10 @@ public class Context {
 		for(VariableInfo vi: getAllVariables()) {
 			Optional<VariableInfo>ovi = vi.getIfInstanceCombination(getCounter());
 			if(ovi.isPresent()) {
-				addVarToContext(ovi.get());
-				vi.addInstance(ovi.get());
+				VariableInfo vii = ovi.get();
+				addVarToContext(vii);
+				addRefinementInstanceToVariable(vi.getName(), vii.getName());
+				
 			}
 		}
 	}
@@ -182,6 +189,10 @@ public class Context {
 				if(var.getName().equals(name))
 					return var;
 			}
+		}
+		for(VariableInfo var: ctxSpecificVars) {
+			if(var.getName().equals(name))
+				return var;
 		}
 		return null;
 	}
@@ -218,12 +229,18 @@ public class Context {
 		if(!hasVariable(name) || !hasVariable(name2)) return;
 
 		VariableInfo vi1 = getVariableByName(name);
+		VariableInfo vi2 = getVariableByName(name2);
 		vi1.addInstance(getVariableByName(name2));
+		addSpecificVariable(vi2);
 	}
 
 	public Optional<VariableInfo> getLastVariableInstance(String name) {
 		if(!hasVariable(name)) return Optional.empty();
 		return getVariableByName(name).getLastInstance();
+	}
+	
+	void addSpecificVariable(VariableInfo vi) {
+		ctxSpecificVars.add(vi);
 	}
 
 
