@@ -6,26 +6,24 @@ public class SimpleTest {
 
 
 	public static void main(String[] args) {		
-		//see error
-		@Refinement("\\v < 100")
-		int ielse = 90;
-		
-		@Refinement("\\v < 10")
-		int then = 7;		
-		if(then > 6)
-			then = then-8;
-		else
-			ielse = 5;
-		
-		@Refinement("\\v == 7 || \\v == 5")
-		int some = then;
-//		@Refinement("\\v == 7 || \\v==-1")
-//		int thing = changedInElse;
-		
-		
+
+
 	}
 
 	//Errors to take care of
+	// //value_4==innerScope && value_4 == innerScope_1
+	//	@Refinement("\\v < 100")
+	//	int value = 90;
+	//			
+	//	if(value > 6) {
+	//		@Refinement("\\v > 10")
+	//		int innerScope = 30;
+	//		value = innerScope;
+	//	}
+	//	
+	//	@Refinement("\\v == 30 || \\v == 90")
+	//	int some2 = value;
+	
 	//SEE ERROR still error
 	//		@Refinement("(\\v == -5)")
 	//		float prim = Math.copySign(-5, -500);

@@ -159,6 +159,10 @@ public class TestExamples {
 	public void correctUsingAfterIf() {
 		testCorrect(testPath+"CorrectUsingAfterIf.java");
 	}
+	@Test
+	public void correctAfterIfUsingScope() {
+		testCorrect(testPath+"CorrectAfterIfUsingScope.java");
+	}
 	
 	
 	@Test

@@ -22,18 +22,14 @@ public class SimpleTest {
     public static void main(java.lang.String[] args) {
         // see error
         @repair.regen.specification.Refinement("\\v < 100")
-        int ielse = 90;
-        @repair.regen.specification.Refinement("\\v < 10")
-        int then = 7;
-        if (then > 6)
-            then = then - 8;
-        else
-            ielse = 5;
-
-        @repair.regen.specification.Refinement("\\v == 7 || \\v == 5")
-        int some = then;
-        // @Refinement("\\v == 7 || \\v==-1")
-        // int thing = changedInElse;
+        int value = 90;
+        if (value > 6) {
+            @repair.regen.specification.Refinement("\\v > 10")
+            int innerScope = 30;
+            value = innerScope;
+        }
+        @repair.regen.specification.Refinement("\\v == 30 || \\v == 90")
+        int some2 = value;
     }
 }
 
