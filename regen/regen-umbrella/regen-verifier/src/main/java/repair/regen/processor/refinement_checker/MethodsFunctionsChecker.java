@@ -253,7 +253,6 @@ public class MethodsFunctionsChecker {
 			rtc.context.addVarToContext(returnVarName, method.getType(), retRef);
 			rtc.addRefinementVariable(returnVarName);
 			rtc.checkSMT(retRef, expectedType, ret);
-			rtc.context.removeRefinementFromVariableInContext(returnVarName, retRef);
 			rtc.context.newRefinementToVariableInContext(returnVarName, expectedType);
 		}
 	}

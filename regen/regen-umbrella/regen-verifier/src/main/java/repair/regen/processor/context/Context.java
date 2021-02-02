@@ -97,7 +97,7 @@ public class Context {
 		}
 	}
 
-
+//TODO ERASE
 	public void newRefinementToVariableInContext(CtVariable<?> variable, String expectedType) {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
@@ -123,16 +123,6 @@ public class Context {
 	public String getVariableRefinements(String varName) {
 		return hasVariable(varName)?getVariableByName(varName).getRefinement() : ""; 
 	}
-
-	public void removeRefinementFromVariableInContext(CtVariable<?> variable, String et) {
-		VariableInfo vi = getVariableByName(variable.getSimpleName());
-		vi.removeRefinement(et);
-	}
-	public void removeRefinementFromVariableInContext(String variableName, String et) {
-		VariableInfo vi = getVariableByName(variableName);
-		vi.removeRefinement(et);
-	}
-
 	
 	public void variablesSetBeforeIf() {
 		for(VariableInfo vi: getAllVariables())

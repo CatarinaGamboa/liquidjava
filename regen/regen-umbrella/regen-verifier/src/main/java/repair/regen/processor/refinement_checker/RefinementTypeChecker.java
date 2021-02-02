@@ -120,8 +120,7 @@ public class RefinementTypeChecker extends CtScanner {
 				refinementFound = "true";
 			context.addVarToContext(varName, localVariable.getType(), "true");
 			checkVariableRefinements(refinementFound,varName, localVariable);
-			context.removeRefinementFromVariableInContext(varName, "true");
-			
+				
 		}
 	}
 

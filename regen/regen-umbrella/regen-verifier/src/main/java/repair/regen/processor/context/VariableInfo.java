@@ -10,7 +10,7 @@ import spoon.reflect.reference.CtTypeReference;
 public class VariableInfo {
 	private String name;
 	private CtTypeReference<?> type;
-	private List<String> refinements;
+	private String refinement;
 	
 	//Specific Values
 	private Stack<List<VariableInfo>> instances;
@@ -23,8 +23,8 @@ public class VariableInfo {
 	public VariableInfo(String name, CtTypeReference<?> type, String refinement) {
 		this.name = name;
 		this.type = type;
-		this.refinements = new ArrayList<String>();
-		this.refinements.add(refinement);
+		//this.refinements = new ArrayList<String>();
+		this.refinement=refinement;
 		this.instances = new Stack<>();
 		this.instances.push(new ArrayList<VariableInfo>());
 	}
@@ -34,8 +34,8 @@ public class VariableInfo {
 	 * @return
 	 */
 	public String getRefinement() {
-		if(refinements.size() > 0)
-			return refinements.get(refinements.size()-1);
+		if(refinement != null)
+			return refinement;
 		return "";
 		//return String.join(" && ", refinements);
 	}
@@ -52,11 +52,9 @@ public class VariableInfo {
 	}
 
 	public void newRefinement(String toAdd) {
-		refinements.add(toAdd);
+		refinement=toAdd;
 	}
-	public void removeRefinement(String toRemove) {
-		refinements.remove(toRemove);
-	}
+
 	
 	
 	//INSTANCES
@@ -157,7 +155,7 @@ public class VariableInfo {
 	@Override
 	public String toString() {
 		return "VariableInfo [name=" + name + ", type=" + type + ", refinements=" +
-				refinements + 
+				refinement + 
 				", instances=" + instances + "]";
 	}
 

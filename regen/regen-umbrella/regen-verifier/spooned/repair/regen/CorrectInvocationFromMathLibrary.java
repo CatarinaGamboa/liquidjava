@@ -3,17 +3,6 @@ package repair.regen;
 
 public class CorrectInvocationFromMathLibrary {
     public static void main(java.lang.String[] args) {
-        // @Refinement("\\v == -6") //TODO REVIEW
-        // int e = -Math.abs(-d);
-        // Math.random()
-        @repair.regen.specification.Refinement("\\v >= 0")
-        double c = java.lang.Math.random();
-        @repair.regen.specification.Refinement("\\v < 0")
-        double f = -(java.lang.Math.random());
-        @repair.regen.specification.Refinement("true")
-        double r1 = java.lang.Math.random();
-        @repair.regen.specification.Refinement("\\v > 0")
-        double r2 = r1 * 5;
         // Math.abs(...)
         @repair.regen.specification.Refinement("b > 0")
         int b = java.lang.Math.abs(6);
@@ -21,12 +10,8 @@ public class CorrectInvocationFromMathLibrary {
         int a = java.lang.Math.abs(6);
         @repair.regen.specification.Refinement("\\v > 4")
         int d = java.lang.Math.abs((-6));
-        @repair.regen.specification.Refinement("\\v > 0")
-        double a1 = java.lang.Math.abs(15.3);
-        @repair.regen.specification.Refinement("\\v > 10")
-        long b1 = java.lang.Math.abs((-13));
-        @repair.regen.specification.Refinement("\\v > 10")
-        float c1 = java.lang.Math.abs((-13.0F));
+        @repair.regen.specification.Refinement("\\v == -6")
+        int e = -(java.lang.Math.abs((-d)));
         @repair.regen.specification.Refinement("\\v > 4")
         int d1 = java.lang.Math.abs((-6));
         @repair.regen.specification.Refinement("\\v == -6")
@@ -35,24 +20,9 @@ public class CorrectInvocationFromMathLibrary {
         int f1 = -(java.lang.Math.abs(e1));
         @repair.regen.specification.Refinement("\\v == -6")
         int f2 = -(java.lang.Math.abs(f1));
-        // Constants
-        @repair.regen.specification.Refinement("\\v > 3")
-        double a2 = java.lang.Math.PI;
-        @repair.regen.specification.Refinement("\\v > 2")
-        double b2 = java.lang.Math.E;
-        @repair.regen.specification.Refinement("\\v == 30")
-        double radius = 30;
-        @repair.regen.specification.Refinement("perimeter > 1")
-        double perimeter = (2 * (java.lang.Math.PI)) * radius;
         // addExact(...)
         @repair.regen.specification.Refinement("\\v == 11")
         int a3 = java.lang.Math.addExact(5, 6);
-        @repair.regen.specification.Refinement("\\v > 10")
-        long b3 = java.lang.Math.addExact(5L, 6L);
-        @repair.regen.specification.Refinement("\\v < 4")
-        double a5 = java.lang.Math.acos(0.5);
-        @repair.regen.specification.Refinement("\\v < 2")
-        double a6 = java.lang.Math.asin(a5);
         // decrementExact
         @repair.regen.specification.Refinement("\\v > 5")
         int a7 = 10;
@@ -60,10 +30,6 @@ public class CorrectInvocationFromMathLibrary {
         int a8 = java.lang.Math.decrementExact(a7);
         @repair.regen.specification.Refinement("\\v == 9")
         int a9 = java.lang.Math.decrementExact(a7);
-        @repair.regen.specification.Refinement("\\v > 4")
-        long a10 = java.lang.Math.decrementExact(a7);
-        @repair.regen.specification.Refinement("\\v == 9")
-        long a11 = java.lang.Math.decrementExact(a7);
         // incrementExact
         @repair.regen.specification.Refinement("\\v > 6")
         int a12 = java.lang.Math.incrementExact(a7);
@@ -114,6 +80,54 @@ public class CorrectInvocationFromMathLibrary {
         int subEx = java.lang.Math.subtractExact(0, subE);
         @repair.regen.specification.Refinement("\\v == 0")
         int subExa = java.lang.Math.subtractExact(subEx, subEx);
+    }
+
+    private void notIntMethods() {
+        // working but taking lot of time
+        // //Math.random()
+        // @Refinement("\\v >= 0")
+        // double c = Math.random();
+        // @Refinement("\\v < 0")
+        // double f = -Math.random();
+        // @Refinement("true")
+        // double r1 = Math.random();
+        // @Refinement("\\v > 0")
+        // double r2 = r1*5;
+        // 
+        // 
+        // @Refinement("\\v > 0")
+        // double a1 = Math.abs(15.3);
+        // @Refinement("\\v > 10")
+        // long b1 = Math.abs(-13);
+        // @Refinement("\\v > 10")
+        // float c1 = Math.abs(-13f);
+        // 
+        // @Refinement("\\v > 10")
+        // long b3 = Math.addExact(5l, 6l);
+        // 
+        // 
+        // @Refinement("\\v < 4")
+        // double a5 = Math.acos(0.5);
+        // @Refinement("\\v < 2")
+        // double a6 = Math.asin(a5);
+        // 
+        // 
+        // @Refinement("\\v > 5")
+        // int a7 = 10;
+        // @Refinement("\\v > 4")
+        // long a10 = Math.decrementExact(a7);
+        // @Refinement("\\v == 9")
+        // long a11 = Math.decrementExact(a7);
+        // 
+        // Constants
+        @repair.regen.specification.Refinement("\\v > 3")
+        double a2 = java.lang.Math.PI;
+        @repair.regen.specification.Refinement("\\v > 2")
+        double b2 = java.lang.Math.E;
+        @repair.regen.specification.Refinement("\\v == 30")
+        double radius = 30;
+        @repair.regen.specification.Refinement("perimeter > 1")
+        double perimeter = (2 * (java.lang.Math.PI)) * radius;
     }
 }
 
