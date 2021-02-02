@@ -15,7 +15,6 @@ public class FunctionInfo {
 
 	
 	private Context context;
-	private final String prefix = "FF";
 	
 	public FunctionInfo() {
 		argRefinements= new ArrayList<>();

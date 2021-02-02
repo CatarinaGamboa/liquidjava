@@ -1,10 +1,13 @@
-package repair.regen.processor;
+package repair.regen.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.processor.Utils;
+import repair.regen.processor.VCChecker;
+import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.VariableInfo;
 import spoon.reflect.code.CtAssignment;
@@ -118,7 +121,7 @@ public class RefinementTypeChecker extends CtScanner {
 			context.addVarToContext(varName, localVariable.getType(), "true");
 			checkVariableRefinements(refinementFound,varName, localVariable);
 			context.removeRefinementFromVariableInContext(varName, "true");
-			//context.addMainRefinementVariable(varName, "("+context.getVariableRefinements(varName)+")");
+			
 		}
 	}
 

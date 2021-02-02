@@ -1,4 +1,4 @@
-package repair.regen.processor;
+package repair.regen.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
+import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.context.FunctionInfo;
 import repair.regen.processor.context.VariableInfo;
 

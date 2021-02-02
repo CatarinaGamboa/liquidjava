@@ -3,6 +3,7 @@ package repair.regen.processor;
 import java.util.ArrayList;
 import java.util.List;
 
+import repair.regen.processor.refinement_checker.RefinementTypeChecker;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;
