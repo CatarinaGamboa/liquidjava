@@ -1,4 +1,4 @@
-package repair.regen.processor;
+package repair.regen.processor.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -133,16 +133,6 @@ public class Context {
 		vi.removeRefinement(et);
 	}
 
-	public void addMainRefinementVariable(String name, String refinement) {
-		VariableInfo vi = getVariableByName(name);
-		vi.setMainRefinement(refinement);
-	}
-
-	public String getMainRefinementVariable(String name) {
-		VariableInfo vi = getVariableByName(name);
-		return vi.getMainRefinement();
-	}
-	
 	
 	public void variablesSetBeforeIf() {
 		for(VariableInfo vi: getAllVariables())
@@ -239,7 +229,7 @@ public class Context {
 		return getVariableByName(name).getLastInstance();
 	}
 	
-	void addSpecificVariable(VariableInfo vi) {
+	public void addSpecificVariable(VariableInfo vi) {
 		ctxSpecificVars.add(vi);
 	}
 

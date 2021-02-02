@@ -1,6 +1,7 @@
 package repair.regen.processor;
 import java.util.Optional;
 
+import repair.regen.processor.context.VariableInfo;
 import spoon.Launcher;
 import spoon.reflect.factory.Factory;
 

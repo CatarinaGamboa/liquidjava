@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.ast.Wildcard;
 
+import repair.regen.processor.context.FunctionInfo;
+import repair.regen.processor.context.VariableInfo;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;

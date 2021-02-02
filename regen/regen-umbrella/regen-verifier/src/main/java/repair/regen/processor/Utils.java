@@ -3,6 +3,9 @@ package repair.regen.processor;
 import java.util.ArrayList;
 import java.util.List;
 
+import repair.regen.processor.context.Context;
+import repair.regen.processor.context.VariableInfo;
+
 public class Utils {
 	private Context context = Context.getInstance();
 	

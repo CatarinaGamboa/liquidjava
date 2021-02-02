@@ -1,4 +1,4 @@
-package repair.regen.processor;
+package repair.regen.processor.context;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +35,10 @@ public class FunctionInfo {
 	public void addArgRefinements(String varName, CtTypeReference<?> type, String refinement) {
 		VariableInfo v = new VariableInfo(varName, type, refinement);
 		this.argRefinements.add(v);
-		if(!v.hasIncognitoName()) {
-			int a = context.getCounter();
-			System.out.println("+++++++++++++ METHOD: "+name + ", FF"+a);
-			v.setIncognitoName(prefix+a);
-		}
+
 	}
 	
 	public void addArgRefinements(VariableInfo vi) {
-		if(!vi.hasIncognitoName()) vi.setIncognitoName(prefix+context.getCounter());
 		this.argRefinements.add(vi);
 	}
 	

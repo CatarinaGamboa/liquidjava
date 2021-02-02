@@ -1,4 +1,4 @@
-package repair.regen.processor;
+package repair.regen.processor.context;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +10,12 @@ import spoon.reflect.reference.CtTypeReference;
 public class VariableInfo {
 	private String name;
 	private CtTypeReference<?> type;
-	private String mainRefinement;
 	private List<String> refinements;
-	private String incognitoName;
 	
+	//Specific Values
 	private Stack<List<VariableInfo>> instances;
+	
+	//To combine if values
 	private VariableInfo ifBefore;
 	private VariableInfo ifThen;
 	private VariableInfo ifElse;
@@ -27,15 +28,7 @@ public class VariableInfo {
 		this.instances = new Stack<>();
 		this.instances.push(new ArrayList<VariableInfo>());
 	}
-	
-	public void setMainRefinement(String main) {
-		mainRefinement = main;
-	}
-	public String getMainRefinement() {
-		return mainRefinement == null?"true":mainRefinement;
-	}
 
-	
 	/**
 	 * Gets last refinement
 	 * @return
@@ -50,10 +43,6 @@ public class VariableInfo {
 		return type;
 	}
 	
-	public String getRenamedRefinements() {
-		return getRefinement().replaceAll(name, incognitoName);
-	}
-	
 	public String getRenamedRefinements(String toReplace) {
 		return getRefinement().replaceAll(name, toReplace);
 	}
@@ -61,19 +50,7 @@ public class VariableInfo {
 	public String getName() {
 		return name;
 	}
-	
-	public String getIncognitoName() {
-		return hasIncognitoName()? incognitoName: null;
-	}
-	
-	public void setIncognitoName(String name) {
-		incognitoName = name;
-	}
-	
-	public boolean hasIncognitoName() {
-		return incognitoName != null;
-	}
-	
+
 	public void newRefinement(String toAdd) {
 		refinements.add(toAdd);
 	}
@@ -180,7 +157,7 @@ public class VariableInfo {
 	@Override
 	public String toString() {
 		return "VariableInfo [name=" + name + ", type=" + type + ", refinements=" +
-				refinements + ", mainRefinement=" + mainRefinement+ 
+				refinements + 
 				", instances=" + instances + "]";
 	}
 

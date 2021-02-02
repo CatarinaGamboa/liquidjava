@@ -7,6 +7,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
+import repair.regen.processor.context.FunctionInfo;
+import repair.regen.processor.context.VariableInfo;
+
 import java.util.Optional;
 
 import spoon.reflect.code.CtExpression;

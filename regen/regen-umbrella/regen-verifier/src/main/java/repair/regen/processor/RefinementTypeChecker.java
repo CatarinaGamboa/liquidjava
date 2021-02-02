@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.processor.context.Context;
+import repair.regen.processor.context.VariableInfo;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConditional;
@@ -116,7 +118,7 @@ public class RefinementTypeChecker extends CtScanner {
 			context.addVarToContext(varName, localVariable.getType(), "true");
 			checkVariableRefinements(refinementFound,varName, localVariable);
 			context.removeRefinementFromVariableInContext(varName, "true");
-			context.addMainRefinementVariable(varName, "("+context.getVariableRefinements(varName)+")");
+			//context.addMainRefinementVariable(varName, "("+context.getVariableRefinements(varName)+")");
 		}
 	}
 
