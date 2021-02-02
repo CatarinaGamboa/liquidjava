@@ -6,7 +6,7 @@ public class ErrorArithmeticBinaryOperations {
         @repair.regen.specification.Refinement("\\v < 100")
         int y = 50;
         @repair.regen.specification.Refinement("\\v > 0")
-        int z = y - 3;
+        int z = y - 51;
     }
 }
 

@@ -11,7 +11,7 @@ public class BinaryExpression extends Expression implements IModel {
 	Expression e1;
 	BinaryOperator op;
 	Expression e2;
-
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
 		return op.eval(ctx, e1, e2);

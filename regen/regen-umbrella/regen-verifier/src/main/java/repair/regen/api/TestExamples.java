@@ -33,27 +33,49 @@ public class TestExamples {
 	
 	@Test
 	public void correctSimpleAssignment() {
-		testCorrect(testPath+"CorrectSimpleAssignment.java");//passVC
+		testCorrect(testPath+"CorrectSimpleAssignment.java");
 	}
 	@Test
 	public void correctArithmeticBinaryOperation() {
-		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");//passVC
+		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");
 	}
 
 	@Test
 	public void correctAssignementAfterDeclaration() {
-		testCorrect(testPath+"CorrectAssignementAfterDeclaration.java");//passVC
+		testCorrect(testPath+"CorrectAssignementAfterDeclaration.java");
 	}
 	
 
 	@Test
 	public void correctUnaryOperators() {
-		testCorrect(testPath+"CorrectUnaryOperators.java");//passVC
+		testCorrect(testPath+"CorrectUnaryOperators.java");
+	}
+	
+	
+	@Test
+	public void correctImplies() {
+		testCorrect(testPath+"CorrectImplies.java");
 	}
 	
 	@Test
+	public void correctLongUsage() {
+		testCorrect(testPath+"CorrectLongUsage.java");
+	}
+	
+//	@Test
+//	public void correctPrimitiveNumbersTypes() {
+//		testCorrect(testPath+"CorrectPrimitiveNumbersTypes.java");
+//	} //Takes a long time
+	
+	@Test
+	public void correctFPArithmetic() {
+		testCorrect(testPath+"CorrectFPArithmetic.java");
+	}
+	
+	
+	@Test
 	public void correctNoRefinements() {
-		testCorrect(testPath+"CorrectNoRefinements.java");//passVC
+		testCorrect(testPath+"CorrectNoRefinements.java");
 	}
 	
 	@Test
@@ -87,10 +109,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectIfThen.java");
 	}
 	
-	@Test
-	public void correctTernaryExpression() {
-		testCorrect(testPath+"CorrectTernaryExpression.java");
-	}
+//	@Test
+//	public void correctTernaryExpression() {
+//		testCorrect(testPath+"CorrectTernaryExpression.java");//TODO REVIEW TEST
+//	}
 	
 	@Test
 	public void correctSimpleIfElse() {
@@ -108,9 +130,40 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctMethodInvocation() {
+		testCorrect(testPath+"CorrectMethodInvocation.java");
+	}
+	
+	
+	@Test
 	public void correctChainedVariableReferences() {
 		testCorrect(testPath+"CorrectChainedVariableReferences.java");
 	}
+	
+	@Test
+	public void correctReadSpecificAssignment() {
+		testCorrect(testPath+"CorrectReadSpecificAssignment.java");
+	}
+	
+	@Test
+	public void correctSpecificFunctionInvocation() {
+		testCorrect(testPath+"CorrectSpecificFunctionInvocation.java");
+	}
+	
+	@Test
+	public void correctInvocationFromMathLibrary() {
+		testCorrect(testPath+"CorrectInvocationFromMathLibrary.java");
+	}
+	
+	@Test
+	public void correctUsingAfterIf() {
+		testCorrect(testPath+"CorrectUsingAfterIf.java");
+	}
+	@Test
+	public void correctAfterIfUsingScope() {
+		testCorrect(testPath+"CorrectAfterIfUsingScope.java");
+	}
+	
 	
 	@Test
 	public void errorSimpleAssignment() {
@@ -138,6 +191,33 @@ public class TestExamples {
 		testWrong(testPath+"ErrorUnaryOpMinus.java");
 	}
 	
+	@Test
+	public void errorLongUsage1() {
+		testWrong(testPath+"ErrorLongUsage1.java");
+	}
+	
+	@Test
+	public void errorLongUsage2() {
+		testWrong(testPath+"ErrorLongUsage2.java");
+	}
+	
+	@Test
+	public void errorArithmeticFP1() {
+		testWrong(testPath+"ErrorArithmeticFP1.java");
+	}
+	@Test
+	public void errorArithmeticFP2() {
+		testWrong(testPath+"ErrorArithmeticFP2.java");
+	}
+	@Test
+	public void errorArithmeticFP3() {
+		testWrong(testPath+"ErrorArithmeticFP3.java");
+	}
+	@Test
+	public void errorArithmeticFP4() {
+		testWrong(testPath+"ErrorArithmeticFP4.java");
+	}
+	
 	
 	@Test
 	public void errorNoRefinementsVar() {
@@ -153,6 +233,11 @@ public class TestExamples {
 	@Test
 	public void errorFunctionInvocation() {
 		testWrong(testPath+"ErrorFunctionInvocation.java");
+	}
+	
+	@Test
+	public void errorFunctionInvocation1() {
+		testWrong(testPath+"ErrorFunctionInvocation1.java");
 	}
 	
 	@Test
@@ -191,10 +276,68 @@ public class TestExamples {
 		testWrong(testPath+"ErrorBooleanFunInvocation.java");
 	}
 	
+	
+	@Test
+	public void errorIfSpecificValueAssignment() {
+		testWrong(testPath+"ErrorSpecificValuesIf2.java");
+	}
+	
+	@Test
+	public void errorAfterIf() {
+		testWrong(testPath+"ErrorAfterIf.java");
+	}
+	
+	@Test
+	public void errorAfterIf2() {
+		testWrong(testPath+"ErrorAfterIf2.java");
+	}
+	
+	@Test
+	public void errorSpecificValuesIf() {
+		testWrong(testPath+"ErrorSpecificValuesIf.java");
+	}
+	
+	@Test
+	public void errorSpecificArithmetic() {
+		testWrong(testPath+"ErrorSpecificArithmetic.java");
+	}
+
+	@Test
+	public void errorSpecificVarInRefinement() {
+		testWrong(testPath+"ErrorSpecificVarInRefinement.java");
+	}
+	@Test
+	public void errorSpecificVarInRefinementIf() {
+		testWrong(testPath+"ErrorSpecificVarInRefinementIf.java");
+	}
+	
+	@Test
+	public void errorMathMax() {
+		testWrong(testPath+"ErrorMathMax.java");
+	}
+	@Test
+	public void errorRandom() {
+		testWrong(testPath+"ErrorRandom.java");
+	}
+	@Test
+	public void errorMathAbs() {
+		testWrong(testPath+"ErrorMathAbs.java");
+	}
+	@Test
+	public void errorMathMin() {
+		testWrong(testPath+"ErrorMathMin.java");
+	}
+	@Test
+	public void errorMathMultiplyExact() {
+		testWrong(testPath+"ErrorMathMultiplyExact.java");
+	}
+	
+	
 	@Test
 	public void errorRecursion1() {
 		testWrong(testPath+"ErrorRecursion1.java");
 	}
+
 	
 	
 	class MySecurityManager extends SecurityManager {

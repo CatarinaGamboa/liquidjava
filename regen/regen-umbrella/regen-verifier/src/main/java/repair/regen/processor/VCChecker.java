@@ -1,12 +1,11 @@
 package repair.regen.processor;
 
-import java.awt.dnd.peer.DropTargetPeer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
@@ -48,6 +47,13 @@ public class VCChecker {
 		
 		return all;
 	}
+	
+	private void removeFromAllVariables(String s1) {
+		for(List<String> l : allVariables)
+			if(l.contains(s1))
+				l.remove(s1);
+		
+	}
 
 	public List<String> getLastContextVariables(){
 		return allVariables.get(allVariables.size()-1);
@@ -55,15 +61,33 @@ public class VCChecker {
 	public void setPathVariables(String key) {
 		pathVariables.put(key, allVariables.get(allVariables.size()-1));
 	}
+	
 	public void removePathVariable(String key) {
 		pathVariables.remove(key);
 	}
+	public void removeFreshVariableThatIncludes(String otherVar) {
+		//Remove from path
+		List<String> toRemove = new ArrayList<>();
+		for(Entry<String, List<String>> e : pathVariables.entrySet()) {
+			String pathName = e.getKey();
+			for(String s: e.getValue()) 
+				if(s.equals(otherVar) && !toRemove.contains(pathName)) 
+					toRemove.add(pathName);
+		}
+		for(String s:toRemove) {
+			pathVariables.remove(s);
+			removeFromAllVariables(s);
+		}
+		
+	}
+
 	public void enterContext() {
 		allVariables.add(new ArrayList<String>());
 	}
 	public void exitContext() {
 		allVariables.remove(allVariables.size()-1);
 	}
+	
 
 	public void processSubtyping(String expectedType, CtElement element) {
 		process(expectedType, element, getVariables());
@@ -95,7 +119,7 @@ public class VCChecker {
 			VariableInfo vi = context.getVariableByName(var);
 			if(vi != null) {
 				String ref = vi.getRefinement();
-				sb.append("forall "+var+":"+ref+" -> ");
+				sb.append("forall "+var+":"+ref+" -> \n");
 				sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
 			}
 		}
@@ -140,7 +164,9 @@ public class VCChecker {
 		} catch (TypeCheckError e) {
 			printError(element, expectedType, correctRefinement);
 
-		}
+		}//catch(NullPointerException e) {
+		//	printErrorUnknownVariable(element, expectedType, correctRefinement);
+		//}
 
 	}
 
@@ -159,6 +185,18 @@ public class VCChecker {
 		System.out.println();
 		System.out.println("Type expected:" + et);
 		System.out.println("Refinement found:" + correctRefinement);
+		System.out.println("Location: " + var.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(1);
+	}
+	private <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement) {
+		System.out.println("______________________________________________________");
+		System.err.println("Encountered unknown variable");
+		System.out.println();
+		System.out.println(var);
+		System.out.println();
+		//System.out.println("Type expected:" + et);
+		//System.out.println("Refinement found:" + correctRefinement);
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);

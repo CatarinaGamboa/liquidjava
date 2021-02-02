@@ -1,11 +1,8 @@
 package repair.regen.processor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
-
-import org.eclipse.jdt.internal.core.nd.java.TypeRef;
+import java.util.Optional;
 
 import spoon.reflect.reference.CtTypeReference;
 
@@ -38,7 +35,11 @@ public class FunctionInfo {
 	public void addArgRefinements(String varName, CtTypeReference<?> type, String refinement) {
 		VariableInfo v = new VariableInfo(varName, type, refinement);
 		this.argRefinements.add(v);
-		if(!v.hasIncognitoName()) v.setIncognitoName(prefix+context.getCounter());
+		if(!v.hasIncognitoName()) {
+			int a = context.getCounter();
+			System.out.println("+++++++++++++ METHOD: "+name + ", FF"+a);
+			v.setIncognitoName(prefix+a);
+		}
 	}
 	
 	public void addArgRefinements(VariableInfo vi) {
@@ -68,7 +69,9 @@ public class FunctionInfo {
 		String update = place;
 		for(VariableInfo p: argRefinements) {
 			String var = p.getName();
-			String newName = p.getIncognitoName();
+			Optional<VariableInfo> ovi = p.getLastInstance();
+			String newName = ovi.isPresent()? ovi.get().getName():var;
+						
 			String newRefs = p.getRefinement().replaceAll(var, newName);
 			context.addVarToContext(newName, p.getType(), newRefs);
 			update = update.replaceAll(var, newName);
@@ -97,7 +100,7 @@ public class FunctionInfo {
 			sb.append(vi.getRefinement()+ " && ");
 		}
 		sb.append(argRefinements.get(i).getRefinement());
-		return getRenamedRefinements(sb.toString());
+		return sb.toString();//getRenamedRefinements();
 	}
 
 	@Override

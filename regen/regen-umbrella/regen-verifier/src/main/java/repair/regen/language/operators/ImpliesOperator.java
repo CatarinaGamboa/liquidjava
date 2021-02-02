@@ -8,7 +8,7 @@ import com.microsoft.z3.Expr;
 import repair.regen.language.Expression;
 import repair.regen.smt.TranslatorToZ3;
 
-@Priority(value=1)
+@Priority(value=8)
 @Pattern(regExp = "-->")
 public class ImpliesOperator extends BinaryOperator {
 
