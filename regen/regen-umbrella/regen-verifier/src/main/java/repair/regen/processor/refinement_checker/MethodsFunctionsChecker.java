@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import repair.regen.processor.built_ins.RefinementsLibrary;
-import repair.regen.processor.context.FunctionInfo;
-import repair.regen.processor.context.VariableInfo;
+import repair.regen.processor.context.RefinedFunction;
+import repair.regen.processor.context.RefinedVariable;
 
 import java.util.Optional;
 
@@ -36,7 +36,6 @@ public class MethodsFunctionsChecker {
 		lib = rtc.lib;
 		
 	}
-
 
 	<R> void getInvocationRefinements(CtInvocation<R> invocation) {
 		CtExecutable<?> method = invocation.getExecutable().getDeclaration();
@@ -84,7 +83,7 @@ public class MethodsFunctionsChecker {
 
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName) {
-		FunctionInfo f = rtc.context.getFunctionByName(methodName);
+		RefinedFunction f = rtc.context.getFunctionByName(methodName);
 		String methodRef = f.getRenamedReturn();
 		String metRef = f.getRenamedReturn();
 		
@@ -98,12 +97,12 @@ public class MethodsFunctionsChecker {
 		if(methodRef != null) {
 			//Checking Parameters
 			List<CtExpression<?>> exps = invocation.getArguments();
-			List<VariableInfo> params = f.getArgRefinements();
+			List<RefinedVariable> params = f.getArgRefinements();
 			for (int i = 0; i < params.size(); i++) {
-				VariableInfo pinfo = params.get(i);
+				RefinedVariable pinfo = params.get(i);
 				CtExpression<?> exp = exps.get(i);
 				String paramOriginalName = pinfo.getName();
-				String newParamName = paramOriginalName+"_"+rtc.context.getCounter()+"_";//pinfo.getIncognitoName();
+				String newParamName = paramOriginalName+"_"+rtc.context.getCounter()+"_";
 				newNames.put(paramOriginalName, newParamName);
 				
 				String refPar = f.getRefinementsForParamIndex(i).replace(paramOriginalName, newParamName);
@@ -114,7 +113,7 @@ public class MethodsFunctionsChecker {
 						refPar = refPar.replace(entry, newNames.get(entry));
 				}
 
-				VariableInfo vi = rtc.context.addVarToContext(newParamName, pinfo.getType(), refInv);
+				RefinedVariable vi = rtc.context.addVarToContext(newParamName, pinfo.getType(), refInv);
 				rtc.context.newRefinementToVariableInContext(newParamName, refInv);
 				rtc.addRefinementVariable(newParamName);
 				for(String s:saveVars)
@@ -129,20 +128,17 @@ public class MethodsFunctionsChecker {
 					rtc.addRefinementVariable(name);
 					metRef = metRef.replace(newParamName, name);
 				}
-				rtc.checkSMT(refInv, refPar, invocation/*(CtVariable<?>)method.getParameters().get(i)*/);
+				rtc.checkSMT(refInv, refPar, invocation);
 				saveVars.add(newParamName);
 				rtc.context.addRefinementInstanceToVariable(pinfo.getName(), vi.getName());
-				//pinfo.addInstance(vi);
 			}
 
 
-//			for(VariableInfo vi:params) 
-//				rtc.addRefinementVariable(vi.getIncognitoName());
 			for(String s: saveVars)
 				rtc.addRefinementVariable(s);
 			
 			//Checking Return
-			String s = methodRef;// sb.length() == 0? methodRef:  sb.append(" && "+methodRef).toString();
+			String s = methodRef;
 			//String s = methodRef;
 			invocation.putMetadata(rtc.REFINE_KEY, metRefOriginal);
 		}
@@ -150,7 +146,7 @@ public class MethodsFunctionsChecker {
 
 
 	<R> void getMethodRefinements(CtMethod<R> method) {
-		FunctionInfo f = new FunctionInfo();
+		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
 		f.setRefReturn("true");
@@ -176,7 +172,7 @@ public class MethodsFunctionsChecker {
 	 * @param params
 	 * @return
 	 */
-	private String handleFunctionRefinements(FunctionInfo f, String methodRef, List<CtParameter<?>> params) {
+	private String handleFunctionRefinements(RefinedFunction f, String methodRef, List<CtParameter<?>> params) {
 		String[] r = methodRef.split("}\\s*->\\s*\\{");
 		
 		StringBuilder sb = new StringBuilder();
@@ -202,7 +198,7 @@ public class MethodsFunctionsChecker {
 	
 	private String handleFunctionRefinements(String methodRef, Method method) {
 		Parameter[] params = method.getParameters();
-		FunctionInfo f = new FunctionInfo();
+		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getName());
 		f.setType(getType(method.getReturnType()));
 		f.setRefReturn("true");
@@ -240,8 +236,8 @@ public class MethodsFunctionsChecker {
 			//check if method has refinements
 			if(rtc.getRefinement(method) == null)
 				return;
-			FunctionInfo fi = rtc.context.getFunctionByName(method.getSimpleName());
-			for(VariableInfo vi:fi.getArgRefinements())
+			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
+			for(RefinedVariable vi:fi.getArgRefinements())
 				rtc.addRefinementVariable(vi.getName());
 
 			//Both return and the method have metadata

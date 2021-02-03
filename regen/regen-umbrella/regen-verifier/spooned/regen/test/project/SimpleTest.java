@@ -32,23 +32,15 @@ package regen.test.project;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("\\v < 10")
-        int a = 5;
-        if (a > 0) {
-            @repair.regen.specification.Refinement("b > 0")
-            int b = a;
-            b++;
-            // if(b > 10) {
-            // @Refinement("\\v > 0")
-            // int c = a;
-            // @Refinement("\\v > 11")
-            // int d = b+1;
-            // }
-            // if(a > b) {
-            // @Refinement("\\v > b")
-            // int c = a;
-            // }
+        @repair.regen.specification.Refinement("\\v < 100")
+        int value = 90;
+        if (value > 6) {
+            @repair.regen.specification.Refinement("\\v > 10")
+            int innerScope = 30;
+            value = innerScope;
         }
+        @repair.regen.specification.Refinement("\\v == 30 || \\v == 90")
+        int some2 = value;
     }
 }
 

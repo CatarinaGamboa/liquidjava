@@ -11,9 +11,9 @@ import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
 
 public class Context {
-	private Stack<List<VariableInfo>> ctxVars;
-	private List<FunctionInfo> ctxFunctions;
-	private List<VariableInfo> ctxSpecificVars;
+	private Stack<List<RefinedVariable>> ctxVars;
+	private List<RefinedFunction> ctxFunctions;
+	private List<RefinedVariable> ctxSpecificVars;
 	
 	public int counter;
 	private static Context instance;
@@ -46,7 +46,7 @@ public class Context {
 	public void enterContext() {
 		ctxVars.push(new ArrayList<>());
 		//make each variable enter context
-		for(VariableInfo vi: getAllVariables())
+		for(RefinedVariable vi: getAllVariables())
 			vi.enterContext();
 
 	}
@@ -54,7 +54,7 @@ public class Context {
 	public void exitContext() {
 		ctxVars.pop();
 		//make each variable exit context
-		for(VariableInfo vi: getAllVariables())
+		for(RefinedVariable vi: getAllVariables())
 			vi.exitContext();
 	}
 
@@ -65,23 +65,23 @@ public class Context {
 
 	public Map<String, CtTypeReference<?>> getContext() {
 		Map<String, CtTypeReference<?>> ret = new HashMap<>();
-		for(List<VariableInfo> l: ctxVars) {
-			for(VariableInfo var: l) {
+		for(List<RefinedVariable> l: ctxVars) {
+			for(RefinedVariable var: l) {
 				ret.put(var.getName(), var.getType());
 			}
 		}
-		for(VariableInfo var: ctxSpecificVars)
+		for(RefinedVariable var: ctxSpecificVars)
 			ret.put(var.getName(), var.getType());
 		return ret;
 	}
 
-	public void addVarToContext(VariableInfo var) {
+	public void addVarToContext(RefinedVariable var) {
 		if(!hasVariable(var.getName()))
 			ctxVars.peek().add(var);
 	}
 
-	public VariableInfo addVarToContext(String name, CtTypeReference<?> type, String refinements) {
-		VariableInfo vi =new VariableInfo(name, type, refinements);
+	public RefinedVariable addVarToContext(String name, CtTypeReference<?> type, String refinements) {
+		RefinedVariable vi =new RefinedVariable(name, type, refinements);
 		addVarToContext(vi);
 		return vi;
 	}
@@ -89,7 +89,7 @@ public class Context {
 	public void addRefinementToVariableInContext(CtVariable<?> variable, String et) {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
-			VariableInfo vi = getVariableByName(name);
+			RefinedVariable vi = getVariableByName(name);
 			String oldRef = vi.getRefinement();
 			vi.newRefinement(et);
 		}else {
@@ -101,7 +101,7 @@ public class Context {
 	public void newRefinementToVariableInContext(CtVariable<?> variable, String expectedType) {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
-			VariableInfo vi = getVariableByName(name);
+			RefinedVariable vi = getVariableByName(name);
 			vi.newRefinement("("+expectedType+")");
 		}else
 			addVarToContext(name, variable.getType(), expectedType);
@@ -114,7 +114,7 @@ public class Context {
 	 */
 	public void newRefinementToVariableInContext(String variableName, String expectedType) {
 		if(hasVariable(variableName)){
-			VariableInfo vi = getVariableByName(variableName);
+			RefinedVariable vi = getVariableByName(variableName);
 			vi.newRefinement("("+expectedType+")");
 		}
 	}
@@ -125,22 +125,22 @@ public class Context {
 	}
 	
 	public void variablesSetBeforeIf() {
-		for(VariableInfo vi: getAllVariables())
+		for(RefinedVariable vi: getAllVariables())
 			vi.saveInstanceBeforeIf();
 	}
 	public void variablesSetThenIf() {
-		for(VariableInfo vi: getAllVariables())
+		for(RefinedVariable vi: getAllVariables())
 			vi.saveInstanceThen();
 	}
 	public void variablesSetElseIf() {
-		for(VariableInfo vi: getAllVariables())
+		for(RefinedVariable vi: getAllVariables())
 			vi.saveInstanceElse();
 	}
 	public void variablesCombineFromIf() {
-		for(VariableInfo vi: getAllVariables()) {
-			Optional<VariableInfo>ovi = vi.getIfInstanceCombination(getCounter());
+		for(RefinedVariable vi: getAllVariables()) {
+			Optional<RefinedVariable>ovi = vi.getIfInstanceCombination(getCounter());
 			if(ovi.isPresent()) {
-				VariableInfo vii = ovi.get();
+				RefinedVariable vii = ovi.get();
 				addVarToContext(vii);
 				addRefinementInstanceToVariable(vi.getName(), vii.getName());
 				
@@ -150,27 +150,27 @@ public class Context {
 
 
 
-	public void addFunctionToContext(FunctionInfo f) {
+	public void addFunctionToContext(RefinedFunction f) {
 		if(!ctxFunctions.contains(f))
 			ctxFunctions.add(f);
 	}
 
-	public FunctionInfo getFunctionByName(String name) {
-		for(FunctionInfo fi: ctxFunctions) {
+	public RefinedFunction getFunctionByName(String name) {
+		for(RefinedFunction fi: ctxFunctions) {
 			if(fi.getName().equals(name))
 				return fi;
 		}
 		return null;
 	}
 
-	public VariableInfo getVariableByName(String name) {
-		for(List<VariableInfo> l: ctxVars) {
-			for(VariableInfo var: l) {
+	public RefinedVariable getVariableByName(String name) {
+		for(List<RefinedVariable> l: ctxVars) {
+			for(RefinedVariable var: l) {
 				if(var.getName().equals(name))
 					return var;
 			}
 		}
-		for(VariableInfo var: ctxSpecificVars) {
+		for(RefinedVariable var: ctxSpecificVars) {
 			if(var.getName().equals(name))
 				return var;
 		}
@@ -183,8 +183,8 @@ public class Context {
 
 	public String allVariablesToString() {
 		StringBuilder sb = new StringBuilder();
-		for(List<VariableInfo> l: ctxVars) {
-			for(VariableInfo var: l) {
+		for(List<RefinedVariable> l: ctxVars) {
+			for(RefinedVariable var: l) {
 				sb.append(var.toString()+"; ");
 			}
 		}
@@ -195,10 +195,10 @@ public class Context {
 	 * Lists all variables inside the stack
 	 * @return
 	 */
-	public List<VariableInfo> getAllVariables() {
-		List<VariableInfo> lvi = new ArrayList<>();
-		for(List<VariableInfo> l: ctxVars) {
-			for(VariableInfo var: l) {
+	public List<RefinedVariable> getAllVariables() {
+		List<RefinedVariable> lvi = new ArrayList<>();
+		for(List<RefinedVariable> l: ctxVars) {
+			for(RefinedVariable var: l) {
 				lvi.add(var);
 			}
 		}
@@ -208,18 +208,18 @@ public class Context {
 	public void addRefinementInstanceToVariable(String name, String name2) {
 		if(!hasVariable(name) || !hasVariable(name2)) return;
 
-		VariableInfo vi1 = getVariableByName(name);
-		VariableInfo vi2 = getVariableByName(name2);
+		RefinedVariable vi1 = getVariableByName(name);
+		RefinedVariable vi2 = getVariableByName(name2);
 		vi1.addInstance(getVariableByName(name2));
 		addSpecificVariable(vi2);
 	}
 
-	public Optional<VariableInfo> getLastVariableInstance(String name) {
+	public Optional<RefinedVariable> getLastVariableInstance(String name) {
 		if(!hasVariable(name)) return Optional.empty();
 		return getVariableByName(name).getLastInstance();
 	}
 	
-	public void addSpecificVariable(VariableInfo vi) {
+	public void addSpecificVariable(RefinedVariable vi) {
 		ctxSpecificVars.add(vi);
 	}
 
@@ -228,15 +228,15 @@ public class Context {
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
 		sb.append("###########Variables############");
-		for(List<VariableInfo> l : ctxVars) {
+		for(List<RefinedVariable> l : ctxVars) {
 			sb.append("{");
-			for(VariableInfo var: l) {
+			for(RefinedVariable var: l) {
 				sb.append(var.toString()+"; ");
 			}
 			sb.append("}\n");
 		}
 		sb.append("\n############Functions:############\n");
-		for(FunctionInfo f : ctxFunctions)
+		for(RefinedFunction f : ctxFunctions)
 			sb.append(f.toString());
 		return sb.toString();
 	}

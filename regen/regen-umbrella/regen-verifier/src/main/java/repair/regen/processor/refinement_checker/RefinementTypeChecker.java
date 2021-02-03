@@ -9,7 +9,7 @@ import repair.regen.processor.Utils;
 import repair.regen.processor.VCChecker;
 import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.context.Context;
-import repair.regen.processor.context.VariableInfo;
+import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConditional;
@@ -356,9 +356,9 @@ public class RefinementTypeChecker extends CtScanner {
 		return (String) elem.getMetadata(REFINE_KEY);
 	}
 
-	private List<VariableInfo> addReferencedVars(String string, String differentFrom) {
-		List<VariableInfo> vis = utils.searchForVars(string, differentFrom);
-		for(VariableInfo vi: vis)
+	private List<RefinedVariable> addReferencedVars(String string, String differentFrom) {
+		List<RefinedVariable> vis = utils.searchForVars(string, differentFrom);
+		for(RefinedVariable vi: vis)
 			addRefinementVariable(vi.getName());
 		return vis;
 	}
@@ -376,9 +376,9 @@ public class RefinementTypeChecker extends CtScanner {
 		String name = varDecl.getSimpleName();
 
 		String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";
-		Optional<VariableInfo> ovi = context.getLastVariableInstance(name);
+		Optional<RefinedVariable> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent()) {
-			VariableInfo vi = ovi.get();
+			RefinedVariable vi = ovi.get();
 			addRefinementVariable(vi.getName());
 			ref = ref + "&& ("+WILD_VAR+" == "+vi.getName()+")";
 		}

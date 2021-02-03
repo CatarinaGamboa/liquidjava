@@ -7,26 +7,25 @@ import java.util.Stack;
 
 import spoon.reflect.reference.CtTypeReference;
 
-public class VariableInfo {
+public class RefinedVariable {
 	private String name;
 	private CtTypeReference<?> type;
 	private String refinement;
 	
 	//Specific Values
-	private Stack<List<VariableInfo>> instances;
+	private Stack<List<RefinedVariable>> instances;
 	
 	//To combine if values
-	private VariableInfo ifBefore;
-	private VariableInfo ifThen;
-	private VariableInfo ifElse;
+	private RefinedVariable ifBefore;
+	private RefinedVariable ifThen;
+	private RefinedVariable ifElse;
 	
-	public VariableInfo(String name, CtTypeReference<?> type, String refinement) {
+	public RefinedVariable(String name, CtTypeReference<?> type, String refinement) {
 		this.name = name;
 		this.type = type;
-		//this.refinements = new ArrayList<String>();
-		this.refinement=refinement;
+		this.refinement = refinement;
 		this.instances = new Stack<>();
-		this.instances.push(new ArrayList<VariableInfo>());
+		this.instances.push(new ArrayList<RefinedVariable>());
 	}
 
 	/**
@@ -65,7 +64,7 @@ public class VariableInfo {
 		instances.pop();
 	}
 	
-	public void addInstance(VariableInfo vi) {
+	public void addInstance(RefinedVariable vi) {
 		System.out.println("add instance in variableInfo");
 		instances.peek().add(vi);
 	}
@@ -75,10 +74,10 @@ public class VariableInfo {
 			instances.peek().remove(instances.size()-1);
 	}
 	
-	public Optional<VariableInfo> getLastInstance() {
-		Stack<List<VariableInfo>> backup = new Stack<>();
+	public Optional<RefinedVariable> getLastInstance() {
+		Stack<List<RefinedVariable>> backup = new Stack<>();
 		while(instances.size() > 0) {
-			List<VariableInfo> lvi = instances.peek();
+			List<RefinedVariable> lvi = instances.peek();
 			if(lvi.size() > 0) {//last list in stack has a value
 				reloadFromBackup(backup);
 				return Optional.of(lvi.get(lvi.size()-1));
@@ -90,7 +89,7 @@ public class VariableInfo {
 		return Optional.empty();
 	}
 	
-	private void reloadFromBackup(Stack<List<VariableInfo>> backup) {
+	private void reloadFromBackup(Stack<List<RefinedVariable>> backup) {
 		while(backup.size() > 0) {
 			instances.add(backup.pop());
 		}
@@ -98,17 +97,17 @@ public class VariableInfo {
 	
 	//IFS
 	void saveInstanceBeforeIf() {
-		Optional<VariableInfo> b = getLastInstance();
+		Optional<RefinedVariable> b = getLastInstance();
 		if(b.isPresent())
 			ifBefore = b.get();
 	}
 	void saveInstanceThen() {
-		Optional<VariableInfo> b = getLastInstance();
+		Optional<RefinedVariable> b = getLastInstance();
 		if(b.isPresent())
 			ifThen = b.get();
 	}
 	void saveInstanceElse() {
-		Optional<VariableInfo> b = getLastInstance();
+		Optional<RefinedVariable> b = getLastInstance();
 		if(b.isPresent())
 			ifElse = b.get();
 	}
@@ -121,7 +120,7 @@ public class VariableInfo {
 	 * @return A new VariableInfo created by the combination of 
 	 * 		   refinements or an empty Optional
 	 */
-	Optional<VariableInfo> getIfInstanceCombination(int counter) {
+	Optional<RefinedVariable> getIfInstanceCombination(int counter) {
 		if(ifBefore == null && ifThen==null && ifElse==null)
 			return Optional.empty();
 		String nName = name+"_"+counter+"_";
@@ -149,7 +148,7 @@ public class VariableInfo {
 			}
 		}
 		ifBefore=null;ifThen=null;ifElse=null;
-		return Optional.of(new VariableInfo(nName, type, refinement));
+		return Optional.of(new RefinedVariable(nName, type, refinement));
 	}
 
 	@Override

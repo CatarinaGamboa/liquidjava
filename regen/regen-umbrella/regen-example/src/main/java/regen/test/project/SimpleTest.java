@@ -9,22 +9,6 @@ public class SimpleTest {
 		@Refinement("\\v < 10")
 		int a = 5;
 
-		if(a > 0) {
-			@Refinement("b > 0")
-			int b = a;
-			b++;
-//			if(b > 10) {
-//				@Refinement("\\v > 0")
-//				int c = a;
-//				@Refinement("\\v > 11")
-//				int d = b+1;
-//			}
-//			if(a > b) {
-//				@Refinement("\\v > b")
-//				int c = a;
-//			}
-		}
-
 	}
 
 	//Errors to take care of

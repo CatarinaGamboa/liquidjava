@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import repair.regen.processor.context.Context;
-import repair.regen.processor.context.VariableInfo;
+import repair.regen.processor.context.RefinedVariable;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.declaration.CtElement;
@@ -118,7 +118,7 @@ public class VCChecker {
 
 		List<String> vars2 = getAllVariablesInRefinements(vars);
 		for(String var:vars2) {
-			VariableInfo vi = context.getVariableByName(var);
+			RefinedVariable vi = context.getVariableByName(var);
 			if(vi != null) {
 				String ref = vi.getRefinement();
 				sb.append("forall "+var+":"+ref+" -> \n");
@@ -141,10 +141,10 @@ public class VCChecker {
 
 	private void recAuxGetVars(String varName, List<String> newVars) {
 		String ref = context.getVariableRefinements(varName);
-		List<VariableInfo>vis = utils.searchForVars(ref, varName);
+		List<RefinedVariable>vis = utils.searchForVars(ref, varName);
 		if(vis.isEmpty())
 			return;
-		for(VariableInfo vi: vis) {
+		for(RefinedVariable vi: vis) {
 			if(!newVars.contains(vi.getName())) {
 				newVars.add(vi.getName());
 				recAuxGetVars(vi.getName(), newVars);

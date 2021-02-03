@@ -6,17 +6,17 @@ import java.util.Optional;
 
 import spoon.reflect.reference.CtTypeReference;
 
-public class FunctionInfo {
+public class RefinedFunction {
 	
 	private String name;
-	private List<VariableInfo> argRefinements;
+	private List<RefinedVariable> argRefinements;
 	private CtTypeReference<?> type;
 	private String refReturn;
 
 	
 	private Context context;
 	
-	public FunctionInfo() {
+	public RefinedFunction() {
 		argRefinements= new ArrayList<>();
 		context = Context.getInstance();
 	}
@@ -28,16 +28,16 @@ public class FunctionInfo {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public List<VariableInfo> getArgRefinements() {
+	public List<RefinedVariable> getArgRefinements() {
 		return argRefinements;
 	}
 	public void addArgRefinements(String varName, CtTypeReference<?> type, String refinement) {
-		VariableInfo v = new VariableInfo(varName, type, refinement);
+		RefinedVariable v = new RefinedVariable(varName, type, refinement);
 		this.argRefinements.add(v);
 
 	}
 	
-	public void addArgRefinements(VariableInfo vi) {
+	public void addArgRefinements(RefinedVariable vi) {
 		this.argRefinements.add(vi);
 	}
 	
@@ -61,9 +61,9 @@ public class FunctionInfo {
 	
 	private String getRenamedRefinements(String place) {
 		String update = place;
-		for(VariableInfo p: argRefinements) {
+		for(RefinedVariable p: argRefinements) {
 			String var = p.getName();
-			Optional<VariableInfo> ovi = p.getLastInstance();
+			Optional<RefinedVariable> ovi = p.getLastInstance();
 			String newName = ovi.isPresent()? ovi.get().getName():var;
 						
 			String newRefs = p.getRefinement().replaceAll(var, newName);
@@ -79,7 +79,7 @@ public class FunctionInfo {
 
 	public String getAllRefinements() {
 		StringBuilder sb = new StringBuilder();
-		for(VariableInfo p: argRefinements) {
+		for(RefinedVariable p: argRefinements) {
 			sb.append(p.getRefinement()+ " && ");
 		}
 		sb.append(refReturn);
@@ -90,7 +90,7 @@ public class FunctionInfo {
 	public String getRefinementsForParamIndex(int i) {
 		StringBuilder sb = new StringBuilder();
 		for (int j = 0; j < i && j < argRefinements.size(); j++) {
-			VariableInfo vi = argRefinements.get(i);
+			RefinedVariable vi = argRefinements.get(i);
 			sb.append(vi.getRefinement()+ " && ");
 		}
 		sb.append(argRefinements.get(i).getRefinement());
@@ -114,7 +114,7 @@ public class FunctionInfo {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		FunctionInfo other = (FunctionInfo) obj;
+		RefinedFunction other = (RefinedFunction) obj;
 		if (argRefinements == null) {
 			if (other.argRefinements != null)
 				return false;

@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.ast.Wildcard;
 
-import repair.regen.processor.context.FunctionInfo;
-import repair.regen.processor.context.VariableInfo;
+import repair.regen.processor.context.RefinedFunction;
+import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -163,7 +163,7 @@ class OperationsChecker {
 				elem_ref = rtc.getRefinement(elemVar);
 				String newName = elemName+"_"+rtc.context.getCounter()+"_";
 				String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
-				VariableInfo newVi = rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
+				RefinedVariable newVi = rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
 				rtc.context.addSpecificVariable(newVi);
 				rtc.addRefinementVariable(newName);
 				returnName = newName;
@@ -195,7 +195,7 @@ class OperationsChecker {
 			CtExecutable<?> method = inv.getExecutable().getDeclaration();
 			//Get function refinements with non_used variables
 			
-			FunctionInfo fi = rtc.context.getFunctionByName(method.getSimpleName());
+			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
 			String innerRefs = fi.getRenamedRefinements();
 			//Substitute \\v by the variable that we send
 			String newName = rtc.FRESH + rtc.context.getCounter();
