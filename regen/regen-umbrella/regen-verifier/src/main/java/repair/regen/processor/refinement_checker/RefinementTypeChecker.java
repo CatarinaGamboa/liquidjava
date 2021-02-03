@@ -11,7 +11,8 @@ import repair.regen.language.Variable;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.processor.Utils;
 import repair.regen.processor.built_ins.RefinementsLibrary;
-import repair.regen.processor.constraints.SingleConstraint;
+import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.code.CtAssignment;
@@ -111,15 +112,16 @@ public class RefinementTypeChecker extends CtScanner {
 		super.visitCtLocalVariable(localVariable);
 		//only declaration, no assignment
 		if(localVariable.getAssignment() == null) {
-			Optional<String> a = getRefinementFromAnnotation(localVariable);
+			Optional<Constraint> a = getRefinementFromAnnotation(localVariable);
+			context.addVarToContextConstraint(localVariable.getSimpleName(), localVariable.getType(), 
+					a.isPresent()? a.get() : new Predicate("true"));
 			context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), 
-					a.isPresent()? a.get() : "true");
+					a.isPresent()? a.get().toString() : "true");//TODO REMOVE
 		}else {
 			String varName = localVariable.getSimpleName();
 			CtExpression<?> e = localVariable.getAssignment();
-			String refinementFound = getRefinement(localVariable.getAssignment());
+			String refinementFound = getRefinement(e);
 
-			CtExpression a = localVariable.getAssignment();
 			if (refinementFound == null)
 				refinementFound = "true";
 			context.addVarToContext(varName, localVariable.getType(), "true");
@@ -363,7 +365,7 @@ public class RefinementTypeChecker extends CtScanner {
 	}
 
 	private void parseRef(String metadata) {
-		new SingleConstraint(metadata);
+		new Predicate(metadata);
 	}
 
 	private List<RefinedVariable> addReferencedVars(String string, String differentFrom) {
@@ -397,7 +399,8 @@ public class RefinementTypeChecker extends CtScanner {
 	}
 	
 
-	public Optional<String> getRefinementFromAnnotation(CtElement element) {
+	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
+		Optional<Constraint> constr = Optional.empty();
 		Optional<String> ref = Optional.empty();
 		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) 
 			if( ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -406,10 +409,10 @@ public class RefinementTypeChecker extends CtScanner {
 				ref = Optional.of(s.getValue());
 			}
 		
-		if(ref.isPresent())
-			parseRef(ref.get());
-		
-		return ref;
+		if(ref.isPresent()) {
+			constr = Optional.of(new Predicate(ref.get()));
+		}
+		return constr;
 	}
 
 }

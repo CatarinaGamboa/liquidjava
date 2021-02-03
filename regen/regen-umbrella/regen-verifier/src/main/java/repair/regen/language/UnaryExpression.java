@@ -21,4 +21,8 @@ public class UnaryExpression extends Expression implements IModel {
 		return op.toString()+e.toString();
 	}
 	
+	public Expression getExpression() {
+		return e;
+	}
+	
 }

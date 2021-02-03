@@ -24,4 +24,11 @@ public class BinaryExpression extends Expression implements IModel {
 		String se2 = e2.toString();
 		return String.format("%s %s %s", se1,sop,se2);
 	}
+	
+	public Expression getFirstExpression() {
+		return e1;
+	}
+	public Expression getSecondExpression() {
+		return e2;
+	}
 }

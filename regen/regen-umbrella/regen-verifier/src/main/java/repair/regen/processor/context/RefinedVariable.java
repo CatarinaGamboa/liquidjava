@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
+import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedVariable {
 	private String name;
 	private CtTypeReference<?> type;
-	private String refinement;
-	
+	private Constraint refinement;
+
 	//Specific Values
 	private Stack<List<RefinedVariable>> instances;
 	
@@ -20,10 +22,10 @@ public class RefinedVariable {
 	private RefinedVariable ifThen;
 	private RefinedVariable ifElse;
 	
-	public RefinedVariable(String name, CtTypeReference<?> type, String refinement) {
+	public RefinedVariable(String name, CtTypeReference<?> type, Constraint ref) {
 		this.name = name;
 		this.type = type;
-		this.refinement = refinement;
+		this.refinement = ref;
 		this.instances = new Stack<>();
 		this.instances.push(new ArrayList<RefinedVariable>());
 	}
@@ -32,25 +34,30 @@ public class RefinedVariable {
 	 * Gets last refinement
 	 * @return
 	 */
-	public String getRefinement() {
+	public Constraint getRefinement() {
 		if(refinement != null)
 			return refinement;
-		return "";
+		return new Predicate("true");
 		//return String.join(" && ", refinements);
 	}
 	public CtTypeReference<?> getType(){
 		return type;
 	}
 	
-	public String getRenamedRefinements(String toReplace) {
-		return getRefinement().replaceAll(name, toReplace);
+	public Constraint getRenamedRefinements(String toReplace) {
+		if(refinement instanceof Predicate) {
+			Predicate np = new Predicate(refinement.toString());
+			np.substituteVariable(name, toReplace);
+			return np;
+		}
+		return refinement;//TODO REMOVE when all cases of Constraint are implemented
 	}
 
 	public String getName() {
 		return name;
 	}
 
-	public void newRefinement(String toAdd) {
+	public void newRefinement(Constraint toAdd) {
 		refinement=toAdd;
 	}
 
@@ -123,38 +130,39 @@ public class RefinedVariable {
 	Optional<RefinedVariable> getIfInstanceCombination(int counter) {
 		if(ifBefore == null && ifThen==null && ifElse==null)
 			return Optional.empty();
+		//TODO CHANGE ALMOST ALL
 		String nName = name+"_"+counter+"_";
 		String refinement = "";
 		//no else 
 		if(ifElse == null) {
 			if(ifBefore != null && ifThen != null){
-				String ref1 = ifBefore.getRenamedRefinements(nName);
-				String ref2 = ifThen.getRenamedRefinements(nName);
-				refinement = String.format("(%s)||(%s)", ref1, ref2);
+				Constraint ref1 = ifBefore.getRenamedRefinements(nName);
+				Constraint ref2 = ifThen.getRenamedRefinements(nName);
+				refinement = String.format("(%s)||(%s)", ref1.toString(), ref2.toString());//TODO CHANGE
 			}else if(ifBefore == null) {//no value before if but has inside
-				refinement = ifThen.getRenamedRefinements(nName);
+				refinement = ifThen.getRenamedRefinements(nName).toString();
 			}
 		}else {//has else
 			if(ifBefore != null && ifThen == null) {//no value in if
-				String ref1 = ifBefore.getRenamedRefinements(nName);
-				String ref2 = ifElse.getRenamedRefinements(nName);
+				String ref1 = ifBefore.getRenamedRefinements(nName).toString();
+				String ref2 = ifElse.getRenamedRefinements(nName).toString();
 				refinement = String.format("(%s)||(%s)", ref1, ref2);
 			}else if(ifThen != null) {
-				String ref1 = ifThen.getRenamedRefinements(nName);
-				String ref2 = ifElse.getRenamedRefinements(nName);
+				String ref1 = ifThen.getRenamedRefinements(nName).toString();
+				String ref2 = ifElse.getRenamedRefinements(nName).toString();
 				refinement = String.format("(%s)||(%s)", ref1, ref2);
 			}else {//no value before and no value on if
-				refinement = ifElse.getRenamedRefinements(nName);
+				refinement = ifElse.getRenamedRefinements(nName).toString();
 			}
 		}
 		ifBefore=null;ifThen=null;ifElse=null;
-		return Optional.of(new RefinedVariable(nName, type, refinement));
+		return Optional.of(new RefinedVariable(nName, type, new Predicate(refinement)));//TODO CHANGE
 	}
 
 	@Override
 	public String toString() {
-		return "VariableInfo [name=" + name + ", type=" + type + ", refinements=" +
-				refinement + 
+		return "VariableInfo [name=" + name + ", type=" + type + ", refinement=" +
+				refinement +
 				", instances=" + instances + "]";
 	}
 

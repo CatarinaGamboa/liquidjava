@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 
+import repair.regen.processor.constraints.Constraint;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -79,18 +80,17 @@ public class Context {
 		if(!hasVariable(var.getName()))
 			ctxVars.peek().add(var);
 	}
-
-	public RefinedVariable addVarToContext(String name, CtTypeReference<?> type, String refinements) {
-		RefinedVariable vi =new RefinedVariable(name, type, refinements);
+	
+	public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
+		RefinedVariable vi =new RefinedVariable(simpleName, type, c);
 		addVarToContext(vi);
 		return vi;
+		
 	}
-
-	public void addRefinementToVariableInContext(CtVariable<?> variable, String et) {
+	public void addRefinementToVariableInContext(CtVariable<?> variable, Constraint et) {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
 			RefinedVariable vi = getVariableByName(name);
-			String oldRef = vi.getRefinement();
 			vi.newRefinement(et);
 		}else {
 			addVarToContext(name, variable.getType(), et);
@@ -98,11 +98,11 @@ public class Context {
 	}
 
 //TODO ERASE
-	public void newRefinementToVariableInContext(CtVariable<?> variable, String expectedType) {
+	public void newRefinementToVariableInContext(CtVariable<?> variable, Constraint expectedType) {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
 			RefinedVariable vi = getVariableByName(name);
-			vi.newRefinement("("+expectedType+")");
+			vi.newRefinement(expectedType);
 		}else
 			addVarToContext(name, variable.getType(), expectedType);
 	}
@@ -112,16 +112,16 @@ public class Context {
 	 * @param variableName
 	 * @param expectedType
 	 */
-	public void newRefinementToVariableInContext(String variableName, String expectedType) {
+	public void newRefinementToVariableInContext(String variableName, Constraint expectedType) {
 		if(hasVariable(variableName)){
 			RefinedVariable vi = getVariableByName(variableName);
-			vi.newRefinement("("+expectedType+")");
+			vi.newRefinement(expectedType);
 		}
 	}
 
 
-	public String getVariableRefinements(String varName) {
-		return hasVariable(varName)?getVariableByName(varName).getRefinement() : ""; 
+	public Constraint getVariableRefinements(String varName) {
+		return hasVariable(varName)?getVariableByName(varName).getRefinement() : null; 
 	}
 	
 	public void variablesSetBeforeIf() {
@@ -240,5 +240,7 @@ public class Context {
 			sb.append(f.toString());
 		return sb.toString();
 	}
+
+
 
 }

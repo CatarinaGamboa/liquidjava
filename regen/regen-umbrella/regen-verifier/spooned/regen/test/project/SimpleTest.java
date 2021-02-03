@@ -32,8 +32,8 @@ package regen.test.project;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("\\v < 10 &&} \\v > 0")
-        int a = 5;
+        @repair.regen.specification.Refinement("a < 10 && a > 0")
+        int a = 8;
     }
 }
 
