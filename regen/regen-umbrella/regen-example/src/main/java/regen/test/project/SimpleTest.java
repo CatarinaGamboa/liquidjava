@@ -4,12 +4,21 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
 
-
-	public static void main(String[] args) {	
-		@Refinement("a < 10 && a > 0")
-		int a = 8;
-
+	@Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
+	public static int posMult(int a, int b) {
+		@Refinement("y > 30")
+		int y = 50;
+		return y-10;
 	}
+
+	public static void main(String[] args) {
+		@Refinement("\\v >= 0")
+		int p = 10;
+		p = posMult(10, 3);
+		//p = posMult(10, 15-6);
+	}
+
+
 
 	//Errors to take care of
 	// //value_4==innerScope && value_4 == innerScope_1
@@ -24,7 +33,7 @@ public class SimpleTest {
 	//	
 	//	@Refinement("\\v == 30 || \\v == 90")
 	//	int some2 = value;
-	
+
 	//SEE ERROR still error
 	//		@Refinement("(\\v == -5)")
 	//		float prim = Math.copySign(-5, -500);

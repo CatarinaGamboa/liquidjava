@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import repair.regen.processor.built_ins.RefinementsLibrary;
+import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 
@@ -84,10 +86,10 @@ public class MethodsFunctionsChecker {
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName) {
 		RefinedFunction f = rtc.context.getFunctionByName(methodName);
-		String methodRef = f.getRenamedReturn();
-		String metRef = f.getRenamedReturn();
+		Constraint methodRef = f.getRenamedReturn();
+		Constraint metRef = f.getRenamedReturn();
 		
-		String metRefOriginal = f.getRefReturn(); 
+		Constraint metRefOriginal = f.getRefReturn(); 
 		List<String> saveVars = new ArrayList<>();
 		for(String v: rtc.vcChecker.getVariables())
 			saveVars.add(v);
@@ -105,12 +107,17 @@ public class MethodsFunctionsChecker {
 				String newParamName = paramOriginalName+"_"+rtc.context.getCounter()+"_";
 				newNames.put(paramOriginalName, newParamName);
 				
-				String refPar = f.getRefinementsForParamIndex(i).replace(paramOriginalName, newParamName);
-				String refInv = (rtc.getRefinement(exp)).replace(rtc.WILD_VAR, newParamName);
 				
+				Constraint refPar = f.getRefinementsForParamIndex(i);
+				refPar.substituteVariable(paramOriginalName, newParamName);
+				Constraint refInv = rtc.getRefinement(exp);
+				refInv.substituteVariable(rtc.WILD_VAR, newParamName);
+				
+				List<String> names = refPar.getVariableNames();
 				for(String entry: newNames.keySet()) {
-					if(!entry.equals(paramOriginalName) && refPar.contains(entry))
-						refPar = refPar.replace(entry, newNames.get(entry));
+					if(!entry.equals(paramOriginalName) && names.contains(entry))
+						refPar.substituteVariable(entry, newNames.get(entry));
+					
 				}
 
 				RefinedVariable vi = rtc.context.addVarToContext(newParamName, pinfo.getType(), refInv);
@@ -119,16 +126,16 @@ public class MethodsFunctionsChecker {
 				for(String s:saveVars)
 					rtc.addRefinementVariable(s);
 				
-				metRefOriginal = metRefOriginal.replace(pinfo.getName(), newParamName);
-
+				metRefOriginal.substituteVariable(pinfo.getName(), newParamName);
+				
 				if(exp instanceof CtVariableRead<?>) {
 					String name = ((CtVariableRead) exp).getVariable().getSimpleName();
 					rtc.context.addVarToContext(name,
 							((CtVariableRead) exp).getType(), refPar);
 					rtc.addRefinementVariable(name);
-					metRef = metRef.replace(newParamName, name);
+					metRef.substituteVariable(newParamName, name);
 				}
-				rtc.checkSMT(refInv, refPar, invocation);
+				rtc.checkSMT(refInv.toString(), refPar.toString(), invocation);//TODO CHANGE
 				saveVars.add(newParamName);
 				rtc.context.addRefinementInstanceToVariable(pinfo.getName(), vi.getName());
 			}
@@ -137,9 +144,6 @@ public class MethodsFunctionsChecker {
 			for(String s: saveVars)
 				rtc.addRefinementVariable(s);
 			
-			//Checking Return
-			String s = methodRef;
-			//String s = methodRef;
 			invocation.putMetadata(rtc.REFINE_KEY, metRefOriginal);
 		}
 	}
@@ -149,7 +153,7 @@ public class MethodsFunctionsChecker {
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
-		f.setRefReturn("true");
+		f.setRefReturn(new Predicate("true"));
 		rtc.context.addFunctionToContext(f);
 		for(CtAnnotation<? extends Annotation> ann :method.getAnnotations()) {
 			if( !ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -160,7 +164,7 @@ public class MethodsFunctionsChecker {
 			List<CtParameter<?>> params = method.getParameters();
 			
 			String ref = handleFunctionRefinements(f, methodRef, params);
-			method.putMetadata(rtc.REFINE_KEY, ref);
+			method.putMetadata(rtc.REFINE_KEY, new Predicate(ref));
 		}
 	}
 
@@ -173,6 +177,7 @@ public class MethodsFunctionsChecker {
 	 * @return
 	 */
 	private String handleFunctionRefinements(RefinedFunction f, String methodRef, List<CtParameter<?>> params) {
+		//TODO CHANGE
 		String[] r = methodRef.split("}\\s*->\\s*\\{");
 		
 		StringBuilder sb = new StringBuilder();
@@ -182,15 +187,16 @@ public class MethodsFunctionsChecker {
 			CtParameter<?> param = params.get(i);
 			String name = param.getSimpleName();
 			String metRef = "("+r[i].replace("{", "").replace("}", "").replace(rtc.WILD_VAR, name)+")";
-			param.putMetadata(rtc.REFINE_KEY, metRef);
+			Constraint cmetRef = new Predicate(metRef);
+			param.putMetadata(rtc.REFINE_KEY, cmetRef);
 			sb.append(sb.length() == 0? metRef : " && "+metRef);
 
-			f.addArgRefinements(name,param.getType(), metRef);
-			rtc.context.addVarToContext(name, param.getType(), metRef);
+			f.addArgRefinements(name,param.getType(), cmetRef);
+			rtc.context.addVarToContext(name, param.getType(), cmetRef);
 			rtc.addRefinementVariable(name);
 		}
 		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
-		f.setRefReturn(retRef);
+		f.setRefReturn(new Predicate(retRef));
 		rtc.context.addFunctionToContext(f);
 		
 		return sb.append(" && "+ retRef).toString();
@@ -201,7 +207,7 @@ public class MethodsFunctionsChecker {
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getName());
 		f.setType(getType(method.getReturnType()));
-		f.setRefReturn("true");
+		f.setRefReturn(new Predicate("true"));
 		
 		String[] r = methodRef.split("}\\s*->\\s*\\{");
 		
@@ -215,12 +221,13 @@ public class MethodsFunctionsChecker {
 			//param.putMetadata(rtc.REFINE_KEY, metRef);
 			sb.append(sb.length() == 0? metRef : " && "+metRef);
 
-			f.addArgRefinements(name,getType(param.getType()), metRef);
-			rtc.context.addVarToContext(name, getType(param.getType()), metRef);
+			Constraint cmetRef = new Predicate(metRef);
+			f.addArgRefinements(name,getType(param.getType()), cmetRef);
+			rtc.context.addVarToContext(name, getType(param.getType()), cmetRef);
 			rtc.addRefinementVariable(name);
 		}
 		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
-		f.setRefReturn(retRef);
+		f.setRefReturn(new Predicate(retRef));
 		rtc.context.addFunctionToContext(f);
 		return sb.append(" && "+ retRef).toString();
 	}
@@ -231,7 +238,7 @@ public class MethodsFunctionsChecker {
 		if(ret.getReturnedExpression() != null) {
 			//check if there are refinements
 			if(rtc.getRefinement(ret.getReturnedExpression())== null)
-				ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, "true");
+				ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, new Predicate("true"));
 			CtMethod method = ret.getParent(CtMethod.class);
 			//check if method has refinements
 			if(rtc.getRefinement(method) == null)
@@ -241,15 +248,19 @@ public class MethodsFunctionsChecker {
 				rtc.addRefinementVariable(vi.getName());
 
 			//Both return and the method have metadata
-			String returnVarName = "RET_"+rtc.context.getCounter(); 
-			String retRef = String.format("(%s)", rtc.getRefinement(ret.getReturnedExpression())
-					.replace(rtc.WILD_VAR, returnVarName));
-			String expectedType = fi.getRefReturn().replace(rtc.WILD_VAR, returnVarName);
+			String returnVarName = "RET_"+rtc.context.getCounter();
+			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression());
+			cretRef.substituteVariable(rtc.WILD_VAR, returnVarName);
+			Constraint cexpectedType = fi.getRefReturn();
+			cexpectedType.substituteVariable(rtc.WILD_VAR, returnVarName);
+			//String retRef = String.format("(%s)", rtc.getRefinement(ret.getReturnedExpression())
+			//		.replace(rtc.WILD_VAR, returnVarName));
+			//String expectedType = fi.getRefReturn().replace(rtc.WILD_VAR, returnVarName);
 
-			rtc.context.addVarToContext(returnVarName, method.getType(), retRef);
+			rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
 			rtc.addRefinementVariable(returnVarName);
-			rtc.checkSMT(retRef, expectedType, ret);
-			rtc.context.newRefinementToVariableInContext(returnVarName, expectedType);
+			rtc.checkSMT(cretRef.toString(), cexpectedType.toString(), ret);//TODO CHANGE
+			rtc.context.newRefinementToVariableInContext(returnVarName, cexpectedType);
 		}
 	}
 

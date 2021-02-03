@@ -118,12 +118,12 @@ public class RefinementTypeChecker extends CtScanner {
 		}else {
 			String varName = localVariable.getSimpleName();
 			CtExpression<?> e = localVariable.getAssignment();
-			String refinementFound = getRefinement(e);
+			Constraint refinementFound = getRefinement(e);
 
 			if (refinementFound == null)
-				refinementFound = "true";
+				refinementFound = new Predicate("true");
 			context.addVarToContext(varName, localVariable.getType(), new Predicate("true"));
-			checkVariableRefinements(refinementFound,varName, localVariable);
+			checkVariableRefinements(refinementFound, varName, localVariable);
 				
 		}
 	}
@@ -140,12 +140,12 @@ public class RefinementTypeChecker extends CtScanner {
 
 			getPutVariableMetadada(ex, varDecl);
 
-			String refinementFound = getRefinement(assignement.getAssignment());
+			Constraint refinementFound = getRefinement(assignement.getAssignment());
 			if (refinementFound == null) {
-				refinementFound = "true";
+				refinementFound = new Predicate("true");
 			}
 			vcChecker.removeFreshVariableThatIncludes(name);
-			checkVariableRefinements(refinementFound, name, varDecl);
+			checkVariableRefinements(refinementFound, name, varDecl);//TODO CHANGE
 
 		}
 	}
@@ -154,7 +154,7 @@ public class RefinementTypeChecker extends CtScanner {
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
 		List<String> types = Arrays.asList(implementedTypes);
 		if (types.contains(lit.getType().getQualifiedName())) {
-			lit.putMetadata(REFINE_KEY,"("+ WILD_VAR+" == " + lit.getValue()+")");
+			lit.putMetadata(REFINE_KEY, new Predicate("("+ WILD_VAR+" == " + lit.getValue()+")"));
 		}else if(lit.getType().getQualifiedName().contentEquals("java.lang.String")){
 			//Only taking care of strings inside refinements
 		}else {
@@ -170,7 +170,7 @@ public class RefinementTypeChecker extends CtScanner {
 			String var = fieldRead.getVariable().toString();
 			if(lib.getRefinement(var).isPresent()) {
 				System.out.println(lib.getRefinement(var).get());
-				fieldRead.putMetadata(REFINE_KEY, lib.getRefinement(var).get());
+				fieldRead.putMetadata(REFINE_KEY, new Predicate(lib.getRefinement(var).get()));
 			}
 		}
 		super.visitCtFieldRead(fieldRead);
@@ -260,12 +260,13 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtConditional(CtConditional<T> conditional) {
 		super.visitCtConditional(conditional);
-
-		String condRefs = getRefinement(conditional.getCondition());
+		//TODO REVIEW ALL
+		Constraint cond = getRefinement(conditional.getCondition());
+		String condRefs = cond.toString(); 
 		String condThen = "!(" + condRefs + ") || ("+ getRefinement(conditional.getThenExpression())+")", //!A or B
 				notCondElse = "("+condRefs + ") || ("+ getRefinement(conditional.getElseExpression())+")";//A or C
 
-		conditional.putMetadata(REFINE_KEY, "("+condThen+") && ("+notCondElse+")");
+		conditional.putMetadata(REFINE_KEY, new Predicate("("+condThen+") && ("+notCondElse+")"));//TODO CHANGE TO CONJUNCTION
 	}
 
 
@@ -288,7 +289,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 	//############################### Inner Visitors  ##########################################
 
-	private String getExpressionRefinements(CtExpression element) {
+	private Constraint getExpressionRefinements(CtExpression element) {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			return getRefinement(element);
@@ -302,7 +303,7 @@ public class RefinementTypeChecker extends CtScanner {
 			return getRefinement(op);
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
-			return l.getValue().toString();
+			return new Predicate(l.getValue().toString());
 		}else if(element instanceof CtInvocation<?>) {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
 			visitCtInvocation(inv);
@@ -313,7 +314,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 
 	//############################### SMT Evaluation ##########################################
-	<T> void checkVariableRefinements(String refinementFound, String simpleName, CtVariable<T> variable) {
+	<T> void checkVariableRefinements(Constraint refinementFound, String simpleName, CtVariable<T> variable) {
 		Optional<String> expectedType = variable.getAnnotations().stream()
 				.filter(
 						ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -330,10 +331,10 @@ public class RefinementTypeChecker extends CtScanner {
 			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
 			
 			String newName = simpleName+"_"+context.getCounter()+"_";
-			Constraint correctRefinement = c.clone();
+			Constraint correctRefinement = refinementFound.clone();
 			correctRefinement.substituteVariable(WILD_VAR, simpleName);
 			
-			Constraint correctNewRefinement = c.clone();
+			Constraint correctNewRefinement = refinementFound.clone();
 			correctNewRefinement.substituteVariable(WILD_VAR, newName);
 			c.substituteVariable(simpleName, newName);
 			
@@ -355,27 +356,25 @@ public class RefinementTypeChecker extends CtScanner {
 	
 	<T> void checkSMT(String correctRefinement, String expectedType, CtElement element) {
 		vcChecker.processSubtyping(expectedType, element);
-		element.putMetadata(REFINE_KEY, expectedType);	
+		element.putMetadata(REFINE_KEY, new Predicate(expectedType));	
 		renewVariables();
 	}
 	
 	private void checkSMTVariable(String completeRefinement, String expectedType, 
 			CtVariable<?> element, String simpleName) {
 		vcChecker.processSubtyping(expectedType, simpleName, element);
-		element.putMetadata(REFINE_KEY, expectedType);	
+		element.putMetadata(REFINE_KEY, new Predicate(expectedType));	
 		renewVariables();
 
 	}
 
 
 	//############################### Get Metadata ##########################################
-	String getRefinement(CtElement elem) {
-		return (String) elem.getMetadata(REFINE_KEY);
+	Constraint getRefinement(CtElement elem) {
+		return (Constraint)elem.getMetadata(REFINE_KEY);
+
 	}
 
-	private void parseRef(String metadata) {
-		new Predicate(metadata);
-	}
 
 	private void addReferencedVars(Constraint constraint, String differentFrom) {
 		List<String> variableNames = constraint.getVariableNames();
@@ -397,7 +396,7 @@ public class RefinementTypeChecker extends CtScanner {
 //		String refinementFound = getRefinement(varDecl);
 		String name = varDecl.getSimpleName();
 
-		String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";
+		String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";//TODO CHANGE TO NEW PREDICATE ==
 		Optional<RefinedVariable> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent()) {
 			RefinedVariable vi = ovi.get();
@@ -405,7 +404,7 @@ public class RefinementTypeChecker extends CtScanner {
 			ref = ref + "&& ("+WILD_VAR+" == "+vi.getName()+")";
 		}
 		
-		variable.putMetadata(REFINE_KEY, ref);
+		variable.putMetadata(REFINE_KEY, new Predicate(ref));
 	}
 	
 

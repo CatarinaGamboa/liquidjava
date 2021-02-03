@@ -9,7 +9,7 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 @Priority(6)
-@Pattern(regExp = "[a-zA-Z][a-zA-z0-9]*")
+@Pattern(regExp = "([a-zA-Z][a-zA-z0-9]*)|(\\\\v)")
 public class Variable extends Expression implements IModel {
 	
 	@Value

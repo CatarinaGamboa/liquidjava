@@ -31,9 +31,18 @@ package regen.test.project;
 // int c = (a < 100)? three(): a;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
+    @repair.regen.specification.Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
+    public static int posMult(int a, int b) {
+        @repair.regen.specification.Refinement("y > 30")
+        int y = 50;
+        return y - 10;
+    }
+
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("a < 10 && a > 0")
-        int a = 8;
+        @repair.regen.specification.Refinement("\\v >= 0")
+        int p = 10;
+        p = regen.test.project.SimpleTest.posMult(10, 3);
+        // p = posMult(10, 15-6);
     }
 }
 

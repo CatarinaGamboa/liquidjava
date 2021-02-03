@@ -13,7 +13,7 @@ public class RefinedFunction {
 	private String name;
 	private List<RefinedVariable> argRefinements;
 	private CtTypeReference<?> type;
-	private String refReturn;
+	private Constraint refReturn;
 
 	
 	private Context context;
@@ -43,10 +43,10 @@ public class RefinedFunction {
 		this.argRefinements.add(vi);
 	}
 	
-	public String getRefReturn() {
+	public Constraint getRefReturn() {
 		return refReturn;
 	}
-	public void setRefReturn( String ref) {
+	public void setRefReturn(Constraint ref) {
 		this.refReturn = ref;
 	}
 	public CtTypeReference<?> getType() {
@@ -77,8 +77,8 @@ public class RefinedFunction {
 //		return update;
 //	}
 	
-	private Constraint getRenamedRefinements(String place) {
-		Constraint update = new Predicate(place);
+	private Constraint getRenamedRefinements(Constraint place) {
+		Constraint update = place.clone();
 		for(RefinedVariable p: argRefinements) {
 			String varName = p.getName();
 			//trocar varName por newName, adicionar newName ao context, trocar o varName por newName no update
@@ -98,24 +98,25 @@ public class RefinedFunction {
 		return getRenamedRefinements(this.refReturn);
 	}
 
-	public String getAllRefinements() {
+	public Constraint getAllRefinements() {
+		//TODO CHANGE to Conjunction
 		StringBuilder sb = new StringBuilder();
 		for(RefinedVariable p: argRefinements) {
 			sb.append(p.getRefinement()+ " && ");
 		}
 		sb.append(refReturn);
-		return sb.toString();
+		return new Predicate(sb.toString());
 	}
 
 
-	public String getRefinementsForParamIndex(int i) {
+	public Constraint getRefinementsForParamIndex(int i) {
 		StringBuilder sb = new StringBuilder();
 		for (int j = 0; j < i && j < argRefinements.size(); j++) {
 			RefinedVariable vi = argRefinements.get(i);
 			sb.append(vi.getRefinement()+ " && ");
 		}
 		sb.append(argRefinements.get(i).getRefinement());
-		return sb.toString();//getRenamedRefinements();
+		return new Predicate(sb.toString());//getRenamedRefinements();
 	}
 
 	@Override

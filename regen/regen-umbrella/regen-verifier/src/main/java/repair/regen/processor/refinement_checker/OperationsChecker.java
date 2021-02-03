@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.eclipse.jdt.internal.compiler.ast.Wildcard;
 
+import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.code.BinaryOperatorKind;
@@ -48,17 +50,17 @@ class OperationsChecker {
 	public <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) {
 		CtExpression<?> right = operator.getRightHandOperand();
 		CtExpression<?> left = operator.getLeftHandOperand();
-		String oper = operator.toString();
+		Constraint oper;// = operator.toString();
 		CtElement parent = operator.getParent();
 		if(parent instanceof CtAssignment<?, ?>) {
 			CtVariableWriteImpl<?> parentVar = (CtVariableWriteImpl<?>)((CtAssignment) parent)
 					.getAssigned();
 			oper = getOperationRefinements(operator, parentVar, operator);
 		}else {
-			String varRight = getOperationRefinements(operator, right);
-			String varLeft = getOperationRefinements(operator, left);
-			oper = String.format("(%s %s %s)", 
-					varLeft, getOperatorFromKind(operator.getKind()),varRight);
+			Constraint varRight = getOperationRefinements(operator, right);
+			Constraint varLeft = getOperationRefinements(operator, left);
+			oper = new Predicate(String.format("(%s %s %s)", 
+					varLeft, getOperatorFromKind(operator.getKind()),varRight));
 
 		}
 		String type = operator.getType().getQualifiedName(); 
@@ -67,9 +69,9 @@ class OperationsChecker {
 			operator.putMetadata(rtc.REFINE_KEY, oper);
 			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
 					parent instanceof CtReturn<?>)
-				operator.putMetadata(rtc.REFINE_KEY, "("+rtc.WILD_VAR+" == (" + oper+"))");
+				operator.putMetadata(rtc.REFINE_KEY, new Predicate("("+rtc.WILD_VAR+" == (" + oper+"))"));//TODO EQUALPRED
 		}else if (types.contains(type)) {
-			operator.putMetadata(rtc.REFINE_KEY, "("+rtc.WILD_VAR+" == " + oper+")");
+			operator.putMetadata(rtc.REFINE_KEY, new Predicate("("+rtc.WILD_VAR+" == " + oper+")"));
 		}else {
 			System.out.println("Literal type not implemented");
 		}
@@ -83,7 +85,8 @@ class OperationsChecker {
 	 */
 	public <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) {
 		CtExpression<T> ex = operator.getOperand();
-		String name = rtc.FRESH, all;
+		String name = rtc.FRESH;
+		Constraint all;
 		if(ex instanceof CtVariableWrite) {
 			CtVariableWrite<T> w = (CtVariableWrite<T>) ex;
 			name = w.getVariable().getSimpleName();
@@ -111,18 +114,21 @@ class OperationsChecker {
 			}
 		}
 
-		String metadata = rtc.getRefinement(ex);
+		Constraint metadata = rtc.getRefinement(ex);
 		String newName = name+"_"+rtc.context.getCounter()+"_";
-		String newMeta = "("+metadata.replace(rtc.WILD_VAR, newName)+")";
-		String unOp = getOperatorFromKind(operator.getKind());
-
+		Constraint newMeta = metadata.clone();
+		newMeta.substituteVariable(rtc.WILD_VAR, newName);
+		
+		Constraint unOp = getOperatorFromKind(operator.getKind());
 		CtElement p = operator.getParent();
-		String opS = unOp.replace(rtc.WILD_VAR, newName);
+		Constraint opS = unOp.clone();
+		opS.substituteVariable(rtc.WILD_VAR, newName);
+	
 		if(p instanceof CtIf)
-			all = "("+unOp.replace(rtc.WILD_VAR, newName)+")";
+			all = opS;
 		else
-			all ="("+rtc.WILD_VAR+" == (" + opS + "))";
-		System.out.println(newMeta + " && "+all);
+			all =new Predicate("("+rtc.WILD_VAR+" == (" + opS.toString() + "))");
+		
 		rtc.context.addVarToContext(newName, ex.getType(), newMeta);
 		rtc.addRefinementVariable(newName);
 		operator.putMetadata(rtc.REFINE_KEY, all);
@@ -136,7 +142,7 @@ class OperationsChecker {
 	 * @param element
 	 * @return String with the operation refinements
 	 */
-	private String getOperationRefinements(CtBinaryOperator<?> operator, 
+	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, 
 			CtExpression<?> element) {
 		return getOperationRefinements(operator, null, element);
 	}
@@ -148,12 +154,12 @@ class OperationsChecker {
 	 * @param element CtExpression that represent an Binary Operation or one of the operands
 	 * @return String with the operation refinements
 	 */
-	private String getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWriteImpl<?> parentVar, 
+	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWriteImpl<?> parentVar, 
 			CtExpression<?> element) {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			String elemName = elemVar.getVariable().getSimpleName();
-			String elem_ref = rtc.context.getVariableRefinements(elemName);
+			Constraint elem_ref = rtc.context.getVariableRefinements(elemName);
 
 			String returnName = elemName;
 
@@ -162,33 +168,36 @@ class OperationsChecker {
 			if(parent != null && !(parent instanceof CtIfImpl)) {
 				elem_ref = rtc.getRefinement(elemVar);
 				String newName = elemName+"_"+rtc.context.getCounter()+"_";
-				String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
+				Constraint newElem_ref = elem_ref.clone();
+				newElem_ref.substituteVariable(rtc.WILD_VAR, newName);
+				//String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
 				RefinedVariable newVi = rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
 				rtc.context.addSpecificVariable(newVi);
 				rtc.addRefinementVariable(newName);
 				returnName = newName;
 			}
 			
-			elem_ref = elem_ref.replace(rtc.WILD_VAR, elemName);
+			elem_ref.substituteVariable(rtc.WILD_VAR, elemName);
 			rtc.context.addVarToContext(elemName, elemVar.getType(), elem_ref);
 			rtc.addRefinementVariable(elemName);
-			return returnName;
+			return new Predicate(returnName);
 		}
 
 		else if(element instanceof CtBinaryOperator<?>) {
 			CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
-			String right = getOperationRefinements(operator, parentVar, binop.getRightHandOperand());
-			String left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand());
-			return left +" "+ getOperatorFromKind(binop.getKind()) +" "+ right;
+			Constraint right = getOperationRefinements(operator, parentVar, binop.getRightHandOperand());
+			Constraint left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand());
+			
+			return new Predicate(left+" "+ getOperatorFromKind(binop.getKind()) +" "+ right);
 
 		}else if (element instanceof CtUnaryOperator<?>) {
 			String a = (String) element.getMetadata(rtc.REFINE_KEY);
 			String b = a.replace(rtc.WILD_VAR, "").replace("(", "").replace(")", "")
 					.replace("==", "").replace(" ", "");
-			return String.format("(%s)",b);
+			return new Predicate(String.format("(%s)",b));
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
-			return l.getValue().toString();
+			return new Predicate(l.getValue().toString());
 
 		}else if(element instanceof CtInvocation<?>) {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
@@ -196,16 +205,15 @@ class OperationsChecker {
 			//Get function refinements with non_used variables
 			
 			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
-			String innerRefs = fi.getRenamedRefinements();
+			Constraint innerRefs = fi.getRenamedRefinements();
 			//Substitute \\v by the variable that we send
 			String newName = rtc.FRESH + rtc.context.getCounter();
 			
 			//ERRO AQUI!!!!!!!!NO INNERREFS
-			
-			innerRefs = innerRefs.replace("\\v", newName);
+			innerRefs.substituteVariable(rtc.WILD_VAR, newName);
 			rtc.context.addVarToContext(newName, fi.getType(), innerRefs);
 			rtc.addRefinementVariable(newName);
-			return newName;//Return variable that represents the invocation
+			return new Predicate(newName);//Return variable that represents the invocation
 		}
 		return rtc.getRefinement(element);
 		//TODO Maybe add cases
@@ -221,17 +229,21 @@ class OperationsChecker {
 	 * @param name
 	 * @return String with the refinements
 	 */
-	private <T> String getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
+	private <T> Constraint getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
 			String name) {
 		String newName = name+"__"+rtc.context.getCounter();
 		CtVariable<T> varDecl = w.getVariable().getDeclaration();
 
-		String metadada = rtc.context.getVariableRefinements(varDecl.getSimpleName());
+		Constraint metadada = rtc.context.getVariableRefinements(varDecl.getSimpleName());
+		metadada.substituteVariable(rtc.WILD_VAR, newName);
+		metadada.substituteVariable(name, newName);
+		
+		Constraint c = getOperatorFromKind(operator.getKind());
+		c.substituteVariable(rtc.WILD_VAR, newName);
+		
 		rtc.addRefinementVariable(newName);
-		String operation = getOperatorFromKind(operator.getKind()).replace(rtc.WILD_VAR, newName);
-		String metaOper = metadada.replace(rtc.WILD_VAR, newName).replace(name, newName);
-		rtc.context.addVarToContext(newName, w.getType(), metaOper);
-		return "("+rtc.WILD_VAR+" == "+operation+")";
+		rtc.context.addVarToContext(newName, w.getType(), metadada);
+		return new Predicate("("+rtc.WILD_VAR+" == "+c+")");
 	}
 
 	//############################### Operations Auxiliaries ##########################################
@@ -264,17 +276,18 @@ class OperationsChecker {
 		}
 	}
 
-	private String getOperatorFromKind(UnaryOperatorKind kind) {
+	private Constraint getOperatorFromKind(UnaryOperatorKind kind) {
+		String ret = null;
 		switch(kind) {
-		case POSTINC:	return rtc.WILD_VAR+" + 1";
-		case POSTDEC: 	return rtc.WILD_VAR+" - 1";
-		case PREINC:	return rtc.WILD_VAR+" + 1";
-		case PREDEC: 	return rtc.WILD_VAR+" - 1";
+		case POSTINC:	ret = rtc.WILD_VAR+" + 1";break;
+		case POSTDEC: 	ret = rtc.WILD_VAR+" - 1";break;
+		case PREINC:	ret = rtc.WILD_VAR+" + 1";break;
+		case PREDEC: 	ret = rtc.WILD_VAR+" - 1";break;
 		//TODO COMPLETE WITH MORE OPERATIONS
-		case NOT: 	return "!" + rtc.WILD_VAR;
-		case POS: 	return "0 + "+ rtc.WILD_VAR;
-		case NEG: 	return "-" + rtc.WILD_VAR;
-		default:	return null;
+		case NOT: 	ret = "!" + rtc.WILD_VAR;break;
+		case POS: 	ret = "0 + "+ rtc.WILD_VAR;break;
+		case NEG: 	ret = "-" + rtc.WILD_VAR;
 		}
+		return new Predicate(ret);
 	}
 }

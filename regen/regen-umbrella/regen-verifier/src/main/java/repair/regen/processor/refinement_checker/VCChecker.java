@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import repair.regen.processor.Utils;
+import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.smt.SMTEvaluator;
@@ -121,7 +123,7 @@ public class VCChecker {
 		for(String var:vars2) {
 			RefinedVariable vi = context.getVariableByName(var);
 			if(vi != null) {
-				String ref = vi.getRefinement();
+				String ref = vi.getRefinement().toString();
 				sb.append("forall "+var+":"+ref+" -> \n");
 				sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
 			}
@@ -141,14 +143,12 @@ public class VCChecker {
 	}
 
 	private void recAuxGetVars(String varName, List<String> newVars) {
-		String ref = context.getVariableRefinements(varName);
-		List<RefinedVariable>vis = utils.searchForVars(ref, varName);
-		if(vis.isEmpty())
-			return;
-		for(RefinedVariable vi: vis) {
-			if(!newVars.contains(vi.getName())) {
-				newVars.add(vi.getName());
-				recAuxGetVars(vi.getName(), newVars);
+		Constraint c = context.getVariableRefinements(varName);
+		List<String> l = c.getVariableNames();
+		for(String name:l) {
+			if(!name.equals(varName) && !newVars.contains(name)) {
+				newVars.add(name);
+				recAuxGetVars(name, newVars);
 			}
 		}
 	}
