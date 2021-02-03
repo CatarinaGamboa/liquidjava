@@ -143,6 +143,8 @@ public class VCChecker {
 	}
 
 	private void recAuxGetVars(String varName, List<String> newVars) {
+		if(!context.hasVariable(varName))
+			return;
 		Constraint c = context.getVariableRefinements(varName);
 		List<String> l = c.getVariableNames();
 		for(String name:l) {

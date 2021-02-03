@@ -31,18 +31,37 @@ package regen.test.project;
 // int c = (a < 100)? three(): a;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
-    public static int posMult(int a, int b) {
-        @repair.regen.specification.Refinement("y > 30")
-        int y = 50;
-        return y - 10;
+    // @Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
+    // public static int posMult(int a, int b) {
+    // @Refinement("y > 30")
+    // int y = 50;
+    // return y-10;
+    // }
+    // 
+    @repair.regen.specification.Refinement("{\\v == 10}")
+    public static int ten() {
+        return 10;
     }
 
+    @repair.regen.specification.Refinement("{true}->{\\v == b*2}")
+    private static int multTwo(int b) {
+        return b * 2;
+    }
+
+    // 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("\\v >= 0")
-        int p = 10;
-        p = regen.test.project.SimpleTest.posMult(10, 3);
-        // p = posMult(10, 15-6);
+        // @Refinement("\\v >= 0")
+        // int p = 10;
+        // p = posMult(ten(), 4);
+        // 
+        // @Refinement("\\v < 6")
+        // int z = 5;
+        // 
+        // @Refinement("\\v > 6")
+        // int x = multTwo(z);
+        // 
+        // @Refinement("\\v == 20")
+        // int y = multTwo(x);
     }
 }
 

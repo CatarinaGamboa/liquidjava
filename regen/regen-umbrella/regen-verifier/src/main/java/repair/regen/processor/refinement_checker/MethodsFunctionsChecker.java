@@ -198,8 +198,8 @@ public class MethodsFunctionsChecker {
 		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
 		f.setRefReturn(new Predicate(retRef));
 		rtc.context.addFunctionToContext(f);
-		
-		return sb.append(" && "+ retRef).toString();
+		String ss = sb.length()>0?" && "+ retRef:retRef;
+		return sb.append(ss).toString();
 	}
 	
 	private String handleFunctionRefinements(String methodRef, Method method) {
@@ -229,7 +229,8 @@ public class MethodsFunctionsChecker {
 		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
 		f.setRefReturn(new Predicate(retRef));
 		rtc.context.addFunctionToContext(f);
-		return sb.append(" && "+ retRef).toString();
+		String ss = sb.length()>0?" && "+ retRef:retRef;
+		return sb.append(ss).toString();
 	}
 
 
