@@ -188,10 +188,11 @@ class OperationsChecker {
 			return new Predicate(left+" "+ getOperatorFromKind(binop.getKind()) +" "+ right);
 
 		}else if (element instanceof CtUnaryOperator<?>) {
-			String a = (String) element.getMetadata(rtc.REFINE_KEY);
-			String b = a.replace(rtc.WILD_VAR, "").replace("(", "").replace(")", "")
-					.replace("==", "").replace(" ", "");
-			return new Predicate(String.format("(%s)",b));
+			Constraint a = (Constraint) element.getMetadata(rtc.REFINE_KEY);
+			a = a.substituteVariable(rtc.WILD_VAR, "");
+			String s = a.toString().replace("(", "").replace(")", "")
+					.replace("==", "").replace(" ", "");//TODO IMPROVE
+			return new Predicate(String.format("(%s)",s));
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
 			return new Predicate(l.getValue().toString());

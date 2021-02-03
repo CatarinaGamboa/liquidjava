@@ -31,34 +31,31 @@ package regen.test.project;
 // int c = (a < 100)? three(): a;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
-    public static int posMult(int a, int b) {
-        @repair.regen.specification.Refinement("y > 30")
-        int y = 50;
-        return y - 10;
-    }
-
-    @repair.regen.specification.Refinement("{\\v == 10}")
-    public static int ten() {
-        return 10;
-    }
-
-    @repair.regen.specification.Refinement("{true}->{\\v == b*2}")
-    private static int multTwo(int b) {
-        return b * 2;
-    }
-
-    // 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("\\v >= 0")
-        int p = 10;
-        p = regen.test.project.SimpleTest.posMult(regen.test.project.SimpleTest.ten(), 4);
-        @repair.regen.specification.Refinement("\\v < 6")
-        int z = 5;
-        @repair.regen.specification.Refinement("\\v > 6")
-        int x = regen.test.project.SimpleTest.multTwo(z);
-        @repair.regen.specification.Refinement("\\v == 20")
-        int y = regen.test.project.SimpleTest.multTwo(x);
+        @repair.regen.specification.Refinement("\\v > 5.0")
+        double a = 5.5;
+        @repair.regen.specification.Refinement("\\v == 10.0")
+        double b = 10.0;
+        @repair.regen.specification.Refinement("\\v != 10.0")
+        double c = 5.0;
+        @repair.regen.specification.Refinement("t > 0.0")
+        double t = a + 1.0;
+        @repair.regen.specification.Refinement("\\v >= 3.0")
+        double k = a - 1.0;
+        @repair.regen.specification.Refinement("\\v > 0.0")
+        double l = k * t;
+        @repair.regen.specification.Refinement("\\v > 0.0")
+        double m = l / 2.0;
+        @repair.regen.specification.Refinement("\\v < 4.0")
+        double n = 6.0 % 4.0;
+        @repair.regen.specification.Refinement("\\v < 0.0")
+        double p = -5.0;
+        @repair.regen.specification.Refinement("\\v <= 0.0")
+        double p1 = -a;
+        @repair.regen.specification.Refinement("\\v < -1.0")
+        double p3 = p;
+        @repair.regen.specification.Refinement("\\v < -5.5")
+        double d = (-a) - 2.0;
     }
 }
 
