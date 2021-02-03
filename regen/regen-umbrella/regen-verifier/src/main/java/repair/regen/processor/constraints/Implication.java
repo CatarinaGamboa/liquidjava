@@ -5,9 +5,9 @@ import java.util.List;
 public class Implication extends Constraint{
 
 	@Override
-	public void substituteVariable(String from, String to) {
+	public Constraint substituteVariable(String from, String to) {
 		// TODO Auto-generated method stub
-		//return null;
+		return null;
 	}
 
 	@Override

@@ -89,7 +89,7 @@ public class RefinedFunction {
 				c = p.getRenamedRefinements(varName);
 			}
 			context.addVarToContext(varName, p.getType(), c);
-			update.substituteVariable(p.getName(), varName);
+			update = update.substituteVariable(p.getName(), varName);
 		}
 		return update;
 	}

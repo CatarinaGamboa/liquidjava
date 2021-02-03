@@ -227,9 +227,9 @@ public class RefinementTypeChecker extends CtScanner {
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
 		vcChecker.setPathVariables(freshVarName);		
-		expRefs.substituteVariable(WILD_VAR, freshVarName);
+		Constraint nExpRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
 		context.addVarToContext(freshVarName, factory.Type().INTEGER_PRIMITIVE, 
-				expRefs);
+				nExpRefs);
 		vcChecker.addRefinementVariable(freshVarName);
 		
 		//VISIT THEN
@@ -331,12 +331,10 @@ public class RefinementTypeChecker extends CtScanner {
 			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
 			
 			String newName = simpleName+"_"+context.getCounter()+"_";
-			Constraint correctRefinement = refinementFound.clone();
-			correctRefinement.substituteVariable(WILD_VAR, simpleName);
+			Constraint correctRefinement = refinementFound.substituteVariable(WILD_VAR, simpleName);
 			
-			Constraint correctNewRefinement = refinementFound.clone();
-			correctNewRefinement.substituteVariable(WILD_VAR, newName);
-			c.substituteVariable(simpleName, newName);
+			Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
+			c = c.substituteVariable(simpleName, newName);
 			
 			//String correctRefinement = refinementFound.replace(WILD_VAR, simpleName);
 			//String correctNewRefinement = refinementFound.replace(WILD_VAR, newName);

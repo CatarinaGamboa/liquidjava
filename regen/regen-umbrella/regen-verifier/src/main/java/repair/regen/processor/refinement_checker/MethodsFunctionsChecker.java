@@ -108,15 +108,13 @@ public class MethodsFunctionsChecker {
 				newNames.put(paramOriginalName, newParamName);
 				
 				
-				Constraint refPar = f.getRefinementsForParamIndex(i);
-				refPar.substituteVariable(paramOriginalName, newParamName);
-				Constraint refInv = rtc.getRefinement(exp);
-				refInv.substituteVariable(rtc.WILD_VAR, newParamName);
+				Constraint refPar = f.getRefinementsForParamIndex(i).substituteVariable(paramOriginalName, newParamName);
+				Constraint refInv = rtc.getRefinement(exp).substituteVariable(rtc.WILD_VAR, newParamName);
 				
 				List<String> names = refPar.getVariableNames();
 				for(String entry: newNames.keySet()) {
 					if(!entry.equals(paramOriginalName) && names.contains(entry))
-						refPar.substituteVariable(entry, newNames.get(entry));
+						refPar = refPar.substituteVariable(entry, newNames.get(entry));
 					
 				}
 
@@ -126,14 +124,14 @@ public class MethodsFunctionsChecker {
 				for(String s:saveVars)
 					rtc.addRefinementVariable(s);
 				
-				metRefOriginal.substituteVariable(pinfo.getName(), newParamName);
+				metRefOriginal = metRefOriginal.substituteVariable(pinfo.getName(), newParamName);
 				
 				if(exp instanceof CtVariableRead<?>) {
 					String name = ((CtVariableRead) exp).getVariable().getSimpleName();
 					rtc.context.addVarToContext(name,
 							((CtVariableRead) exp).getType(), refPar);
 					rtc.addRefinementVariable(name);
-					metRef.substituteVariable(newParamName, name);
+					metRef = metRef.substituteVariable(newParamName, name);
 				}
 				rtc.checkSMT(refInv.toString(), refPar.toString(), invocation);//TODO CHANGE
 				saveVars.add(newParamName);
@@ -250,10 +248,8 @@ public class MethodsFunctionsChecker {
 
 			//Both return and the method have metadata
 			String returnVarName = "RET_"+rtc.context.getCounter();
-			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).clone();
-			cretRef.substituteVariable(rtc.WILD_VAR, returnVarName);
-			Constraint cexpectedType = fi.getRefReturn().clone();
-			cexpectedType.substituteVariable(rtc.WILD_VAR, returnVarName);
+			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
+			Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
 			//String retRef = String.format("(%s)", rtc.getRefinement(ret.getReturnedExpression())
 			//		.replace(rtc.WILD_VAR, returnVarName));
 			//String expectedType = fi.getRefReturn().replace(rtc.WILD_VAR, returnVarName);

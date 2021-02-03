@@ -4,13 +4,13 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
 
-//	@Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
-//    public static int posMult(int a, int b) {
-//		@Refinement("y > 30")
-//		int y = 50;
-//    	return y-10;
-//    }
-//	
+	@Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
+    public static int posMult(int a, int b) {
+		@Refinement("y > 30")
+		int y = 50;
+    	return y-10;
+    }
+	
 	@Refinement("{\\v == 10}")
     public static int ten() {
 		return 10;
@@ -23,18 +23,18 @@ public class SimpleTest {
 	}
 //	
 	public static void main(String[] args) {
-//    	@Refinement("\\v >= 0")
-//    	int p = 10;
-//    	p = posMult(ten(), 4);
-//    	
-//		@Refinement("\\v < 6")
-//		int z = 5;
-//		
-//		@Refinement("\\v > 6")
-//		int x = multTwo(z);
-//		
-//		@Refinement("\\v == 20")
-//		int y = multTwo(x);
+    	@Refinement("\\v >= 0")
+    	int p = 10;
+    	p = posMult(ten(), 4);
+    	
+		@Refinement("\\v < 6")
+		int z = 5;
+		
+		@Refinement("\\v > 6")
+		int x = multTwo(z);
+		
+		@Refinement("\\v == 20")
+		int y = multTwo(x);
 
 	}
 

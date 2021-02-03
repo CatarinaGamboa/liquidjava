@@ -27,8 +27,10 @@ public class Predicate extends Constraint{
 	}
 
 	@Override
-	public void substituteVariable(String from, String to) {
-		auxSubstitute(exp, from, to);
+	public Constraint substituteVariable(String from, String to) {
+		Predicate c = (Predicate) this.clone();
+		auxSubstitute(c.exp, from, to);
+		return c;
 	}
 
 	private Expression parse(String ref) {
