@@ -16,4 +16,9 @@ public class SubtractionOperator extends BinaryOperator implements IModel {
 	public Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) {
 		return ctx.makeSub(e1.eval(ctx), e2.eval(ctx));
 	}
+	
+	@Override
+	public String toString() {
+		return "-";
+	}
 }

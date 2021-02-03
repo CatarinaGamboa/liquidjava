@@ -20,4 +20,11 @@ public class Variable extends Expression implements IModel {
 		//System.out.println("IN VAR");
 		return ctx.makeVariable(name);
 	}
+
+	@Override
+	public String toString() {
+		return name;
+	}
+	
+	
 }

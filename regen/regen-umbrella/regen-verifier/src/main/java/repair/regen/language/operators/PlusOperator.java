@@ -15,4 +15,9 @@ public class PlusOperator extends UnaryOperator implements IModel {
 	public Expr eval(TranslatorToZ3 ctx, Expression e1) {
 		return null;
 	}
+	
+	@Override
+	public String toString() {
+		return "+";
+	}
 }

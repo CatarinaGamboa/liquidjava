@@ -23,4 +23,9 @@ public class RealLiteral extends LiteralExpression implements IModel {
 		}
 		return ctx.makeDoubleLiteral(value);
 	}
+
+	@Override
+	public String toString() {
+		return Double.toString(value);
+	}
 }

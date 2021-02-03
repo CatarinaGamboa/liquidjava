@@ -18,6 +18,11 @@ public class AndOperator extends BinaryOperator {
 //		System.out.println("Expression2:"+e2);
 		return ctx.makeAnd(e1.eval(ctx), e2.eval(ctx));
 	}
+
+	@Override
+	public String toString() {
+		return "&&";
+	}
 	
 
 }

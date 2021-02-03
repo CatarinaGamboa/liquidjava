@@ -16,4 +16,12 @@ public class BinaryExpression extends Expression implements IModel {
 	public Expr eval(TranslatorToZ3 ctx) {
 		return op.eval(ctx, e1, e2);
 	}
+
+	@Override
+	public String toString() {
+		String se1 = e1.toString();
+		String sop = op.toString();
+		String se2 = e2.toString();
+		return String.format("%s %s %s", se1,sop,se2);
+	}
 }

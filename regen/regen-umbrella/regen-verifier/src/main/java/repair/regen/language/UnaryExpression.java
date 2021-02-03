@@ -15,4 +15,10 @@ public class UnaryExpression extends Expression implements IModel {
 	public Expr eval(TranslatorToZ3 ctx) {
 		return op.eval(ctx, e);
 	}
+
+	@Override
+	public String toString() {
+		return op.toString()+e.toString();
+	}
+	
 }

@@ -20,4 +20,9 @@ public class BooleanLiteral extends LiteralExpression implements IModel {
 		//System.out.println("IN BOOL");
 		return ctx.makeBooleanLiteral(value);
 	}
+
+	@Override
+	public String toString() {
+		return Boolean.toString(value);
+	}
 }

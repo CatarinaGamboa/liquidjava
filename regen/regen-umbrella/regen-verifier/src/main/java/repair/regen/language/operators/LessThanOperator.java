@@ -17,5 +17,10 @@ public class LessThanOperator extends BinaryOperator {
 		return ctx.makeLt(e1.eval(ctx), e2.eval(ctx));
 	}
 	
+	@Override
+	public String toString() {
+		return "<";
+	}
+	
 
 }

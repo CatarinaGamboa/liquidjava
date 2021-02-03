@@ -18,4 +18,9 @@ public class ExpressionGroup extends Expression implements IModel {
 //		System.out.println("IN ExpGroup"+ctx);
 		return e.eval(ctx);
 	}
+
+	@Override
+	public String toString() {
+		return String.format("(%s)", e.toString());
+	}
 }

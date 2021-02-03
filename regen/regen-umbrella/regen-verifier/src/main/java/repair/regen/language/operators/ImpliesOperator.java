@@ -17,5 +17,9 @@ public class ImpliesOperator extends BinaryOperator {
 		return ctx.makeImplies(e1.eval(ctx), e2.eval(ctx));
 	}
 	
+	@Override
+	public String toString() {
+		return "-->";
+	}
 
 }

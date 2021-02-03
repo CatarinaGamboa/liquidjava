@@ -17,5 +17,10 @@ public class OrOperator extends BinaryOperator {
 		return ctx.makeOr(e1.eval(ctx), e2.eval(ctx));
 	}
 	
+	@Override
+	public String toString() {
+		return "||";
+	}
+	
 
 }

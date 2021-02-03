@@ -16,4 +16,9 @@ public class MinusOperator extends UnaryOperator implements IModel {
 	public Expr eval(TranslatorToZ3 ctx, Expression e) {
 		return ctx.makeMinus(e.eval(ctx));
 	}
+	
+	@Override
+	public String toString() {
+		return "-";
+	}
 }

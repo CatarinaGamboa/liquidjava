@@ -17,5 +17,9 @@ public class GreaterThanOperator extends BinaryOperator {
 		return ctx.makeGt(e1.eval(ctx), e2.eval(ctx));
 	}
 	
+	@Override
+	public String toString() {
+		return ">";
+	}
 
 }

@@ -17,5 +17,10 @@ public class LessOrEqualOperator extends BinaryOperator {
 		return ctx.makeLtEq(e1.eval(ctx), e2.eval(ctx));
 	}
 	
+	@Override
+	public String toString() {
+		return "<=";
+	}
+	
 
 }

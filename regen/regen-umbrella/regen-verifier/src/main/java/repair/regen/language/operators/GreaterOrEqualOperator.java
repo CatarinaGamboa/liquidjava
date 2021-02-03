@@ -18,5 +18,9 @@ public class GreaterOrEqualOperator extends BinaryOperator {
 		return ctx.makeGtEq(e1.eval(ctx), e2.eval(ctx));
 	}
 	
+	@Override
+	public String toString() {
+		return ">=";
+	}
 
 }

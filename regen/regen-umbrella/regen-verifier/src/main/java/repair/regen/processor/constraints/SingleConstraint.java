@@ -13,13 +13,12 @@ public class SingleConstraint extends Constraint{
 		Optional<Expression> oe = RefinementParser.parse(ref);
 		if(oe.isPresent()) {
 			Expression e = oe.get();
-			if(e instanceof BinaryExpression) {
-				BinaryExpression be = (BinaryExpression) e;
-				System.out.println("Here:"+be.toString());
-			}
-			System.out.println("Here");
-			
+			exp = e;
+		}else {
+			//TODO throw Exception - not well formated
 		}
-		
+	}
+	public String toString() {
+		return exp.toString();
 	}
 }
