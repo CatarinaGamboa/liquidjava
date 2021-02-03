@@ -113,10 +113,8 @@ public class RefinementTypeChecker extends CtScanner {
 		//only declaration, no assignment
 		if(localVariable.getAssignment() == null) {
 			Optional<Constraint> a = getRefinementFromAnnotation(localVariable);
-			context.addVarToContextConstraint(localVariable.getSimpleName(), localVariable.getType(), 
-					a.isPresent()? a.get() : new Predicate("true"));
 			context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), 
-					a.isPresent()? a.get().toString() : "true");//TODO REMOVE
+					a.isPresent()? a.get() : new Predicate("true"));
 		}else {
 			String varName = localVariable.getSimpleName();
 			CtExpression<?> e = localVariable.getAssignment();
@@ -124,7 +122,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 			if (refinementFound == null)
 				refinementFound = "true";
-			context.addVarToContext(varName, localVariable.getType(), "true");
+			context.addVarToContext(varName, localVariable.getType(), new Predicate("true"));
 			checkVariableRefinements(refinementFound,varName, localVariable);
 				
 		}
@@ -221,16 +219,17 @@ public class RefinementTypeChecker extends CtScanner {
 
 	@Override
 	public void visitCtIf(CtIf ifElement) {
+		//TODO REVER
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		context.variablesSetBeforeIf();
 		enterContexts();
 		
-		String expRefs = getExpressionRefinements(exp);
+		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
 		vcChecker.setPathVariables(freshVarName);		
-		
+		expRefs.substituteVariable(WILD_VAR, freshVarName);
 		context.addVarToContext(freshVarName, factory.Type().INTEGER_PRIMITIVE, 
-				expRefs.replace(WILD_VAR, freshVarName));
+				expRefs);
 		vcChecker.addRefinementVariable(freshVarName);
 		
 		//VISIT THEN
@@ -242,7 +241,8 @@ public class RefinementTypeChecker extends CtScanner {
 		//VISIT ELSE
 		if(ifElement.getElseStatement() != null) {
 			context.getVariableByName(freshVarName);
-			context.newRefinementToVariableInContext(freshVarName, "!("+expRefs+")");
+			expRefs.negate();
+			context.newRefinementToVariableInContext(freshVarName, expRefs);
 			enterContexts();
 			visitCtBlock(ifElement.getElseStatement());
 			context.variablesSetElseIf();
@@ -324,23 +324,32 @@ public class RefinementTypeChecker extends CtScanner {
 										str -> str.getValue().replace(WILD_VAR, simpleName)
 										).findAny();
 		expectedType.ifPresent((et) -> {
-			parseRef(et);
+			Constraint c = new Predicate(et);
 			
 			//create new variable for validation
 			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
+			
 			String newName = simpleName+"_"+context.getCounter()+"_";
-			String correctRefinement = refinementFound.replace(WILD_VAR, simpleName);
-			String correctNewRefinement = refinementFound.replace(WILD_VAR, newName);
-			String etNew = et.replaceAll(simpleName, newName);//TODO: Change replaceAll for better
-			addReferencedVars(etNew, newName);
+			Constraint correctRefinement = c.clone();
+			correctRefinement.substituteVariable(WILD_VAR, simpleName);
+			
+			Constraint correctNewRefinement = c.clone();
+			correctNewRefinement.substituteVariable(WILD_VAR, newName);
+			c.substituteVariable(simpleName, newName);
+			
+			//String correctRefinement = refinementFound.replace(WILD_VAR, simpleName);
+			//String correctNewRefinement = refinementFound.replace(WILD_VAR, newName);
+			//String etNew = et.replaceAll(simpleName, newName);//TODO: Change replaceAll for better
+			
+			addReferencedVars(c, newName);
 
 			//Substitute variable in verification
 			context.addVarToContext(newName, variable.getType(), correctNewRefinement);
 			context.addRefinementInstanceToVariable(simpleName, newName);
 			addRefinementVariable(newName);
 			//smt check
-			checkSMTVariable(correctNewRefinement, etNew, variable, simpleName);
-			context.addRefinementToVariableInContext(variable, "("+et+")");
+			checkSMTVariable(correctNewRefinement.toString(), c.toString(), variable, simpleName);//TODO CHANGE
+			context.addRefinementToVariableInContext(variable, new Predicate("("+et+")"));
 		});
 	}
 	
@@ -368,11 +377,12 @@ public class RefinementTypeChecker extends CtScanner {
 		new Predicate(metadata);
 	}
 
-	private List<RefinedVariable> addReferencedVars(String string, String differentFrom) {
-		List<RefinedVariable> vis = utils.searchForVars(string, differentFrom);
-		for(RefinedVariable vi: vis)
-			addRefinementVariable(vi.getName());
-		return vis;
+	private void addReferencedVars(Constraint constraint, String differentFrom) {
+		List<String> variableNames = constraint.getVariableNames();
+		for(String s: variableNames) {
+			if(!s.equals(differentFrom))
+				addRefinementVariable(s);
+		}
 	}
 
 
