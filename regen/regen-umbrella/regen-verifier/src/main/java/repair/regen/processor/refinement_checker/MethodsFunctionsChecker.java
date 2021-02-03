@@ -249,9 +249,9 @@ public class MethodsFunctionsChecker {
 
 			//Both return and the method have metadata
 			String returnVarName = "RET_"+rtc.context.getCounter();
-			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression());
+			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).clone();
 			cretRef.substituteVariable(rtc.WILD_VAR, returnVarName);
-			Constraint cexpectedType = fi.getRefReturn();
+			Constraint cexpectedType = fi.getRefReturn().clone();
 			cexpectedType.substituteVariable(rtc.WILD_VAR, returnVarName);
 			//String retRef = String.format("(%s)", rtc.getRefinement(ret.getReturnedExpression())
 			//		.replace(rtc.WILD_VAR, returnVarName));
