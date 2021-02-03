@@ -1,4 +1,4 @@
-package repair.regen.processor;
+package repair.regen.processor.refinement_checker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import repair.regen.processor.Utils;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.smt.SMTEvaluator;

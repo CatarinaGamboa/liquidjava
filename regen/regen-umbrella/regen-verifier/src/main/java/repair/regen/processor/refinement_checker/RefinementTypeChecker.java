@@ -5,9 +5,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.language.BinaryExpression;
+import repair.regen.language.Expression;
+import repair.regen.language.Variable;
+import repair.regen.language.parser.RefinementParser;
 import repair.regen.processor.Utils;
-import repair.regen.processor.VCChecker;
 import repair.regen.processor.built_ins.RefinementsLibrary;
+import repair.regen.processor.constraints.SingleConstraint;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.code.CtAssignment;
@@ -318,6 +322,8 @@ public class RefinementTypeChecker extends CtScanner {
 										str -> str.getValue().replace(WILD_VAR, simpleName)
 										).findAny();
 		expectedType.ifPresent((et) -> {
+			parseRef(et);
+			
 			//create new variable for validation
 			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
 			String newName = simpleName+"_"+context.getCounter()+"_";
@@ -354,6 +360,10 @@ public class RefinementTypeChecker extends CtScanner {
 	//############################### Get Metadata ##########################################
 	String getRefinement(CtElement elem) {
 		return (String) elem.getMetadata(REFINE_KEY);
+	}
+
+	private void parseRef(String metadata) {
+		new SingleConstraint(metadata);
 	}
 
 	private List<RefinedVariable> addReferencedVars(String string, String differentFrom) {
@@ -395,6 +405,10 @@ public class RefinementTypeChecker extends CtScanner {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 				ref = Optional.of(s.getValue());
 			}
+		
+		if(ref.isPresent())
+			parseRef(ref.get());
+		
 		return ref;
 	}
 

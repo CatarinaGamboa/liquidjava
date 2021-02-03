@@ -6,7 +6,7 @@ public class SimpleTest {
 
 
 	public static void main(String[] args) {	
-		@Refinement("\\v < 10")
+		@Refinement("a < 10")
 		int a = 5;
 
 	}
