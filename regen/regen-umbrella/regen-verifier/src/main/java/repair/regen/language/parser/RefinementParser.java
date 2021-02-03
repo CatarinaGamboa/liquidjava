@@ -5,13 +5,14 @@ import java.util.Optional;
 import org.modelcc.io.java.JavaModelReader;
 import org.modelcc.language.metamodel.LanguageModel;
 import org.modelcc.parser.Parser;
+import org.modelcc.parser.ParserException;
 import org.modelcc.parser.ParserFactory;
 
 import repair.regen.language.Expression;
 
 public class RefinementParser {
 	@SuppressWarnings("unchecked")
-	public static Optional<Expression> parse(String code) {
+	public static Optional<Expression> parse(String code) throws SyntaxException {
 		try {
 			//System.out.println("Parsing: " + code);
 			LanguageModel m = JavaModelReader.read(Expression.class);
@@ -20,6 +21,11 @@ public class RefinementParser {
 			Expression modeled = parser.parse(code);
 			//System.out.println("modeled: " + modeled);
 			return Optional.of(modeled);
+			
+		} catch (ParserException e) {
+			String m = e.getMessage();
+			if(m.equals("Syntax error"))
+				throw new SyntaxException(m);
 		} catch (Exception e) {
 			System.out.println("Could not parse: " + code);
 			e.printStackTrace();
