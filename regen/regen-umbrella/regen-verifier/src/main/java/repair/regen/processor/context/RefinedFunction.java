@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction {
@@ -31,7 +33,7 @@ public class RefinedFunction {
 	public List<RefinedVariable> getArgRefinements() {
 		return argRefinements;
 	}
-	public void addArgRefinements(String varName, CtTypeReference<?> type, String refinement) {
+	public void addArgRefinements(String varName, CtTypeReference<?> type, Constraint refinement) {
 		RefinedVariable v = new RefinedVariable(varName, type, refinement);
 		this.argRefinements.add(v);
 
@@ -55,25 +57,44 @@ public class RefinedFunction {
 	}
 	
 	
-	public String getRenamedRefinements() {
+	public Constraint getRenamedRefinements() {
 		return getRenamedRefinements(getAllRefinements());
 	}
 	
-	private String getRenamedRefinements(String place) {
-		String update = place;
+//	private String getRenamedRefinements(String place) {
+//		String update = place;
+//		for(RefinedVariable p: argRefinements) {
+//			String var = p.getName();
+//			Optional<RefinedVariable> ovi = p.getLastInstance();
+//			String newName = ovi.isPresent()? ovi.get().getName():var;
+//			
+//			p.getRenamedRefinements(newName);
+//			
+//			String newRefs = p.getRefinement().replaceAll(var, newName);
+//			context.addVarToContext(newName, p.getType(), newRefs);
+//			update = update.replaceAll(var, newName);
+//		}
+//		return update;
+//	}
+	
+	private Constraint getRenamedRefinements(String place) {
+		Constraint update = new Predicate(place);
 		for(RefinedVariable p: argRefinements) {
-			String var = p.getName();
+			String varName = p.getName();
+			//trocar varName por newName, adicionar newName ao context, trocar o varName por newName no update
+			Constraint c = p.getRefinement();
 			Optional<RefinedVariable> ovi = p.getLastInstance();
-			String newName = ovi.isPresent()? ovi.get().getName():var;
-						
-			String newRefs = p.getRefinement().replaceAll(var, newName);
-			context.addVarToContext(newName, p.getType(), newRefs);
-			update = update.replaceAll(var, newName);
+			if(ovi.isPresent()) {
+				varName = ovi.get().getName();
+				c = p.getRenamedRefinements(varName);
+			}
+			context.addVarToContext(varName, p.getType(), c);
+			update.substituteVariable(p.getName(), varName);
 		}
 		return update;
 	}
 	
-	public String getRenamedReturn() {
+	public Constraint getRenamedReturn() {
 		return getRenamedRefinements(this.refReturn);
 	}
 

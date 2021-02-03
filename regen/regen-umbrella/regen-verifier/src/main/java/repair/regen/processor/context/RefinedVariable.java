@@ -44,6 +44,11 @@ public class RefinedVariable {
 		return type;
 	}
 	
+	/**
+	 * New Constraint with the variable name renamed to toReplace
+	 * @param toReplace
+	 * @return
+	 */
 	public Constraint getRenamedRefinements(String toReplace) {
 		if(refinement instanceof Predicate) {
 			Predicate np = new Predicate(refinement.toString());
