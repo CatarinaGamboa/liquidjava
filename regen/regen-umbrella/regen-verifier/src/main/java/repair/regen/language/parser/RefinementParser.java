@@ -25,7 +25,7 @@ public class RefinementParser {
 		} catch (ParserException e) {
 			String m = e.getMessage();
 			if(m.equals("Syntax error"))
-				throw new SyntaxException(m);
+				throw new SyntaxException("Syntax error in: "+code);
 		} catch (Exception e) {
 			System.out.println("Could not parse: " + code);
 			e.printStackTrace();

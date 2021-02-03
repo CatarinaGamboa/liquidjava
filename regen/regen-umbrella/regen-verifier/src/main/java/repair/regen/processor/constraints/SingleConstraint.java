@@ -21,7 +21,6 @@ public class SingleConstraint extends Constraint{
 				exp = e;
 			}
 		} catch (SyntaxException e1) {
-			System.err.println("Refinement does not follow the language directives: "+ref);
 			e1.printStackTrace();
 		}
 	}
