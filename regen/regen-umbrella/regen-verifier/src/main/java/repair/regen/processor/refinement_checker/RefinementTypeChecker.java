@@ -241,7 +241,7 @@ public class RefinementTypeChecker extends CtScanner {
 		//VISIT ELSE
 		if(ifElement.getElseStatement() != null) {
 			context.getVariableByName(freshVarName);
-			expRefs.negate();
+			expRefs = expRefs.negate();
 			context.newRefinementToVariableInContext(freshVarName, expRefs);
 			enterContexts();
 			visitCtBlock(ifElement.getElseStatement());
@@ -325,7 +325,7 @@ public class RefinementTypeChecker extends CtScanner {
 										str -> str.getValue().replace(WILD_VAR, simpleName)
 										).findAny();
 		expectedType.ifPresent((et) -> {
-			Constraint c = new Predicate(et);
+			Constraint c = new Predicate("("+et+")");
 			
 			//create new variable for validation
 			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5

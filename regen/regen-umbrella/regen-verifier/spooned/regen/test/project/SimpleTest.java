@@ -32,30 +32,73 @@ package regen.test.project;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("\\v > 5.0")
-        double a = 5.5;
-        @repair.regen.specification.Refinement("\\v == 10.0")
-        double b = 10.0;
-        @repair.regen.specification.Refinement("\\v != 10.0")
-        double c = 5.0;
-        @repair.regen.specification.Refinement("t > 0.0")
-        double t = a + 1.0;
-        @repair.regen.specification.Refinement("\\v >= 3.0")
-        double k = a - 1.0;
-        @repair.regen.specification.Refinement("\\v > 0.0")
-        double l = k * t;
-        @repair.regen.specification.Refinement("\\v > 0.0")
-        double m = l / 2.0;
-        @repair.regen.specification.Refinement("\\v < 4.0")
-        double n = 6.0 % 4.0;
-        @repair.regen.specification.Refinement("\\v < 0.0")
-        double p = -5.0;
-        @repair.regen.specification.Refinement("\\v <= 0.0")
-        double p1 = -a;
-        @repair.regen.specification.Refinement("\\v < -1.0")
-        double p3 = p;
-        @repair.regen.specification.Refinement("\\v < -5.5")
-        double d = (-a) - 2.0;
+        // Example 1
+        // @Refinement("\\v > 5")
+        // int a = 6;
+        // if(a > 8)
+        // a = 20;
+        // else
+        // a = 30;
+        // @Refinement("\\v == 30 || \\v == 20")
+        // int b = a;
+        // 
+        // //Example 2
+        // @Refinement("y < 100")
+        // int y = 50;
+        // if(y > 2)
+        // y = 3;
+        // else
+        // y = 6;
+        // 
+        // @Refinement("z < 7")
+        // int z = y;
+        // 
+        // //Example 3
+        // @Refinement("\\v < 100")
+        // int changedInThenAndElse = 10;
+        // @Refinement("\\v > 6")
+        // int changeOnlyInThen = 7;
+        // if(changedInThenAndElse > 2) {
+        // changedInThenAndElse = 3;
+        // changeOnlyInThen = 8;
+        // }else {
+        // changedInThenAndElse = 6;
+        // }
+        // @Refinement("\\v < 7")
+        // int ze1 = changedInThenAndElse;
+        // @Refinement("\\v < 9")
+        // int ze2 = changeOnlyInThen;
+        // 
+        // //Example 4
+        // @Refinement("\\v < 100")
+        // int initializedInThen;
+        // if(true)
+        // initializedInThen = 7;
+        // @Refinement("\\v == 35")
+        // int hello = initializedInThen*5;
+        // 
+        // Example 5
+        @repair.regen.specification.Refinement("\\v < 100")
+        int initializedInElse;
+        int asds;
+        if (false)
+            asds = 5;
+        else
+            initializedInElse = 8;
+
+        @repair.regen.specification.Refinement("\\v == 40")
+        int world = initializedInElse * 5;
+        // //Example 7
+        // @Refinement("k > 0 && k < 100")
+        // int k = 5;
+        // if(k > 7) {
+        // k = 9;
+        // }
+        // @Refinement("\\v < 10")
+        // int m = k;
+        // k = 50;
+        // @Refinement("\\v == 50")
+        // int m2 = k;
     }
 }
 

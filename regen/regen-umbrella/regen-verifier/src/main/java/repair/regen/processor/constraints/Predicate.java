@@ -22,8 +22,10 @@ public class Predicate extends Constraint{
 	}
 
 	@Override
-	public void negate() {
-		exp = parse("!("+exp.toString()+")");
+	public Constraint negate() {
+		Predicate c = (Predicate)this.clone();
+		c.exp = parse("(!("+exp.toString()+"))");
+		return c;
 	}
 
 	@Override

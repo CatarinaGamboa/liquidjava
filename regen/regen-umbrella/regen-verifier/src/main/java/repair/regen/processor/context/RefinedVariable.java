@@ -52,8 +52,7 @@ public class RefinedVariable {
 	public Constraint getRenamedRefinements(String toReplace) {
 		if(refinement instanceof Predicate) {
 			Predicate np = new Predicate(refinement.toString());
-			np.substituteVariable(name, toReplace);
-			return np;
+			return np.substituteVariable(name, toReplace);
 		}
 		return refinement;//TODO REMOVE when all cases of Constraint are implemented
 	}

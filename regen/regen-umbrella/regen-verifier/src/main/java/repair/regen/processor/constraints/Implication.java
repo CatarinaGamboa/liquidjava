@@ -11,9 +11,9 @@ public class Implication extends Constraint{
 	}
 
 	@Override
-	public void negate() {
+	public Constraint negate() {
 		// TODO Auto-generated method stub
-		
+		return null;
 	}
 
 	@Override
