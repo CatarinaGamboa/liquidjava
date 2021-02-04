@@ -31,42 +31,11 @@ package regen.test.project;
 // int c = (a < 100)? three(): a;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{a < 0 }->{_ > 0}")
-    public static int toPositive(int a) {
-        return -a;
-    }
-
-    @repair.regen.specification.Refinement("{a > 0 }->{_ < 0}")
-    public static int toNegative(int a) {
-        return -a;
-    }
-
     public static void main(java.lang.String[] args) {
-        // @Refinement("_ < 10")
-        // int a = 5;
-        // 
-        // if(a < 0) {
-        // @Refinement("b < 0")
-        // int b = a;
-        // } else {
-        // @Refinement("b >= 0")
-        // int b = a;
-        // }
-        // 
-        // EXAMPLE 2
-        @repair.regen.specification.Refinement("_ < 10")
-        int ex_a = 5;
-        if (ex_a < 0) {
-            @repair.regen.specification.Refinement("_ >= 10")
-            int ex_b = (regen.test.project.SimpleTest.toPositive(ex_a)) * 10;
-        } else {
-            // if(ex_a != 0) {
-            // @Refinement("_ < 0")
-            // int ex_d = toNegative(ex_a);
-            // }
-            @repair.regen.specification.Refinement("_ < ex_a")
-            int ex_c = -10;
-        }
+        @repair.regen.specification.Refinement("true")
+        double m1 = java.lang.Math.random();
+        @repair.regen.specification.Refinement("m2 <= 0")
+        double m2 = m1 * 5;
     }
 }
 

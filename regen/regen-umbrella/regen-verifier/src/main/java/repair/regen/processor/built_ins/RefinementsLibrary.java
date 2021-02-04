@@ -39,7 +39,7 @@ public class RefinementsLibrary {
 		map.put("java.lang.Math.addExact(int,int)", addExact);
 		map.put("java.lang.Math.addExact(long,long)", addExact);
 		
-		map.put("java.lang.Math.random()", "{\\v > 0.0 && \\v < 1.0}");
+		map.put("java.lang.Math.random()", "{_ > 0.0 && _ < 1.0}");
 		map.put("java.lang.Math.sqrt(double)", "{true}->{"+WILD_VAR+" > 0}");//TODO maybe improve
 		
 		double p2= pi/2;
@@ -58,7 +58,7 @@ public class RefinementsLibrary {
 //						+ "{((%s == arg0) || (%s == -arg0)) && ((!(arg1 > 0) || (%s > 0)) && ((arg1 > 0) || (%s < 0)))}", 
 //						WILD_VAR, WILD_VAR, WILD_VAR, WILD_VAR));
 		
-		//if arg1 > 0 then \\v > 0 else \\v <= 0
+		//if arg1 > 0 then _ > 0 else _ <= 0
 		String cond = "(arg0 > 0)";
 		map.put("java.lang.Math.copySign(float,float)", 
 				String.format("{true}->{true}->"
@@ -99,7 +99,7 @@ public class RefinementsLibrary {
 		
 //		power sim
 //		if then else para z3 - ite ? :
-//		(\\v == arg0 || \\v == -arg0) && (if arg1 > 0 then \\v > 0 else \\v < 0)
+//		(_ == arg0 || _ == -arg0) && (if arg1 > 0 then _ > 0 else _ < 0)
 		
 	}
 	public Optional<String> getRefinement(String met) {
