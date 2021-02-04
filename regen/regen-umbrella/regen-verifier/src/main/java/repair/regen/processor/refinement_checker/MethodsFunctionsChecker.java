@@ -132,7 +132,7 @@ public class MethodsFunctionsChecker {
 					rtc.addRefinementVariable(name);
 					metRef = metRef.substituteVariable(newParamName, name);
 				}
-				rtc.checkSMT(refInv.toString(), refPar.toString(), invocation);//TODO CHANGE
+				rtc.checkSMT(refPar, invocation);
 				saveVars.add(newParamName);
 				rtc.context.addRefinementInstanceToVariable(pinfo.getName(), vi.getName());
 			}
@@ -252,7 +252,7 @@ public class MethodsFunctionsChecker {
 
 			rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
 			rtc.addRefinementVariable(returnVarName);
-			rtc.checkSMT(cretRef.toString(), cexpectedType.toString(), ret);//TODO CHANGE
+			rtc.checkSMT(cexpectedType, ret);
 			rtc.context.newRefinementToVariableInContext(returnVarName, cexpectedType);
 		}
 	}

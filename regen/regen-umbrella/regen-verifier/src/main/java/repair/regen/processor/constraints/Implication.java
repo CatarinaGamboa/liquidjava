@@ -3,6 +3,14 @@ package repair.regen.processor.constraints;
 import java.util.List;
 
 public class Implication extends Constraint{
+	
+//	 	name: str
+//	    base: BaseType
+//	    pred: LiquidTerm
+//	    seq: Constraint
+//	    u"∀{}:{}, ({}) => {}".format(self.name, self.base, self.pred,
+//                self.seq)
+
 
 	@Override
 	public Constraint substituteVariable(String from, String to) {

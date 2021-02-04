@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.smt.SMTEvaluator;
@@ -53,7 +55,6 @@ public class VCChecker {
 		for(List<String> l : allVariables)
 			if(l.contains(s1))
 				l.remove(s1);
-		
 	}
 
 	public List<String> getLastContextVariables(){
@@ -90,20 +91,20 @@ public class VCChecker {
 	}
 	
 
-	public void processSubtyping(String expectedType, CtElement element) {
+	public void processSubtyping(Constraint expectedType, CtElement element) {
 		process(expectedType, element, getVariables());
 	}
 
-	public void processSubtyping(String expectedType, String name, CtElement element) {
+	public void processSubtyping(Constraint expectedType, String name, CtElement element) {
 		if(pathVariables.isEmpty())
 			process(expectedType, element, getVariables());
 		else {
 			List<String> pathRemove = new ArrayList<>();
-			for(String k:pathVariables.keySet()) {
+			for(String k:pathVariables.keySet()) 
 				for(String s: pathVariables.get(k))
 					if(s.equals(name))
 						pathRemove.add(k);
-			}
+			
 			List<String> toSend = getVariables().stream()
 					.filter(a->!pathRemove.contains(a))
 					.collect(Collectors.toList());
@@ -111,14 +112,16 @@ public class VCChecker {
 		}
 	}
 
-	private void process(String expectedType, CtElement element, List<String> vars) {
+	private void process(Constraint expectedType, CtElement element, List<String> vars) {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sbSMT = new StringBuilder();
 
+		Constraint cSMT = new Predicate();
 		List<String> vars2 = getAllVariablesInRefinements(vars);
 		for(String var:vars2) {
 			RefinedVariable vi = context.getVariableByName(var);
 			if(vi != null) {
+				cSMT = new Conjunction(cSMT, vi.getRefinement());
 				String ref = vi.getRefinement().toString();
 				sb.append("forall "+var+":"+ref+" -> \n");
 				sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
@@ -126,7 +129,7 @@ public class VCChecker {
 		}
 		sb.append(expectedType);
 		printVCs(sb.toString(), sbSMT.toString(), expectedType);
-		smtChecking(sbSMT.toString(), expectedType, element);
+		smtChecking(cSMT, expectedType, element);
 	}
 
 	private List<String> getAllVariablesInRefinements(List<String> vars) {
@@ -151,19 +154,19 @@ public class VCChecker {
 		}
 	}
 
-	private void printVCs(String string, String stringSMT, String expectedType) {
+	private void printVCs(String string, String stringSMT, Constraint expectedType) {
 		System.out.println("----------------------------VC--------------------------------");
 		System.out.println("VC:"+string);
-		System.out.println("SMT subtyping:" + stringSMT + " <: " + expectedType);
+		System.out.println("SMT subtyping:" + stringSMT + " <: " + expectedType.toString());
 		System.out.println("--------------------------------------------------------------");
 
 	}
 
-	private void smtChecking(String correctRefinement, String expectedType, CtElement element) {
+	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
 		try {
-			new SMTEvaluator().verifySubtype(correctRefinement, expectedType, context.getContext());
+			new SMTEvaluator().verifySubtype(cSMT.toString(), expectedType.toString(), context.getContext());
 		} catch (TypeCheckError e) {
-			printError(element, expectedType, correctRefinement);
+			printError(element, expectedType, cSMT);
 
 		}//catch(NullPointerException e) {
 		//	printErrorUnknownVariable(element, expectedType, correctRefinement);
@@ -175,17 +178,17 @@ public class VCChecker {
 	 * Prints the error message
 	 * @param <T>
 	 * @param var
-	 * @param et
-	 * @param correctRefinement
+	 * @param expectedType
+	 * @param cSMT
 	 */
-	private <T> void printError(CtElement var, String et, String correctRefinement) {
+	private <T> void printError(CtElement var, Constraint expectedType, Constraint cSMT) {
 		System.out.println("______________________________________________________");
 		System.err.println("Failed to check refinement at: ");
 		System.out.println();
 		System.out.println(var);
 		System.out.println();
-		System.out.println("Type expected:" + et);
-		System.out.println("Refinement found:" + correctRefinement);
+		System.out.println("Type expected:" + expectedType.toString());
+		System.out.println("Refinement found:" + cSMT.toString());
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);

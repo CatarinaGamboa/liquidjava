@@ -335,21 +335,21 @@ public class RefinementTypeChecker extends CtScanner {
 			context.addRefinementInstanceToVariable(simpleName, newName);
 			addRefinementVariable(newName);
 			//smt check
-			checkSMTVariable(correctNewRefinement.toString(), c.toString(), variable, simpleName);//TODO CHANGE
+			checkSMTVariable(c, variable, simpleName);//TODO CHANGE
 			context.addRefinementToVariableInContext(variable, cet);
 		});
 	}
 	
-	<T> void checkSMT(String correctRefinement, String expectedType, CtElement element) {
+	<T> void checkSMT(Constraint expectedType, CtElement element) {
 		vcChecker.processSubtyping(expectedType, element);
-		element.putMetadata(REFINE_KEY, new Predicate(expectedType));	
+		element.putMetadata(REFINE_KEY, expectedType);	
 		renewVariables();
 	}
 	
-	private void checkSMTVariable(String completeRefinement, String expectedType, 
+	private void checkSMTVariable(Constraint expectedType, 
 			CtVariable<?> element, String simpleName) {
 		vcChecker.processSubtyping(expectedType, simpleName, element);
-		element.putMetadata(REFINE_KEY, new Predicate(expectedType));	
+		element.putMetadata(REFINE_KEY, expectedType);	
 		renewVariables();
 
 	}
