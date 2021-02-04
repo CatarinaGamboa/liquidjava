@@ -2,7 +2,7 @@ package repair.regen;
 
 
 public class ErrorLongUsage2 {
-    @repair.regen.specification.Refinement("{a > 20}->{ \\v > 40}")
+    @repair.regen.specification.Refinement("{a > 20}->{ _ > 40}")
     public static long doubleBiggerThanTwenty(long a) {
         return a * 2;
     }

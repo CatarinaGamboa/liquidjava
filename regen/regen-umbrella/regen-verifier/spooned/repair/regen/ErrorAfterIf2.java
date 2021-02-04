@@ -9,7 +9,7 @@ public class ErrorAfterIf2 {
             k = 9;
         }
         k = 50;
-        @repair.regen.specification.Refinement("\\v < 10")
+        @repair.regen.specification.Refinement("_ < 10")
         int m = k;
     }
 }

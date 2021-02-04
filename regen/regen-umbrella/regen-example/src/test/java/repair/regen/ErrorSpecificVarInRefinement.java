@@ -4,10 +4,10 @@ import repair.regen.specification.Refinement;
 
 public class ErrorSpecificVarInRefinement {
 	public static void main(String[] args) {
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int a = 6;
 		
-		@Refinement("\\v > a")
+		@Refinement("_ > a")
 		int b = 9;
 
 	}

@@ -4,18 +4,18 @@ import repair.regen.specification.Refinement;
 
 public class CorrectSimpleIfElse {
 	
-	@Refinement("{a < 0 }->{\\v > 0}")
+	@Refinement("{a < 0 }->{_ > 0}")
 	public static int toPositive(int a) {
 		return -a;
 	}
 	
-	@Refinement("{a > 0 }->{\\v < 0}")
+	@Refinement("{a > 0 }->{_ < 0}")
 	public static int toNegative(int a) {
 		return -a;
 	}
 	
 	public static void main(String[] args) {
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int a = 5;
 
 		if(a < 0) {
@@ -27,17 +27,17 @@ public class CorrectSimpleIfElse {
 		}
 		
 		//EXAMPLE 2
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int ex_a = 5;
 		if(ex_a < 0) {
-			@Refinement("\\v >= 10")
+			@Refinement("_ >= 10")
 			int ex_b = toPositive(ex_a)*10;
 		}else {
 			if(ex_a != 0) {
-				@Refinement("\\v < 0")
+				@Refinement("_ < 0")
 				int ex_d = toNegative(ex_a);
 			}
-			@Refinement("\\v < ex_a")
+			@Refinement("_ < ex_a")
 			int ex_c = -10;
 			
 		}

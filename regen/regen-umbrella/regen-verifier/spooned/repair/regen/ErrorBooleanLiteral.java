@@ -3,11 +3,11 @@ package repair.regen;
 
 public class ErrorBooleanLiteral {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("\\v < 10")
+        @repair.regen.specification.Refinement("_ < 10")
         int a = 5;
-        @repair.regen.specification.Refinement("\\v == true")
+        @repair.regen.specification.Refinement("_ == true")
         boolean k = a < 11;
-        @repair.regen.specification.Refinement("\\v == false")
+        @repair.regen.specification.Refinement("_ == false")
         boolean t = !(a == 12);
     }
 }

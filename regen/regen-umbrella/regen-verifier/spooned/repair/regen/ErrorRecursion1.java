@@ -2,7 +2,7 @@ package repair.regen;
 
 
 public class ErrorRecursion1 {
-    @repair.regen.specification.Refinement("{k >= 0}->{\\v == 0}")
+    @repair.regen.specification.Refinement("{k >= 0}->{_ == 0}")
     public static int untilZero(int k) {
         if (k == 1)
             return 0;

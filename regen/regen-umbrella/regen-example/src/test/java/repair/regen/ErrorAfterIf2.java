@@ -10,7 +10,7 @@ public class ErrorAfterIf2 {
 			k = 9;
 		}
 		k = 50;
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int m = k;
 	}
 }

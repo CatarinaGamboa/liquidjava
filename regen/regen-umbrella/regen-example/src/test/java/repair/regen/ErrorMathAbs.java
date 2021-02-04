@@ -7,7 +7,7 @@ public class ErrorMathAbs {
 		@Refinement("true")
 		int ab = Math.abs(-9);
 
-		@Refinement("\\v == 9")
+		@Refinement("_ == 9")
 		int ab1 = -ab;
 	}
 }

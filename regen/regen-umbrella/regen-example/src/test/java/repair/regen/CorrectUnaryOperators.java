@@ -4,14 +4,14 @@ import repair.regen.specification.Refinement;
 
 public class CorrectUnaryOperators {
 	public static void main(String[] args) {
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int v = 3;
 		v--;
-		@Refinement("\\v >= 10")
+		@Refinement("_ >= 10")
 		int s = 100;
 		s++;
 		
-		@Refinement("\\v < 0")
+		@Refinement("_ < 0")
 		int a = -6;
 		@Refinement("b > 0")
 		int b = 8;
@@ -23,7 +23,7 @@ public class CorrectUnaryOperators {
 		b = +3;
 		b = +s;
 		
-		@Refinement("\\v <= 0")
+		@Refinement("_ <= 0")
 		int c = 5 * (-10);	
 		
 	}

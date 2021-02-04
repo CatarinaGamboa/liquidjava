@@ -11,7 +11,7 @@ public class CorrectAssignementAfterDeclaration {
     	u = 11 + z;
     	u = z*2;
     	u = 30 + z;
-    	@Refinement("\\v > 0")
+    	@Refinement("_ > 0")
     	int n = 1;
     	n = z + n + 1 * n;
     	@Refinement("y > 0")

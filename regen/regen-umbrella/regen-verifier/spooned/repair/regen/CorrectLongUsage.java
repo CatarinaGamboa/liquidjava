@@ -2,12 +2,12 @@ package repair.regen;
 
 
 public class CorrectLongUsage {
-    @repair.regen.specification.Refinement("{a > 10}->{ \\v > 10}")
+    @repair.regen.specification.Refinement("{a > 10}->{ _ > 10}")
     public static long doubleBiggerThanTen(int a) {
         return a * 2;
     }
 
-    @repair.regen.specification.Refinement("{a > 20}->{ \\v > 40}")
+    @repair.regen.specification.Refinement("{a > 20}->{ _ > 40}")
     public static long doubleBiggerThanTwenty(long a) {
         return a * 2;
     }
@@ -25,7 +25,7 @@ public class CorrectLongUsage {
         long d = repair.regen.CorrectLongUsage.doubleBiggerThanTen(100);
         @repair.regen.specification.Refinement("e > 10")
         long e = repair.regen.CorrectLongUsage.doubleBiggerThanTwenty((d * 2));
-        @repair.regen.specification.Refinement("\\v > 10")
+        @repair.regen.specification.Refinement("_ > 10")
         long f = repair.regen.CorrectLongUsage.doubleBiggerThanTwenty((2 * 80));
     }
 }

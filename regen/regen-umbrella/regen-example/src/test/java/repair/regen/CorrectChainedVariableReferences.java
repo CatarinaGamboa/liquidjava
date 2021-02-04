@@ -4,22 +4,22 @@ import repair.regen.specification.Refinement;
 
 public class CorrectChainedVariableReferences {
 	public static void main(String[] args) {
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int a = 5;
 
-		@Refinement("\\v > a && \\v < 20")
+		@Refinement("_ > a && _ < 20")
 		int b = 18;
 
-		@Refinement("\\v > b && \\v < 60")
+		@Refinement("_ > b && _ < 60")
 		int c = 40;
 
 		@Refinement("true")
 		int d = c;
 
-		@Refinement("\\v > c")
+		@Refinement("_ > c")
 		int e = 80;
 
-		@Refinement("\\v > (c+c)")
+		@Refinement("_ > (c+c)")
 		int f = 8000;
 	}
 }

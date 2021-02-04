@@ -10,7 +10,7 @@ public class CorrectAssignementAfterDeclaration {
         u = 11 + z;
         u = z * 2;
         u = 30 + z;
-        @repair.regen.specification.Refinement("\\v > 0")
+        @repair.regen.specification.Refinement("_ > 0")
         int n = 1;
         n = (z + n) + (1 * n);
         @repair.regen.specification.Refinement("y > 0")

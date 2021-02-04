@@ -3,7 +3,7 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class CorrectImplies {
-	@Refinement("{true}->{((arg0 < 0) --> (\\v == (-arg0*2))) && ((arg0 >= 0) --> (\\v == arg0*2))}")
+	@Refinement("{true}->{((arg0 < 0) --> (_ == (-arg0*2))) && ((arg0 >= 0) --> (_ == arg0*2))}")
 	private static int getPositiveDouble(int arg0) {
 		if(arg0 < 0)
 			return -arg0*2;
@@ -12,7 +12,7 @@ public class CorrectImplies {
 	}
 	
 	public static void main(String[] args) {
-		@Refinement("\\v > 5")
+		@Refinement("_ > 5")
 		int x = 10;
 		
 		@Refinement("(x > 50) --> (y > 50)")
@@ -21,10 +21,10 @@ public class CorrectImplies {
 		@Refinement("y > 1 --> z > 2")
 		int z = y*2;
 		
-		@Refinement("\\v == 12")
+		@Refinement("_ == 12")
 		int z0 = getPositiveDouble(6);
 		
-//		@Refinement("z > 0 --> \\v > 0") //works but takes 1min to run
+//		@Refinement("z > 0 --> _ > 0") //works but takes 1min to run
 //		int z1 = getPositiveDouble(z);
 				
 	}

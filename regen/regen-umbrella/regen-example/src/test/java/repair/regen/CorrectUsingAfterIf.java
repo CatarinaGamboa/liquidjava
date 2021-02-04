@@ -5,13 +5,13 @@ import repair.regen.specification.Refinement;
 public class CorrectUsingAfterIf {
 	public static void main(String[] args) {
 		//Example 1
-		@Refinement("\\v > 5")
+		@Refinement("_ > 5")
 		int a = 6;
 		if(a > 8)
 			a = 20;
 		else
 			a = 30;
-		@Refinement("\\v == 30 || \\v == 20")
+		@Refinement("_ == 30 || _ == 20")
 		int b = a;
 
 		//Example 2
@@ -26,9 +26,9 @@ public class CorrectUsingAfterIf {
 		int z = y;
 		
 		//Example 3
-		@Refinement("\\v < 100")
+		@Refinement("_ < 100")
 		int changedInThenAndElse = 10;
-		@Refinement("\\v > 6")
+		@Refinement("_ > 6")
 		int changeOnlyInThen = 7;
 		if(changedInThenAndElse > 2) {
 		    changedInThenAndElse = 3;
@@ -36,28 +36,28 @@ public class CorrectUsingAfterIf {
 		}else {
 		    changedInThenAndElse = 6;
 		}
-		@Refinement("\\v < 7")
+		@Refinement("_ < 7")
 		int ze1 = changedInThenAndElse;
-		@Refinement("\\v < 9")
+		@Refinement("_ < 9")
 		int ze2 = changeOnlyInThen;
 		
 		//Example 4
-		@Refinement("\\v < 100")
+		@Refinement("_ < 100")
 		int initializedInThen;
 		if(true)
 			initializedInThen = 7;
-		@Refinement("\\v == 35")
+		@Refinement("_ == 35")
 		int hello = initializedInThen*5;
 		
 		//Example 5
-		@Refinement("\\v < 100")
+		@Refinement("_ < 100")
 		int initializedInElse;
 		int asds;		
 		if(false)
 			asds = 5;
 		else
 			initializedInElse = 8;
-		@Refinement("\\v == 40")
+		@Refinement("_ == 40")
 		int world = initializedInElse*5;
 		
 
@@ -67,10 +67,10 @@ public class CorrectUsingAfterIf {
 		if(k > 7) {
 			k = 9;
 		}
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int m = k;
 		k = 50;
-		@Refinement("\\v == 50")
+		@Refinement("_ == 50")
 		int m2 = k;
 
 	}

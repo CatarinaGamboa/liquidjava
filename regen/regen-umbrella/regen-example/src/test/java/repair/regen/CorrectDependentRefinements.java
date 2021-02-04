@@ -5,38 +5,38 @@ import repair.regen.specification.Refinement;
 public class CorrectDependentRefinements {
 	public static void main(String[] args) {
 		
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int smaller = 5;
 		@Refinement("bigger > 20")
 		int bigger = 50;
-		@Refinement("\\v > smaller  && \\v < bigger")
+		@Refinement("_ > smaller  && _ < bigger")
 		int middle = 15;
 		
-		@Refinement("\\v >= smaller")
+		@Refinement("_ >= smaller")
 		int k = 10;
-		@Refinement("\\v <= bigger")
+		@Refinement("_ <= bigger")
 		int y = 10;
 
-		@Refinement("\\v == 20")
+		@Refinement("_ == 20")
 		int x1 = 20;
-		@Refinement("\\v == x1 + 1")
+		@Refinement("_ == x1 + 1")
 		int x2 = 21;
-		@Refinement("\\v == x1 - 1")
+		@Refinement("_ == x1 - 1")
 		int x3 = 19;
-		@Refinement("\\v == x1 * 5")
+		@Refinement("_ == x1 * 5")
 		int x4 = x1*5;
-		@Refinement("\\v == x1 / 2")
+		@Refinement("_ == x1 / 2")
 		int x5 = 10;
-		@Refinement("\\v == x1 % 2")
+		@Refinement("_ == x1 % 2")
 		int x6 = 0;
 		@Refinement("(-x7) < x1")
 		int x7 = 0;
-		@Refinement("\\v != x1")
+		@Refinement("_ != x1")
 		int x8 = 0;
 		
-		@Refinement("\\v == 30")
+		@Refinement("_ == 30")
 		int o = 30;
-		@Refinement("\\v == x1 || \\v == o ")
+		@Refinement("_ == x1 || _ == o ")
 		int x9 = 20;
 	}
 }

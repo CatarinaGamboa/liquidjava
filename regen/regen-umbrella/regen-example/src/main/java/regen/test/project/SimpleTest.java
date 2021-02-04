@@ -4,104 +4,73 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {
 
-		public static void main(String[] args) {
-			//Example 1
-//			@Refinement("\\v > 5")
-//			int a = 6;
-//			if(a > 8)
-//				a = 20;
-//			else
-//				a = 30;
-//			@Refinement("\\v == 30 || \\v == 20")
-//			int b = a;
-//
-//			//Example 2
-//			@Refinement("y < 100")
-//			int y = 50;
-//			if(y > 2)
-//			    y = 3;
-//			else
-//			    y = 6;
-//
-//			@Refinement("z < 7")
-//			int z = y;
-//			
-//			//Example 3
-//			@Refinement("\\v < 100")
-//			int changedInThenAndElse = 10;
-//			@Refinement("\\v > 6")
-//			int changeOnlyInThen = 7;
-//			if(changedInThenAndElse > 2) {
-//			    changedInThenAndElse = 3;
-//			    changeOnlyInThen = 8;
-//			}else {
-//			    changedInThenAndElse = 6;
-//			}
-//			@Refinement("\\v < 7")
-//			int ze1 = changedInThenAndElse;
-//			@Refinement("\\v < 9")
-//			int ze2 = changeOnlyInThen;
-//			
-//			//Example 4
-//			@Refinement("\\v < 100")
-//			int initializedInThen;
-//			if(true)
-//				initializedInThen = 7;
-//			@Refinement("\\v == 35")
-//			int hello = initializedInThen*5;
-//			
-			//Example 5
-			@Refinement("\\v < 100")
-			int initializedInElse;
-			int asds;		
-			if(false)
-				asds = 5;
-			else
-				initializedInElse = 8;
-			@Refinement("\\v == 40")
-			int world = initializedInElse*5;
+	@Refinement("{a < 0 }->{_ > 0}")
+	public static int toPositive(int a) {
+		return -a;
+	}
+	
+	@Refinement("{a > 0 }->{_ < 0}")
+	public static int toNegative(int a) {
+		return -a;
+	}
+	
+	public static void main(String[] args) {
+		@Refinement("_ < 10")
+		int a = 5;
+
+		if(a < 0) {
+			@Refinement("b < 0")
+			int b = a;
+		} else {
+			@Refinement("b >= 0")
+			int b = a;
+		}
+		
+		//EXAMPLE 2
+		@Refinement("_ < 10")
+		int ex_a = 5;
+		if(ex_a < 0) {
+			@Refinement("_ >= 10")
+			int ex_b = toPositive(ex_a)*10;
+		}else {
+			if(ex_a != 0) {
+				@Refinement("_ < 0")
+				int ex_d = toNegative(ex_a);
+			}
+			@Refinement("_ < ex_a")
+			int ex_c = -10;
 			
+		}
 
-//			//Example 7
-//			@Refinement("k > 0 && k < 100")
-//			int k = 5;
-//			if(k > 7) {
-//				k = 9;
-//			}
-//			@Refinement("\\v < 10")
-//			int m = k;
-//			k = 50;
-//			@Refinement("\\v == 50")
-//			int m2 = k;
+	}
 
-		}	
 	
 
 
 	//Errors to take care of
 	// //value_4==innerScope && value_4 == innerScope_1
-	//	@Refinement("\\v < 100")
+	//	@Refinement("_ < 100")
 	//	int value = 90;
 	//			
 	//	if(value > 6) {
-	//		@Refinement("\\v > 10")
+	//		@Refinement("_ > 10")
 	//		int innerScope = 30;
 	//		value = innerScope;
 	//	}
 	//	
-	//	@Refinement("\\v == 30 || \\v == 90")
+	//	@Refinement("_ == 30 || _ == 90")
 	//	int some2 = value;
 
 	//SEE ERROR still error
-	//		@Refinement("(\\v == -5)")
+	//		@Refinement("(_ == -5)")
 	//		float prim = Math.copySign(-5, -500);
-	//		@Refinement("\\v == -656")
+	//		@Refinement("_ == -656")
 	//		float ter = Math.copySign(656, prim);
 
 	//See error NaN
 	//		@Refinement("true")
 	//		double b = 0/0;
-	//		@Refinement("\\v > 5")
+	//		@Refinement("_ > 5")
 	//		double c = b;
 
 

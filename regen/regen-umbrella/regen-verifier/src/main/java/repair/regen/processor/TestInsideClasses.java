@@ -15,8 +15,8 @@ public class TestInsideClasses {
         launcher.run();
         
         final Factory factory = launcher.getFactory();
-		RefinedVariable vi2 = new RefinedVariable("\\v",factory.Type().INTEGER_PRIMITIVE, new Predicate("\\v > 0"));
-		Constraint c2 = vi2.getRenamedRefinements("uu");
+		RefinedVariable vi2 = new RefinedVariable("_",factory.Type().INTEGER_PRIMITIVE, new Predicate("_ > 0"));
+		Constraint c2 = vi2.getRenamedRefinements("_");
 		
 		List<String> ls = c2.getVariableNames();
 		for(String s : ls)

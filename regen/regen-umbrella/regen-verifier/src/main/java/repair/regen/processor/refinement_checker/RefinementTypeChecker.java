@@ -5,10 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.language.BinaryExpression;
-import repair.regen.language.Expression;
-import repair.regen.language.Variable;
-import repair.regen.language.parser.RefinementParser;
 import repair.regen.processor.Utils;
 import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.constraints.Constraint;
@@ -32,11 +28,9 @@ import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.reflect.visitor.CtScanner;
 import spoon.support.reflect.code.CtVariableWriteImpl;
@@ -47,7 +41,7 @@ public class RefinementTypeChecker extends CtScanner {
 	// 1. Keep track of the context variable types
 	// 2. Do type checking and inference
 	final String REFINE_KEY = "refinement";
-	final String WILD_VAR = "\\v";
+	final String WILD_VAR = "_";
 	final String FRESH = "FRESH_";
 
 	Context context = Context.getInstance();

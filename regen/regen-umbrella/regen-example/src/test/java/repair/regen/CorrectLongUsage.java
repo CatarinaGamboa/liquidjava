@@ -4,12 +4,12 @@ import repair.regen.specification.Refinement;
 
 public class CorrectLongUsage {
 	
-	@Refinement("{a > 10}->{ \\v > 10}")
+	@Refinement("{a > 10}->{ _ > 10}")
 	public static long doubleBiggerThanTen(int a){
 		return a*2;
 	}
 	
-	@Refinement("{a > 20}->{ \\v > 40}")
+	@Refinement("{a > 20}->{ _ > 40}")
 	public static long doubleBiggerThanTwenty(long a){
 		return a*2;
 	}
@@ -33,7 +33,7 @@ public class CorrectLongUsage {
 		@Refinement("e > 10")
 		long e = doubleBiggerThanTwenty(d*2);
 		
-		@Refinement("\\v > 10")
+		@Refinement("_ > 10")
 		long f = doubleBiggerThanTwenty(2*80);
 		
 	}

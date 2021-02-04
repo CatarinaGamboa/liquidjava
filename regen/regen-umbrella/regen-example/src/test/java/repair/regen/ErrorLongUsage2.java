@@ -4,7 +4,7 @@ import repair.regen.specification.Refinement;
 
 public class ErrorLongUsage2 {
 	
-	@Refinement("{a > 20}->{ \\v > 40}")
+	@Refinement("{a > 20}->{ _ > 40}")
 	public static long doubleBiggerThanTwenty(long a){
 		return a*2;
 	}

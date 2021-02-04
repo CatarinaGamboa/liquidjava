@@ -4,7 +4,7 @@ import repair.regen.specification.Refinement;
 
 public class CorrectIfThen {
 	public static void main(String[] args) {
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int a = 5;
 
 		if(a > 0) {
@@ -12,13 +12,13 @@ public class CorrectIfThen {
 			int b = a;
 			b++;
 			if(b > 10) {
-				@Refinement("\\v > 0")
+				@Refinement("_ > 0")
 				int c = a;
-				@Refinement("\\v > 11")
+				@Refinement("_ > 11")
 				int d = b+1;
 			}
 			if(a > b) {
-				@Refinement("\\v > b")
+				@Refinement("_ > b")
 				int c = a;
 			}
 		}

@@ -4,7 +4,7 @@ import repair.regen.specification.Refinement;
 
 public class ErrorSpecificVarInRefinementIf {
 	public static void main(String[] args) {
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int a = 6;
 		if(a > 0) {
 			a = -2;

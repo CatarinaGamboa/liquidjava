@@ -3,36 +3,36 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class CorrectFunctionInInvocation {
-	@Refinement("{a == 10} -> {\\v < a && \\v > 0} -> {\\v >= a}")
+	@Refinement("{a == 10} -> {_ < a && _ > 0} -> {_ >= a}")
     public static int posMult(int a, int b) {
 		@Refinement("y > 30")
 		int y = 50;
     	return y-10;
     }
 	
-	@Refinement("{\\v == 10}")
+	@Refinement("{_ == 10}")
     public static int ten() {
 		return 10;
     }
 	
 	
-	@Refinement("{true}->{\\v == b*2}")
+	@Refinement("{true}->{_ == b*2}")
 	private static int multTwo(int b) {
 		return b*2;
 	}
 	
 	public static void main(String[] args) {
-    	@Refinement("\\v >= 0")
+    	@Refinement("_ >= 0")
     	int p = 10;
     	p = posMult(ten(), 4);
     	
-		@Refinement("\\v < 6")
+		@Refinement("_ < 6")
 		int z = 5;
 		
-		@Refinement("\\v > 6")
+		@Refinement("_ > 6")
 		int x = multTwo(z);
 		
-		@Refinement("\\v == 20")
+		@Refinement("_ == 20")
 		int y = multTwo(x);
 
 	}

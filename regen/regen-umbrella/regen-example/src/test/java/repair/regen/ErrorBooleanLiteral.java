@@ -4,13 +4,13 @@ import repair.regen.specification.Refinement;
 
 public class ErrorBooleanLiteral {
 	public static void main(String[] args) {
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int a = 5;
 
-		@Refinement("\\v == true")
+		@Refinement("_ == true")
 		boolean k = (a < 11);
 
-		@Refinement("\\v == false")
+		@Refinement("_ == false")
 		boolean t = !(a == 12);
 	}
 }

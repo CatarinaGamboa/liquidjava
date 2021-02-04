@@ -4,21 +4,21 @@ import repair.regen.specification.Refinement;
 
 public class ErrorBooleanFunInvocation {
 
-	@Refinement("{true}->{ \\v == (n > 10) }")
+	@Refinement("{true}->{ _ == (n > 10) }")
 	public static boolean greaterThanTen(int n) {
 		return n > 10;
 	}
 	public static void main(String[] args) {
-		@Refinement("\\v < 10")
+		@Refinement("_ < 10")
 		int a = 5;
 
-		@Refinement("\\v == true")
+		@Refinement("_ == true")
 		boolean k = (a < 11);
 
-		@Refinement("\\v == true")
+		@Refinement("_ == true")
 		boolean o = !(a == 12);
 
-		@Refinement("\\v == true")
+		@Refinement("_ == true")
 		boolean m = greaterThanTen(a);
 
 	}
