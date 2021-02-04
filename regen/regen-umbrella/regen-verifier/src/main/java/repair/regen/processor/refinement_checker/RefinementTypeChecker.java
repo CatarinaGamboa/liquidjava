@@ -8,6 +8,7 @@ import java.util.Optional;
 import repair.regen.processor.Utils;
 import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
@@ -148,7 +149,7 @@ public class RefinementTypeChecker extends CtScanner {
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
 		List<String> types = Arrays.asList(implementedTypes);
 		if (types.contains(lit.getType().getQualifiedName())) {
-			lit.putMetadata(REFINE_KEY, new Predicate("("+ WILD_VAR+" == " + lit.getValue()+")"));
+			lit.putMetadata(REFINE_KEY, new EqualsPredicate(WILD_VAR, lit.getValue().toString()));
 		}else if(lit.getType().getQualifiedName().contentEquals("java.lang.String")){
 			//Only taking care of strings inside refinements
 		}else {
@@ -385,7 +386,7 @@ public class RefinementTypeChecker extends CtScanner {
 	private <T> void getPutVariableMetadada(CtElement variable, CtVariable<T> varDecl) {
 //		String refinementFound = getRefinement(varDecl);
 		String name = varDecl.getSimpleName();
-
+		//TODO CONJUNCTION
 		String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";//TODO CHANGE TO NEW PREDICATE ==
 		Optional<RefinedVariable> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent()) {

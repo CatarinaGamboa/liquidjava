@@ -250,10 +250,7 @@ public class MethodsFunctionsChecker {
 			String returnVarName = "RET_"+rtc.context.getCounter();
 			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
 			Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
-			//String retRef = String.format("(%s)", rtc.getRefinement(ret.getReturnedExpression())
-			//		.replace(rtc.WILD_VAR, returnVarName));
-			//String expectedType = fi.getRefReturn().replace(rtc.WILD_VAR, returnVarName);
-
+			
 			rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
 			rtc.addRefinementVariable(returnVarName);
 			rtc.checkSMT(cretRef.toString(), cexpectedType.toString(), ret);//TODO CHANGE

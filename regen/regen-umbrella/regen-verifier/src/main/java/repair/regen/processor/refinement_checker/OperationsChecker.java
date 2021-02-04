@@ -6,6 +6,7 @@ import java.util.List;
 import org.eclipse.jdt.internal.compiler.ast.Wildcard;
 
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
@@ -50,7 +51,7 @@ class OperationsChecker {
 	public <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) {
 		CtExpression<?> right = operator.getRightHandOperand();
 		CtExpression<?> left = operator.getLeftHandOperand();
-		Constraint oper;// = operator.toString();
+		Constraint oper;
 		CtElement parent = operator.getParent();
 		if(parent instanceof CtAssignment<?, ?>) {
 			CtVariableWriteImpl<?> parentVar = (CtVariableWriteImpl<?>)((CtAssignment) parent)
@@ -69,9 +70,9 @@ class OperationsChecker {
 			operator.putMetadata(rtc.REFINE_KEY, oper);
 			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
 					parent instanceof CtReturn<?>)
-				operator.putMetadata(rtc.REFINE_KEY, new Predicate("("+rtc.WILD_VAR+" == (" + oper+"))"));//TODO EQUALPRED
+				operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(rtc.WILD_VAR, oper));//TODO MAYBE ADD () IN OPER
 		}else if (types.contains(type)) {
-			operator.putMetadata(rtc.REFINE_KEY, new Predicate("("+rtc.WILD_VAR+" == " + oper+")"));
+			operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(rtc.WILD_VAR, oper));
 		}else {
 			System.out.println("Literal type not implemented");
 		}
@@ -240,7 +241,7 @@ class OperationsChecker {
 		
 		rtc.addRefinementVariable(newName);
 		rtc.context.addVarToContext(newName, w.getType(), metadada);
-		return new Predicate("("+rtc.WILD_VAR+" == "+c+")");
+		return new EqualsPredicate(rtc.WILD_VAR, c);
 	}
 
 	//############################### Operations Auxiliaries ##########################################
