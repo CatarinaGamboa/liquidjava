@@ -6,16 +6,13 @@ import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
+import java.util.Optional;
 
 import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
-
-import java.util.Optional;
-
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
@@ -26,7 +23,6 @@ import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtTypeReference;
-import spoon.support.reflect.declaration.CtMethodImpl;
 
 public class MethodsFunctionsChecker {
 
@@ -89,8 +85,8 @@ public class MethodsFunctionsChecker {
 		Constraint metRef = f.getRenamedReturn();
 
 		Constraint metRefOriginal = f.getRefReturn(); 
-		List<String> saveVars = new ArrayList<>();
-		for(String v: rtc.vcChecker.getVariables())
+		List<RefinedVariable> saveVars = new ArrayList<>();
+		for(RefinedVariable v: rtc.vcChecker.getVariables())
 			saveVars.add(v);
 
 		HashMap<String, String> newNames = new HashMap<>();
@@ -119,26 +115,26 @@ public class MethodsFunctionsChecker {
 
 				RefinedVariable vi = rtc.context.addVarToContext(newParamName, pinfo.getType(), refInv);
 				rtc.context.newRefinementToVariableInContext(newParamName, refInv);
-				rtc.addRefinementVariable(newParamName);
-				for(String s:saveVars)
+				rtc.addRefinementVariable(vi);
+				for(RefinedVariable s:saveVars)
 					rtc.addRefinementVariable(s);
 
 				metRefOriginal = metRefOriginal.substituteVariable(pinfo.getName(), newParamName);
 
 				if(exp instanceof CtVariableRead<?>) {
 					String name = ((CtVariableRead) exp).getVariable().getSimpleName();
-					rtc.context.addVarToContext(name,
+					RefinedVariable rv = rtc.context.addVarToContext(name,
 							((CtVariableRead) exp).getType(), refPar);
-					rtc.addRefinementVariable(name);
+					rtc.addRefinementVariable(rv);
 					metRef = metRef.substituteVariable(newParamName, name);
 				}
 				rtc.checkSMT(refPar, invocation);
-				saveVars.add(newParamName);
+				saveVars.add(vi);
 				rtc.context.addRefinementInstanceToVariable(pinfo.getName(), vi.getName());
 			}
 
 
-			for(String s: saveVars)
+			for(RefinedVariable s: saveVars)
 				rtc.addRefinementVariable(s);
 
 			invocation.putMetadata(rtc.REFINE_KEY, metRefOriginal);
@@ -189,8 +185,8 @@ public class MethodsFunctionsChecker {
 			sb.append(sb.length() == 0? metRef : " && "+metRef);
 
 			f.addArgRefinements(name,param.getType(), cmetRef);
-			rtc.context.addVarToContext(name, param.getType(), cmetRef);
-			rtc.addRefinementVariable(name);
+			RefinedVariable rv = rtc.context.addVarToContext(name, param.getType(), cmetRef);
+			rtc.addRefinementVariable(rv);
 		}
 		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
 		f.setRefReturn(new Predicate(retRef));
@@ -220,8 +216,8 @@ public class MethodsFunctionsChecker {
 
 			Constraint cmetRef = new Predicate(metRef);
 			f.addArgRefinements(name,getType(param.getType()), cmetRef);
-			rtc.context.addVarToContext(name, getType(param.getType()), cmetRef);
-			rtc.addRefinementVariable(name);
+			RefinedVariable rv = rtc.context.addVarToContext(name, getType(param.getType()), cmetRef);
+			rtc.addRefinementVariable(rv);
 		}
 		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
 		f.setRefReturn(new Predicate(retRef));
@@ -243,15 +239,15 @@ public class MethodsFunctionsChecker {
 				return;
 			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
 			for(RefinedVariable vi:fi.getArgRefinements())
-				rtc.addRefinementVariable(vi.getName());
+				rtc.addRefinementVariable(vi);
 
 			//Both return and the method have metadata
 			String returnVarName = "RET_"+rtc.context.getCounter();
 			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
 			Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
 
-			rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
-			rtc.addRefinementVariable(returnVarName);
+			RefinedVariable rv = rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
+			rtc.addRefinementVariable(rv);
 			rtc.checkSMT(cexpectedType, ret);
 			rtc.context.newRefinementToVariableInContext(returnVarName, cexpectedType);
 		}

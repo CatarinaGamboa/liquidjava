@@ -31,9 +31,19 @@ package regen.test.project;
 // int c = (a < 100)? three(): a;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
+    @repair.regen.specification.Refinement("{a > 0} -> {true}")
+    public static void addZ(int a) {
+        @repair.regen.specification.Refinement("_ > 0")
+        int d = a;
+        if (d > 5) {
+        } else {
+            d = 10;
+            @repair.regen.specification.Refinement("b > 10")
+            int b = d;
+        }
+    }
+
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("_ > 5")
-        int a = 10;
     }
 }
 

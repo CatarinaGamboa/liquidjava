@@ -128,8 +128,8 @@ class OperationsChecker {
 		else
 			all = new EqualsPredicate(rtc.WILD_VAR, opS);//TODO SEE IF () IN OPS IS NEEDED
 		
-		rtc.context.addVarToContext(newName, ex.getType(), newMeta);
-		rtc.addRefinementVariable(newName);
+		RefinedVariable rv = rtc.context.addVarToContext(newName, ex.getType(), newMeta);
+		rtc.addRefinementVariable(rv);
 		operator.putMetadata(rtc.REFINE_KEY, all);
 
 	}
@@ -171,13 +171,13 @@ class OperationsChecker {
 				//String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
 				RefinedVariable newVi = rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
 				rtc.context.addSpecificVariable(newVi);
-				rtc.addRefinementVariable(newName);
+				rtc.addRefinementVariable(newVi);
 				returnName = newName;
 			}
 			
 			Constraint e = elem_ref.substituteVariable(rtc.WILD_VAR, elemName);
-			rtc.context.addVarToContext(elemName, elemVar.getType(), e);
-			rtc.addRefinementVariable(elemName);
+			RefinedVariable rv = rtc.context.addVarToContext(elemName, elemVar.getType(), e);
+			rtc.addRefinementVariable(rv);
 			return new Predicate(returnName);
 		}
 
@@ -210,8 +210,8 @@ class OperationsChecker {
 			
 			//TODO ERRO AQUI!!!!!!!!NO INNERREFS
 			innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
-			rtc.context.addVarToContext(newName, fi.getType(), innerRefs);
-			rtc.addRefinementVariable(newName);
+			RefinedVariable rv = rtc.context.addVarToContext(newName, fi.getType(), innerRefs);
+			rtc.addRefinementVariable(rv);
 			return new Predicate(newName);//Return variable that represents the invocation
 		}
 		return rtc.getRefinement(element);
@@ -239,8 +239,8 @@ class OperationsChecker {
 		
 		Constraint c = getOperatorFromKind(operator.getKind()).substituteVariable(rtc.WILD_VAR, newName);
 		
-		rtc.addRefinementVariable(newName);
-		rtc.context.addVarToContext(newName, w.getType(), metadada);
+		RefinedVariable rv = rtc.context.addVarToContext(newName, w.getType(), metadada);
+		rtc.addRefinementVariable(rv);
 		return new EqualsPredicate(rtc.WILD_VAR, c);
 	}
 

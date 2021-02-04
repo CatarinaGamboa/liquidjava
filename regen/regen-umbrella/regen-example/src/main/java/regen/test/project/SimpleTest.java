@@ -3,10 +3,21 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
+	@Refinement("{a > 0} -> {true}")
+	public static void addZ(int a) {
+		@Refinement("_ > 0")
+		int d = a;
+		if(d > 5) {
+		}else {
+
+			d = 10;
+			@Refinement("b > 10")
+			int b = d;
+		}
+	}
 
 	public static void main(String[] args) {
-		@Refinement("_ > 5")
-		int a = 10;
+	
 	}
 
 
