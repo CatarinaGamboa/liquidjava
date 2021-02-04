@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.processor.Utils;
 import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
@@ -48,7 +47,6 @@ public class RefinementTypeChecker extends CtScanner {
 
 	Context context = Context.getInstance();
 	VCChecker vcChecker = new VCChecker();
-	Utils utils = new Utils();
 	RefinementsLibrary lib = new RefinementsLibrary(WILD_VAR);
 
 	Factory factory;

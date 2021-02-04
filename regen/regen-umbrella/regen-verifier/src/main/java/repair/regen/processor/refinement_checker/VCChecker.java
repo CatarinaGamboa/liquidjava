@@ -7,9 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
-import repair.regen.processor.Utils;
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.smt.SMTEvaluator;
@@ -18,13 +16,11 @@ import spoon.reflect.declaration.CtElement;
 
 public class VCChecker {
 	private Context context;
-	private Utils utils;
 	private List<List<String>> allVariables;
 	private Map<String, List<String>> pathVariables;
 
 	public VCChecker() {
 		context = Context.getInstance();
-		utils = new Utils();
 		allVariables = new ArrayList<>();
 		allVariables.add(new ArrayList<String>());
 		pathVariables = new HashMap<>();

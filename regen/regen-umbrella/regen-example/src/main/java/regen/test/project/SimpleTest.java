@@ -6,7 +6,7 @@ public class SimpleTest {
 
 	public static void main(String[] args) {
 		@Refinement("_ > 5")
-		int a =10;
+		int a = 10;
 	}
 
 
