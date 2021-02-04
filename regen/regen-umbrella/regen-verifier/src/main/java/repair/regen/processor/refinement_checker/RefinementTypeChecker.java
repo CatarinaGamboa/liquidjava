@@ -316,11 +316,12 @@ public class RefinementTypeChecker extends CtScanner {
 						).map(
 								ann -> (CtLiteral<String>) ann.getAllValues().get("value")
 								).map(
-										str -> str.getValue().replace(WILD_VAR, simpleName)
-										).findAny();
+										str -> str.getValue()
+										).findAny();//ERROR IN HERE!!!!!!!!!
 		expectedType.ifPresent((et) -> {
 			Constraint c = new Predicate("("+et+")");
-			
+			c = c.substituteVariable(WILD_VAR, simpleName);
+			Constraint cet = c.substituteVariable(WILD_VAR, simpleName);
 			//create new variable for validation
 			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
 			
@@ -330,9 +331,6 @@ public class RefinementTypeChecker extends CtScanner {
 			Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
 			c = c.substituteVariable(simpleName, newName);
 			
-			//String correctRefinement = refinementFound.replace(WILD_VAR, simpleName);
-			//String correctNewRefinement = refinementFound.replace(WILD_VAR, newName);
-			//String etNew = et.replaceAll(simpleName, newName);//TODO: Change replaceAll for better
 			
 			addReferencedVars(c, newName);
 
@@ -342,7 +340,7 @@ public class RefinementTypeChecker extends CtScanner {
 			addRefinementVariable(newName);
 			//smt check
 			checkSMTVariable(correctNewRefinement.toString(), c.toString(), variable, simpleName);//TODO CHANGE
-			context.addRefinementToVariableInContext(variable, new Predicate("("+et+")"));
+			context.addRefinementToVariableInContext(variable, cet);
 		});
 	}
 	

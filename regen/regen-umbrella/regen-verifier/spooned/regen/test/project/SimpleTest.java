@@ -42,15 +42,17 @@ public class SimpleTest {
     }
 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("_ < 10")
-        int a = 5;
-        if (a < 0) {
-            @repair.regen.specification.Refinement("b < 0")
-            int b = a;
-        } else {
-            @repair.regen.specification.Refinement("b >= 0")
-            int b = a;
-        }
+        // @Refinement("_ < 10")
+        // int a = 5;
+        // 
+        // if(a < 0) {
+        // @Refinement("b < 0")
+        // int b = a;
+        // } else {
+        // @Refinement("b >= 0")
+        // int b = a;
+        // }
+        // 
         // EXAMPLE 2
         @repair.regen.specification.Refinement("_ < 10")
         int ex_a = 5;
@@ -58,10 +60,10 @@ public class SimpleTest {
             @repair.regen.specification.Refinement("_ >= 10")
             int ex_b = (regen.test.project.SimpleTest.toPositive(ex_a)) * 10;
         } else {
-            if (ex_a != 0) {
-                @repair.regen.specification.Refinement("_ < 0")
-                int ex_d = regen.test.project.SimpleTest.toNegative(ex_a);
-            }
+            // if(ex_a != 0) {
+            // @Refinement("_ < 0")
+            // int ex_d = toNegative(ex_a);
+            // }
             @repair.regen.specification.Refinement("_ < ex_a")
             int ex_c = -10;
         }
