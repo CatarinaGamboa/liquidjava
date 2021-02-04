@@ -2,6 +2,7 @@ package repair.regen.processor;
 import java.util.List;
 
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedVariable;
 import spoon.Launcher;
@@ -17,6 +18,9 @@ public class TestInsideClasses {
         final Factory factory = launcher.getFactory();
 		RefinedVariable vi2 = new RefinedVariable("_",factory.Type().INTEGER_PRIMITIVE, new Predicate("_ > 0"));
 		Constraint c2 = vi2.getRenamedRefinements("_");
+		
+		EqualsPredicate ep = new EqualsPredicate("_", "7+8");
+		
 		
 		List<String> ls = c2.getVariableNames();
 		for(String s : ls)

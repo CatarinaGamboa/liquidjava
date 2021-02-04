@@ -5,16 +5,29 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
 
 	public static void main(String[] args) {
-		@Refinement("true")
-		double m1 = Math.random();
-
-		@Refinement("m2 <= 0")
-		double m2 = m1*5;
-
+		@Refinement("_ > 5")
+		int a = Math.abs(-5-10);
+		@Refinement("_ > 10")
+		int b = a;
+		@Refinement("max == 15")
+		int max = Math.max(a, Math.multiplyExact(b, -1));
 	}
 
 
 
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 
 	//Errors to take care of
 	// //value_4==innerScope && value_4 == innerScope_1

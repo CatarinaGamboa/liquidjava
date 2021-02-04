@@ -151,7 +151,7 @@ public class MethodsFunctionsChecker {
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
-		f.setRefReturn(new Predicate("true"));
+		f.setRefReturn(new Predicate());
 		rtc.context.addFunctionToContext(f);
 		for(CtAnnotation<? extends Annotation> ann :method.getAnnotations()) {
 			if( !ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -205,7 +205,7 @@ public class MethodsFunctionsChecker {
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getName());
 		f.setType(getType(method.getReturnType()));
-		f.setRefReturn(new Predicate("true"));
+		f.setRefReturn(new Predicate());
 		
 		String[] r = methodRef.split("}\\s*->\\s*\\{");
 		
@@ -237,7 +237,7 @@ public class MethodsFunctionsChecker {
 		if(ret.getReturnedExpression() != null) {
 			//check if there are refinements
 			if(rtc.getRefinement(ret.getReturnedExpression())== null)
-				ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, new Predicate("true"));
+				ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, new Predicate());
 			CtMethod method = ret.getParent(CtMethod.class);
 			//check if method has refinements
 			if(rtc.getRefinement(method) == null)

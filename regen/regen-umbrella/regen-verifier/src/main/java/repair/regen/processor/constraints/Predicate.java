@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import org.modelcc.parser.ParserException;
-
 import repair.regen.language.BinaryExpression;
 import repair.regen.language.Expression;
 import repair.regen.language.ExpressionGroup;
@@ -16,6 +14,13 @@ import repair.regen.language.parser.SyntaxException;
 
 public class Predicate extends Constraint{
 	private Expression exp;
+	
+	/**
+	 * Create a predicate with the expression true
+	 */
+	public Predicate() {
+		exp = parse("true");
+	}
 
 	public Predicate(String ref) {
 		exp = parse(ref);

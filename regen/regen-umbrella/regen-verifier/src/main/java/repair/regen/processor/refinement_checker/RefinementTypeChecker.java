@@ -108,15 +108,15 @@ public class RefinementTypeChecker extends CtScanner {
 		if(localVariable.getAssignment() == null) {
 			Optional<Constraint> a = getRefinementFromAnnotation(localVariable);
 			context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), 
-					a.isPresent()? a.get() : new Predicate("true"));
+					a.isPresent()? a.get() : new Predicate());
 		}else {
 			String varName = localVariable.getSimpleName();
 			CtExpression<?> e = localVariable.getAssignment();
 			Constraint refinementFound = getRefinement(e);
 
 			if (refinementFound == null)
-				refinementFound = new Predicate("true");
-			context.addVarToContext(varName, localVariable.getType(), new Predicate("true"));
+				refinementFound = new Predicate();
+			context.addVarToContext(varName, localVariable.getType(), new Predicate());
 			checkVariableRefinements(refinementFound, varName, localVariable);
 				
 		}
@@ -136,7 +136,7 @@ public class RefinementTypeChecker extends CtScanner {
 
 			Constraint refinementFound = getRefinement(assignement.getAssignment());
 			if (refinementFound == null) {
-				refinementFound = new Predicate("true");
+				refinementFound = new Predicate();
 			}
 			vcChecker.removeFreshVariableThatIncludes(name);
 			checkVariableRefinements(refinementFound, name, varDecl);//TODO CHANGE

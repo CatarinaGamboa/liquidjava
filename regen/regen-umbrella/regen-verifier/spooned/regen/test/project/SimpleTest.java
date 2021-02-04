@@ -32,10 +32,12 @@ package regen.test.project;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("true")
-        double m1 = java.lang.Math.random();
-        @repair.regen.specification.Refinement("m2 <= 0")
-        double m2 = m1 * 5;
+        @repair.regen.specification.Refinement("_ > 5")
+        int a = java.lang.Math.abs(((-5) - 10));
+        @repair.regen.specification.Refinement("_ > 10")
+        int b = a;
+        @repair.regen.specification.Refinement("max == 15")
+        int max = java.lang.Math.max(a, java.lang.Math.multiplyExact(b, (-1)));
     }
 }
 
