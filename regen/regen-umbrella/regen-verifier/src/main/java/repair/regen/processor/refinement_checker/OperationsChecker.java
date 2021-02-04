@@ -126,7 +126,7 @@ class OperationsChecker {
 		if(p instanceof CtIf)
 			all = opS;
 		else
-			all =new Predicate("("+rtc.WILD_VAR+" == (" + opS.toString() + "))");
+			all =new EqualsPredicate(rtc.WILD_VAR, opS);//TODO SEE IF () IN OPS IS NEEDED
 		
 		rtc.context.addVarToContext(newName, ex.getType(), newMeta);
 		rtc.addRefinementVariable(newName);
@@ -194,6 +194,7 @@ class OperationsChecker {
 			String s = a.toString().replace("(", "").replace(")", "")
 					.replace("==", "").replace(" ", "");//TODO IMPROVE
 			return new Predicate(String.format("(%s)",s));
+			
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
 			return new Predicate(l.getValue().toString());
@@ -202,13 +203,12 @@ class OperationsChecker {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
 			CtExecutable<?> method = inv.getExecutable().getDeclaration();
 			//Get function refinements with non_used variables
-			
 			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
 			Constraint innerRefs = fi.getRenamedRefinements();
-			//Substitute \\v by the variable that we send
+			//Substitute _ by the variable that we send
 			String newName = rtc.FRESH + rtc.context.getCounter();
 			
-			//ERRO AQUI!!!!!!!!NO INNERREFS
+			//TODO ERRO AQUI!!!!!!!!NO INNERREFS
 			innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
 			rtc.context.addVarToContext(newName, fi.getType(), innerRefs);
 			rtc.addRefinementVariable(newName);

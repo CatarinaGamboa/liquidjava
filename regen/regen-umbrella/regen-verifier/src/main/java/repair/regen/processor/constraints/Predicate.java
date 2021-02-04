@@ -25,6 +25,10 @@ public class Predicate extends Constraint{
 	public Predicate(String ref) {
 		exp = parse(ref);
 	}
+	
+	public Predicate(String ref, boolean parenthesis) {
+		exp = parenthesis ? parse("("+ref+")") : parse(ref);
+	}
 
 	@Override
 	public Constraint negate() {
@@ -70,6 +74,7 @@ public class Predicate extends Constraint{
 
 	}
 
+	@Override
 	public String toString() {
 		return exp.toString();
 	}

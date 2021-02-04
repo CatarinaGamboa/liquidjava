@@ -28,4 +28,10 @@ public class Implication extends Constraint{
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

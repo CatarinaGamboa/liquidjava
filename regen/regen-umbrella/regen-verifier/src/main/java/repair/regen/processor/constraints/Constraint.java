@@ -8,6 +8,7 @@ public abstract class Constraint {
 	public abstract Constraint negate();
 	public abstract Constraint clone();
 	public abstract List<String> getVariableNames();
+	public abstract String toString();
 	
 
 }

@@ -6,11 +6,7 @@ public class SimpleTest {
 
 	public static void main(String[] args) {
 		@Refinement("_ > 5")
-		int a = Math.abs(-5-10);
-		@Refinement("_ > 10")
-		int b = a;
-		@Refinement("max == 15")
-		int max = Math.max(a, Math.multiplyExact(b, -1));
+		int a =10;
 	}
 
 

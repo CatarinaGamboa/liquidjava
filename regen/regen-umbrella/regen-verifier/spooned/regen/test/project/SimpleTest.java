@@ -33,11 +33,7 @@ package regen.test.project;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("_ > 5")
-        int a = java.lang.Math.abs(((-5) - 10));
-        @repair.regen.specification.Refinement("_ > 10")
-        int b = a;
-        @repair.regen.specification.Refinement("max == 15")
-        int max = java.lang.Math.max(a, java.lang.Math.multiplyExact(b, (-1)));
+        int a = 10;
     }
 }
 

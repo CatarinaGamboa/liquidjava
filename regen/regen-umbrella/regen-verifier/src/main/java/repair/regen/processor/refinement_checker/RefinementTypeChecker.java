@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import repair.regen.processor.Utils;
 import repair.regen.processor.built_ins.RefinementsLibrary;
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -318,9 +319,9 @@ public class RefinementTypeChecker extends CtScanner {
 								ann -> (CtLiteral<String>) ann.getAllValues().get("value")
 								).map(
 										str -> str.getValue()
-										).findAny();//ERROR IN HERE!!!!!!!!!
+										).findAny();
 		expectedType.ifPresent((et) -> {
-			Constraint c = new Predicate("("+et+")");
+			Constraint c = new Predicate(et, true);
 			c = c.substituteVariable(WILD_VAR, simpleName);
 			Constraint cet = c.substituteVariable(WILD_VAR, simpleName);
 			//create new variable for validation
@@ -387,15 +388,17 @@ public class RefinementTypeChecker extends CtScanner {
 //		String refinementFound = getRefinement(varDecl);
 		String name = varDecl.getSimpleName();
 		//TODO CONJUNCTION
-		String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";//TODO CHANGE TO NEW PREDICATE ==
+		Constraint cref = new EqualsPredicate(WILD_VAR, name);
+		//String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";//TODO CHANGE TO NEW PREDICATE ==
 		Optional<RefinedVariable> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent()) {
 			RefinedVariable vi = ovi.get();
 			addRefinementVariable(vi.getName());
-			ref = ref + "&& ("+WILD_VAR+" == "+vi.getName()+")";
+			cref = new Conjunction(cref, new EqualsPredicate(WILD_VAR, vi.getName()));
+			//ref = ref + "&& ("+WILD_VAR+" == "+vi.getName()+")";
 		}
 		
-		variable.putMetadata(REFINE_KEY, new Predicate(ref));
+		variable.putMetadata(REFINE_KEY, cref);
 	}
 	
 
