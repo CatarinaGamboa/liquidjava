@@ -92,7 +92,6 @@ public class RefinementTypeChecker extends CtScanner {
 
 
 	public <R> void visitCtMethod(CtMethod<R> method) {
-		//super.visitCtMethod(method); //-- first we need the signature refinements
 		enterContexts();
 		mfc.getMethodRefinements(method);
 		super.visitCtMethod(method);
@@ -139,7 +138,7 @@ public class RefinementTypeChecker extends CtScanner {
 				refinementFound = new Predicate();
 			}
 			vcChecker.removeFreshVariableThatIncludes(name);
-			checkVariableRefinements(refinementFound, name, varDecl);//TODO CHANGE
+			checkVariableRefinements(refinementFound, name, varDecl);
 
 		}
 	}
@@ -326,14 +325,11 @@ public class RefinementTypeChecker extends CtScanner {
 			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
 			
 			String newName = simpleName+"_"+context.getCounter()+"_";
-			Constraint correctRefinement = refinementFound.substituteVariable(WILD_VAR, simpleName);
-			
 			Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
 			c = c.substituteVariable(simpleName, newName);
-			
-			
-			addReferencedVars(c, newName);
 
+			addReferencedVars(c, newName);
+			
 			//Substitute variable in verification
 			context.addVarToContext(newName, variable.getType(), correctNewRefinement);
 			context.addRefinementInstanceToVariable(simpleName, newName);
@@ -383,17 +379,13 @@ public class RefinementTypeChecker extends CtScanner {
 	 * @param varDecl Cannot be null
 	 */
 	private <T> void getPutVariableMetadada(CtElement variable, CtVariable<T> varDecl) {
-//		String refinementFound = getRefinement(varDecl);
 		String name = varDecl.getSimpleName();
-		//TODO CONJUNCTION
 		Constraint cref = new EqualsPredicate(WILD_VAR, name);
-		//String ref = "("+WILD_VAR+" == " + varDecl.getSimpleName()+ ")";//TODO CHANGE TO NEW PREDICATE ==
 		Optional<RefinedVariable> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent()) {
 			RefinedVariable vi = ovi.get();
 			addRefinementVariable(vi.getName());
 			cref = new Conjunction(cref, new EqualsPredicate(WILD_VAR, vi.getName()));
-			//ref = ref + "&& ("+WILD_VAR+" == "+vi.getName()+")";
 		}
 		
 		variable.putMetadata(REFINE_KEY, cref);
@@ -408,11 +400,10 @@ public class RefinementTypeChecker extends CtScanner {
 					.contentEquals("repair.regen.specification.Refinement")) {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 				ref = Optional.of(s.getValue());
-			}
-		
-		if(ref.isPresent()) {
+			}		
+		if(ref.isPresent()) 
 			constr = Optional.of(new Predicate(ref.get()));
-		}
+		
 		return constr;
 	}
 

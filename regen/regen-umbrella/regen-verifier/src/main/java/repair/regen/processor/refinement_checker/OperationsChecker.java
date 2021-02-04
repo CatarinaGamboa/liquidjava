@@ -126,7 +126,7 @@ class OperationsChecker {
 		if(p instanceof CtIf)
 			all = opS;
 		else
-			all =new EqualsPredicate(rtc.WILD_VAR, opS);//TODO SEE IF () IN OPS IS NEEDED
+			all = new EqualsPredicate(rtc.WILD_VAR, opS);//TODO SEE IF () IN OPS IS NEEDED
 		
 		rtc.context.addVarToContext(newName, ex.getType(), newMeta);
 		rtc.addRefinementVariable(newName);
