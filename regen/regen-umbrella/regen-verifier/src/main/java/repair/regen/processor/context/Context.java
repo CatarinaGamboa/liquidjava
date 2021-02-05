@@ -91,7 +91,7 @@ public class Context {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
 			RefinedVariable vi = getVariableByName(name);
-			vi.newRefinement(et);
+			vi.setRefinement(et);
 		}else {
 			addVarToContext(name, variable.getType(), et);
 		}
@@ -102,7 +102,7 @@ public class Context {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
 			RefinedVariable vi = getVariableByName(name);
-			vi.newRefinement(expectedType);
+			vi.setRefinement(expectedType);
 		}else
 			addVarToContext(name, variable.getType(), expectedType);
 	}
@@ -115,7 +115,7 @@ public class Context {
 	public void newRefinementToVariableInContext(String variableName, Constraint expectedType) {
 		if(hasVariable(variableName)){
 			RefinedVariable vi = getVariableByName(variableName);
-			vi.newRefinement(expectedType);
+			vi.setRefinement(expectedType);
 		}
 	}
 

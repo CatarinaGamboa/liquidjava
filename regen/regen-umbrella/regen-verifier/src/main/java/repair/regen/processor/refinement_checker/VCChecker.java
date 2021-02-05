@@ -113,20 +113,26 @@ public class VCChecker {
 		}
 	}
 
+	//check type
 	private void process(Constraint expectedType, CtElement element, List<RefinedVariable> vars) {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sbSMT = new StringBuilder();
 
+		//Check
 		Constraint cSMT = new Predicate();
 		List<RefinedVariable> vars2 = getAllVariablesInRefinements(vars);
 		for(RefinedVariable var:vars2) {
 			cSMT = new Conjunction(cSMT, var.getRefinement());
 			String ref = var.getRefinement().toString();
+			
+			//imprimir
 			sb.append("forall "+var.getName()+":"+ref+" -> \n");
 			sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
 		}
 		sb.append(expectedType);
 		printVCs(sb.toString(), sbSMT.toString(), expectedType);
+		
+		//check type
 		smtChecking(cSMT, expectedType, element);
 	}
 

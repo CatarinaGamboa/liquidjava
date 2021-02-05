@@ -9,11 +9,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
-public class RefinedVariable {
-	private String name;
-	private CtTypeReference<?> type;
-	private Constraint refinement;
-
+public class RefinedVariable extends Refined{
 	//Specific Values
 	private Stack<List<RefinedVariable>> instances;
 	
@@ -23,49 +19,25 @@ public class RefinedVariable {
 	private RefinedVariable ifElse;
 	
 	public RefinedVariable(String name, CtTypeReference<?> type, Constraint ref) {
-		this.name = name;
-		this.type = type;
-		this.refinement = ref;
+		super(name, type, ref);
 		this.instances = new Stack<>();
 		this.instances.push(new ArrayList<RefinedVariable>());
 	}
 
-	/**
-	 * Gets last refinement
-	 * @return
-	 */
-	public Constraint getRefinement() {
-		if(refinement != null)
-			return refinement;
-		return new Predicate("true");
-		//return String.join(" && ", refinements);
-	}
-	public CtTypeReference<?> getType(){
-		return type;
-	}
-	
+
 	/**
 	 * New Constraint with the variable name renamed to toReplace
 	 * @param toReplace
 	 * @return
 	 */
 	public Constraint getRenamedRefinements(String toReplace) {
+		Constraint refinement =  super.getRefinement();
 		if(refinement instanceof Predicate) {
 			Predicate np = new Predicate(refinement.toString());
-			return np.substituteVariable(name, toReplace);
+			return np.substituteVariable(super.getName(), toReplace);
 		}
 		return refinement;//TODO REMOVE when all cases of Constraint are implemented
-	}
-
-	public String getName() {
-		return name;
-	}
-
-	public void newRefinement(Constraint toAdd) {
-		refinement=toAdd;
-	}
-
-	
+	}	
 	
 	//INSTANCES
 	public void enterContext() {
@@ -76,7 +48,6 @@ public class RefinedVariable {
 	}
 	
 	public void addInstance(RefinedVariable vi) {
-		System.out.println("add instance in variableInfo");
 		instances.peek().add(vi);
 	}
 	
@@ -134,6 +105,8 @@ public class RefinedVariable {
 	Optional<RefinedVariable> getIfInstanceCombination(int counter) {
 		if(ifBefore == null && ifThen==null && ifElse==null)
 			return Optional.empty();
+		String name = super.getName();
+		CtTypeReference<?> type = super.getType();
 		//TODO CHANGE ALMOST ALL
 		String nName = name+"_"+counter+"_";
 		String refinement = "";
@@ -162,43 +135,12 @@ public class RefinedVariable {
 		ifBefore=null;ifThen=null;ifElse=null;
 		return Optional.of(new RefinedVariable(nName, type, new Predicate(refinement)));//TODO CHANGE
 	}
-
+	
+	
 	@Override
 	public String toString() {
-		return "VariableInfo [name=" + name + ", type=" + type + ", refinement=" +
-				refinement +
-				", instances=" + instances + "]";
-	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		RefinedVariable other = (RefinedVariable) obj;
-		if (name == null) {
-			if (other.name != null)
-				return false;
-		} else if (!name.equals(other.name))
-			return false;
-		if (type == null) {
-			if (other.type != null)
-				return false;
-		} else if (!type.equals(other.type))
-			return false;
-		return true;
+		return "VariableInfo [name=" + super.getName() + ", type=" + super.getType() + ", refinement=" +
+				super.getRefinement() +"]";
 	}
 
 }
