@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
@@ -49,7 +50,6 @@ public class RefinedFunction extends Refined{
 		Constraint update = place.clone();
 		for(RefinedVariable p: argRefinements) {
 			String varName = p.getName();
-			//trocar varName por newName, adicionar newName ao context, trocar o varName por newName no update
 			Constraint c = p.getRefinement();
 			Optional<RefinedVariable> ovi = p.getLastInstance();
 			if(ovi.isPresent()) {
@@ -67,24 +67,25 @@ public class RefinedFunction extends Refined{
 	}
 
 	public Constraint getAllRefinements() {
-		//TODO CHANGE to Conjunction
-		StringBuilder sb = new StringBuilder();
-		for(RefinedVariable p: argRefinements) {
-			sb.append(p.getRefinement()+ " && ");
-		}
-		sb.append(super.getRefinement().toString());
-		return new Predicate(sb.toString());
+		Constraint c = new Predicate();
+		for(RefinedVariable p: argRefinements)
+			c = new Conjunction(c, p.getRefinement());//joinArgs
+		c = new Conjunction(c, super.getRefinement());//joinReturn
+		return c;
 	}
 
 
-	public Constraint getRefinementsForParamIndex(int i) {
-		StringBuilder sb = new StringBuilder();
-		for (int j = 0; j < i && j < argRefinements.size(); j++) {
-			RefinedVariable vi = argRefinements.get(i);
-			sb.append(vi.getRefinement()+ " && ");
-		}
-		sb.append(argRefinements.get(i).getRefinement());
-		return new Predicate(sb.toString());//getRenamedRefinements();
+	/**
+	 * Gives the Constraint for a certain parameter index
+	 * and regards all the previous parameters' Constraints
+	 * @param index
+	 * @return
+	 */
+	public Constraint getRefinementsForParamIndex(int index) {
+		Constraint c = new Predicate();
+		for (int i = 0; i <= index && i < argRefinements.size(); i++)
+			c = new Conjunction(c, argRefinements.get(i).getRefinement());
+		return c;
 	}
 
 	@Override
