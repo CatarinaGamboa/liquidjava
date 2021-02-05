@@ -24,12 +24,10 @@ public class Predicate extends Constraint{
 
 	public Predicate(String ref) {
 		exp = parse(ref);
+		if(!(exp instanceof ExpressionGroup)) {
+			exp = parse(String.format("(%s)", ref));
+		}
 	}
-	
-	public Predicate(String ref, boolean parenthesis) {
-		exp = parenthesis ? parse("("+ref+")") : parse(ref);
-	}
-
 	@Override
 	public Constraint negate() {
 		Predicate c = (Predicate)this.clone();

@@ -318,7 +318,7 @@ public class RefinementTypeChecker extends CtScanner {
 										str -> str.getValue()
 										).findAny();
 		expectedType.ifPresent((et) -> {
-			Constraint c = new Predicate(et, true);
+			Constraint c = new Predicate(et);
 			c = c.substituteVariable(WILD_VAR, simpleName);
 			Constraint cet = c.substituteVariable(WILD_VAR, simpleName);
 			//create new variable for validation
