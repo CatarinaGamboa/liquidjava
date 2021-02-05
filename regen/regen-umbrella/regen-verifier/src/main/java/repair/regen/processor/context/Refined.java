@@ -42,6 +42,9 @@ public abstract class Refined {
 		return new Predicate("true");
 	}
 	
+	public Constraint getRenamedRefinements(String toReplace) {
+		return refinement.substituteVariable(name, toReplace);
+	}	
 
 	@Override
 	public String toString() {

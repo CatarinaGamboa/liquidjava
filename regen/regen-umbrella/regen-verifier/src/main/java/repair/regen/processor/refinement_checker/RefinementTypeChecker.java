@@ -12,6 +12,7 @@ import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConditional;
@@ -331,7 +332,7 @@ public class RefinementTypeChecker extends CtScanner {
 			addReferencedVars(c, newName);
 			
 			//Substitute variable in verification
-			RefinedVariable rv= context.addVarToContext(newName, variable.getType(), correctNewRefinement);
+			RefinedVariable rv= context.addInstanceToContext(newName, variable.getType(), correctNewRefinement);
 			context.addRefinementInstanceToVariable(simpleName, newName);
 			addRefinementVariable(rv);
 			//smt check
@@ -382,7 +383,7 @@ public class RefinementTypeChecker extends CtScanner {
 	private <T> void getPutVariableMetadada(CtElement variable, CtVariable<T> varDecl) {
 		String name = varDecl.getSimpleName();
 		Constraint cref = new EqualsPredicate(WILD_VAR, name);
-		Optional<RefinedVariable> ovi = context.getLastVariableInstance(name);
+		Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent()) {
 			RefinedVariable vi = ovi.get();
 			addRefinementVariable(vi);

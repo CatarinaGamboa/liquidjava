@@ -13,6 +13,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.Variable;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
@@ -94,7 +95,7 @@ public class MethodsFunctionsChecker {
 		if(methodRef != null) {
 			//Checking Parameters
 			List<CtExpression<?>> exps = invocation.getArguments();
-			List<RefinedVariable> params = f.getArgRefinements();
+			List<Variable> params = f.getArgRefinements();
 			for (int i = 0; i < params.size(); i++) {
 				RefinedVariable pinfo = params.get(i);
 				CtExpression<?> exp = exps.get(i);
@@ -113,7 +114,7 @@ public class MethodsFunctionsChecker {
 
 				}
 
-				RefinedVariable vi = rtc.context.addVarToContext(newParamName, pinfo.getType(), refInv);
+				RefinedVariable vi = rtc.context.addInstanceToContext(newParamName, pinfo.getType(), refInv);
 				rtc.context.newRefinementToVariableInContext(newParamName, refInv);
 				rtc.addRefinementVariable(vi);
 				for(RefinedVariable s:saveVars)

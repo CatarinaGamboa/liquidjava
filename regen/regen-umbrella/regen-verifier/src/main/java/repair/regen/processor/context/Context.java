@@ -15,7 +15,7 @@ public class Context {
 	private Stack<List<RefinedVariable>> ctxVars;
 	private List<RefinedFunction> ctxFunctions;
 	private List<RefinedVariable> ctxSpecificVars;
-	
+
 	public int counter;
 	private static Context instance;
 
@@ -48,7 +48,8 @@ public class Context {
 		ctxVars.push(new ArrayList<>());
 		//make each variable enter context
 		for(RefinedVariable vi: getAllVariables())
-			vi.enterContext();
+			if(vi instanceof Variable)
+				((Variable)vi).enterContext();
 
 	}
 
@@ -56,7 +57,8 @@ public class Context {
 		ctxVars.pop();
 		//make each variable exit context
 		for(RefinedVariable vi: getAllVariables())
-			vi.exitContext();
+			if(vi instanceof Variable)
+				((Variable)vi).exitContext();
 	}
 
 
@@ -80,13 +82,19 @@ public class Context {
 		if(!hasVariable(var.getName()))
 			ctxVars.peek().add(var);
 	}
-	
+
 	public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
-		RefinedVariable vi =new RefinedVariable(simpleName, type, c);
+		RefinedVariable vi = new Variable(simpleName, type, c);
 		addVarToContext(vi);
 		return vi;
-		
 	}
+	
+	public RefinedVariable addInstanceToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
+		RefinedVariable vi = new VariableInstance(simpleName, type, c);
+		addVarToContext(vi);
+		return vi;
+	}
+	
 	public void addRefinementToVariableInContext(CtVariable<?> variable, Constraint et) {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
@@ -97,7 +105,7 @@ public class Context {
 		}
 	}
 
-//TODO ERASE
+	//TODO ERASE
 	public void newRefinementToVariableInContext(CtVariable<?> variable, Constraint expectedType) {
 		String name = variable.getSimpleName();
 		if(hasVariable(name)){
@@ -123,27 +131,33 @@ public class Context {
 	public Constraint getVariableRefinements(String varName) {
 		return hasVariable(varName)?getVariableByName(varName).getRefinement() : null; 
 	}
-	
+
 	public void variablesSetBeforeIf() {
 		for(RefinedVariable vi: getAllVariables())
-			vi.saveInstanceBeforeIf();
+			if(vi instanceof Variable)
+				((Variable)vi).saveInstanceBeforeIf();
 	}
 	public void variablesSetThenIf() {
 		for(RefinedVariable vi: getAllVariables())
-			vi.saveInstanceThen();
+			if(vi instanceof Variable)
+				((Variable)vi).saveInstanceThen();
 	}
 	public void variablesSetElseIf() {
 		for(RefinedVariable vi: getAllVariables())
-			vi.saveInstanceElse();
+			if(vi instanceof Variable)
+				((Variable)vi).saveInstanceElse();
 	}
 	public void variablesCombineFromIf() {
 		for(RefinedVariable vi: getAllVariables()) {
-			Optional<RefinedVariable>ovi = vi.getIfInstanceCombination(getCounter());
-			if(ovi.isPresent()) {
-				RefinedVariable vii = ovi.get();
-				addVarToContext(vii);
-				addRefinementInstanceToVariable(vi.getName(), vii.getName());
-				
+			if(vi instanceof Variable) {
+				Optional<VariableInstance>ovi = 
+						((Variable) vi).getIfInstanceCombination(getCounter());
+				if(ovi.isPresent()) {
+					RefinedVariable vii = ovi.get();
+					addVarToContext(vii);
+					addRefinementInstanceToVariable(vi.getName(), vii.getName());
+
+				}
 			}
 		}
 	}
@@ -206,19 +220,21 @@ public class Context {
 	}
 
 	public void addRefinementInstanceToVariable(String name, String name2) {
-		if(!hasVariable(name) || !hasVariable(name2)) return;
-
 		RefinedVariable vi1 = getVariableByName(name);
 		RefinedVariable vi2 = getVariableByName(name2);
-		vi1.addInstance(getVariableByName(name2));
+		if(!hasVariable(name) || !hasVariable(name2) || 
+				!(vi1 instanceof Variable && vi2 instanceof VariableInstance)) return;
+		
+		((Variable)vi1).addInstance((VariableInstance) vi2);
 		addSpecificVariable(vi2);
 	}
 
-	public Optional<RefinedVariable> getLastVariableInstance(String name) {
-		if(!hasVariable(name)) return Optional.empty();
-		return getVariableByName(name).getLastInstance();
+	public Optional<VariableInstance> getLastVariableInstance(String name) {
+		RefinedVariable rv = getVariableByName(name);
+		if(!hasVariable(name) || !(rv instanceof Variable)) return Optional.empty();
+		return ((Variable)rv).getLastInstance();
 	}
-	
+
 	public void addSpecificVariable(RefinedVariable vi) {
 		ctxSpecificVars.add(vi);
 	}

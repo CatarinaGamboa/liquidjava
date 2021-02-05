@@ -6,6 +6,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.Variable;
 import spoon.Launcher;
 import spoon.reflect.factory.Factory;
 
@@ -17,7 +18,7 @@ public class TestInsideClasses {
         launcher.run();
         
         final Factory factory = launcher.getFactory();
-		RefinedVariable vi2 = new RefinedVariable("a",factory.Type().INTEGER_PRIMITIVE, new Predicate("a > 0"));
+		RefinedVariable vi2 = new Variable("a",factory.Type().INTEGER_PRIMITIVE, new Predicate("a > 0"));
 		Constraint c2 = vi2.getRenamedRefinements("_");
 		
 		

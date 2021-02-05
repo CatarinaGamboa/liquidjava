@@ -11,7 +11,7 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction extends Refined{
 	
-	private List<RefinedVariable> argRefinements;
+	private List<Variable> argRefinements;
 	
 	private Context context;
 	
@@ -20,17 +20,17 @@ public class RefinedFunction extends Refined{
 		context = Context.getInstance();
 	}
 	
-	public List<RefinedVariable> getArgRefinements() {
+	public List<Variable> getArgRefinements() {
 		return argRefinements;
 	}
 	
 	public void addArgRefinements(String varName, CtTypeReference<?> type, Constraint refinement) {
-		RefinedVariable v = new RefinedVariable(varName, type, refinement);
+		Variable v = new Variable(varName, type, refinement);
 		this.argRefinements.add(v);
 
 	}
 	
-	public void addArgRefinements(RefinedVariable vi) {
+	public void addArgRefinements(Variable vi) {
 		this.argRefinements.add(vi);
 	}
 	
@@ -48,10 +48,10 @@ public class RefinedFunction extends Refined{
 	
 	private Constraint getRenamedRefinements(Constraint place) {
 		Constraint update = place.clone();
-		for(RefinedVariable p: argRefinements) {
+		for(Variable p: argRefinements) {
 			String varName = p.getName();
 			Constraint c = p.getRefinement();
-			Optional<RefinedVariable> ovi = p.getLastInstance();
+			Optional<VariableInstance> ovi = p.getLastInstance();
 			if(ovi.isPresent()) {
 				varName = ovi.get().getName();
 				c = p.getRenamedRefinements(varName);

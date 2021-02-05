@@ -31,19 +31,34 @@ package regen.test.project;
 // int c = (a < 100)? three(): a;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{a > 0} -> {true}")
-    public static void addZ(int a) {
-        @repair.regen.specification.Refinement("_ > 0")
-        int d = a;
-        if (d > 5) {
-        } else {
-            d = 10;
-            @repair.regen.specification.Refinement("b > 10")
-            int b = d;
-        }
+    // @Refinement("{a == 10} -> {_ < a && _ > 0} -> {_ >= a}")
+    // public static int posMult(int a, int b) {
+    // @Refinement("y > 30")
+    // int y = 50;
+    // return y-10;
+    // }
+    // 
+    // @Refinement("{_ == 10}")
+    // public static int ten() {
+    // return 10;
+    // }
+    // 
+    @repair.regen.specification.Refinement("{true}->{_ == b*2}")
+    private static int multTwo(int b) {
+        return b * 2;
     }
 
     public static void main(java.lang.String[] args) {
+        // @Refinement("_ >= 0")
+        // int p = 10;
+        // p = posMult(ten(), 4);
+        // 
+        @repair.regen.specification.Refinement("_ < 6")
+        int z = 5;
+        @repair.regen.specification.Refinement("_ > 6")
+        int x = regen.test.project.SimpleTest.multTwo(z);
+        // @Refinement("_ == 20")
+        // int y = multTwo(x);
     }
 }
 
