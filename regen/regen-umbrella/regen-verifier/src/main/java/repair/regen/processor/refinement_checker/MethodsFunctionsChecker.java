@@ -87,8 +87,8 @@ public class MethodsFunctionsChecker {
 
 		Constraint metRefOriginal = f.getRefReturn(); 
 		List<RefinedVariable> saveVars = new ArrayList<>();
-		for(RefinedVariable v: rtc.vcChecker.getVariables())
-			saveVars.add(v);
+		//for(RefinedVariable v: rtc.vcChecker.getVariables()) //TODO CHECK
+			//saveVars.add(v);
 
 		HashMap<String, String> newNames = new HashMap<>();
 

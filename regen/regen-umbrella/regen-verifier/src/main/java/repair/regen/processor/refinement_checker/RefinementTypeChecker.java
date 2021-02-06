@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.processor.built_ins.RefinementsLibrary;
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -138,7 +137,7 @@ public class RefinementTypeChecker extends CtScanner {
 			if (refinementFound == null) {
 				refinementFound = new Predicate();
 			}
-			vcChecker.removeFreshVariableThatIncludes(name);
+			vcChecker.removeFreshVariableThatIncludes(name);//AQUI!!
 			checkVariableRefinements(refinementFound, name, varDecl);
 
 		}
@@ -221,10 +220,13 @@ public class RefinementTypeChecker extends CtScanner {
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
 		Constraint nExpRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
+		nExpRefs = substituteAllVariablesForLastInstance(nExpRefs);
+		
+		
 		RefinedVariable freshRV = context.addVarToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, nExpRefs);
 		vcChecker.setPathVariables(freshRV);
-		vcChecker.addRefinementVariable(freshRV);
+		//vcChecker.addRefinementVariable(freshRV);
 		
 		//VISIT THEN
 		enterContexts();
@@ -244,12 +246,25 @@ public class RefinementTypeChecker extends CtScanner {
 		}
 		//end
 		vcChecker.removePathVariable(freshRV);
-		vcChecker.renewVariables();
+		//vcChecker.renewVariables();
 		exitContexts();
 		context.variablesCombineFromIf();
 	}
 
 
+
+	private Constraint substituteAllVariablesForLastInstance(Constraint c) {
+		Constraint ret = c;
+		List<String> ls = c.getVariableNames();
+		for(String s:ls) {
+			Optional<VariableInstance> rv = context.getLastVariableInstance(s);
+			if(rv.isPresent()) {
+				VariableInstance vi = rv.get();
+				ret = ret.substituteVariable(s, vi.getName());
+			}
+		}
+		return ret;
+	}
 
 	@Override
 	public <T> void visitCtConditional(CtConditional<T> conditional) {
@@ -267,18 +282,18 @@ public class RefinementTypeChecker extends CtScanner {
 	//------------------------------- Auxiliary Methods ----------------------------------------
 	//############################### Variables and Context handling  ##########################################
 	private void renewVariables() {
-		vcChecker.renewVariables();
+		//vcChecker.renewVariables();
 	}
 	void addRefinementVariable(RefinedVariable var) {
-		vcChecker.addRefinementVariable(var);
+		//vcChecker.addRefinementVariable(var);
 	}
 	private void enterContexts() {
 		context.enterContext();
-		vcChecker.enterContext();
+		//vcChecker.enterContext();
 	}
 	private void exitContexts() {
 		context.exitContext();
-		vcChecker.exitContext();
+		//vcChecker.exitContext();
 	}
 
 	//############################### Inner Visitors  ##########################################
@@ -319,24 +334,24 @@ public class RefinementTypeChecker extends CtScanner {
 										str -> str.getValue()
 										).findAny();
 		expectedType.ifPresent((et) -> {
-			Constraint c = new Predicate(et);
-			c = c.substituteVariable(WILD_VAR, simpleName);
-			Constraint cet = c.substituteVariable(WILD_VAR, simpleName);
+			Constraint cEt = new Predicate(et);
+			cEt = cEt.substituteVariable(WILD_VAR, simpleName);
+			Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
 			//create new variable for validation
 			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
 			
 			String newName = simpleName+"_"+context.getCounter()+"_";
 			Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
-			c = c.substituteVariable(simpleName, newName);
+			cEt = cEt.substituteVariable(simpleName, newName);
 
-			addReferencedVars(c, newName);
+			addReferencedVars(cEt, newName);
 			
 			//Substitute variable in verification
 			RefinedVariable rv= context.addInstanceToContext(newName, variable.getType(), correctNewRefinement);
 			context.addRefinementInstanceToVariable(simpleName, newName);
 			addRefinementVariable(rv);
 			//smt check
-			checkSMTVariable(c, variable, simpleName);//TODO CHANGE
+			checkSMTVariable(cEt, variable, simpleName);//TODO CHANGE
 			context.addRefinementToVariableInContext(variable, cet);
 		});
 	}
@@ -387,7 +402,7 @@ public class RefinementTypeChecker extends CtScanner {
 		if(ovi.isPresent()) {
 			RefinedVariable vi = ovi.get();
 			addRefinementVariable(vi);
-			cref = new Conjunction(cref, new EqualsPredicate(WILD_VAR, vi.getName()));
+			cref = new EqualsPredicate(WILD_VAR, vi.getName());
 		}
 		
 		variable.putMetadata(REFINE_KEY, cref);

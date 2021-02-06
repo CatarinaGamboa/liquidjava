@@ -14,54 +14,78 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.VariableInstance;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.declaration.CtElement;
 
 public class VCChecker {
 	private Context context;
-	private List<List<RefinedVariable>> allVariables;
+	//private List<List<RefinedVariable>> allVariables;
 	private List<RefinedVariable> pathVariables;
 
 	public VCChecker() {
 		context = Context.getInstance();
-		allVariables = new ArrayList<>();
-		allVariables.add(new ArrayList<>());
+		//		allVariables = new ArrayList<>();
+		//		allVariables.add(new ArrayList<>());
 		pathVariables = new Stack<>();
 	}
+	//
+	//	public void renewVariables() {
+	////		int size = allVariables.size();
+	////		if(size > 0) {
+	////			allVariables.remove(size-1);
+	////			allVariables.add(new ArrayList<>());
+	////		}
+	//	}
+	//	public void addRefinementVariable(RefinedVariable var) {
+	////		List<RefinedVariable> variables = allVariables.get(allVariables.size()-1);
+	////		if(!variables.contains(var))
+	////			variables.add(var);
+	//	}
 
-	public void renewVariables() {
-		int size = allVariables.size();
-		if(size > 0) {
-			allVariables.remove(size-1);
-			allVariables.add(new ArrayList<>());
+	//	public List<RefinedVariable> getVariables() {
+	////		List<RefinedVariable> all = new ArrayList<>();
+	////		for(List<RefinedVariable> l : allVariables)
+	////			for(RefinedVariable s : l)
+	////				if(!all.contains(s))
+	////					all.add(s);
+	////
+	////		return all;
+	//	}
+
+	public List<RefinedVariable> getVariables(Constraint c) {
+		List<RefinedVariable> allVars = new ArrayList<>();
+		getVariablesFromContext(c.getVariableNames(), allVars);
+		List<String> pathNames = pathVariables.stream()
+				.map(a->a.getName())
+				.collect(Collectors.toList());
+		getVariablesFromContext(pathNames, allVars);
+
+
+		return allVars;
+	}
+
+	private void getVariablesFromContext(List<String> lvars, List<RefinedVariable> allVars) {
+		for(String name: lvars) {
+			if(context.hasVariable(name)) {
+				RefinedVariable rv = context.getVariableByName(name);
+				if(!allVars.contains(rv)) {
+					allVars.add(rv);
+					recAuxGetVars(rv, allVars);
+				}
+			}
 		}
 	}
-	public void addRefinementVariable(RefinedVariable var) {
-		List<RefinedVariable> variables = allVariables.get(allVariables.size()-1);
-		if(!variables.contains(var))
-			variables.add(var);
-	}
+	//	private void removeFromAllVariables(RefinedVariable s1) {
+	//		for(List<RefinedVariable> l : allVariables)
+	//			if(l.contains(s1))
+	//				l.remove(s1);
+	//	}
 
-	public List<RefinedVariable> getVariables() {
-		List<RefinedVariable> all = new ArrayList<>();
-		for(List<RefinedVariable> l : allVariables)
-			for(RefinedVariable s : l)
-				if(!all.contains(s))
-					all.add(s);
-
-		return all;
-	}
-
-	private void removeFromAllVariables(RefinedVariable s1) {
-		for(List<RefinedVariable> l : allVariables)
-			if(l.contains(s1))
-				l.remove(s1);
-	}
-
-	public List<RefinedVariable> getLastContextVariables(){
-		return allVariables.get(allVariables.size()-1);
-	}
+	//	public List<RefinedVariable> getLastContextVariables(){
+	//		return allVariables.get(allVariables.size()-1);
+	//	}
 	public void setPathVariables(RefinedVariable rv) {
 		pathVariables.add(rv);
 	}
@@ -76,28 +100,28 @@ public class VCChecker {
 			if(rv.getRefinement().getVariableNames().contains(otherVar))
 				toRemove.add(rv);
 		}
-		for(RefinedVariable rv:toRemove) {
-			pathVariables.remove(rv);
-			removeFromAllVariables(rv);
-		}
+		//		for(RefinedVariable rv:toRemove) {
+		//			pathVariables.remove(rv);
+		//			removeFromAllVariables(rv);
+		//		}
 
 	}
 
-	public void enterContext() {
-		allVariables.add(new ArrayList<>());
-	}
-	public void exitContext() {
-		allVariables.remove(allVariables.size()-1);
-	}
+	//	public void enterContext() {
+	//		allVariables.add(new ArrayList<>());
+	//	}
+	//	public void exitContext() {
+	//		allVariables.remove(allVariables.size()-1);
+	//	}
 
 
 	public void processSubtyping(Constraint expectedType, CtElement element) {
-		process(expectedType, element, getVariables());
+		process(expectedType, element, getVariables(expectedType));
 	}
 
 	public void processSubtyping(Constraint expectedType, String name, CtElement element) {
 		if(pathVariables.isEmpty())
-			process(expectedType, element, getVariables());
+			process(expectedType, element, getVariables(expectedType));
 		else {
 			List<RefinedVariable> pathRemove = new ArrayList<>();
 
@@ -106,7 +130,7 @@ public class VCChecker {
 					pathRemove.add(rv);
 			}
 
-			List<RefinedVariable> toSend = getVariables().stream()
+			List<RefinedVariable> toSend = getVariables(expectedType).stream()
 					.filter(a->!pathRemove.contains(a))
 					.collect(Collectors.toList());
 			process(expectedType, element, toSend);
@@ -120,30 +144,30 @@ public class VCChecker {
 
 		//Check
 		Constraint cSMT = new Predicate();
-		List<RefinedVariable> vars2 = getAllVariablesInRefinements(vars);
+		List<RefinedVariable> vars2 = vars;//getAllVariablesInRefinements(vars);
 		for(RefinedVariable var:vars2) {
 			cSMT = new Conjunction(cSMT, var.getRefinement());
 			String ref = var.getRefinement().toString();
-			
+
 			//imprimir
 			sb.append("forall "+var.getName()+":"+ref+" -> \n");
 			sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
 		}
 		sb.append(expectedType);
 		printVCs(sb.toString(), sbSMT.toString(), expectedType);
-		
+
 		//check type
 		smtChecking(cSMT, expectedType, element);
 	}
 
-	private List<RefinedVariable> getAllVariablesInRefinements(List<RefinedVariable> vars) {
-		List<RefinedVariable> newVars = new ArrayList();
-		for (RefinedVariable var:getVariables()) 
-			newVars.add(var);
-		for (RefinedVariable var:getVariables())
-			recAuxGetVars(var, newVars);
-		return newVars;
-	}
+	//	private List<RefinedVariable> getAllVariablesInRefinements(List<RefinedVariable> vars) {
+	//		List<RefinedVariable> newVars = new ArrayList();
+	//		for (RefinedVariable var:getVariables()) 
+	//			newVars.add(var);
+	//		for (RefinedVariable var:getVariables())
+	//			recAuxGetVars(var, newVars);
+	//		return newVars;
+	//	}
 
 	private void recAuxGetVars(RefinedVariable var, List<RefinedVariable> newVars) {
 		if(!context.hasVariable(var.getName()))

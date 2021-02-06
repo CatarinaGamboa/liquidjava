@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -17,6 +19,21 @@ public class Variable extends RefinedVariable{
 	private VariableInstance ifBefore;
 	private VariableInstance ifThen;
 	private VariableInstance ifElse;
+	
+	public Constraint getRefinement() {
+		Constraint c = super.getRefinement();
+		Optional<VariableInstance> ovi =getLastInstance();
+		if(ovi.isPresent()) {
+			VariableInstance vi = ovi.get();
+			c = new Conjunction(new EqualsPredicate(this.getName(), vi.getName()), c);
+		}
+		return c;
+	}
+	
+	public Constraint getMainRefinement() {
+		return super.getRefinement();
+	}
+	
 	
 	public Variable(String name, CtTypeReference<?> type, Constraint ref) {
 		super(name, type, ref);
