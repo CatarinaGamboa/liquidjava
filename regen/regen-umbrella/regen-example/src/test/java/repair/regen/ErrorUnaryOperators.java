@@ -8,7 +8,7 @@ public class ErrorUnaryOperators {
 		int v = 3;
 		v--;
 		@Refinement("_ >= 10")
-		int s = 100;
+		int s = 10;
 		s--;
 
 	}

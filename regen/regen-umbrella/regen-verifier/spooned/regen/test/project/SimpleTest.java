@@ -1,6 +1,9 @@
 package regen.test.project;
 
 
+// ErrorDependentRefinement
+// ErrorSpecificVarInRefinementIf
+// ErrorSpecificVarInRefinement
 // Errors to take care of
 // //value_4==innerScope && value_4 == innerScope_1
 // @Refinement("_ < 100")
@@ -32,20 +35,12 @@ package regen.test.project;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        // Example 1
-        @repair.regen.specification.Refinement("_ < 100")
-        int ielse = 90;
         @repair.regen.specification.Refinement("_ < 10")
-        int then = 7;
-        if (then > 6)
-            then = then - 8;
-        else
-            ielse = 5;
-
-        @repair.regen.specification.Refinement("_ == 7 || _ == 5")
-        int some = then;
-        @repair.regen.specification.Refinement("_ == 5 || _==90")
-        int thing = ielse;
+        int v = 3;
+        v--;
+        @repair.regen.specification.Refinement("_ >= 10")
+        int s = 10;
+        s--;
     }
 }
 

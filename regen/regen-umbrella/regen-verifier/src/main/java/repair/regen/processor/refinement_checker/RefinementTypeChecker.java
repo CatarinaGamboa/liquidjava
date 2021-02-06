@@ -137,6 +137,10 @@ public class RefinementTypeChecker extends CtScanner {
 			if (refinementFound == null) {
 				refinementFound = new Predicate();
 			}
+			Optional<VariableInstance> r = context.getLastVariableInstance(name);
+			if(r.isPresent())
+				vcChecker.removeFreshVariableThatIncludes(r.get().getName());//AQUI!!
+
 			vcChecker.removeFreshVariableThatIncludes(name);//AQUI!!
 			checkVariableRefinements(refinementFound, name, varDecl);
 

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -100,10 +101,10 @@ public class VCChecker {
 			if(rv.getRefinement().getVariableNames().contains(otherVar))
 				toRemove.add(rv);
 		}
-		//		for(RefinedVariable rv:toRemove) {
-		//			pathVariables.remove(rv);
-		//			removeFromAllVariables(rv);
-		//		}
+		for(RefinedVariable rv:toRemove) {
+			pathVariables.remove(rv);
+			//removeFromAllVariables(rv);
+		}
 
 	}
 
@@ -123,10 +124,14 @@ public class VCChecker {
 		if(pathVariables.isEmpty())
 			process(expectedType, element, getVariables(expectedType));
 		else {
+			String nameToRemove = name;
+			Optional<VariableInstance> elemrv = context.getLastVariableInstance(name);
+			if(elemrv.isPresent())
+				nameToRemove =elemrv.get().getName();
 			List<RefinedVariable> pathRemove = new ArrayList<>();
 
 			for(RefinedVariable rv: pathVariables) {
-				if(rv.getRefinement().getVariableNames().contains(name))
+				if(rv.getRefinement().getVariableNames().contains(nameToRemove))
 					pathRemove.add(rv);
 			}
 
