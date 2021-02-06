@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.language.BinaryExpression;
+import repair.regen.language.BooleanLiteral;
 import repair.regen.language.Expression;
 import repair.regen.language.ExpressionGroup;
 import repair.regen.language.UnaryExpression;
@@ -102,6 +103,14 @@ public class Predicate extends Constraint{
 		}else if(exp2 instanceof ExpressionGroup) {
 			auxGetVariableNames(((ExpressionGroup)exp2).getExpression(), l);
 		}
+	}
+	
+	boolean isBooleanTrue() {
+		if (exp instanceof BooleanLiteral) {
+			BooleanLiteral b = (BooleanLiteral) exp;
+			return b.getValue();			
+		}
+		return false;
 	}
 
 }

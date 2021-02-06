@@ -17,7 +17,6 @@ public class BooleanLiteral extends LiteralExpression implements IModel {
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
-		//System.out.println("IN BOOL");
 		return ctx.makeBooleanLiteral(value);
 	}
 
@@ -25,4 +24,9 @@ public class BooleanLiteral extends LiteralExpression implements IModel {
 	public String toString() {
 		return Boolean.toString(value);
 	}
+	
+	public boolean getValue() {
+		return value;
+	}
+	
 }

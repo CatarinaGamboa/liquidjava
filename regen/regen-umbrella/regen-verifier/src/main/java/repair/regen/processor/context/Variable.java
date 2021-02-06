@@ -24,20 +24,6 @@ public class Variable extends RefinedVariable{
 		this.instances.push(new ArrayList<VariableInstance>());
 	}
 
-
-	/**
-	 * New Constraint with the variable name renamed to toReplace
-	 * @param toReplace
-	 * @return
-	 */
-	public Constraint getRenamedRefinements(String toReplace) {
-		Constraint refinement =  super.getRefinement();
-		if(refinement instanceof Predicate) {
-			Predicate np = new Predicate(refinement.toString());
-			return np.substituteVariable(super.getName(), toReplace);
-		}
-		return refinement;//TODO REMOVE when all cases of Constraint are implemented
-	}	
 	
 	//INSTANCES
 	public void enterContext() {

@@ -76,11 +76,6 @@ public abstract class Refined {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (refinement == null) {
-			if (other.refinement != null)
-				return false;
-		} else if (!refinement.equals(other.refinement))
-			return false;
 		if (type == null) {
 			if (other.type != null)
 				return false;
