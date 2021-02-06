@@ -8,6 +8,7 @@ import repair.regen.language.BinaryExpression;
 import repair.regen.language.BooleanLiteral;
 import repair.regen.language.Expression;
 import repair.regen.language.ExpressionGroup;
+import repair.regen.language.LiteralExpression;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.Variable;
 import repair.regen.language.parser.RefinementParser;
@@ -25,7 +26,7 @@ public class Predicate extends Constraint{
 
 	public Predicate(String ref) {
 		exp = parse(ref);
-		if(!(exp instanceof ExpressionGroup)) {
+		if(!(exp instanceof ExpressionGroup) && !(exp instanceof LiteralExpression)) {
 			exp = parse(String.format("(%s)", ref));
 		}
 	}

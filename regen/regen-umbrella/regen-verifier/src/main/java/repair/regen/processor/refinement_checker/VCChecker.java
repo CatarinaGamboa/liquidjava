@@ -22,38 +22,12 @@ import spoon.reflect.declaration.CtElement;
 
 public class VCChecker {
 	private Context context;
-	//private List<List<RefinedVariable>> allVariables;
 	private List<RefinedVariable> pathVariables;
 
 	public VCChecker() {
 		context = Context.getInstance();
-		//		allVariables = new ArrayList<>();
-		//		allVariables.add(new ArrayList<>());
 		pathVariables = new Stack<>();
 	}
-	//
-	//	public void renewVariables() {
-	////		int size = allVariables.size();
-	////		if(size > 0) {
-	////			allVariables.remove(size-1);
-	////			allVariables.add(new ArrayList<>());
-	////		}
-	//	}
-	//	public void addRefinementVariable(RefinedVariable var) {
-	////		List<RefinedVariable> variables = allVariables.get(allVariables.size()-1);
-	////		if(!variables.contains(var))
-	////			variables.add(var);
-	//	}
-
-	//	public List<RefinedVariable> getVariables() {
-	////		List<RefinedVariable> all = new ArrayList<>();
-	////		for(List<RefinedVariable> l : allVariables)
-	////			for(RefinedVariable s : l)
-	////				if(!all.contains(s))
-	////					all.add(s);
-	////
-	////		return all;
-	//	}
 
 	public List<RefinedVariable> getVariables(Constraint c) {
 		List<RefinedVariable> allVars = new ArrayList<>();
@@ -94,55 +68,26 @@ public class VCChecker {
 	public void removePathVariable(RefinedVariable rv) {
 		pathVariables.remove(rv);
 	}
+
 	public void removeFreshVariableThatIncludes(String otherVar) {
-		//Remove from path
 		List<RefinedVariable> toRemove = new ArrayList<>();
-		for(RefinedVariable rv:pathVariables) {
+		for(RefinedVariable rv:pathVariables)
 			if(rv.getRefinement().getVariableNames().contains(otherVar))
 				toRemove.add(rv);
-		}
-		for(RefinedVariable rv:toRemove) {
+
+		for(RefinedVariable rv:toRemove) 
 			pathVariables.remove(rv);
-			//removeFromAllVariables(rv);
-		}
-
 	}
-
-	//	public void enterContext() {
-	//		allVariables.add(new ArrayList<>());
-	//	}
-	//	public void exitContext() {
-	//		allVariables.remove(allVariables.size()-1);
-	//	}
-
 
 	public void processSubtyping(Constraint expectedType, CtElement element) {
 		process(expectedType, element, getVariables(expectedType));
 	}
 
 	public void processSubtyping(Constraint expectedType, String name, CtElement element) {
-		if(pathVariables.isEmpty())
-			process(expectedType, element, getVariables(expectedType));
-		else {
-			String nameToRemove = name;
-			Optional<VariableInstance> elemrv = context.getLastVariableInstance(name);
-			if(elemrv.isPresent())
-				nameToRemove =elemrv.get().getName();
-			List<RefinedVariable> pathRemove = new ArrayList<>();
+		process(expectedType, element, getVariables(expectedType));
 
-			for(RefinedVariable rv: pathVariables) {
-				if(rv.getRefinement().getVariableNames().contains(nameToRemove))
-					pathRemove.add(rv);
-			}
-
-			List<RefinedVariable> toSend = getVariables(expectedType).stream()
-					.filter(a->!pathRemove.contains(a))
-					.collect(Collectors.toList());
-			process(expectedType, element, toSend);
-		}
 	}
 
-	//check type
 	private void process(Constraint expectedType, CtElement element, List<RefinedVariable> vars) {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sbSMT = new StringBuilder();
@@ -165,14 +110,7 @@ public class VCChecker {
 		smtChecking(cSMT, expectedType, element);
 	}
 
-	//	private List<RefinedVariable> getAllVariablesInRefinements(List<RefinedVariable> vars) {
-	//		List<RefinedVariable> newVars = new ArrayList();
-	//		for (RefinedVariable var:getVariables()) 
-	//			newVars.add(var);
-	//		for (RefinedVariable var:getVariables())
-	//			recAuxGetVars(var, newVars);
-	//		return newVars;
-	//	}
+
 
 	private void recAuxGetVars(RefinedVariable var, List<RefinedVariable> newVars) {
 		if(!context.hasVariable(var.getName()))
@@ -191,6 +129,8 @@ public class VCChecker {
 		}
 	}
 
+
+	//################################# PRINTS ########################################
 	private void printVCs(String string, String stringSMT, Constraint expectedType) {
 		System.out.println("----------------------------VC--------------------------------");
 		System.out.println("VC:"+string);
@@ -236,8 +176,6 @@ public class VCChecker {
 		System.out.println();
 		System.out.println(var);
 		System.out.println();
-		//System.out.println("Type expected:" + et);
-		//System.out.println("Refinement found:" + correctRefinement);
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);
