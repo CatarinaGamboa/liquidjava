@@ -52,9 +52,20 @@ public class Predicate extends Constraint{
 				return e;
 			}
 		} catch (SyntaxException e1) {
-			e1.printStackTrace();
+			printSyntaxError(ref);
+			
 		}	
 		return null;
+	}
+
+	private void printSyntaxError(String ref) {
+		System.out.println("______________________________________________________");
+		System.err.println("Syntax error");
+		System.out.println("Found in refinement:");
+		System.out.println(ref);
+		System.out.println("______________________________________________________");
+		System.exit(2);
+		
 	}
 
 	private void auxSubstitute(Expression exp2, String from, String to) {

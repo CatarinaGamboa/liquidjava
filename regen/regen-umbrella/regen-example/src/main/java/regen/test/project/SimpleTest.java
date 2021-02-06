@@ -5,7 +5,7 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
 
 	public static void main(String[] args) {
-		@Refinement("_ < 100")
+		@Refinement("_ < 100 +")
 			int value = 90+4;
 					
 	}

@@ -42,7 +42,7 @@ public class VCChecker {
 	}
 
 	private void getVariablesFromContext(List<String> lvars, List<RefinedVariable> allVars) {
-		for(String name: lvars) {
+		for(String name: lvars) 
 			if(context.hasVariable(name)) {
 				RefinedVariable rv = context.getVariableByName(name);
 				if(!allVars.contains(rv)) {
@@ -50,17 +50,8 @@ public class VCChecker {
 					recAuxGetVars(rv, allVars);
 				}
 			}
-		}
 	}
-	//	private void removeFromAllVariables(RefinedVariable s1) {
-	//		for(List<RefinedVariable> l : allVariables)
-	//			if(l.contains(s1))
-	//				l.remove(s1);
-	//	}
 
-	//	public List<RefinedVariable> getLastContextVariables(){
-	//		return allVariables.get(allVariables.size()-1);
-	//	}
 	public void setPathVariables(RefinedVariable rv) {
 		pathVariables.add(rv);
 	}
@@ -85,7 +76,6 @@ public class VCChecker {
 
 	public void processSubtyping(Constraint expectedType, String name, CtElement element) {
 		process(expectedType, element, getVariables(expectedType));
-
 	}
 
 	private void process(Constraint expectedType, CtElement element, List<RefinedVariable> vars) {
@@ -94,8 +84,7 @@ public class VCChecker {
 
 		//Check
 		Constraint cSMT = new Predicate();
-		List<RefinedVariable> vars2 = vars;//getAllVariablesInRefinements(vars);
-		for(RefinedVariable var:vars2) {
+		for(RefinedVariable var:vars) {
 			cSMT = new Conjunction(cSMT, var.getRefinement());
 			String ref = var.getRefinement().toString();
 
@@ -106,7 +95,6 @@ public class VCChecker {
 		sb.append(expectedType);
 		printVCs(sb.toString(), sbSMT.toString(), expectedType);
 
-		//check type
 		smtChecking(cSMT, expectedType, element);
 	}
 
@@ -128,17 +116,15 @@ public class VCChecker {
 			}
 		}
 	}
+	
 
-
-	//################################# PRINTS ########################################
-	private void printVCs(String string, String stringSMT, Constraint expectedType) {
-		System.out.println("----------------------------VC--------------------------------");
-		System.out.println("VC:"+string);
-		System.out.println("SMT subtyping:" + stringSMT + " <: " + expectedType.toString());
-		System.out.println("--------------------------------------------------------------");
-
-	}
-
+	/**
+	 * Checks the expectedType against the cSMT constraint.
+	 * If the types do not check and error is sent and the program ends
+	 * @param cSMT
+	 * @param expectedType
+	 * @param element
+	 */
 	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
 		try {
 			new SMTEvaluator().verifySubtype(cSMT.toString(), expectedType.toString(), context.getContext());
@@ -150,6 +136,16 @@ public class VCChecker {
 		//}
 
 	}
+
+	//################################# PRINTS ########################################
+	private void printVCs(String string, String stringSMT, Constraint expectedType) {
+		System.out.println("----------------------------VC--------------------------------");
+		System.out.println("VC:"+string);
+		System.out.println("SMT subtyping:" + stringSMT + " <: " + expectedType.toString());
+		System.out.println("--------------------------------------------------------------");
+
+	}
+
 
 	/**
 	 * Prints the error message
@@ -178,6 +174,6 @@ public class VCChecker {
 		System.out.println();
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
-		System.exit(1);
+		System.exit(2);
 	}
 }
