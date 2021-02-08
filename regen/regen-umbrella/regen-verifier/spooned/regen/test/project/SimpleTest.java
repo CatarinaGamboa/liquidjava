@@ -13,19 +13,21 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("{a == 10} -> {_ < a && _ > 0} -> {_ >= a}")
-    public static int posMult(int a, int b) {
+    @repair.regen.specification.Refinement("_ >= a")
+    public static int posMult(@repair.regen.specification.Refinement("a == 10")
+    int a, @repair.regen.specification.Refinement(" _ < a && _ > 0")
+    int b) {
         @repair.regen.specification.Refinement("y > 30")
         int y = 50;
         return y - 10;
     }
 
-    @repair.regen.specification.Refinement("{_ == 10}")
+    @repair.regen.specification.Refinement("_ == 10")
     public static int ten() {
         return 10;
     }
 
-    @repair.regen.specification.Refinement("{true}->{_ == b*2}")
+    @repair.regen.specification.Refinement("_ == b*2")
     private static int multTwo(int b) {
         return b * 2;
     }

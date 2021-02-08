@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.processor.built_ins.RefinementsLibrary;
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
@@ -87,8 +88,7 @@ public class MethodsFunctionsChecker {
 
 		Constraint metRefOriginal = f.getRefReturn(); 
 		List<RefinedVariable> saveVars = new ArrayList<>();
-		//for(RefinedVariable v: rtc.vcChecker.getVariables()) //TODO CHECK
-			//saveVars.add(v);
+
 
 		HashMap<String, String> newNames = new HashMap<>();
 
@@ -136,24 +136,52 @@ public class MethodsFunctionsChecker {
 
 
 	<R> void getMethodRefinements(CtMethod<R> method) {
+		//main cannot have refinement - for now
+		if(method.getSignature().equals("main(java.lang.String[])"))
+			return;
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
 		f.setRefReturn(new Predicate());
 		rtc.context.addFunctionToContext(f);
-		for(CtAnnotation<? extends Annotation> ann :method.getAnnotations()) {
-			if( !ann.getActualAnnotation().annotationType().getCanonicalName()
-					.contentEquals("repair.regen.specification.Refinement"))
-				continue;
-			CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-			String methodRef = s.getValue();
-			List<CtParameter<?>> params = method.getParameters();
-
-			String ref = handleFunctionRefinements(f, methodRef, params);
-			method.putMetadata(rtc.REFINE_KEY, new Predicate(ref));
-		}
+		
+		List<CtParameter<?>> params = method.getParameters();
+		Constraint ref = handleFunctionRefinements(f, method, params);
+		method.putMetadata(rtc.REFINE_KEY, ref);
+		
 	}
 
+	/**
+	 * Joins all the refinements from parameters and return
+	 * @param f
+	 * @param methodRef
+	 * @param params
+	 * @return Conjunction of all 
+	 */
+	private Constraint handleFunctionRefinements(RefinedFunction f, CtMethod<?> method, 
+			List<CtParameter<?>> params) {
+		Constraint joint = new Predicate();
+		
+		for(CtParameter<?> param:params) {
+			String paramName = param.getSimpleName();
+			Optional<Constraint> oc = rtc.getRefinementFromAnnotation(param);
+			Constraint c = oc.isPresent()?oc.get():new Predicate();
+			c = c.substituteVariable(rtc.WILD_VAR, paramName);
+			param.putMetadata(rtc.REFINE_KEY, c);
+			RefinedVariable v = rtc.context.addVarToContext(param.getSimpleName(), param.getType(), c);
+			if(v instanceof Variable)
+				f.addArgRefinements((Variable)v);
+			joint = Conjunction.createConjunction(joint, c);
+		}
+
+		Optional<Constraint> oret = rtc.getRefinementFromAnnotation(method);
+		Constraint ret = oret.isPresent()?oret.get():new Predicate();
+		f.setRefReturn(ret);
+		rtc.context.addFunctionToContext(f);
+		return Conjunction.createConjunction(joint, ret);
+	}
+	
+	
 
 	/**
 	 * Adds information to FunctionInfo according to the refinements 
@@ -162,7 +190,7 @@ public class MethodsFunctionsChecker {
 	 * @param params
 	 * @return
 	 */
-	private String handleFunctionRefinements(RefinedFunction f, String methodRef, List<CtParameter<?>> params) {
+	private String handleFunctionRefinementsOLD(RefinedFunction f, String methodRef, List<CtParameter<?>> params) {
 		//TODO CHANGE
 		String[] r = methodRef.split("}\\s*->\\s*\\{");
 
@@ -188,6 +216,7 @@ public class MethodsFunctionsChecker {
 	}
 
 	private String handleFunctionRefinements(String methodRef, Method method) {
+		//TODO REMAKE
 		Parameter[] params = method.getParameters();
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getName());

@@ -4,21 +4,21 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {	
 	
-	
-	@Refinement("{a == 10} -> {_ < a && _ > 0} -> {_ >= a}")
-    public static int posMult(int a, int b) {
+	@Refinement("_ >= a")
+    public static int posMult(@Refinement("a == 10") int a, 
+    						  @Refinement(" _ < a && _ > 0") int b) {
 		@Refinement("y > 30")
 		int y = 50;
     	return y-10;
     }
 	
-	@Refinement("{_ == 10}")
+	@Refinement("_ == 10")
     public static int ten() {
 		return 10;
     }
 	
 	
-	@Refinement("{true}->{_ == b*2}")
+	@Refinement("_ == b*2")
 	private static int multTwo(int b) {
 		return b*2;
 	}
@@ -39,9 +39,6 @@ public class SimpleTest {
 
 	}
 	
-
-
-
 
 	////correctImplies -rever!!!
 	//	@Refinement("_ > 5")
