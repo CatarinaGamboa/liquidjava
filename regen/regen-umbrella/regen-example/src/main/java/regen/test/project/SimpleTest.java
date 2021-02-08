@@ -3,14 +3,21 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {
-
+//	@Refinement("{_ == 3}")
+//	public static int three() {
+//		return 3;
+//	}
 	public static void main(String[] args) {
-
-		@Refinement("(_ == -5)")
-		float prim = Math.copySign(-5, -500);
-		@Refinement("_ == -656")
-		float ter = Math.copySign(656, prim);
-
+		@Refinement("_ < 10")
+		int a = 5;
+		@Refinement("_ > 0")
+		int b = 3;
+		a = (a == 2)? 6 : 9;
+//		a = (b > 2)? 8 : -1;
+//		b = (a < 100)? three(): three()-1;
+//		@Refinement("c < 100")
+//		int c = (a < 100)? three(): a;
+//		c = (a < 100)? three()*3 : a*5;
 	}
 
 
@@ -35,12 +42,6 @@ public class SimpleTest {
 
 
 
-
-	//SEE ERROR still error
-	//		@Refinement("(_ == -5)")
-	//		float prim = Math.copySign(-5, -500);
-	//		@Refinement("_ == -656")
-	//		float ter = Math.copySign(656, prim);
 
 	//See error NaN
 	//		@Refinement("true")

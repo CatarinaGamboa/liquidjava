@@ -230,7 +230,6 @@ public class RefinementTypeChecker extends CtScanner {
 		RefinedVariable freshRV = context.addVarToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, nExpRefs);
 		vcChecker.addPathVariable(freshRV);
-		//vcChecker.addRefinementVariable(freshRV);
 		
 		//VISIT THEN
 		enterContexts();
@@ -250,7 +249,6 @@ public class RefinementTypeChecker extends CtScanner {
 		}
 		//end
 		vcChecker.removePathVariable(freshRV);
-		//vcChecker.renewVariables();
 		exitContexts();
 		context.variablesCombineFromIf();
 	}
@@ -273,7 +271,6 @@ public class RefinementTypeChecker extends CtScanner {
 	@Override
 	public <T> void visitCtConditional(CtConditional<T> conditional) {
 		super.visitCtConditional(conditional);
-		//TODO REVIEW ALL
 		Constraint cond = getRefinement(conditional.getCondition());
 		String condRefs = cond.toString(); 
 		String condThen = "!(" + condRefs + ") || ("+ getRefinement(conditional.getThenExpression())+")", //!A or B

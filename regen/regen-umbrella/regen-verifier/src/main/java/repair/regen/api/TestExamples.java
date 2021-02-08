@@ -111,10 +111,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectIfThen.java");
 	}
 	
-//	@Test
-//	public void correctTernaryExpression() {
-//		testCorrect(testPath+"CorrectTernaryExpression.java");//TODO REVIEW TEST
-//	}
+	@Test
+	public void correctTernaryExpression() {
+		testCorrect(testPath+"CorrectTernaryExpression.java");//TODO REVIEW TEST
+	}
 	
 	@Test
 	public void correctSimpleIfElse() {
