@@ -92,10 +92,10 @@ public class RefinementTypeChecker extends CtScanner {
 
 
 	public <R> void visitCtMethod(CtMethod<R> method) {
-		enterContexts();
+		context.enterContext();
 		mfc.getMethodRefinements(method);
 		super.visitCtMethod(method);
-		exitContexts();
+		context.exitContext();
 
 	}
 
@@ -179,7 +179,6 @@ public class RefinementTypeChecker extends CtScanner {
 		super.visitCtVariableRead(variableRead);
 		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
 		String name = varDecl.getSimpleName();
-		addRefinementVariable(context.getVariableByName(name));
 		getPutVariableMetadada(variableRead, varDecl);
 	}
 
@@ -219,7 +218,7 @@ public class RefinementTypeChecker extends CtScanner {
 		//TODO REVER
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		context.variablesSetBeforeIf();
-		enterContexts();
+		context.enterContext();
 		
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
@@ -232,24 +231,24 @@ public class RefinementTypeChecker extends CtScanner {
 		vcChecker.addPathVariable(freshRV);
 		
 		//VISIT THEN
-		enterContexts();
+		context.enterContext();
 		visitCtBlock(ifElement.getThenStatement());
 		context.variablesSetThenIf();
-		exitContexts();
+		context.exitContext();
 
 		//VISIT ELSE
 		if(ifElement.getElseStatement() != null) {
 			context.getVariableByName(freshVarName);
 			expRefs = expRefs.negate();
 			context.newRefinementToVariableInContext(freshVarName, expRefs);
-			enterContexts();
+			context.enterContext();
 			visitCtBlock(ifElement.getElseStatement());
 			context.variablesSetElseIf();
-			exitContexts();
+			context.exitContext();
 		}
 		//end
 		vcChecker.removePathVariable(freshRV);
-		exitContexts();
+		context.exitContext();
 		context.variablesCombineFromIf();
 	}
 
@@ -278,25 +277,9 @@ public class RefinementTypeChecker extends CtScanner {
 
 		conditional.putMetadata(REFINE_KEY, new Predicate("("+condThen+") && ("+notCondElse+")"));//TODO CHANGE TO CONJUNCTION
 	}
-
-
-	//------------------------------- Auxiliary Methods ----------------------------------------
-	//############################### Variables and Context handling  ##########################################
-	private void renewVariables() {
-		//vcChecker.renewVariables();
-	}
-	void addRefinementVariable(RefinedVariable var) {
-		//vcChecker.addRefinementVariable(var);
-	}
-	private void enterContexts() {
-		context.enterContext();
-		//vcChecker.enterContext();
-	}
-	private void exitContexts() {
-		context.exitContext();
-		//vcChecker.exitContext();
-	}
-
+	
+	
+	
 	//############################### Inner Visitors  ##########################################
 
 	private Constraint getExpressionRefinements(CtExpression element) {
@@ -338,8 +321,6 @@ public class RefinementTypeChecker extends CtScanner {
 			Constraint cEt = new Predicate(et);
 			cEt = cEt.substituteVariable(WILD_VAR, simpleName);
 			Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
-			//create new variable for validation
-			//Ex: @Ref(a>5) a = 10; VC becomes: a__0 == 10 -> a__0 > 5
 			
 			String newName = simpleName+"_"+context.getCounter()+"_";
 			Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
@@ -348,17 +329,16 @@ public class RefinementTypeChecker extends CtScanner {
 			//Substitute variable in verification
 			RefinedVariable rv= context.addInstanceToContext(newName, variable.getType(), correctNewRefinement);
 			context.addRefinementInstanceToVariable(simpleName, newName);
-			addRefinementVariable(rv);//TODO REMOVE
 			//smt check
 			checkSMT(cEt, variable);//TODO CHANGE
 			context.addRefinementToVariableInContext(variable, cet);
 		});
+		System.out.println();
 	}
 	
 	<T> void checkSMT(Constraint expectedType, CtElement element) {
 		vcChecker.processSubtyping(expectedType, element);
 		element.putMetadata(REFINE_KEY, expectedType);	
-		renewVariables();
 	}
 	
 
@@ -378,11 +358,8 @@ public class RefinementTypeChecker extends CtScanner {
 		String name = varDecl.getSimpleName();
 		Constraint cref = new EqualsPredicate(WILD_VAR, name);
 		Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
-		if(ovi.isPresent()) {
-			RefinedVariable vi = ovi.get();
-			addRefinementVariable(vi);
-			cref = new EqualsPredicate(WILD_VAR, vi.getName());
-		}
+		if(ovi.isPresent())
+			cref = new EqualsPredicate(WILD_VAR, ovi.get().getName());
 		
 		variable.putMetadata(REFINE_KEY, cref);
 	}

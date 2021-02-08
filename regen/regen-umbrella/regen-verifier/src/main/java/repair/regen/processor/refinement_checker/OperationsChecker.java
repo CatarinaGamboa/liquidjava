@@ -129,7 +129,6 @@ class OperationsChecker {
 			all = new EqualsPredicate(rtc.WILD_VAR, opS);//TODO SEE IF () IN OPS IS NEEDED
 		
 		RefinedVariable rv = rtc.context.addVarToContext(newName, ex.getType(), newMeta);
-		rtc.addRefinementVariable(rv);
 		operator.putMetadata(rtc.REFINE_KEY, all);
 
 	}
@@ -171,13 +170,11 @@ class OperationsChecker {
 				//String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
 				RefinedVariable newVi = rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
 				rtc.context.addSpecificVariable(newVi);
-				rtc.addRefinementVariable(newVi);
 				returnName = newName;
 			}
 			
 			Constraint e = elem_ref.substituteVariable(rtc.WILD_VAR, elemName);
 			RefinedVariable rv = rtc.context.addVarToContext(elemName, elemVar.getType(), e);
-			rtc.addRefinementVariable(rv);
 			return new Predicate(returnName);
 		}
 
@@ -208,10 +205,8 @@ class OperationsChecker {
 			//Substitute _ by the variable that we send
 			String newName = rtc.FRESH + rtc.context.getCounter();
 			
-			//TODO ERRO AQUI!!!!!!!!NO INNERREFS
 			innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
 			RefinedVariable rv = rtc.context.addVarToContext(newName, fi.getType(), innerRefs);
-			rtc.addRefinementVariable(rv);
 			return new Predicate(newName);//Return variable that represents the invocation
 		}
 		return rtc.getRefinement(element);
@@ -240,7 +235,6 @@ class OperationsChecker {
 		Constraint c = getOperatorFromKind(operator.getKind()).substituteVariable(rtc.WILD_VAR, newName);
 		
 		RefinedVariable rv = rtc.context.addVarToContext(newName, w.getType(), metadada);
-		rtc.addRefinementVariable(rv);
 		return new EqualsPredicate(rtc.WILD_VAR, c);
 	}
 

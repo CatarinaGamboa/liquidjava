@@ -118,7 +118,11 @@ public class CorrectInvocationFromMathLibrary {
         // long a10 = Math.decrementExact(a7);
         // @Refinement("_ == 9")
         // long a11 = Math.decrementExact(a7);
-        // 
+        // copySign
+        // @Refinement("(_ == -5)")
+        // float prim = Math.copySign(-5, -500);
+        // @Refinement("_ == -656")
+        // float ter = Math.copySign(656, prim);
         // Constants
         @repair.regen.specification.Refinement("_ > 3")
         double a2 = java.lang.Math.PI;
