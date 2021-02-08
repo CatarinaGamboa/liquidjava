@@ -5,43 +5,36 @@ import repair.regen.specification.Refinement;
 public class SimpleTest {
 
 	public static void main(String[] args) {
-		@Refinement("_ < 100 +")
-			int value = 90+4;
-					
+
+		@Refinement("(_ == -5)")
+		float prim = Math.copySign(-5, -500);
+		@Refinement("_ == -656")
+		float ter = Math.copySign(656, prim);
+
 	}
 
 
-//ErrorDependentRefinement
-//ErrorSpecificVarInRefinementIf
-//ErrorSpecificVarInRefinement
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-	//Errors to take care of
-	// //value_4==innerScope && value_4 == innerScope_1
-	//	@Refinement("_ < 100")
-	//	int value = 90;
-	//			
-	//	if(value > 6) {
-	//		@Refinement("_ > 10")
-	//		int innerScope = 30;
-	//		value = innerScope;
-	//	}
+	////correctImplies -rever!!!
+	//	@Refinement("_ > 5")
+	//	int x = 10;
 	//	
-	//	@Refinement("_ == 30 || _ == 90")
-	//	int some2 = value;
+	//	@Refinement("(x > 50) --> (y > 50)")
+	//	int y = x;
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	//SEE ERROR still error
 	//		@Refinement("(_ == -5)")

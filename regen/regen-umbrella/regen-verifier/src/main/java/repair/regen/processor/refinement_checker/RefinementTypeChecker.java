@@ -139,9 +139,9 @@ public class RefinementTypeChecker extends CtScanner {
 			}
 			Optional<VariableInstance> r = context.getLastVariableInstance(name);
 			if(r.isPresent())
-				vcChecker.removeFreshVariableThatIncludes(r.get().getName());//AQUI!!
+				vcChecker.removePathVariableThatIncludes(r.get().getName());//AQUI!!
 
-			vcChecker.removeFreshVariableThatIncludes(name);//AQUI!!
+			vcChecker.removePathVariableThatIncludes(name);//AQUI!!
 			checkVariableRefinements(refinementFound, name, varDecl);
 
 		}
@@ -229,7 +229,7 @@ public class RefinementTypeChecker extends CtScanner {
 		
 		RefinedVariable freshRV = context.addVarToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, nExpRefs);
-		vcChecker.setPathVariables(freshRV);
+		vcChecker.addPathVariable(freshRV);
 		//vcChecker.addRefinementVariable(freshRV);
 		
 		//VISIT THEN
@@ -347,15 +347,13 @@ public class RefinementTypeChecker extends CtScanner {
 			String newName = simpleName+"_"+context.getCounter()+"_";
 			Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
 			cEt = cEt.substituteVariable(simpleName, newName);
-
-			addReferencedVars(cEt, newName);
 			
 			//Substitute variable in verification
 			RefinedVariable rv= context.addInstanceToContext(newName, variable.getType(), correctNewRefinement);
 			context.addRefinementInstanceToVariable(simpleName, newName);
-			addRefinementVariable(rv);
+			addRefinementVariable(rv);//TODO REMOVE
 			//smt check
-			checkSMTVariable(cEt, variable, simpleName);//TODO CHANGE
+			checkSMT(cEt, variable);//TODO CHANGE
 			context.addRefinementToVariableInContext(variable, cet);
 		});
 	}
@@ -366,13 +364,6 @@ public class RefinementTypeChecker extends CtScanner {
 		renewVariables();
 	}
 	
-	private void checkSMTVariable(Constraint expectedType, 
-			CtVariable<?> element, String simpleName) {
-		vcChecker.processSubtyping(expectedType, simpleName, element);
-		element.putMetadata(REFINE_KEY, expectedType);	
-		renewVariables();
-
-	}
 
 
 	//############################### Get Metadata ##########################################
@@ -380,19 +371,6 @@ public class RefinementTypeChecker extends CtScanner {
 		return (Constraint)elem.getMetadata(REFINE_KEY);
 
 	}
-
-
-	private void addReferencedVars(Constraint constraint, String differentFrom) {
-		List<String> variableNames = constraint.getVariableNames();
-		for(String s: variableNames) {
-			if(!s.equals(differentFrom) && context.hasVariable(s)) {
-				addRefinementVariable(context.getVariableByName(s));
-			}
-		}
-	}
-
-
-
 	/**
 	 * 
 	 * @param <T>

@@ -14,5 +14,7 @@ public abstract class RefinedVariable extends Refined{
 	public RefinedVariable(String name, CtTypeReference<?> type, Constraint c) {
 		super(name, type, c);
 	}
+	
+	public abstract Constraint getMainRefinement();
 
 }

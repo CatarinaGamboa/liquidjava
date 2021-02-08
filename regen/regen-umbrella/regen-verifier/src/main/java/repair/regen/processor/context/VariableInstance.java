@@ -8,6 +8,12 @@ public class VariableInstance extends RefinedVariable{
 	public VariableInstance(String name, CtTypeReference<?> type, Constraint c) {
 		super(name, type, c);
 	}
+	
+	@Override
+	public Constraint getMainRefinement() {
+		return super.getRefinement();
+	}
+	
 
 	@Override
 	public String toString() {

@@ -1,12 +1,7 @@
 package repair.regen.processor.refinement_checker;
 
-import java.sql.Ref;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
@@ -15,7 +10,6 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
-import repair.regen.processor.context.VariableInstance;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.declaration.CtElement;
@@ -29,30 +23,7 @@ public class VCChecker {
 		pathVariables = new Stack<>();
 	}
 
-	public List<RefinedVariable> getVariables(Constraint c) {
-		List<RefinedVariable> allVars = new ArrayList<>();
-		getVariablesFromContext(c.getVariableNames(), allVars);
-		List<String> pathNames = pathVariables.stream()
-				.map(a->a.getName())
-				.collect(Collectors.toList());
-		getVariablesFromContext(pathNames, allVars);
-
-
-		return allVars;
-	}
-
-	private void getVariablesFromContext(List<String> lvars, List<RefinedVariable> allVars) {
-		for(String name: lvars) 
-			if(context.hasVariable(name)) {
-				RefinedVariable rv = context.getVariableByName(name);
-				if(!allVars.contains(rv)) {
-					allVars.add(rv);
-					recAuxGetVars(rv, allVars);
-				}
-			}
-	}
-
-	public void setPathVariables(RefinedVariable rv) {
+	public void addPathVariable(RefinedVariable rv) {
 		pathVariables.add(rv);
 	}
 
@@ -60,7 +31,7 @@ public class VCChecker {
 		pathVariables.remove(rv);
 	}
 
-	public void removeFreshVariableThatIncludes(String otherVar) {
+	void removePathVariableThatIncludes(String otherVar) {
 		List<RefinedVariable> toRemove = new ArrayList<>();
 		for(RefinedVariable rv:pathVariables)
 			if(rv.getRefinement().getVariableNames().contains(otherVar))
@@ -70,20 +41,24 @@ public class VCChecker {
 			pathVariables.remove(rv);
 	}
 
-	public void processSubtyping(Constraint expectedType, CtElement element) {
-		process(expectedType, element, getVariables(expectedType));
-	}
 
-	public void processSubtyping(Constraint expectedType, String name, CtElement element) {
-		process(expectedType, element, getVariables(expectedType));
-	}
 
-	private void process(Constraint expectedType, CtElement element, List<RefinedVariable> vars) {
+	private void process(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 
+			List<RefinedVariable> vars) {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sbSMT = new StringBuilder();
 
 		//Check
 		Constraint cSMT = new Predicate();
+		for(RefinedVariable var:mainVars) {
+			cSMT = new Conjunction(cSMT, var.getMainRefinement());
+			String ref = var.getMainRefinement().toString();
+
+			//imprimir
+			sb.append("forall "+var.getName()+":"+ref+" -> \n");
+			sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
+		}
+
 		for(RefinedVariable var:vars) {
 			cSMT = new Conjunction(cSMT, var.getRefinement());
 			String ref = var.getRefinement().toString();
@@ -95,10 +70,56 @@ public class VCChecker {
 		sb.append(expectedType);
 		printVCs(sb.toString(), sbSMT.toString(), expectedType);
 
+		//check type
 		smtChecking(cSMT, expectedType, element);
 	}
 
 
+	public void processSubtyping(Constraint expectedType, CtElement element) {
+		List<RefinedVariable> lrv = new ArrayList<>();
+		List<RefinedVariable> mainVars = new ArrayList<>();
+		for(String s: expectedType.getVariableNames()) {
+			if(context.hasVariable(s)) {
+				RefinedVariable rv = context.getVariableByName(s);
+				mainVars.add(rv);
+				List<RefinedVariable> lm = getVariables(rv.getMainRefinement(), rv.getName());
+				addAllDiferent(lrv, lm);
+			}
+		}
+
+		process(expectedType, element, mainVars, lrv);
+	}
+
+	private void addAllDiferent(List<RefinedVariable> toExpand, List<RefinedVariable> from) {
+		for(RefinedVariable rv:from) {
+			if(!toExpand.contains(rv))
+				toExpand.add(rv);
+		}
+	}
+
+	public List<RefinedVariable> getVariables(Constraint c, String varName) {
+		List<RefinedVariable> allVars = new ArrayList<>();
+		getVariablesFromContext(c.getVariableNames(), allVars, varName);
+		List<String> pathNames = pathVariables.stream()
+				.map(a->a.getName())
+				.collect(Collectors.toList());
+		getVariablesFromContext(pathNames, allVars, "");
+
+
+		return allVars;
+	}
+
+	private void getVariablesFromContext(List<String> lvars, List<RefinedVariable> allVars, 
+			String notAdd) {
+		for(String name: lvars) 
+			if(!name.equals(notAdd) && context.hasVariable(name)) {
+				RefinedVariable rv = context.getVariableByName(name);
+				if(!allVars.contains(rv)) {
+					allVars.add(rv);
+					recAuxGetVars(rv, allVars);
+				}
+			}
+	}
 
 	private void recAuxGetVars(RefinedVariable var, List<RefinedVariable> newVars) {
 		if(!context.hasVariable(var.getName()))
@@ -116,7 +137,7 @@ public class VCChecker {
 			}
 		}
 	}
-	
+
 
 	/**
 	 * Checks the expectedType against the cSMT constraint.

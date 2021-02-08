@@ -1,22 +1,12 @@
 package regen.test.project;
 
 
-// ErrorDependentRefinement
-// ErrorSpecificVarInRefinementIf
-// ErrorSpecificVarInRefinement
-// Errors to take care of
-// //value_4==innerScope && value_4 == innerScope_1
-// @Refinement("_ < 100")
-// int value = 90;
+// //correctImplies -rever!!!
+// @Refinement("_ > 5")
+// int x = 10;
 // 
-// if(value > 6) {
-// @Refinement("_ > 10")
-// int innerScope = 30;
-// value = innerScope;
-// }
-// 
-// @Refinement("_ == 30 || _ == 90")
-// int some2 = value;
+// @Refinement("(x > 50) --> (y > 50)")
+// int y = x;
 // SEE ERROR still error
 // @Refinement("(_ == -5)")
 // float prim = Math.copySign(-5, -500);
@@ -35,8 +25,10 @@ package regen.test.project;
 // c = (a < 100)? three()*3 : a*5;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("_ < 100 +")
-        int value = 90 + 4;
+        @repair.regen.specification.Refinement("(_ == -5)")
+        float prim = java.lang.Math.copySign((-5), (-500));
+        @repair.regen.specification.Refinement("_ == -656")
+        float ter = java.lang.Math.copySign(656, prim);
     }
 }
 
