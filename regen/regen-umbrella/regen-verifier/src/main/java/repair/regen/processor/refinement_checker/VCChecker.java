@@ -51,7 +51,7 @@ public class VCChecker {
 		//Check
 		Constraint cSMT = new Predicate();
 		for(RefinedVariable var:mainVars) {
-			cSMT = new Conjunction(cSMT, var.getMainRefinement());
+			cSMT = Conjunction.createConjunction(cSMT, var.getMainRefinement());
 			String ref = var.getMainRefinement().toString();
 
 			//imprimir
@@ -60,7 +60,7 @@ public class VCChecker {
 		}
 
 		for(RefinedVariable var:vars) {
-			cSMT = new Conjunction(cSMT, var.getRefinement());
+			cSMT = Conjunction.createConjunction(cSMT, var.getRefinement());
 			String ref = var.getRefinement().toString();
 
 			//imprimir

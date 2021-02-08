@@ -25,7 +25,7 @@ public class Variable extends RefinedVariable{
 		Optional<VariableInstance> ovi =getLastInstance();
 		if(ovi.isPresent()) {
 			VariableInstance vi = ovi.get();
-			c = new Conjunction(new EqualsPredicate(this.getName(), vi.getName()), c);
+			c = Conjunction.createConjunction(new EqualsPredicate(this.getName(), vi.getName()), c);
 		}
 		return c;
 	}

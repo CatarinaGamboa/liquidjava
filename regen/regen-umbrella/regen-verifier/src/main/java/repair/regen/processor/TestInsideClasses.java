@@ -24,7 +24,7 @@ public class TestInsideClasses {
 		
 		EqualsPredicate ep = new EqualsPredicate("_", "7+8");
 		
-		Conjunction cc = new Conjunction(c2, ep);
+		Constraint cc = Conjunction.createConjunction(c2, ep);
 		
 		Constraint ss = cc.clone();
 		List<String> ls = cc.getVariableNames();

@@ -118,11 +118,7 @@ public class Predicate extends Constraint{
 	}
 	
 	boolean isBooleanTrue() {
-		if (exp instanceof BooleanLiteral) {
-			BooleanLiteral b = (BooleanLiteral) exp;
-			return b.getValue();			
-		}
-		return false;
+		return toString().equals("true") || toString().equals("(true)") ;	
 	}
 
 }

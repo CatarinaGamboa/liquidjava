@@ -6,11 +6,23 @@ public class Conjunction extends Constraint{
 	private Constraint c1;
 	private Constraint c2;
 
-	public Conjunction(Constraint c1, Constraint c2) {
+	private Conjunction(Constraint c1, Constraint c2) {
 		this.c1 = c1;
 		this.c2 = c2;
 	}
 	
+	public static Constraint createConjunction(Constraint c1, Constraint c2) {
+		if(!isLitTrue(c1) && !isLitTrue(c2))
+			return new Conjunction(c1, c2);
+		if(isLitTrue(c1))
+			return c2;
+		return c1;
+	}
+	
+	private static boolean isLitTrue(Constraint c) {
+		return c instanceof Predicate && ((Predicate)c).isBooleanTrue();
+	}
+
 	@Override
 	public Constraint substituteVariable(String from, String to) {
 		Constraint nc1 = c1.substituteVariable(from, to);

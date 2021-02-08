@@ -69,8 +69,8 @@ public class RefinedFunction extends Refined{
 	public Constraint getAllRefinements() {
 		Constraint c = new Predicate();
 		for(RefinedVariable p: argRefinements)
-			c = new Conjunction(c, p.getRefinement());//joinArgs
-		c = new Conjunction(c, super.getRefinement());//joinReturn
+			c = Conjunction.createConjunction(c, p.getRefinement());//joinArgs
+		c = Conjunction.createConjunction(c, super.getRefinement());//joinReturn
 		return c;
 	}
 
@@ -84,7 +84,7 @@ public class RefinedFunction extends Refined{
 	public Constraint getRefinementsForParamIndex(int index) {
 		Constraint c = new Predicate();
 		for (int i = 0; i <= index && i < argRefinements.size(); i++)
-			c = new Conjunction(c, argRefinements.get(i).getRefinement());
+			c = Conjunction.createConjunction(c, argRefinements.get(i).getRefinement());
 		return c;
 	}
 
