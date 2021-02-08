@@ -317,8 +317,9 @@ public class RefinementTypeChecker extends CtScanner {
 								).map(
 										str -> str.getValue()
 										).findAny();
-		expectedType.ifPresent((et) -> {
-			Constraint cEt = new Predicate(et);
+		
+		Constraint cEt = expectedType.isPresent()?new Predicate(expectedType.get()):new Predicate();
+		
 			cEt = cEt.substituteVariable(WILD_VAR, simpleName);
 			Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
 			
@@ -332,10 +333,11 @@ public class RefinementTypeChecker extends CtScanner {
 			//smt check
 			checkSMT(cEt, variable);//TODO CHANGE
 			context.addRefinementToVariableInContext(variable, cet);
-		});
-		System.out.println();
+		
+
 	}
-	
+
+
 	<T> void checkSMT(Constraint expectedType, CtElement element) {
 		vcChecker.processSubtyping(expectedType, element);
 		element.putMetadata(REFINE_KEY, expectedType);	
