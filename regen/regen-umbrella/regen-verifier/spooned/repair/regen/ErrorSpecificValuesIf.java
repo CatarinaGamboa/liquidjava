@@ -2,8 +2,8 @@ package repair.regen;
 
 
 public class ErrorSpecificValuesIf {
-    @repair.regen.specification.Refinement("{a > 0} -> {true}")
-    public static void addZ(int a) {
+    public static void addZ(@repair.regen.specification.Refinement("a > 0")
+    int a) {
         @repair.regen.specification.Refinement("_ > 0")
         int d = a;
         if (d > 5) {

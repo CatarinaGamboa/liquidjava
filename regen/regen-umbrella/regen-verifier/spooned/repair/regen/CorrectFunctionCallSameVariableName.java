@@ -2,8 +2,9 @@ package repair.regen;
 
 
 public class CorrectFunctionCallSameVariableName {
-    @repair.regen.specification.Refinement("{a > 20}->{ _ == a + 1}")
-    private static int addOnes(int a) {
+    @repair.regen.specification.Refinement(" _ == a + 1")
+    private static int addOnes(@repair.regen.specification.Refinement("a > 20")
+    int a) {
         return a + 1;
     }
 

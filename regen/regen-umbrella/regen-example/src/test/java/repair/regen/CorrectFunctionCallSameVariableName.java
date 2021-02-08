@@ -3,8 +3,8 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class CorrectFunctionCallSameVariableName {
-	@Refinement("{a > 20}->{ _ == a + 1}")
-	private static int addOnes(int a) {
+	@Refinement(" _ == a + 1")
+	private static int addOnes(@Refinement("a > 20") int a) {
 		return a+1;
 	}
 

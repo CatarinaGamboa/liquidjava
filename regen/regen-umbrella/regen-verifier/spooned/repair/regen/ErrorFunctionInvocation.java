@@ -2,8 +2,10 @@ package repair.regen;
 
 
 public class ErrorFunctionInvocation {
-    @repair.regen.specification.Refinement("{a == 10} -> {_ < a && _ > 0} -> {_ >= a}")
-    public static int posMult(int a, int b) {
+    @repair.regen.specification.Refinement(" _ >= a")
+    public static int posMult(@repair.regen.specification.Refinement("a == 10")
+    int a, @repair.regen.specification.Refinement("_ < a && _ > 0")
+    int b) {
         @repair.regen.specification.Refinement("y > 30")
         int y = 50;
         return y - 10;

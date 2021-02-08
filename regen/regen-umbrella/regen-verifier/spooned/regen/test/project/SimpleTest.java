@@ -13,35 +13,20 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("_ >= a")
-    public static int posMult(@repair.regen.specification.Refinement("a == 10")
-    int a, @repair.regen.specification.Refinement(" _ < a && _ > 0")
-    int b) {
-        @repair.regen.specification.Refinement("y > 30")
-        int y = 50;
-        return y - 10;
-    }
-
-    @repair.regen.specification.Refinement("_ == 10")
-    public static int ten() {
-        return 10;
-    }
-
-    @repair.regen.specification.Refinement("_ == b*2")
-    private static int multTwo(int b) {
-        return b * 2;
-    }
-
-    public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("_ >= 0")
-        int p = 10;
-        p = regen.test.project.SimpleTest.posMult(regen.test.project.SimpleTest.ten(), 4);
-        @repair.regen.specification.Refinement("_ < 6")
-        int z = 5;
-        @repair.regen.specification.Refinement("_ > 6")
-        int x = regen.test.project.SimpleTest.multTwo(z);
-        @repair.regen.specification.Refinement("_ == 20")
-        int y = regen.test.project.SimpleTest.multTwo(x);
+    public static void addZ(@repair.regen.specification.Refinement("a > 0")
+    int a) {
+        @repair.regen.specification.Refinement("_ > 0")
+        int d = a;
+        if (d > 5) {
+            @repair.regen.specification.Refinement("b > 5")
+            int b = d;
+        } else {
+            @repair.regen.specification.Refinement("_ <= 5")
+            int c = d;
+            d = 10;
+            @repair.regen.specification.Refinement("b > 10")
+            int b = d;
+        }
     }
 }
 

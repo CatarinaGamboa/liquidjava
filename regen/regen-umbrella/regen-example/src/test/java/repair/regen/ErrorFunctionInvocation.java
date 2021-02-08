@@ -3,8 +3,9 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class ErrorFunctionInvocation {
-	@Refinement("{a == 10} -> {_ < a && _ > 0} -> {_ >= a}")
-    public static int posMult(int a, int b) {
+	@Refinement(" _ >= a")
+    public static int posMult(@Refinement("a == 10") int a, 
+    						  @Refinement("_ < a && _ > 0") int b) {
 		@Refinement("y > 30")
 		int y = 50;
     	return y-10;

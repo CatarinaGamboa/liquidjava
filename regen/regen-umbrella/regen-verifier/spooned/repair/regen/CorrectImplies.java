@@ -2,7 +2,7 @@ package repair.regen;
 
 
 public class CorrectImplies {
-    @repair.regen.specification.Refinement("{true}->{((arg0 < 0) --> (_ == (-arg0*2))) && ((arg0 >= 0) --> (_ == arg0*2))}")
+    @repair.regen.specification.Refinement("((arg0 < 0) --> (_ == (-arg0*2))) && ((arg0 >= 0) --> (_ == arg0*2))")
     private static int getPositiveDouble(int arg0) {
         if (arg0 < 0)
             return (-arg0) * 2;

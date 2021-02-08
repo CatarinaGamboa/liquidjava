@@ -3,6 +3,26 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class CorrectPrimitiveNumbersTypes {
+	@Refinement("_ < i && _ > 0")
+	private static double fromType(@Refinement("_ > 0")int i) {
+		return i*0.1;
+	}
+	
+	@Refinement(" _ < i && _ > 0")
+	private static double fromType(@Refinement("_ > 0")long i) {
+		return i*0.1;
+	}
+	
+	@Refinement(" _ < i && _ > 0")
+	private static double fromType(@Refinement("_ > 0") short i) {
+		return i*0.1;
+	}
+	
+	@Refinement("_ > i")
+	private static float twice(@Refinement("i > 0")short i) {
+		return i*2f;
+	}
+	
 	public static void main(String[] args) {
 		@Refinement("_ > 5")
 		int a = 10;
@@ -27,23 +47,5 @@ public class CorrectPrimitiveNumbersTypes {
 		
 	}
 	
-	@Refinement("{_ > 0}->{_ < i && _ > 0}")
-	private static double fromType(int i) {
-		return i*0.1;
-	}
-	
-	@Refinement("{_ > 0}->{_ < i && _ > 0}")
-	private static double fromType(long i) {
-		return i*0.1;
-	}
-	
-	@Refinement("{_ > 0}->{_ < i && _ > 0}")
-	private static double fromType(short i) {
-		return i*0.1;
-	}
-	
-	@Refinement("{i > 0}->{_ > i}")
-	private static float twice(short i) {
-		return i*2f;
-	}
+
 }

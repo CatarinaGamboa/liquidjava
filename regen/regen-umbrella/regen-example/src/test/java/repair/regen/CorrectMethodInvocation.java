@@ -4,17 +4,17 @@ import repair.regen.specification.Refinement;
 
 public class CorrectMethodInvocation {
 
-	@Refinement("{_ == 2}")
+	@Refinement("_ == 2")
 	private static int getTwo() {
 		return 1+1;
 	}
 	
-	@Refinement("{_ == 0}")
+	@Refinement("_ == 0")
 	private static int getZero() {
 		return 0;
 	}
 	
-	@Refinement("{_ == 1}")
+	@Refinement("_ == 1")
 	private static int getOne() {
 		@Refinement("_ == 0")
 		int a = getZero();

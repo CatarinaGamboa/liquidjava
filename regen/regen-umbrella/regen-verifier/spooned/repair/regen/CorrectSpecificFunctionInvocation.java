@@ -2,8 +2,9 @@ package repair.regen;
 
 
 public class CorrectSpecificFunctionInvocation {
-    @repair.regen.specification.Refinement("{a > 10}->{ _ > 0}")
-    public static int doubleBiggerThanTen(int a) {
+    @repair.regen.specification.Refinement(" _ > 0")
+    public static int doubleBiggerThanTen(@repair.regen.specification.Refinement("a > 10")
+    int a) {
         return a * 2;
     }
 

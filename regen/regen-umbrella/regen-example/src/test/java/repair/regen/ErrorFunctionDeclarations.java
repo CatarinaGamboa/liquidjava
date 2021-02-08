@@ -3,8 +3,9 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class ErrorFunctionDeclarations {
-	@Refinement("{d >= 0}->{i > d}->{_ >= d && _ < i}")
-	private static int range(int d, int i) {
+	@Refinement("_ >= d && _ < i")
+	private static int range(@Refinement("d >= 0")int d, 
+							 @Refinement("i > d")int i) {
 		return i+1;
 	}
 }

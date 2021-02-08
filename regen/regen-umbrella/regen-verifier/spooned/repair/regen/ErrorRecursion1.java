@@ -2,8 +2,9 @@ package repair.regen;
 
 
 public class ErrorRecursion1 {
-    @repair.regen.specification.Refinement("{k >= 0}->{_ == 0}")
-    public static int untilZero(int k) {
+    @repair.regen.specification.Refinement(" _ == 0")
+    public static int untilZero(@repair.regen.specification.Refinement("k >= 0")
+    int k) {
         if (k == 1)
             return 0;
         else

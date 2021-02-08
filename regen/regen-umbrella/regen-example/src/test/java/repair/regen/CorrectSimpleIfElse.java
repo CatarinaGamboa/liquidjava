@@ -4,13 +4,13 @@ import repair.regen.specification.Refinement;
 
 public class CorrectSimpleIfElse {
 	
-	@Refinement("{a < 0 }->{_ > 0}")
-	public static int toPositive(int a) {
+	@Refinement("_ > 0")
+	public static int toPositive(@Refinement("a < 0") int a) {
 		return -a;
 	}
 	
-	@Refinement("{a > 0 }->{_ < 0}")
-	public static int toNegative(int a) {
+	@Refinement("_ < 0")
+	public static int toNegative(@Refinement("a > 0")int a) {
 		return -a;
 	}
 	

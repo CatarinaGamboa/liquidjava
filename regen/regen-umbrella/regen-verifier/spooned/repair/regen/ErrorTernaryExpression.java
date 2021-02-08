@@ -2,7 +2,7 @@ package repair.regen;
 
 
 public class ErrorTernaryExpression {
-    @repair.regen.specification.Refinement("{ _ == 3}")
+    @repair.regen.specification.Refinement(" _ == 3")
     public static int three() {
         return 3;
     }

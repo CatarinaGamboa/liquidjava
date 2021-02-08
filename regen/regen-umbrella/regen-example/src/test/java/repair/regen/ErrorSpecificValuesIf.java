@@ -3,8 +3,8 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class ErrorSpecificValuesIf {
-	@Refinement("{a > 0} -> {true}")
-	public static void addZ(int a) {
+	
+	public static void addZ(@Refinement("a > 0")int a) {
 		@Refinement("_ > 0")
 		int d = a;
 		if(d > 5) {

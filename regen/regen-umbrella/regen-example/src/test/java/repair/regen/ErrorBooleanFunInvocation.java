@@ -4,7 +4,7 @@ import repair.regen.specification.Refinement;
 
 public class ErrorBooleanFunInvocation {
 
-	@Refinement("{true}->{ _ == (n > 10) }")
+	@Refinement("_ == (n > 10)")
 	public static boolean greaterThanTen(int n) {
 		return n > 10;
 	}

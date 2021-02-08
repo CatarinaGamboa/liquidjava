@@ -2,13 +2,15 @@ package repair.regen;
 
 
 public class CorrectSimpleIfElse {
-    @repair.regen.specification.Refinement("{a < 0 }->{_ > 0}")
-    public static int toPositive(int a) {
+    @repair.regen.specification.Refinement("_ > 0")
+    public static int toPositive(@repair.regen.specification.Refinement("a < 0")
+    int a) {
         return -a;
     }
 
-    @repair.regen.specification.Refinement("{a > 0 }->{_ < 0}")
-    public static int toNegative(int a) {
+    @repair.regen.specification.Refinement("_ < 0")
+    public static int toNegative(@repair.regen.specification.Refinement("a > 0")
+    int a) {
         return -a;
     }
 
