@@ -12,6 +12,7 @@ public class SimpleTest {
 		int a = Math.abs(6);
 		@Refinement("_ > 4")
 		int d = Math.abs(-6);
+		
 //		@Refinement("_ == -6")
 //		int e = -Math.abs(-d);
 		
