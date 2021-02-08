@@ -63,17 +63,25 @@ public class MethodsFunctionsChecker {
 
 
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
+		if(rtc.context.getFunctionByName(m.getName()) != null) {//inside rtc.context
+			checkInvocationRefinements(invocation, m.getName());
+			return;
+		}
 		String name = m.toGenericString();
 		int lastSpaceI = name.lastIndexOf(" ");
 		name = name.substring(lastSpaceI+1);
-		Optional<String> ref = lib.getRefinement(name);
-		if(ref.isPresent()) {
-			String metRef = handleFunctionRefinements(ref.get(), m);//maybe here error?
-			System.out.println(metRef);
+		Optional<RefinedFunction> ref = lib.getRefinement(name, m, rtc.factory);
+		if(ref.isPresent()){
+			RefinedFunction rf = ref.get();
+			for(Variable v:rf.getArguments())
+				rtc.context.addVarToContext(v);
+			rtc.context.addFunctionToContext(rf);
 			checkInvocationRefinements(invocation, m.getName());
 		}
-
 	}
+
+
+
 
 
 	private CtTypeReference<?> getType(Class<?> type) {
@@ -95,7 +103,7 @@ public class MethodsFunctionsChecker {
 		if(methodRef != null) {
 			//Checking Parameters
 			List<CtExpression<?>> exps = invocation.getArguments();
-			List<Variable> params = f.getArgRefinements();
+			List<Variable> params = f.getArguments();
 			for (int i = 0; i < params.size(); i++) {
 				RefinedVariable pinfo = params.get(i);
 				CtExpression<?> exp = exps.get(i);
@@ -103,7 +111,7 @@ public class MethodsFunctionsChecker {
 				String newParamName = paramOriginalName+"_"+rtc.context.getCounter()+"_";
 				newNames.put(paramOriginalName, newParamName);
 
-
+				Constraint rP = f.getRefinementsForParamIndex(i);
 				Constraint refPar = f.getRefinementsForParamIndex(i).substituteVariable(paramOriginalName, newParamName);
 				Constraint refInv = rtc.getRefinement(exp).substituteVariable(rtc.WILD_VAR, newParamName);
 
@@ -181,6 +189,7 @@ public class MethodsFunctionsChecker {
 		return Conjunction.createConjunction(joint, ret);
 	}
 	
+
 	
 
 	/**

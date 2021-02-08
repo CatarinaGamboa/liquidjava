@@ -165,9 +165,9 @@ public class RefinementTypeChecker extends CtScanner {
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
 		if(fieldRead.getTarget().toString().equals("java.lang.Math")) {
 			String var = fieldRead.getVariable().toString();
-			if(lib.getRefinement(var).isPresent()) {
-				System.out.println(lib.getRefinement(var).get());
-				fieldRead.putMetadata(REFINE_KEY, new Predicate(lib.getRefinement(var).get()));
+			if(lib.getFieldRefinement(var).isPresent()) {
+				fieldRead.putMetadata(REFINE_KEY, 
+						lib.getFieldRefinement(var).get());
 			}
 		}
 		super.visitCtFieldRead(fieldRead);

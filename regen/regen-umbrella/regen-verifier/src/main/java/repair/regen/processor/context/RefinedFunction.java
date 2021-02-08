@@ -20,7 +20,8 @@ public class RefinedFunction extends Refined{
 		context = Context.getInstance();
 	}
 	
-	public List<Variable> getArgRefinements() {
+	
+	public List<Variable> getArguments() {
 		return argRefinements;
 	}
 	
