@@ -9,6 +9,9 @@ public interface MathRefinements {
 	@Refinement("_ == 3.141592653589793")
 	public double PI = 0;
 	
+	@Refinement("_ == 2.7182818284590452354")
+	public double E = 0;
+			
 	@Refinement("( _ == arg0 ||  _ == -arg0) && _ > 0")
 	public int abs(int arg0);
 

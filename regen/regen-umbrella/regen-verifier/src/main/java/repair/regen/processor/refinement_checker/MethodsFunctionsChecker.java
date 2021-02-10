@@ -59,6 +59,14 @@ public class MethodsFunctionsChecker {
 		if(rtc.context.getFunctionByName(m.getName()) != null) {//inside rtc.context
 			checkInvocationRefinements(invocation, m.getName());
 			return;
+		}else {
+			String name = m.getName();
+			String prefix = m.getDeclaringClass().getCanonicalName();
+			String completeName = String.format("%s.%s", prefix, name);
+			if(rtc.context.getFunctionByName(completeName) != null) {
+				checkInvocationRefinements(invocation, completeName);
+			}
+
 		}
 //		String name = m.toGenericString();
 //		int lastSpaceI = name.lastIndexOf(" ");

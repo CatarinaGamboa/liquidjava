@@ -98,7 +98,6 @@ public class RefinementTypeChecker extends CtScanner {
 			System.out.println();
 			
 		}
-		// TODO Auto-generated method stub
 		super.visitCtField(f);
 	}
 

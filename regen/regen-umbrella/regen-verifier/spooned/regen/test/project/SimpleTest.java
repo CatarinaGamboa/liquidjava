@@ -14,8 +14,14 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("p > 3")
-        double p = java.lang.Math.PI;
+        @repair.regen.specification.Refinement("b > 0")
+        int b = java.lang.Math.abs(6);
+        @repair.regen.specification.Refinement("_ == 6")
+        int a = java.lang.Math.abs((-6));
+        @repair.regen.specification.Refinement("_ > 4")
+        int d = java.lang.Math.abs((-6));
+        @repair.regen.specification.Refinement("_ == -6")
+        int e = -(java.lang.Math.abs((-d)));
         // @Refinement("_ == 11")
         // int a3 = Math.addExact(5, 6);
         // 

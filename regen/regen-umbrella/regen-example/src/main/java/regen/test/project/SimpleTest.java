@@ -3,12 +3,19 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {	
-	
-
 	public static void main(String[] args) {
+
+		@Refinement("b > 0")
+		int b = Math.abs(6);
+		@Refinement("_ == 6")
+		int a = Math.abs(-6);
 		
-		@Refinement("p > 3")
-		double p = Math.PI;
+		@Refinement("_ > 4")
+		int d = Math.abs(-6);
+		
+		@Refinement("_ == -6")
+		int e = -Math.abs(-d);
+		
 
 		
 //		@Refinement("_ == 11")
