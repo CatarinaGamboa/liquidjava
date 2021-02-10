@@ -154,7 +154,7 @@ public class TestExamples {
 	
 	@Test
 	public void correctInvocationFromMathLibrary() {
-		testCorrect(testPath+"/math");
+		testCorrect(testPath+"/math/correctInvocation");
 	}
 	
 	@Test
@@ -176,6 +176,7 @@ public class TestExamples {
 	public void errorArithmeticBinaryOperation() {
 		testWrong(testPath+"ErrorArithmeticBinaryOperations.java");
 	}
+	
 	
 	@Test
 	public void errorAssignementAfterDeclaration() {
@@ -315,23 +316,17 @@ public class TestExamples {
 	
 	@Test
 	public void errorMathMax() {
-		testWrong(testPath+"ErrorMathMax.java");
+		testWrong(testPath+"/math/errorMax");
 	}
-	@Test
-	public void errorRandom() {
-		testWrong(testPath+"ErrorRandom.java");
-	}
+
 	@Test
 	public void errorMathAbs() {
-		testWrong(testPath+"ErrorMathAbs.java");
+		testWrong(testPath+"/math/errorAbs");
 	}
-	@Test
-	public void errorMathMin() {
-		testWrong(testPath+"ErrorMathMin.java");
-	}
+
 	@Test
 	public void errorMathMultiplyExact() {
-		testWrong(testPath+"ErrorMathMultiplyExact.java");
+		testWrong(testPath+"/math/errorMultiplyExact");
 	}
 	
 	

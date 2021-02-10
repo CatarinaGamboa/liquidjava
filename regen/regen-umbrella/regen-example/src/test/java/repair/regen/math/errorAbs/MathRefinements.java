@@ -1,4 +1,4 @@
-package repair.regen.correctMathInvocation;
+package repair.regen.math.errorAbs;
 
 import repair.regen.specification.ExternalRefinementsFor;
 import repair.regen.specification.Refinement;
