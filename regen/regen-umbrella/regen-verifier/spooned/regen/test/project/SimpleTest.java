@@ -14,46 +14,83 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
+        // Math.abs(...)
         @repair.regen.specification.Refinement("b > 0")
         int b = java.lang.Math.abs(6);
         @repair.regen.specification.Refinement("_ == 6")
-        int a = java.lang.Math.abs((-6));
+        int a = java.lang.Math.abs(6);
         @repair.regen.specification.Refinement("_ > 4")
         int d = java.lang.Math.abs((-6));
         @repair.regen.specification.Refinement("_ == -6")
         int e = -(java.lang.Math.abs((-d)));
-        // @Refinement("_ == 11")
-        // int a3 = Math.addExact(5, 6);
-        // 
-        // @Refinement("_ == 5")
-        // int m1 = Math.max(4, 5);
-        // @Refinement("_ > 5")
-        // int m2 = Math.max(100, m1);
-        // @Refinement("_ == 100")
-        // int m3 = Math.max(100, m2);
-        // @Refinement("_ == -100")
-        // int m4 = Math.max(-1000, -m2);
-        // Math.abs(...)
-        // @Refinement("b > 0")
-        // int b = Math.abs(6);
-        // @Refinement("_ == 6")
-        // int a = Math.abs(-6);
-        // @Refinement("_ > 4")
-        // int d = Math.abs(-6);
-        // @Refinement("_ == -6")
-        // int e = -Math.abs(-d);
-        // @Refinement("_ > 4")
-        // int d1 = Math.abs(-6);
-        // @Refinement("_ == -6")
-        // int e1 = -Math.abs(-d1);
-        // @Refinement("_ == -6")
-        // int f1 = -Math.abs(e1);
-        // @Refinement("_ == -6")
-        // int f2 = -Math.abs(f1);
-        // 
-        // //addExact(...)
-        // @Refinement("_ == 11")
-        // int a3 = Math.addExact(5, 6);
+        @repair.regen.specification.Refinement("_ > 4")
+        int d1 = java.lang.Math.abs((-6));
+        @repair.regen.specification.Refinement("_ == -6")
+        int e1 = -(java.lang.Math.abs((-d1)));
+        @repair.regen.specification.Refinement("_ == -6")
+        int f1 = -(java.lang.Math.abs(e1));
+        @repair.regen.specification.Refinement("_ == -6")
+        int f2 = -(java.lang.Math.abs(f1));
+        // addExact(...)
+        @repair.regen.specification.Refinement("_ == 11")
+        int a3 = java.lang.Math.addExact(5, 6);
+        // decrementExact
+        @repair.regen.specification.Refinement("_ > 5")
+        int a7 = 10;
+        @repair.regen.specification.Refinement("_ > 4")
+        int a8 = java.lang.Math.decrementExact(a7);
+        @repair.regen.specification.Refinement("_ == 9")
+        int a9 = java.lang.Math.decrementExact(a7);
+        // incrementExact
+        @repair.regen.specification.Refinement("_ > 6")
+        int a12 = java.lang.Math.incrementExact(a7);
+        @repair.regen.specification.Refinement("_ == 11")
+        int a13 = java.lang.Math.incrementExact(a7);
+        @repair.regen.specification.Refinement("_ > 5")
+        int prim = 10;
+        @repair.regen.specification.Refinement("_ > 6")
+        int seg = java.lang.Math.incrementExact(prim);
+        @repair.regen.specification.Refinement("_ == 12")
+        int ter = java.lang.Math.incrementExact(seg);
+        // max
+        @repair.regen.specification.Refinement("_ == 5")
+        int m1 = java.lang.Math.max(4, 5);
+        @repair.regen.specification.Refinement("_ > 5")
+        int m2 = java.lang.Math.max(100, m1);
+        @repair.regen.specification.Refinement("_ == 100")
+        int m3 = java.lang.Math.max(100, m2);
+        @repair.regen.specification.Refinement("_ == -100")
+        int m4 = java.lang.Math.max((-1000), (-m2));
+        // min
+        @repair.regen.specification.Refinement("_ == 4")
+        int m5 = java.lang.Math.min(4, 5);
+        @repair.regen.specification.Refinement("_ < 5")
+        int m6 = java.lang.Math.min(100, m5);
+        @repair.regen.specification.Refinement("_ == 4")
+        int m7 = java.lang.Math.min(100, m6);
+        @repair.regen.specification.Refinement("_ == -1000")
+        int m8 = java.lang.Math.min((-1000), (-m6));
+        // multiplyExact
+        @repair.regen.specification.Refinement("_ == 40")
+        int mul = java.lang.Math.multiplyExact(5, 8);
+        @repair.regen.specification.Refinement("_ == -mul")
+        int mul1 = java.lang.Math.multiplyExact(mul, (-1));
+        @repair.regen.specification.Refinement("_ > mul")
+        int mul2 = java.lang.Math.multiplyExact(mul1, mul1);
+        // negateExact
+        @repair.regen.specification.Refinement("_ == 40")
+        int negE = java.lang.Math.negateExact((-40));
+        @repair.regen.specification.Refinement("_ < 0")
+        int negEx = java.lang.Math.negateExact(negE);
+        @repair.regen.specification.Refinement("_ > 39")
+        int negExa = java.lang.Math.negateExact(negEx);
+        // subtractExact
+        @repair.regen.specification.Refinement("_ < -40")
+        int subE = java.lang.Math.subtractExact((-40), 5);
+        @repair.regen.specification.Refinement("_ > 0")
+        int subEx = java.lang.Math.subtractExact(0, subE);
+        @repair.regen.specification.Refinement("_ == 0")
+        int subExa = java.lang.Math.subtractExact(subEx, subEx);
         // 
         // //decrementExact
         // @Refinement("_ > 5")
@@ -77,16 +114,6 @@ public class SimpleTest {
         // @Refinement("_ == 12")
         // int ter = Math.incrementExact(seg);
         // 
-        // 
-        // //max
-        // @Refinement("_ == 5")
-        // int m1 = Math.max(4, 5);
-        // @Refinement("_ > 5")
-        // int m2 = Math.max(100, m1);
-        // @Refinement("_ == 100")
-        // int m3 = Math.max(100, m2);
-        // @Refinement("_ == -100")
-        // int m4 = Math.max(-1000, -m2);
         // 
         // //min
         // @Refinement("_ == 4")
