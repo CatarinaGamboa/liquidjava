@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -29,6 +28,8 @@ import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtField;
+import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
@@ -47,7 +48,6 @@ public class RefinementTypeChecker extends CtScanner {
 
 	Context context = Context.getInstance();
 	VCChecker vcChecker = new VCChecker();
-	RefinementsLibrary lib = new RefinementsLibrary(WILD_VAR);
 
 	Factory factory;
 	
@@ -56,6 +56,7 @@ public class RefinementTypeChecker extends CtScanner {
 	MethodsFunctionsChecker mfc;
 	
 	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double"}; //TODO add types
+	private String externalPrefix = null;
 
 	public RefinementTypeChecker(Factory factory) {
 		this.factory = factory;
@@ -70,6 +71,38 @@ public class RefinementTypeChecker extends CtScanner {
 		context.reinitializeContext();
 		super.visitCtClass(ctClass);
 	}
+	
+	@Override
+	public <T> void visitCtInterface(CtInterface<T> intrface) {
+		Optional<String> externalRefinements = getExternalRefinement(intrface);
+		if(externalRefinements.isPresent()) {
+			String prefix = externalRefinements.get();
+			externalPrefix = prefix;
+			
+			
+			super.visitCtInterface(intrface);
+			externalPrefix = null;
+			
+		}else
+			super.visitCtInterface(intrface);
+	}
+	
+	@Override
+	public <T> void visitCtField(CtField<T> f) {
+		//Inside external refinements interface
+		if(externalPrefix != null) {
+			Optional<Constraint> oc = getRefinementFromAnnotation(f);
+			Constraint c = oc.isPresent()?oc.get():new Predicate();
+			context.addGlobalVariableToContext(String.format("%s.%s", externalPrefix, f.getSimpleName()), 
+					f.getType(), c);
+			System.out.println();
+			
+		}
+		// TODO Auto-generated method stub
+		super.visitCtField(f);
+	}
+
+
 	@Override
 	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
 		super.visitCtAnnotation(annotation);
@@ -93,7 +126,10 @@ public class RefinementTypeChecker extends CtScanner {
 
 	public <R> void visitCtMethod(CtMethod<R> method) {
 		context.enterContext();
-		mfc.getMethodRefinements(method);
+		if(externalPrefix == null)
+			mfc.getMethodRefinements(method);
+		else
+			mfc.getMethodRefinements(method, externalPrefix);
 		super.visitCtMethod(method);
 		context.exitContext();
 
@@ -163,13 +199,16 @@ public class RefinementTypeChecker extends CtScanner {
 	
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
-		if(fieldRead.getTarget().toString().equals("java.lang.Math")) {
-			String var = fieldRead.getVariable().toString();
-			if(lib.getFieldRefinement(var).isPresent()) {
-				fieldRead.putMetadata(REFINE_KEY, 
-						lib.getFieldRefinement(var).get());
-			}
+		System.out.println();
+		String fieldName = fieldRead.toString();
+		if(context.hasVariable(fieldName)) {
+			Constraint c = context.getVariableRefinements(fieldName);
+			fieldRead.putMetadata(REFINE_KEY, c);
+		} else {
+			fieldRead.putMetadata(REFINE_KEY, new Predicate());
+			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
 		}
+
 		super.visitCtFieldRead(fieldRead);
 	}
 
@@ -380,6 +419,18 @@ public class RefinementTypeChecker extends CtScanner {
 			constr = Optional.of(new Predicate(ref.get()));
 		
 		return constr;
+	}
+	
+	
+	private Optional<String> getExternalRefinement(CtInterface<?> intrface) {
+		Optional<String> ref = Optional.empty();
+		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
+			if( ann.getActualAnnotation().annotationType().getCanonicalName()
+					.contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				ref = Optional.of(s.getValue());
+			}		
+		return ref;
 	}
 
 }

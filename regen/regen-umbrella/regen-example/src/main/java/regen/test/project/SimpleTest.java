@@ -3,15 +3,34 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 
 public class SimpleTest {	
+	
 
 	public static void main(String[] args) {
+		
+		@Refinement("p > 3")
+		double p = Math.PI;
+
+		
+//		@Refinement("_ == 11")
+//		int a3 = Math.addExact(5, 6);
+//		
+//		@Refinement("_ == 5")
+//		int m1 = Math.max(4, 5);
+//		@Refinement("_ > 5")
+//		int m2 = Math.max(100, m1);
+//		@Refinement("_ == 100")
+//		int m3 = Math.max(100, m2);
+//		@Refinement("_ == -100")
+//		int m4 = Math.max(-1000, -m2);
+
 		//Math.abs(...)
-		@Refinement("b > 0")
-		int b = Math.abs(6);
-		@Refinement("_ == 6")
-		int a = Math.abs(6);
-		@Refinement("_ > 4")
-		int d = Math.abs(-6);
+//		@Refinement("b > 0")
+//		int b = Math.abs(6);
+//		@Refinement("_ == 6")
+//		int a = Math.abs(-6);
+		
+//		@Refinement("_ > 4")
+//		int d = Math.abs(-6);
 		
 //		@Refinement("_ == -6")
 //		int e = -Math.abs(-d);

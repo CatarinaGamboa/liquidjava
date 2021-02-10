@@ -15,6 +15,9 @@ public class Context {
 	private Stack<List<RefinedVariable>> ctxVars;
 	private List<RefinedFunction> ctxFunctions;
 	private List<RefinedVariable> ctxSpecificVars;
+	
+	private List<RefinedVariable> ctxGlobalVars;
+	private List<RefinedFunction> ctxGlobalFunctions;
 
 	public int counter;
 	private static Context instance;
@@ -22,9 +25,12 @@ public class Context {
 
 	private Context() {
 		ctxVars = new Stack<>();
-		ctxVars.add(new ArrayList<>());//global vars
+		ctxVars.add(new ArrayList<>());
 		ctxFunctions = new ArrayList<>();
 		ctxSpecificVars = new ArrayList<>();
+		//globals
+		ctxGlobalVars = new ArrayList<>();
+		ctxGlobalFunctions = new ArrayList<>();
 		counter = 0;
 
 	}
@@ -75,7 +81,14 @@ public class Context {
 		}
 		for(RefinedVariable var: ctxSpecificVars)
 			ret.put(var.getName(), var.getType());
+		for(RefinedVariable var: ctxGlobalVars)
+			ret.put(var.getName(), var.getType());
 		return ret;
+	}
+	
+	public void addGlobalVariableToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
+		RefinedVariable vi = new Variable(simpleName, type, c);
+		ctxGlobalVars.add(vi);
 	}
 
 	public void addVarToContext(RefinedVariable var) {
@@ -168,9 +181,17 @@ public class Context {
 		if(!ctxFunctions.contains(f))
 			ctxFunctions.add(f);
 	}
+	public void addGlobalFunctionToContext(RefinedFunction f) {
+		if(!ctxGlobalFunctions.contains(f))
+			ctxGlobalFunctions.add(f);
+	}
 
 	public RefinedFunction getFunctionByName(String name) {
 		for(RefinedFunction fi: ctxFunctions) {
+			if(fi.getName().equals(name))
+				return fi;
+		}
+		for(RefinedFunction fi: ctxGlobalFunctions) {
 			if(fi.getName().equals(name))
 				return fi;
 		}
@@ -185,6 +206,10 @@ public class Context {
 			}
 		}
 		for(RefinedVariable var: ctxSpecificVars) {
+			if(var.getName().equals(name))
+				return var;
+		}
+		for(RefinedVariable var: ctxGlobalVars) {
 			if(var.getName().equals(name))
 				return var;
 		}
@@ -243,7 +268,10 @@ public class Context {
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();
-		sb.append("###########Variables############");
+		sb.append("\n############Global Variables:############\n");
+		for(RefinedVariable f : ctxGlobalVars)
+			sb.append(f.toString());
+		sb.append("\n###########Variables############");
 		for(List<RefinedVariable> l : ctxVars) {
 			sb.append("{");
 			for(RefinedVariable var: l) {
@@ -251,6 +279,9 @@ public class Context {
 			}
 			sb.append("}\n");
 		}
+		sb.append("\n############Global Functions:############\n");
+		for(RefinedFunction f : ctxGlobalFunctions)
+			sb.append(f.toString());
 		sb.append("\n############Functions:############\n");
 		for(RefinedFunction f : ctxFunctions)
 			sb.append(f.toString());

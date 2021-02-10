@@ -1,14 +1,11 @@
 package repair.regen.processor.refinement_checker;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.processor.built_ins.RefinementsLibrary;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
@@ -17,10 +14,8 @@ import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
-import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
@@ -29,11 +24,9 @@ import spoon.reflect.reference.CtTypeReference;
 public class MethodsFunctionsChecker {
 
 	private RefinementTypeChecker rtc;
-	private RefinementsLibrary lib;
 
 	public MethodsFunctionsChecker(RefinementTypeChecker rtc) {
 		this.rtc = rtc; 
-		lib = rtc.lib;
 
 	}
 
@@ -67,17 +60,17 @@ public class MethodsFunctionsChecker {
 			checkInvocationRefinements(invocation, m.getName());
 			return;
 		}
-		String name = m.toGenericString();
-		int lastSpaceI = name.lastIndexOf(" ");
-		name = name.substring(lastSpaceI+1);
-		Optional<RefinedFunction> ref = lib.getRefinement(name, m, rtc.factory);
-		if(ref.isPresent()){
-			RefinedFunction rf = ref.get();
-			for(Variable v:rf.getArguments())
-				rtc.context.addVarToContext(v);
-			rtc.context.addFunctionToContext(rf);
-			checkInvocationRefinements(invocation, m.getName());
-		}
+//		String name = m.toGenericString();
+//		int lastSpaceI = name.lastIndexOf(" ");
+//		name = name.substring(lastSpaceI+1);
+//		Optional<RefinedFunction> ref = lib.getRefinement(name, m, rtc.factory);
+//		if(ref.isPresent()){
+//			RefinedFunction rf = ref.get();
+//			for(Variable v:rf.getArguments())
+//				rtc.context.addVarToContext(v);
+//			rtc.context.addFunctionToContext(rf);
+//			checkInvocationRefinements(invocation, m.getName());
+//		}
 	}
 
 
@@ -142,19 +135,32 @@ public class MethodsFunctionsChecker {
 		}
 	}
 
-
+	
 	<R> void getMethodRefinements(CtMethod<R> method) {
-		//main cannot have refinement - for now
-		if(method.getSignature().equals("main(java.lang.String[])"))
-			return;
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
 		f.setRefReturn(new Predicate());
 		rtc.context.addFunctionToContext(f);
+		auxGetMethodRefinements(method, f);
 		
+	}
+
+	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {
+		RefinedFunction f = new RefinedFunction();
+		f.setName(String.format("%s.%s", prefix, method.getSimpleName()));
+		f.setType(method.getType());
+		f.setRefReturn(new Predicate());
+		rtc.context.addGlobalFunctionToContext(f);
+		auxGetMethodRefinements(method, f);
+	}
+	
+	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {
+		//main cannot have refinement - for now
+		if(method.getSignature().equals("main(java.lang.String[])"))
+			return;	
 		List<CtParameter<?>> params = method.getParameters();
-		Constraint ref = handleFunctionRefinements(f, method, params);
+		Constraint ref = handleFunctionRefinements(rf, method, params);
 		method.putMetadata(rtc.REFINE_KEY, ref);
 		
 	}
@@ -189,71 +195,6 @@ public class MethodsFunctionsChecker {
 		return Conjunction.createConjunction(joint, ret);
 	}
 	
-
-	
-
-	/**
-	 * Adds information to FunctionInfo according to the refinements 
-	 * @param f
-	 * @param methodRef
-	 * @param params
-	 * @return
-	 */
-	private String handleFunctionRefinementsOLD(RefinedFunction f, String methodRef, List<CtParameter<?>> params) {
-		//TODO CHANGE
-		String[] r = methodRef.split("}\\s*->\\s*\\{");
-
-		StringBuilder sb = new StringBuilder();
-
-		//For syntax {param1} -> {param2} -> ... -> {return}
-		for (int i = 0; i < params.size(); i++) {
-			CtParameter<?> param = params.get(i);
-			String name = param.getSimpleName();
-			String metRef = "("+r[i].replace("{", "").replace("}", "").replace(rtc.WILD_VAR, name)+")";
-			Constraint cmetRef = new Predicate(metRef);
-			param.putMetadata(rtc.REFINE_KEY, cmetRef);
-			sb.append(sb.length() == 0? metRef : " && "+metRef);
-
-			f.addArgRefinements(name,param.getType(), cmetRef);
-			RefinedVariable rv = rtc.context.addVarToContext(name, param.getType(), cmetRef);
-		}
-		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
-		f.setRefReturn(new Predicate(retRef));
-		rtc.context.addFunctionToContext(f);
-		String ss = sb.length()>0?" && "+ retRef:retRef;
-		return sb.append(ss).toString();
-	}
-
-	private String handleFunctionRefinements(String methodRef, Method method) {
-		//TODO REMAKE
-		Parameter[] params = method.getParameters();
-		RefinedFunction f = new RefinedFunction();
-		f.setName(method.getName());
-		f.setType(getType(method.getReturnType()));
-		f.setRefReturn(new Predicate());
-
-		String[] r = methodRef.split("}\\s*->\\s*\\{");
-
-		StringBuilder sb = new StringBuilder();
-
-		//For syntax {param1} -> {param2} -> ... -> {return}
-		for (int i = 0; i < params.length; i++) {
-			Parameter param = params[i];
-			String name = param.getName();
-			String metRef = "("+r[i].replace("{", "").replace("}", "").replace(rtc.WILD_VAR, name)+")";
-			//param.putMetadata(rtc.REFINE_KEY, metRef);
-			sb.append(sb.length() == 0? metRef : " && "+metRef);
-
-			Constraint cmetRef = new Predicate(metRef);
-			f.addArgRefinements(name,getType(param.getType()), cmetRef);
-			RefinedVariable rv = rtc.context.addVarToContext(name, getType(param.getType()), cmetRef);
-		}
-		String retRef = "("+r[r.length-1].replace("{", "").replace("}", "")+")";
-		f.setRefReturn(new Predicate(retRef));
-		rtc.context.addFunctionToContext(f);
-		String ss = sb.length()>0?" && "+ retRef:retRef;
-		return sb.append(ss).toString();
-	}
 
 
 
