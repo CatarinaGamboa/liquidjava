@@ -116,7 +116,8 @@ class OperationsChecker {
 		}
 
 		Constraint metadata = rtc.getRefinement(ex);
-		String newName = name+"_"+rtc.context.getCounter()+"_";
+		
+		String newName = String.format(rtc.instanceFormat, name, rtc.context.getCounter());
 		Constraint newMeta = metadata.substituteVariable(rtc.WILD_VAR, newName);
 		
 		Constraint unOp = getOperatorFromKind(operator.getKind());
@@ -165,7 +166,7 @@ class OperationsChecker {
 			//No need for specific values
 			if(parent != null && !(parent instanceof CtIfImpl)) {
 				elem_ref = rtc.getRefinement(elemVar);
-				String newName = elemName+"_"+rtc.context.getCounter()+"_";
+				String newName = String.format(rtc.instanceFormat, elemName, rtc.context.getCounter());
 				Constraint newElem_ref = elem_ref.substituteVariable(rtc.WILD_VAR, newName);
 				//String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
 				RefinedVariable newVi = rtc.context.addVarToContext(newName, elemVar.getType(), newElem_ref);
@@ -225,7 +226,7 @@ class OperationsChecker {
 	 */
 	private <T> Constraint getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
 			String name) {
-		String newName = name+"__"+rtc.context.getCounter();
+		String newName = String.format(rtc.instanceFormat, name, rtc.context.getCounter());
 		CtVariable<T> varDecl = w.getVariable().getDeclaration();
 
 		Constraint metadada = rtc.context.getVariableRefinements(varDecl.getSimpleName());

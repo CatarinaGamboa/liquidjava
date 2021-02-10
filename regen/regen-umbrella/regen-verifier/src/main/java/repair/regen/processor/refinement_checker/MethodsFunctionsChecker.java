@@ -90,7 +90,7 @@ public class MethodsFunctionsChecker {
 				RefinedVariable pinfo = params.get(i);
 				CtExpression<?> exp = exps.get(i);
 				String paramOriginalName = pinfo.getName();
-				String newParamName = paramOriginalName+"_"+rtc.context.getCounter()+"_";
+				String newParamName = String.format(rtc.instanceFormat, paramOriginalName, rtc.context.getCounter());
 				newNames.put(paramOriginalName, newParamName);
 
 				Constraint rP = f.getRefinementsForParamIndex(i);

@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -213,7 +214,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	@Override
 	public void visitCtIf(CtIf ifElement) {
-		//TODO REVER
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		context.variablesSetBeforeIf();
 		context.enterContext();
@@ -273,7 +273,8 @@ public class RefinementTypeChecker extends TypeChecker {
 		String condThen = "!(" + condRefs + ") || ("+ getRefinement(conditional.getThenExpression())+")", //!A or B
 				notCondElse = "("+condRefs + ") || ("+ getRefinement(conditional.getElseExpression())+")";//A or C
 
-		conditional.putMetadata(REFINE_KEY, new Predicate("("+condThen+") && ("+notCondElse+")"));//TODO CHANGE TO CONJUNCTION
+		conditional.putMetadata(REFINE_KEY, 
+				Conjunction.createConjunction(new Predicate(condThen), new Predicate(notCondElse)));
 	}
 
 
@@ -323,7 +324,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		cEt = cEt.substituteVariable(WILD_VAR, simpleName);
 		Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
 
-		String newName = simpleName+"_"+context.getCounter()+"_";
+		String newName = String.format(instanceFormat, simpleName, context.getCounter());
 		Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
 		cEt = cEt.substituteVariable(simpleName, newName);
 

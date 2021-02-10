@@ -1,8 +1,6 @@
 package regen.test.project;
 
 
-// java.lang.Math.max(int,int):@Refinement("((arg0 > arg1)-->( _ == arg0)) && ((arg0 <= arg1)-->( _ == arg1))")java.lang.Math.max(int,int)
-// java.lang.Math.min(int,int):@Refinement("((arg0 < arg1)-->( _ == arg0)) && ((arg0 >= arg1)-->( _ == arg1))")java.lang.Math.min(int,int)
 @repair.regen.specification.ExternalRefinementsFor("java.lang.Math")
 public interface MathRefinements {
     @repair.regen.specification.Refinement("_ == 3.141592653589793")

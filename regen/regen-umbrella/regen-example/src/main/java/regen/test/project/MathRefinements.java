@@ -56,9 +56,4 @@ public interface MathRefinements {
 	public float copySign(float arg, float sig);
 
 	
-
-
-//	java.lang.Math.max(int,int):@Refinement("((arg0 > arg1)-->( _ == arg0)) && ((arg0 <= arg1)-->( _ == arg1))")java.lang.Math.max(int,int)
-//	java.lang.Math.min(int,int):@Refinement("((arg0 < arg1)-->( _ == arg0)) && ((arg0 >= arg1)-->( _ == arg1))")java.lang.Math.min(int,int)
-
 }
