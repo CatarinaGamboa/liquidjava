@@ -3,6 +3,8 @@ package repair.regen.processor;
 import java.util.ArrayList;
 import java.util.List;
 
+import repair.regen.processor.context.Context;
+import repair.regen.processor.refinement_checker.ExternalRefinementTypeChecker;
 import repair.regen.processor.refinement_checker.RefinementTypeChecker;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.declaration.CtPackage;
@@ -24,7 +26,9 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
 	public void process(CtPackage pkg) {
 		if (!visitedPackages.contains(pkg)) {
 			visitedPackages.add(pkg);
-			pkg.accept(new RefinementTypeChecker(factory));
+			Context c = Context.getInstance();
+			pkg.accept(new ExternalRefinementTypeChecker(c));
+			pkg.accept(new RefinementTypeChecker(c, factory));
 		}
 		
 		

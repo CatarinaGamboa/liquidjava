@@ -37,28 +37,22 @@ import spoon.reflect.reference.CtVariableReference;
 import spoon.reflect.visitor.CtScanner;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
-public class RefinementTypeChecker extends CtScanner {
+public class RefinementTypeChecker extends TypeChecker {
 	// This class should do the following:
 
 	// 1. Keep track of the context variable types
 	// 2. Do type checking and inference
-	final String REFINE_KEY = "refinement";
-	final String WILD_VAR = "_";
-	final String FRESH = "FRESH_";
-
-	Context context = Context.getInstance();
 	VCChecker vcChecker = new VCChecker();
-
 	Factory factory;
-	
+
 	//Auxiliar TypeCheckers
 	OperationsChecker otc;
 	MethodsFunctionsChecker mfc;
-	
-	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double"}; //TODO add types
+
 	private String externalPrefix = null;
 
-	public RefinementTypeChecker(Factory factory) {
+	public RefinementTypeChecker(Context context,Factory factory) {
+		super(context);
 		this.factory = factory;
 		otc = new OperationsChecker(this);
 		mfc = new MethodsFunctionsChecker(this);
@@ -71,35 +65,23 @@ public class RefinementTypeChecker extends CtScanner {
 		context.reinitializeContext();
 		super.visitCtClass(ctClass);
 	}
-	
-	@Override
-	public <T> void visitCtInterface(CtInterface<T> intrface) {
-		Optional<String> externalRefinements = getExternalRefinement(intrface);
-		if(externalRefinements.isPresent()) {
-			String prefix = externalRefinements.get();
-			externalPrefix = prefix;
-			
-			
-			super.visitCtInterface(intrface);
-			externalPrefix = null;
-			
-		}else
-			super.visitCtInterface(intrface);
-	}
-	
-	@Override
-	public <T> void visitCtField(CtField<T> f) {
-		//Inside external refinements interface
-		if(externalPrefix != null) {
-			Optional<Constraint> oc = getRefinementFromAnnotation(f);
-			Constraint c = oc.isPresent()?oc.get():new Predicate();
-			context.addGlobalVariableToContext(String.format("%s.%s", externalPrefix, f.getSimpleName()), 
-					f.getType(), c);
-			System.out.println();
-			
-		}
-		super.visitCtField(f);
-	}
+
+	//	@Override
+	//	public <T> void visitCtInterface(CtInterface<T> intrface) {
+	//		Optional<String> externalRefinements = getExternalRefinement(intrface);
+	//		if(externalRefinements.isPresent()) {
+	//			String prefix = externalRefinements.get();
+	//			externalPrefix = prefix;
+	//			
+	//			
+	//			super.visitCtInterface(intrface);
+	//			externalPrefix = null;
+	//			
+	//		}else
+	//			super.visitCtInterface(intrface);
+	//	}
+
+
 
 
 	@Override
@@ -152,7 +134,7 @@ public class RefinementTypeChecker extends CtScanner {
 				refinementFound = new Predicate();
 			context.addVarToContext(varName, localVariable.getType(), new Predicate());
 			checkVariableRefinements(refinementFound, varName, localVariable);
-				
+
 		}
 	}
 
@@ -194,8 +176,8 @@ public class RefinementTypeChecker extends CtScanner {
 					lit.getType().getQualifiedName()));
 		}
 	}	
-	
-	
+
+
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
 		System.out.println();
@@ -257,17 +239,17 @@ public class RefinementTypeChecker extends CtScanner {
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		context.variablesSetBeforeIf();
 		context.enterContext();
-		
+
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
 		Constraint nExpRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
 		nExpRefs = substituteAllVariablesForLastInstance(nExpRefs);
-		
-		
+
+
 		RefinedVariable freshRV = context.addVarToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, nExpRefs);
 		vcChecker.addPathVariable(freshRV);
-		
+
 		//VISIT THEN
 		context.enterContext();
 		visitCtBlock(ifElement.getThenStatement());
@@ -315,9 +297,9 @@ public class RefinementTypeChecker extends CtScanner {
 
 		conditional.putMetadata(REFINE_KEY, new Predicate("("+condThen+") && ("+notCondElse+")"));//TODO CHANGE TO CONJUNCTION
 	}
-	
-	
-	
+
+
+
 	//############################### Inner Visitors  ##########################################
 
 	private Constraint getExpressionRefinements(CtExpression element) {
@@ -345,7 +327,9 @@ public class RefinementTypeChecker extends CtScanner {
 
 
 	//############################### SMT Evaluation ##########################################
-	<T> void checkVariableRefinements(Constraint refinementFound, String simpleName, CtVariable<T> variable) {
+	
+	@Override
+	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtVariable<?> variable) {
 		Optional<String> expectedType = variable.getAnnotations().stream()
 				.filter(
 						ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
@@ -355,39 +339,32 @@ public class RefinementTypeChecker extends CtScanner {
 								).map(
 										str -> str.getValue()
 										).findAny();
-		
+
 		Constraint cEt = expectedType.isPresent()?new Predicate(expectedType.get()):new Predicate();
-		
-			cEt = cEt.substituteVariable(WILD_VAR, simpleName);
-			Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
-			
-			String newName = simpleName+"_"+context.getCounter()+"_";
-			Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
-			cEt = cEt.substituteVariable(simpleName, newName);
-			
-			//Substitute variable in verification
-			RefinedVariable rv= context.addInstanceToContext(newName, variable.getType(), correctNewRefinement);
-			context.addRefinementInstanceToVariable(simpleName, newName);
-			//smt check
-			checkSMT(cEt, variable);//TODO CHANGE
-			context.addRefinementToVariableInContext(variable, cet);
-		
+
+		cEt = cEt.substituteVariable(WILD_VAR, simpleName);
+		Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
+
+		String newName = simpleName+"_"+context.getCounter()+"_";
+		Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
+		cEt = cEt.substituteVariable(simpleName, newName);
+
+		//Substitute variable in verification
+		RefinedVariable rv= context.addInstanceToContext(newName, variable.getType(), correctNewRefinement);
+		context.addRefinementInstanceToVariable(simpleName, newName);
+		//smt check
+		checkSMT(cEt, variable);//TODO CHANGE
+		context.addRefinementToVariableInContext(variable, cet);
+
 
 	}
 
 
-	<T> void checkSMT(Constraint expectedType, CtElement element) {
-		vcChecker.processSubtyping(expectedType, element);
-		element.putMetadata(REFINE_KEY, expectedType);	
-	}
-	
+
 
 
 	//############################### Get Metadata ##########################################
-	Constraint getRefinement(CtElement elem) {
-		return (Constraint)elem.getMetadata(REFINE_KEY);
 
-	}
 	/**
 	 * 
 	 * @param <T>
@@ -400,10 +377,10 @@ public class RefinementTypeChecker extends CtScanner {
 		Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent())
 			cref = new EqualsPredicate(WILD_VAR, ovi.get().getName());
-		
+
 		variable.putMetadata(REFINE_KEY, cref);
 	}
-	
+
 
 	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
 		Optional<Constraint> constr = Optional.empty();
@@ -416,20 +393,28 @@ public class RefinementTypeChecker extends CtScanner {
 			}		
 		if(ref.isPresent()) 
 			constr = Optional.of(new Predicate(ref.get()));
-		
+
 		return constr;
 	}
-	
-	
-	private Optional<String> getExternalRefinement(CtInterface<?> intrface) {
-		Optional<String> ref = Optional.empty();
-		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
-			if( ann.getActualAnnotation().annotationType().getCanonicalName()
-					.contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
-				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				ref = Optional.of(s.getValue());
-			}		
-		return ref;
+
+	@Override
+	void checkSMT(Constraint expectedType, CtElement element) {
+		vcChecker.processSubtyping(expectedType, element);
+		element.putMetadata(REFINE_KEY, expectedType);	
 	}
+
+
+
+
+	//	private Optional<String> getExternalRefinement(CtInterface<?> intrface) {
+	//		Optional<String> ref = Optional.empty();
+	//		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
+	//			if( ann.getActualAnnotation().annotationType().getCanonicalName()
+	//					.contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
+	//				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+	//				ref = Optional.of(s.getValue());
+	//			}		
+	//		return ref;
+	//	}
 
 }

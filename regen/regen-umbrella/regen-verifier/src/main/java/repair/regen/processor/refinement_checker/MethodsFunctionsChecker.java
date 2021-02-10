@@ -23,9 +23,9 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class MethodsFunctionsChecker {
 
-	private RefinementTypeChecker rtc;
+	private TypeChecker rtc;
 
-	public MethodsFunctionsChecker(RefinementTypeChecker rtc) {
+	public MethodsFunctionsChecker(TypeChecker rtc) {
 		this.rtc = rtc; 
 
 	}
@@ -68,27 +68,8 @@ public class MethodsFunctionsChecker {
 			}
 
 		}
-//		String name = m.toGenericString();
-//		int lastSpaceI = name.lastIndexOf(" ");
-//		name = name.substring(lastSpaceI+1);
-//		Optional<RefinedFunction> ref = lib.getRefinement(name, m, rtc.factory);
-//		if(ref.isPresent()){
-//			RefinedFunction rf = ref.get();
-//			for(Variable v:rf.getArguments())
-//				rtc.context.addVarToContext(v);
-//			rtc.context.addFunctionToContext(rf);
-//			checkInvocationRefinements(invocation, m.getName());
-//		}
+
 	}
-
-
-
-
-
-	private CtTypeReference<?> getType(Class<?> type) {
-		return rtc.factory.createCtTypeReference(type);
-	}
-
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName) {
 		RefinedFunction f = rtc.context.getFunctionByName(methodName);

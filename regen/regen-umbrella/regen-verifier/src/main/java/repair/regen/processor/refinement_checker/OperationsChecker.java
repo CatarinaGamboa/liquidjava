@@ -37,9 +37,9 @@ import spoon.support.reflect.code.CtVariableWriteImpl;
  */
 class OperationsChecker {
 
-	private RefinementTypeChecker rtc;
+	private TypeChecker rtc;
 
-	public OperationsChecker(RefinementTypeChecker rtc) {
+	public OperationsChecker(TypeChecker rtc) {
 		this.rtc = rtc; 
 	}
 
