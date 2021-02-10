@@ -4,16 +4,14 @@ import repair.regen.specification.Refinement;
 
 public class SimpleTest {	
 	public static void main(String[] args) {
-
-		//Math.abs(...)
-		@Refinement("b > 0")
-		int b = Math.abs(6);
-		@Refinement("_ == 6")
-		int a = Math.abs(6);
-		@Refinement("_ > 4")
-		int d = Math.abs(-6);
-		@Refinement("_ == -6")
-		int e = -Math.abs(-d);
+//		@Refinement("_ > 3")
+//		double a2 = Math.PI;
+//		@Refinement("_ > 2")
+//		double b2 = Math.E;
+		@Refinement("_ > 20")
+		double radius = 30;
+		@Refinement("perimeter > 1")
+		double perimeter = 2*Math.PI*radius;
 		
 	}
 

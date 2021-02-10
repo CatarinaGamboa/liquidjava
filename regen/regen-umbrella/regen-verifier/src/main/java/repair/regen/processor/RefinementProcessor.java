@@ -2,6 +2,7 @@ package repair.regen.processor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import repair.regen.processor.context.Context;
 import repair.regen.processor.refinement_checker.ExternalRefinementTypeChecker;
@@ -25,13 +26,13 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
 	@Override
 	public void process(CtPackage pkg) {
 		if (!visitedPackages.contains(pkg)) {
+			Set<CtPackage> sp = pkg.getPackages();
 			visitedPackages.add(pkg);
 			Context c = Context.getInstance();
 			pkg.accept(new ExternalRefinementTypeChecker(c));
 			pkg.accept(new RefinementTypeChecker(c, factory));
 		}
-		
-		
+
 	}
 
 

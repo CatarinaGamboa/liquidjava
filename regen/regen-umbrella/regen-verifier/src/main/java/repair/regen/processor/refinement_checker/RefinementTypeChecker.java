@@ -49,13 +49,12 @@ public class RefinementTypeChecker extends TypeChecker {
 	OperationsChecker otc;
 	MethodsFunctionsChecker mfc;
 
-	private String externalPrefix = null;
-
 	public RefinementTypeChecker(Context context,Factory factory) {
 		super(context);
 		this.factory = factory;
 		otc = new OperationsChecker(this);
 		mfc = new MethodsFunctionsChecker(this);
+		System.out.println("In RefinementTypeChecker");
 	}
 
 	//--------------------- Visitors -----------------------------------
@@ -65,24 +64,6 @@ public class RefinementTypeChecker extends TypeChecker {
 		context.reinitializeContext();
 		super.visitCtClass(ctClass);
 	}
-
-	//	@Override
-	//	public <T> void visitCtInterface(CtInterface<T> intrface) {
-	//		Optional<String> externalRefinements = getExternalRefinement(intrface);
-	//		if(externalRefinements.isPresent()) {
-	//			String prefix = externalRefinements.get();
-	//			externalPrefix = prefix;
-	//			
-	//			
-	//			super.visitCtInterface(intrface);
-	//			externalPrefix = null;
-	//			
-	//		}else
-	//			super.visitCtInterface(intrface);
-	//	}
-
-
-
 
 	@Override
 	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
@@ -107,10 +88,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	public <R> void visitCtMethod(CtMethod<R> method) {
 		context.enterContext();
-		if(externalPrefix == null)
-			mfc.getMethodRefinements(method);
-		else
-			mfc.getMethodRefinements(method, externalPrefix);
+		mfc.getMethodRefinements(method);
 		super.visitCtMethod(method);
 		context.exitContext();
 
@@ -181,7 +159,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
 		System.out.println();
-		String fieldName = fieldRead.toString();
+		String fieldName = fieldRead.toString().replace("(", "").replace(")", "");
 		if(context.hasVariable(fieldName)) {
 			Constraint c = context.getVariableRefinements(fieldName);
 			fieldRead.putMetadata(REFINE_KEY, c);

@@ -154,7 +154,7 @@ public class TestExamples {
 	
 	@Test
 	public void correctInvocationFromMathLibrary() {
-		testCorrect(testPath+"CorrectInvocationFromMathLibrary.java");
+		testCorrect(testPath+"/math");
 	}
 	
 	@Test
@@ -345,6 +345,7 @@ public class TestExamples {
 	public void errorSyntax1() {
 		testWrong(testPath+"ErrorSyntax1.java");
 	}
+	
 
 	
 	

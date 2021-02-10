@@ -25,6 +25,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	public ExternalRefinementTypeChecker(Context context) {
 		super(context);
 		this.context = context;
+		System.out.println("ExternalRefinementTypeChecker");
 	}
 
 	@Override
@@ -47,14 +48,12 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		Constraint c = oc.isPresent()?oc.get():new Predicate();
 		context.addGlobalVariableToContext(String.format("%s.%s", prefix, f.getSimpleName()), 
 				f.getType(), c);
-		System.out.println();
-
-
 		super.visitCtField(f);
 	}
 	
 	public <R> void visitCtMethod(CtMethod<R> method) {
-		//mfc.getMethodRefinements(method, externalPrefix);
+		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
+		mfc.getMethodRefinements(method, prefix);
 		super.visitCtMethod(method);
 	}
 
@@ -73,7 +72,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	@Override
 	protected void checkSMT(Constraint refPar, CtElement invocation) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override

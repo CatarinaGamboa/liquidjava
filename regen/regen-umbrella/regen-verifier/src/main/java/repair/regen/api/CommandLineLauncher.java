@@ -1,8 +1,12 @@
 package repair.regen.api;
+import java.util.Collection;
+
 import repair.regen.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
+import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.factory.PackageFactory;
 import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
@@ -25,7 +29,15 @@ public class CommandLineLauncher {
 		final ProcessingManager processingManager = new QueueProcessingManager(factory);
 		final RefinementProcessor processor = new RefinementProcessor(factory);
 		processingManager.addProcessor(processor);
-		processingManager.process(factory.Package().getRootPackage());
+		
+		//To only search the last package - less time spent 
+		CtPackage v = factory.Package().getAll().stream()
+				  .reduce((first, second) -> second)
+				  .orElse(null);
+		if(v != null)
+			processingManager.process(v);
+		//To search all previous packages
+		//processingManager.process(factory.Package().getRootPackage());
 
         System.out.println("Analysis complete!");
 	}
