@@ -13,6 +13,11 @@ public interface MathRefinements {
 	@Refinement("_ == 2.7182818284590452354")
 	public double E = 0;
 			
+	@Refinement("(a > b)? (_ == a):(_ == b)")
+	public int max(int a, int b);
+	@Refinement("(a > b)? (_ == b):(_ == a)")
+	public int min(int a, int b);
+	
 	@Refinement("(arg0 > 0)?( _ == arg0):(_ == -arg0)")
 	public int abs(int arg0);
 	@Refinement("(arg0 > 0)?( _ == arg0):(_ == -arg0)")
@@ -45,10 +50,6 @@ public interface MathRefinements {
 	public int incrementExact(long a);
 	
 
-	@Refinement("(a > b)? (_ == a):(_ == b)")
-	public int max(int a, int b);
-	@Refinement("(a > b)? (_ == b):(_ == a)")
-	public int min(int a, int b);
 	
 
 	@Refinement(" _ > 0.0 && _ < 1.0")

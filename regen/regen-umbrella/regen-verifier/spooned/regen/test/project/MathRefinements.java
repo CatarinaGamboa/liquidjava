@@ -9,6 +9,12 @@ public interface MathRefinements {
     @repair.regen.specification.Refinement("_ == 2.7182818284590452354")
     public double E = 0;
 
+    @repair.regen.specification.Refinement("(a > b)? (_ == a):(_ == b)")
+    public int max(int a, int b);
+
+    @repair.regen.specification.Refinement("(a > b)? (_ == b):(_ == a)")
+    public int min(int a, int b);
+
     @repair.regen.specification.Refinement("(arg0 > 0)?( _ == arg0):(_ == -arg0)")
     public int abs(int arg0);
 
@@ -47,12 +53,6 @@ public interface MathRefinements {
 
     @repair.regen.specification.Refinement("_ == (a+1)")
     public int incrementExact(long a);
-
-    @repair.regen.specification.Refinement("(a > b)? (_ == a):(_ == b)")
-    public int max(int a, int b);
-
-    @repair.regen.specification.Refinement("(a > b)? (_ == b):(_ == a)")
-    public int min(int a, int b);
 
     @repair.regen.specification.Refinement(" _ > 0.0 && _ < 1.0")
     public long random(long a, long b);

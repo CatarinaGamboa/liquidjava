@@ -18,7 +18,7 @@ public class FunctionDeclaration implements IModel{
     
 	@Multiplicity(minimum=0,maximum=1000)
     @Optional
-    Type[] argtypes;
+    MultipleTypes[] argtypes;
 	
     ParenthesisRight lr;
 	
@@ -29,7 +29,7 @@ public class FunctionDeclaration implements IModel{
 	public Variable getName() {
 		return name;
 	}
-	public Type[] getArgTypes() {
+	public MultipleTypes[] getArgTypes() {
 		return argtypes;
 	}
     
@@ -37,8 +37,8 @@ public class FunctionDeclaration implements IModel{
     	StringBuilder sb = new StringBuilder();
     	sb.append(g+" "+retType.toString()+" "+name.toString()+"(");
     	if(argtypes != null)
-	    	for (Type t:argtypes) {
-				sb.append(t+" ");
+	    	for (MultipleTypes t:argtypes) {
+				sb.append(t.toString()+" ");
 			}
     	sb.append(")");
     	return sb.toString();

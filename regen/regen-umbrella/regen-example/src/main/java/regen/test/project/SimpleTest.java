@@ -1,11 +1,10 @@
 package regen.test.project;
 
-import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementFunction;
 
 public class SimpleTest {	
 	
-	@RefinementFunction("ghost int len(int int String)")
+	@RefinementFunction("ghost int len(int, int, String)")
 	public static int seven() {
 		return 7;
 	}
@@ -14,7 +13,10 @@ public class SimpleTest {
 	
 	
 	public static void main(String[] args) {
-
+		//java.util.stream.IntStream
+		//IntStream.range(5,3);
+		
+		
 	}
 
 
