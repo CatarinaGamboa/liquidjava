@@ -5,15 +5,15 @@ import org.modelcc.Multiplicity;
 import org.modelcc.Optional;
 
 import repair.regen.language.Variable;
-import repair.regen.language.keywords.GhostKeyword;
-import repair.regen.language.keywords.ParenthesisLeft;
-import repair.regen.language.keywords.ParenthesisRight;
+import repair.regen.language.symbols.GhostKeyword;
+import repair.regen.language.symbols.ParenthesisLeft;
+import repair.regen.language.symbols.ParenthesisRight;
 
 public class FunctionDeclaration implements IModel{
 
 	GhostKeyword g;
 	Type retType;
-	Variable name;
+	FunctionName name;
 	ParenthesisLeft lp;
     
 	@Multiplicity(minimum=0,maximum=1000)
@@ -26,7 +26,7 @@ public class FunctionDeclaration implements IModel{
 	public Type getReturnType() {
 		return retType;
 	}
-	public Variable getName() {
+	public FunctionName getName() {
 		return name;
 	}
 	public MultipleTypes[] getArgTypes() {

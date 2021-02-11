@@ -13,14 +13,16 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    @repair.regen.specification.RefinementFunction("ghost int len(int, int, String)")
-    public static int seven() {
-        return 7;
-    }
-
+    // @RefinementFunction("ghost int len(int, int, String)")
+    // public static int seven() {
+    // return 7;
+    // }
+    // 
     public static void main(java.lang.String[] args) {
         // java.util.stream.IntStream
         // IntStream.range(5,3);
+        @repair.regen.specification.Refinement("len(a + 9, 0)")
+        int a;
     }
 }
 

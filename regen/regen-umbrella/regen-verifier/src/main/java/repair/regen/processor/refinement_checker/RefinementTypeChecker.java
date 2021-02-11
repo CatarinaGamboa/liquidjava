@@ -180,7 +180,6 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
 		super.visitCtVariableRead(variableRead);
 		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
-		String name = varDecl.getSimpleName();
 		getPutVariableMetadada(variableRead, varDecl);
 	}
 

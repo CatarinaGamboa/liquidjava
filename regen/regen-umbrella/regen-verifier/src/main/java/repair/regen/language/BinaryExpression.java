@@ -1,12 +1,13 @@
 package repair.regen.language;
 
 import org.modelcc.IModel;
+import org.modelcc.Priority;
 
 import com.microsoft.z3.Expr;
 
 import repair.regen.language.operators.BinaryOperator;
 import repair.regen.smt.TranslatorToZ3;
-
+@Priority(0)
 public class BinaryExpression extends Expression implements IModel {
 	Expression e1;
 	BinaryOperator op;

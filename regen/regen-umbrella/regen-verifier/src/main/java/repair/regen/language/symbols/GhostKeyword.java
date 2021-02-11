@@ -1,4 +1,4 @@
-package repair.regen.language.keywords;
+package repair.regen.language.symbols;
 
 import org.modelcc.IModel;
 import org.modelcc.Pattern;

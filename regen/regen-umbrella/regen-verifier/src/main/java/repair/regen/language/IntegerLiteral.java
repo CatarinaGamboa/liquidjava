@@ -8,7 +8,7 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-@Priority(1)
+@Priority(10)
 public class IntegerLiteral extends LiteralExpression implements IModel {
 	@Value
 	int value;
