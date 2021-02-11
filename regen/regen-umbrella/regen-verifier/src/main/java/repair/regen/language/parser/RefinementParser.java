@@ -1,15 +1,18 @@
 package repair.regen.language.parser;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import org.modelcc.io.java.JavaModelReader;
 import org.modelcc.language.metamodel.LanguageModel;
+import org.modelcc.lexer.recognizer.PatternRecognizer;
 import org.modelcc.parser.Parser;
 import org.modelcc.parser.ParserException;
 import org.modelcc.parser.ParserFactory;
 
 import repair.regen.language.Expression;
-import repair.regen.language.FunctionDeclaration;
+import repair.regen.language.function.FunctionDeclaration;
 
 public class RefinementParser {
 	@SuppressWarnings("unchecked")
@@ -34,6 +37,7 @@ public class RefinementParser {
 		return Optional.empty();
 	}
 	
+	@SuppressWarnings("unchecked")
 	public static Optional<FunctionDeclaration> parseFunctionDecl(String code) throws SyntaxException {
 		try {
 			//System.out.println("Parsing: " + code);

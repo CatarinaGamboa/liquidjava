@@ -13,22 +13,12 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    // @RefinementFunction("ghost len")
-    // public static int seven() {
-    // return 7;
-    // }
-    // @Refinement("(a > 0)? (_ == a): (_ == -a)")
-    // public static int abso(int a) {
-    // if( a > 0)
-    // return a;
-    // else
-    // return -a;
-    // }
+    @repair.regen.specification.RefinementFunction("ghost int len(int int String)")
+    public static int seven() {
+        return 7;
+    }
+
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("b == -8")
-        double b = java.lang.Math.copySign(8, (-6));
-        // @Refinement("(4 > 8)? ( _ == 7):( _ == 10)")
-        // int a = 10;
     }
 }
 

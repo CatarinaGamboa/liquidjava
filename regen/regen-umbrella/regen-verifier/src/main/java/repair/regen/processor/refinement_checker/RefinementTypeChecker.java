@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.language.function.FunctionDeclaration;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Conjunction;
@@ -376,12 +377,16 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	private void getGhostFunction(String value) {
 		//TODO
-//		try {
-//			//RefinementParser.parseFunctionDecl(value);
-//		} catch (SyntaxException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		}
+		try {
+			Optional<FunctionDeclaration> ofd = 
+					RefinementParser.parseFunctionDecl(value);
+			if(ofd.isPresent())
+				System.out.println(ofd.toString());
+			
+		} catch (SyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
 
