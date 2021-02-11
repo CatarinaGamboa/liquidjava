@@ -1,3 +1,4 @@
+package regen.test.project;
 
 
 import repair.regen.specification.ExternalRefinementsFor;
@@ -12,13 +13,13 @@ public interface MathRefinements {
 	@Refinement("_ == 2.7182818284590452354")
 	public double E = 0;
 			
-	@Refinement("( _ == arg0 ||  _ == -arg0) && _ > 0")
+	@Refinement("(arg0 > 0)?( _ == arg0):(_ == -arg0)")
 	public int abs(int arg0);
-	@Refinement("( _ == arg0 ||  _ == -arg0) && _ > 0")
+	@Refinement("(arg0 > 0)?( _ == arg0):(_ == -arg0)")
 	public int abs(long arg0);
-	@Refinement("( _ == arg0 ||  _ == -arg0) && _ > 0")
+	@Refinement("(arg0 > 0)?( _ == arg0):(_ == -arg0)")
 	public int abs(float arg0);
-	@Refinement("( _ == arg0 ||  _ == -arg0) && _ > 0")
+	@Refinement("(arg0 > 0)?( _ == arg0):(_ == -arg0)")
 	public int abs(double arg0);
 	
 	@Refinement(" _ == a+b")
@@ -43,16 +44,17 @@ public interface MathRefinements {
 	@Refinement("_ == (a+1)")
 	public int incrementExact(long a);
 	
-	@Refinement("((a > b)-->( _ == a)) && ((a <= b)-->( _ == b))")
-	public int max(int a, int b);//TODO CHANGE when Ite is done
-	@Refinement("((a < b)-->( _ == a)) && ((a >= b)-->( _ == b))")
-	public int min(int a, int b);//TODO CHANGE when Ite is done
+
+	@Refinement("(a > b)? (_ == a):(_ == b)")
+	public int max(int a, int b);
+	@Refinement("(a > b)? (_ == b):(_ == a)")
+	public int min(int a, int b);
 	
 
 	@Refinement(" _ > 0.0 && _ < 1.0")
 	public long random(long a, long b);
 	
-	@Refinement("((sig > 0) --> (_ > 0)) && (!(sig > 0)-->!(_ > 0)) && ((_ == arg) || (_ == (-arg)))")
+	@Refinement("((sig > 0)?(_ > 0):(_ < 0)) && (( _ == arg)||(_ == -arg))")
 	public float copySign(float arg, float sig);
 
 	
