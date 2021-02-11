@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.language.parser.RefinementParser;
+import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
@@ -309,17 +311,8 @@ public class RefinementTypeChecker extends TypeChecker {
 	
 	@Override
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtVariable<?> variable) {
-		Optional<String> expectedType = variable.getAnnotations().stream()
-				.filter(
-						ann -> ann.getActualAnnotation().annotationType().getCanonicalName()
-						.contentEquals("repair.regen.specification.Refinement")
-						).map(
-								ann -> (CtLiteral<String>) ann.getAllValues().get("value")
-								).map(
-										str -> str.getValue()
-										).findAny();
-
-		Constraint cEt = expectedType.isPresent()?new Predicate(expectedType.get()):new Predicate();
+		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
+		Constraint cEt = expectedType.isPresent()?expectedType.get():new Predicate();
 
 		cEt = cEt.substituteVariable(WILD_VAR, simpleName);
 		Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
@@ -364,16 +357,32 @@ public class RefinementTypeChecker extends TypeChecker {
 	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
 		Optional<Constraint> constr = Optional.empty();
 		Optional<String> ref = Optional.empty();
-		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) 
-			if( ann.getActualAnnotation().annotationType().getCanonicalName()
-					.contentEquals("repair.regen.specification.Refinement")) {
+		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
+			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
+			if( an.contentEquals("repair.regen.specification.Refinement")) {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 				ref = Optional.of(s.getValue());
-			}		
+			}else if( an.contentEquals("repair.regen.specification.RefinementFunction")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				getGhostFunction(s.getValue());
+				ref = Optional.empty();
+			}
+		}
 		if(ref.isPresent()) 
 			constr = Optional.of(new Predicate(ref.get()));
 
 		return constr;
+	}
+
+	private void getGhostFunction(String value) {
+		//TODO
+//		try {
+//			//RefinementParser.parseFunctionDecl(value);
+//		} catch (SyntaxException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
 	}
 
 	@Override

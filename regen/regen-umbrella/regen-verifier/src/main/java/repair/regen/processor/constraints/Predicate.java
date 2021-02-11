@@ -8,6 +8,7 @@ import repair.regen.language.BinaryExpression;
 import repair.regen.language.BooleanLiteral;
 import repair.regen.language.Expression;
 import repair.regen.language.ExpressionGroup;
+import repair.regen.language.IfElseExpression;
 import repair.regen.language.LiteralExpression;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.Variable;
@@ -81,6 +82,11 @@ public class Predicate extends Constraint{
 			auxSubstitute(ue.getExpression(), from, to);
 		}else if(exp2 instanceof ExpressionGroup) {
 			auxSubstitute(((ExpressionGroup)exp2).getExpression(), from, to);
+		}else if(exp2 instanceof IfElseExpression) {
+			IfElseExpression ite = (IfElseExpression)exp2;
+			auxSubstitute(ite.getCondition(), from, to);
+			auxSubstitute(ite.getThenExpression(), from, to);
+			auxSubstitute(ite.getElseExpression(), from, to);
 		}
 
 	}
@@ -114,6 +120,11 @@ public class Predicate extends Constraint{
 			auxGetVariableNames(ue.getExpression(), l);
 		}else if(exp2 instanceof ExpressionGroup) {
 			auxGetVariableNames(((ExpressionGroup)exp2).getExpression(), l);
+		}else if(exp2 instanceof IfElseExpression) {
+			IfElseExpression ite = (IfElseExpression)exp2;
+			auxGetVariableNames(ite.getCondition(),l);
+			auxGetVariableNames(ite.getThenExpression(), l);
+			auxGetVariableNames(ite.getElseExpression(), l);
 		}
 	}
 	

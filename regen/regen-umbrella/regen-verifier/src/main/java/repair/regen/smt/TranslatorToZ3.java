@@ -208,5 +208,13 @@ public class TranslatorToZ3 {
 		}
 		return f;
 	}
+	
+	
+	public Expr makeIte(Expr c, Expr t, Expr e) {
+		if(c instanceof BoolExpr)
+			return z3.mkITE((BoolExpr)c, t, e);
+		System.out.println("Condition is not a boolean expression");
+		return null;
+	}
 
 }
