@@ -11,6 +11,7 @@ import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
+import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
@@ -271,12 +272,10 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtConditional(CtConditional<T> conditional) {
 		super.visitCtConditional(conditional);
 		Constraint cond = getRefinement(conditional.getCondition());
-		String condRefs = cond.toString(); 
-		String condThen = "!(" + condRefs + ") || ("+ getRefinement(conditional.getThenExpression())+")", //!A or B
-				notCondElse = "("+condRefs + ") || ("+ getRefinement(conditional.getElseExpression())+")";//A or C
+		Constraint c= new IfThenElse(cond, getRefinement(conditional.getThenExpression()), 
+				getRefinement(conditional.getElseExpression()));
+		conditional.putMetadata(REFINE_KEY, c);
 
-		conditional.putMetadata(REFINE_KEY, 
-				Conjunction.createConjunction(new Predicate(condThen), new Predicate(notCondElse)));
 	}
 
 

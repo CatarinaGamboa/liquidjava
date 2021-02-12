@@ -9,18 +9,14 @@ public class SimpleTest {
 //	public static int seven() {
 //		return 7;
 //	}
-//	
 
-	
+	@Refinement("_ >= 0 && _ >= v")
+	public int sum(int v) {
+		
+	}
 	
 	public static void main(String[] args) {
-		//java.util.stream.IntStream
-		//IntStream.range(5,3);
-		
-		@Refinement("len(a + 9, 0)")
-		int a;
-		
-		
+
 	}
 
 

@@ -18,11 +18,15 @@ public class SimpleTest {
     // return 7;
     // }
     // 
+    @repair.regen.specification.Refinement("_ == 3")
+    public static int three() {
+        return 3;
+    }
+
     public static void main(java.lang.String[] args) {
-        // java.util.stream.IntStream
-        // IntStream.range(5,3);
-        @repair.regen.specification.Refinement("len(a + 9, 0)")
-        int a;
+        @repair.regen.specification.Refinement("_ < 10")
+        int a = 5;
+        a = (a == 2) ? 6 + (regen.test.project.SimpleTest.three()) : 4 * (regen.test.project.SimpleTest.three());
     }
 }
 
