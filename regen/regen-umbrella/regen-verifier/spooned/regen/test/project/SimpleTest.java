@@ -17,16 +17,19 @@ public class SimpleTest {
     // public static int seven() {
     // return 7;
     // }
-    // 
-    @repair.regen.specification.Refinement("_ == 3")
-    public static int three() {
-        return 3;
+    @repair.regen.specification.Refinement("_ >= 0 && _ >= n")
+    public static int sum(int n) {
+        if (n <= 0)
+            return 0;
+        else {
+            int t1 = regen.test.project.SimpleTest.sum((n - 1));
+            return n + t1;
+        }
     }
 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("_ < 10")
-        int a = 5;
-        a = (a == 2) ? 6 + (regen.test.project.SimpleTest.three()) : 4 * (regen.test.project.SimpleTest.three());
+        @repair.regen.specification.Refinement("i >= 10")
+        int i = regen.test.project.SimpleTest.sum(10);
     }
 }
 

@@ -166,6 +166,11 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectAfterIfUsingScope.java");
 	}
 	
+	@Test
+	public void correctSumFunction() {
+		testCorrect(testPath+"CorrectSumFunction.java");
+	}
+	
 	
 	@Test
 	public void errorSimpleAssignment() {

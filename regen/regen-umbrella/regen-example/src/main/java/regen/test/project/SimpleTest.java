@@ -10,13 +10,20 @@ public class SimpleTest {
 //		return 7;
 //	}
 
-	@Refinement("_ >= 0 && _ >= v")
-	public int sum(int v) {
-		
+	@Refinement("_ >= 0 && _ >= n")
+	public static int sum(int n) {
+		if(n <= 0)
+			return 0;
+		else {
+			int t1 = sum(n-1);
+			return n + t1;
+		}
 	}
 	
 	public static void main(String[] args) {
-
+		//CHECK
+//		@Refinement("i >= 10")
+//		int i = sum(10);
 	}
 
 
