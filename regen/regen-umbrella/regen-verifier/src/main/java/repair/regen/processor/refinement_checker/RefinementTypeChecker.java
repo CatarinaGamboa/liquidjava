@@ -8,12 +8,12 @@ import java.util.Optional;
 import repair.regen.language.function.FunctionDeclaration;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
+import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtAssignment;
@@ -33,13 +33,10 @@ import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtField;
-import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtVariableReference;
-import spoon.reflect.visitor.CtScanner;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
 public class RefinementTypeChecker extends TypeChecker {
@@ -378,8 +375,10 @@ public class RefinementTypeChecker extends TypeChecker {
 		try {
 			Optional<FunctionDeclaration> ofd = 
 					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent())
-				System.out.println(ofd.toString());
+			if(ofd.isPresent()) {
+				GhostFunction gh = new GhostFunction(ofd.get(), factory); 
+				System.out.println(gh);
+			}
 			
 		} catch (SyntaxException e) {
 			// TODO Auto-generated catch block

@@ -13,6 +13,10 @@ public class MultipleTypes implements IModel{
 	@Optional
 	Coma c;
 	
+	public Type getType() {
+		return t;
+	}
+	
 	public String toString() {
 		return t.toString() + (c==null? "":","); 
 	}

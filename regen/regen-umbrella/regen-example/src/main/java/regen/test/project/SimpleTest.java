@@ -1,26 +1,31 @@
 package regen.test.project;
 
+import java.io.InputStreamReader;
+
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementFunction;
 
 public class SimpleTest {	
 	
-//	@RefinementFunction("ghost int len(int, int, String)")
-//	public static int seven() {
-//		return 7;
-//	}
+	
 
-	@Refinement("_ >= 0 && _ >= n")
-	public static int sum(int n) {
-		if(n <= 0)
-			return 0;
-		else {
-			int t1 = sum(n-1);
-			return n + t1;
-		}
+//	@Refinement("_ >= 0 && _ >= n")
+//	public static int absolute(int n) {
+//		if(0 <= n)
+//			return n;
+//		else
+//			return 0 - n;
+//		
+//	}
+	
+	@RefinementFunction("ghost boolean open(int)")
+	public int add() {
+		return 1;
 	}
 	
 	public static void main(String[] args) {
+//		@Refinement("a > 5")
+//		int a = 10;
 		//CHECK
 //		@Refinement("i >= 10")
 //		int i = sum(10);

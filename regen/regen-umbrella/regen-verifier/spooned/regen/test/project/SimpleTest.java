@@ -13,23 +13,25 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    // @RefinementFunction("ghost int len(int, int, String)")
-    // public static int seven() {
-    // return 7;
+    // @Refinement("_ >= 0 && _ >= n")
+    // public static int absolute(int n) {
+    // if(0 <= n)
+    // return n;
+    // else
+    // return 0 - n;
+    // 
     // }
-    @repair.regen.specification.Refinement("_ >= 0 && _ >= n")
-    public static int sum(int n) {
-        if (n <= 0)
-            return 0;
-        else {
-            int t1 = regen.test.project.SimpleTest.sum((n - 1));
-            return n + t1;
-        }
+    @repair.regen.specification.RefinementFunction("ghost boolean open(int String)")
+    public int add() {
+        return 1;
     }
 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("i >= 10")
-        int i = regen.test.project.SimpleTest.sum(10);
+        // @Refinement("a > 5")
+        // int a = 10;
+        // CHECK
+        // @Refinement("i >= 10")
+        // int i = sum(10);
     }
 }
 

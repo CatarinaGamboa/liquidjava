@@ -167,8 +167,8 @@ public class TestExamples {
 	}
 	
 	@Test
-	public void correctSumFunction() {
-		testCorrect(testPath+"CorrectSumFunction.java");
+	public void correctFunctionsTutorial() {
+		testCorrect(testPath+"CorrectFunctionsTutorial.java");
 	}
 	
 	

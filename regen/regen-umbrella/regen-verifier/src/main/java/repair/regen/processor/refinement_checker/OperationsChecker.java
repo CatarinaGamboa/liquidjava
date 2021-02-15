@@ -70,7 +70,7 @@ class OperationsChecker {
 			operator.putMetadata(rtc.REFINE_KEY, oper);
 			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
 					parent instanceof CtReturn<?>)
-				operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(rtc.WILD_VAR, oper));//TODO MAYBE ADD () IN OPER
+				operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(rtc.WILD_VAR, oper));
 		}else if (types.contains(type)) {
 			operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(rtc.WILD_VAR, oper));
 		}else {
