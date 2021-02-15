@@ -1,13 +1,18 @@
 package repair.regen.smt;
 
+import static org.junit.Assert.assertNotNull;
+
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPExpr;
+import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 import com.microsoft.z3.RealExpr;
@@ -16,15 +21,31 @@ import com.microsoft.z3.Sort;
 import com.microsoft.z3.Status;
 
 import repair.regen.language.Expression;
+import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.reference.CtTypeReference;
 
 public class TranslatorToZ3 {
 
 	private Context z3 = new Context();
 	private Map<String, Expr> varTranslation = new HashMap<>();
+	private Map<String, FuncDecl> funcTranslation = new HashMap<>();
+	
+	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx, List<GhostFunction> l ) {
+		translateVariables(ctx);
+		if(!l.isEmpty()) {
+			for(GhostFunction gh: l) {
+				List<CtTypeReference<?>> paramTypes = gh.getParametersTypes();
+				Sort ret = getSort(gh.getReturnType().toString());
+				Sort[] d = paramTypes.stream()
+						.map(t->t.toString())
+						.map(t->getSort(t))
+						.toArray(Sort[]::new);
+				funcTranslation.put(gh.getName(), z3.mkFuncDecl(gh.getName(), d, ret));
+			}
+		}
+	}
 
-
-	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx) {
+	public void translateVariables(Map<String, CtTypeReference<?>> ctx) {
 		for (String name : ctx.keySet()) {
 			if (ctx.get(name).getQualifiedName().contentEquals("int"))
 				varTranslation.put(name, z3.mkIntConst(name));
@@ -48,8 +69,21 @@ public class TranslatorToZ3 {
 		}
 		varTranslation.put("true", z3.mkBool(true));
 		varTranslation.put("false", z3.mkBool(false));
-		
-		
+
+	}
+	
+	private Sort getSort(String sort) {
+		switch(sort) {
+		case "int": return z3.getIntSort();
+		case "boolean":return z3.getBoolSort();
+		case "long":return z3.getRealSort();
+		case "float": return z3.mkFPSort32();
+		case "double":return z3.mkFPSortDouble();
+		case "String":return z3.getStringSort();
+		//case "List":return z3.mkListSort(name, elemSort)
+		default:
+			return null;
+		}	
 	}
 
 	public Status verifyExpression(Expression e) {

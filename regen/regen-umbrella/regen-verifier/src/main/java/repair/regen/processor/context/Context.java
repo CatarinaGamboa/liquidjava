@@ -283,6 +283,11 @@ public class Context {
 		}
 		return false;
 	}
+	
+	public List<GhostFunction> getGhosts() {
+		return ghosts;
+	}
+
 
 
 	@Override
@@ -311,6 +316,7 @@ public class Context {
 			sb.append(f.toString());
 		return sb.toString();
 	}
+
 
 
 

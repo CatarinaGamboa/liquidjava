@@ -30,7 +30,15 @@ public class GhostFunction {
 	public String getName() {
 		return name;
 	}
+	
+	public CtTypeReference<?> getReturnType() {
+		return return_type;
+	}
 
+	public List<CtTypeReference<?>> getParametersTypes(){
+		return param_types; 
+	}
+	
 	private CtTypeReference<?> getType(String type, Factory factory) {
 		//TODO complete
 		switch(type) {

@@ -21,8 +21,8 @@ public class SimpleTest {
     // return 0 - n;
     // 
     // }
+    // @Refinement("open(1) == True")
     @repair.regen.specification.RefinementFunction("ghost boolean open(int)")
-    @repair.regen.specification.Refinement("open(1) == True")
     public int add() {
         return 1;
     }
