@@ -118,6 +118,11 @@ public class TranslatorToZ3 {
 	public Expr makeVariable(String name) {
 		return varTranslation.get(name);
 	}
+	
+	public Expr makeFunctionInvocation(String name, Expr[] params) {
+		FuncDecl fd = funcTranslation.get(name);
+		return z3.mkApp(fd, params);
+	}
 
 
 	//#####################Boolean Operations#####################

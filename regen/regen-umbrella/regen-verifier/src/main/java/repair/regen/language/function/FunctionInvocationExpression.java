@@ -1,5 +1,8 @@
 package repair.regen.language.function;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.modelcc.IModel;
 import org.modelcc.Multiplicity;
 import org.modelcc.Optional;
@@ -18,17 +21,16 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 //	@Multiplicity(minimum=0,maximum=1000)
 //	@Optional
 	Argument mv;
-	/*
-	 * FArgs = emp | Arguments
-	 * Arguments = Exp FollowUp | Exp
-	 * FollowUp = , Arguments
-	 */
+
 	ParenthesisRight pr;
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		List<Expr> params = new ArrayList<>();
+		mv.eval(ctx, params);
+		Expr[] ps = params.stream().toArray(Expr[]::new);
+		return ctx.makeFunctionInvocation(name.toString(), ps);
+		
 	}
 
 	@Override
