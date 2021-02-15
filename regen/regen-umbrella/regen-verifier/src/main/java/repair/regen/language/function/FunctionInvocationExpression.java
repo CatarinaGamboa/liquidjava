@@ -32,6 +32,10 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 		return ctx.makeFunctionInvocation(name.toString(), ps);
 		
 	}
+	
+	public Argument getArgument() {
+		return mv;
+	}
 
 	@Override
 	public String toString() {

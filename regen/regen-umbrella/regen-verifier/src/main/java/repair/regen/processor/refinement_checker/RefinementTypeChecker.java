@@ -25,6 +25,7 @@ import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
+import spoon.reflect.code.CtNewArray;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
@@ -119,6 +120,12 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 	@Override
+	public <T> void visitCtNewArray(CtNewArray<T> newArray) {
+		super.visitCtNewArray(newArray);
+	}
+	
+	
+	@Override
 	public <T,A extends T> void visitCtAssignment(CtAssignment<T,A> assignement) {
 		super.visitCtAssignment(assignement);
 		CtExpression<T> ex =  assignement.getAssigned();
@@ -160,7 +167,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
-		System.out.println();
+		System.out.println("fieldRead:"+fieldRead);
 		String fieldName = fieldRead.toString().replace("(", "").replace(")", "");
 		if(context.hasVariable(fieldName)) {
 			Constraint c = context.getVariableRefinements(fieldName);

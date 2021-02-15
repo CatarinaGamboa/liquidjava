@@ -45,6 +45,7 @@ public class GhostFunction {
 		case "int":return factory.Type().INTEGER_PRIMITIVE;
 		case "double":return factory.Type().DOUBLE_PRIMITIVE;
 		case "boolean": return factory.Type().BOOLEAN_PRIMITIVE;
+		case "int[]": return factory.createArrayReference(getType("int", factory));
 		case "String": return factory.Type().STRING;
 		case "List": return factory.Type().LIST;
 		default:

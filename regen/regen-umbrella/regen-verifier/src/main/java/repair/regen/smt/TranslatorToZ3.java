@@ -61,6 +61,9 @@ public class TranslatorToZ3 {
 			}else if (ctx.get(name).getQualifiedName().contentEquals("double")) {
 				FPExpr k = (FPExpr)z3.mkConst(name, z3.mkFPSort64());
 				varTranslation.put(name, k);
+			}else if (ctx.get(name).getQualifiedName().contentEquals("int[]")) {
+				varTranslation.put(name, 
+						z3.mkArrayConst(name, z3.mkIntSort(), z3.mkIntSort()));	
 			}else {
 				System.out.println(name + ":"+ctx.get(name).getQualifiedName());
 				//TODO ADD OTHER TYPES
@@ -79,6 +82,7 @@ public class TranslatorToZ3 {
 		case "long":return z3.getRealSort();
 		case "float": return z3.mkFPSort32();
 		case "double":return z3.mkFPSortDouble();
+		case "int[]": return z3.mkArraySort(z3.mkIntSort(), z3.mkIntSort());
 		case "String":return z3.getStringSort();
 		//case "List":return z3.mkListSort(name, elemSort)
 		default:
@@ -116,7 +120,7 @@ public class TranslatorToZ3 {
 	}
 
 	public Expr makeVariable(String name) {
-		return varTranslation.get(name);
+		return varTranslation.get(name);//int[] not in varTranslation
 	}
 	
 	public Expr makeFunctionInvocation(String name, Expr[] params) {

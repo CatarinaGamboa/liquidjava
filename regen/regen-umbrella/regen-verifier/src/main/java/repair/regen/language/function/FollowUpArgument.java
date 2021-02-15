@@ -23,6 +23,10 @@ public class FollowUpArgument implements IModel {
 	public String toString() {
 		return ","+arg.toString();
 	}
+	
+	public Argument getArgument() {
+		return arg;
+	}
 
 
 	public void eval(TranslatorToZ3 ctx, List<Expr> l) {

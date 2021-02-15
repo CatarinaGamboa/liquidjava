@@ -12,6 +12,9 @@ import repair.regen.language.IfElseExpression;
 import repair.regen.language.LiteralExpression;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.Variable;
+import repair.regen.language.function.Argument;
+import repair.regen.language.function.FollowUpArgument;
+import repair.regen.language.function.FunctionInvocationExpression;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
 
@@ -89,8 +92,19 @@ public class Predicate extends Constraint{
 			auxSubstitute(ite.getCondition(), from, to);
 			auxSubstitute(ite.getThenExpression(), from, to);
 			auxSubstitute(ite.getElseExpression(), from, to);
+		}else if(exp2 instanceof FunctionInvocationExpression) {
+			FunctionInvocationExpression fie = (FunctionInvocationExpression) exp2;
+			auxSubstitute(fie.getArgument(), from, to);
 		}
 
+	}
+
+	private void auxSubstitute(Argument arg, String from, String to) {
+		auxSubstitute(arg.getExpression(), from, to);
+		if(arg.hasFollowUpArgument()) {
+			FollowUpArgument fua = arg.getFollowUpArgument();
+			auxSubstitute(fua.getArgument(), from, to);
+		}
 	}
 
 	@Override
@@ -127,9 +141,20 @@ public class Predicate extends Constraint{
 			auxGetVariableNames(ite.getCondition(),l);
 			auxGetVariableNames(ite.getThenExpression(), l);
 			auxGetVariableNames(ite.getElseExpression(), l);
+		}else if(exp2 instanceof FunctionInvocationExpression) {
+			FunctionInvocationExpression fie = (FunctionInvocationExpression) exp2;
+			auxGetVariableNames(fie.getArgument(), l);
 		}
 	}
 	
+	private void auxGetVariableNames(Argument arg, List<String> l) {
+		auxGetVariableNames(arg.getExpression(), l);
+		if(arg.hasFollowUpArgument()) {
+			FollowUpArgument fua = arg.getFollowUpArgument();
+			auxGetVariableNames(fua.getArgument(), l);
+		}
+	}
+
 	boolean isBooleanTrue() {
 		return toString().equals("true") || toString().equals("(true)") ;	
 	}

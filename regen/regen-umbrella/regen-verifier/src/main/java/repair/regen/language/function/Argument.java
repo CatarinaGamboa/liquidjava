@@ -21,8 +21,20 @@ public class Argument implements IModel{
 	
 	public void eval(TranslatorToZ3 ctx, List<Expr> l) {
 		l.add(v.eval(ctx));
-		if(fua != null)
+		if(hasFollowUpArgument())
 			fua.eval(ctx, l);
+	}
+	
+	public Expression getExpression() {
+		return v;
+	}
+	
+	public boolean hasFollowUpArgument() {
+		return fua!=null;
+	}
+	
+	public FollowUpArgument getFollowUpArgument() {
+		return fua;
 	}
 	
 

@@ -1,53 +1,35 @@
 package regen.test.project;
 
-import java.io.InputStreamReader;
-
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementFunction;
 
 public class SimpleTest {	
-	
-	
 
-//	@Refinement("_ >= 0 && _ >= n")
-//	public static int absolute(int n) {
-//		if(0 <= n)
-//			return n;
-//		else
-//			return 0 - n;
-//		
-//	}
-	
-//	@RefinementFunction("ghost boolean open(int)")
-//	@Refinement("open(4.5) == true")
-//	public int one() {
-//		return 1;
-//	}
-//	
-	public static void main(String[] args) {
-		@Refinement("_ < 10")
-		int a = 5;
-
-		if(a > 0) {
-			@Refinement("b > 0")
-			int b = a;
-			b++;
-			a = 10;
-
-		}
-
+	@RefinementFunction("ghost int len(int[])")
+	public int one() {
+		return 1;
 	}
-	
-//	public static void main(String[] args) {
-//		@Refinement("a > 5")
-//		int a = 10;
-//		//CHECK
-////		@Refinement("i >= 10")
-////		int i = sum(10);
-//	}
+
+	public static void main(String[] args) {
+		@Refinement("len(a) >= 0")
+		int[] a = new int[5]; //Cannot prove
+	}
 
 
 
+	//	public void searchIndex(int[] l, @Refinement("i < len(l)") int i) {
+	//		if(i >= l.length)
+	//			return;
+	//		else {
+	//			@Refinement(" _ < len(l)")
+	//			int i2 = i+1;
+	//			searchIndex(l, i2);		
+	//		}
+	//	}
+
+	//CHECK
+	//	@Refinement("i >= 0")
+	//	int i = sum(10);
 
 	////correctImplies -rever!!!
 	//	@Refinement("_ > 5")
@@ -55,6 +37,7 @@ public class SimpleTest {
 	//	
 	//	@Refinement("(x > 50) --> (y > 50)")
 	//	int y = x;
+
 
 	//See error NaN
 	//		@Refinement("true")
