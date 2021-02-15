@@ -22,7 +22,7 @@ public class SimpleTest {
     // 
     // }
     @repair.regen.specification.RefinementFunction("ghost boolean open(int)")
-    @repair.regen.specification.Refinement("open(1) == true")
+    @repair.regen.specification.Refinement("open(1, 2) == true")
     public int add() {
         return 1;
     }

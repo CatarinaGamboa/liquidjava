@@ -19,7 +19,7 @@ public class SimpleTest {
 //	}
 	
 	@RefinementFunction("ghost boolean open(int)")
-	@Refinement("open(1) == true")
+	@Refinement("open(1, 2) == true")
 	public int add() {
 		return 1;
 	}

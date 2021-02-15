@@ -17,7 +17,7 @@ public class SMTEvaluator {
 
 
 	public void verifySubtype(String subRef, String supRef, Map<String, CtTypeReference<?>> ctx, 
-			List<GhostFunction> ghosts) throws TypeCheckError {
+			List<GhostFunction> ghosts) throws TypeCheckError, GhostFunctionError {
 		// TODO: create a parser for our SMT-ready refinement language
 		// TODO: discharge the verification to z3 
 
@@ -37,6 +37,11 @@ public class SMTEvaluator {
 		} catch (SyntaxException e1) {
 			System.out.println("Could not parse: " + toVerify);
 			e1.printStackTrace();
+		} catch(Exception e) {
+			if(e.getLocalizedMessage().substring(0, 24).equals("Wrong number of argument"))
+				throw new GhostFunctionError(e.getLocalizedMessage());
+			else
+				e.printStackTrace();
 		}
 		// TODO: Unknown should emit an error
 

@@ -10,6 +10,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.smt.GhostFunctionError;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import spoon.reflect.declaration.CtElement;
@@ -153,7 +154,10 @@ public class VCChecker {
 		} catch (TypeCheckError e) {
 			printError(element, expectedType, cSMT);
 
-		}//catch(NullPointerException e) {
+		}catch (GhostFunctionError e) {
+			printErrorArgs(element, expectedType, e.getMessage());
+		}
+		//catch(NullPointerException e) {
 		//	printErrorUnknownVariable(element, expectedType, correctRefinement);
 		//}
 
@@ -194,6 +198,14 @@ public class VCChecker {
 		System.out.println();
 		System.out.println(var);
 		System.out.println();
+		System.out.println("Location: " + var.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(2);
+	}
+	private <T> void printErrorArgs(CtElement var, Constraint expectedType, String msg) {
+		System.out.println("______________________________________________________");
+		System.err.println("Error in ghost invocation: "+ msg);
+		System.out.println(var+"\nError in refinement:" + expectedType.toString());
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(2);
