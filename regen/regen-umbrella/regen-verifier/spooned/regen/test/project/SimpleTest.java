@@ -21,14 +21,15 @@ public class SimpleTest {
     // return 0 - n;
     // 
     // }
-    @repair.regen.specification.RefinementFunction("ghost boolean open(int String)")
+    @repair.regen.specification.RefinementFunction("ghost boolean open(int)")
+    @repair.regen.specification.Refinement("open(1) == True")
     public int add() {
         return 1;
     }
 
     public static void main(java.lang.String[] args) {
-        // @Refinement("a > 5")
-        // int a = 10;
+        @repair.regen.specification.Refinement("a > 5")
+        int a = 10;
         // CHECK
         // @Refinement("i >= 10")
         // int i = sum(10);

@@ -26,13 +26,17 @@ public class GhostFunction {
 			param_types.add(getType(mt.getType().toString(), factory));
 		}
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	private CtTypeReference<?> getType(String type, Factory factory) {
 		//TODO complete
 		switch(type) {
 		case "int":return factory.Type().INTEGER_PRIMITIVE;
 		case "double":return factory.Type().DOUBLE_PRIMITIVE;
-		case "boolean": return factory.Type().BOOLEAN;
+		case "boolean": return factory.Type().BOOLEAN_PRIMITIVE;
 		case "String": return factory.Type().STRING;
 		case "List": return factory.Type().LIST;
 		default:
@@ -46,6 +50,7 @@ public class GhostFunction {
 		for(CtTypeReference<?> t: param_types) {
 			sb.append(t.toString()+" ,");
 		}
+		sb.delete(sb.length()-2, sb.length());
 		sb.append(")");
 		return sb.toString();
 	}

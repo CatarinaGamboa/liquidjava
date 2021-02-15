@@ -18,6 +18,9 @@ public class Context {
 	
 	private List<RefinedVariable> ctxGlobalVars;
 	private List<RefinedFunction> ctxGlobalFunctions;
+	
+	private List<GhostFunction> ghosts;
+	
 
 	public int counter;
 	private static Context instance;
@@ -31,6 +34,8 @@ public class Context {
 		//globals
 		ctxGlobalVars = new ArrayList<>();
 		ctxGlobalFunctions = new ArrayList<>();
+		
+		ghosts = new ArrayList<>();
 		counter = 0;
 
 	}
@@ -47,6 +52,7 @@ public class Context {
 		ctxVars.add(new ArrayList<>());//global vars
 		ctxFunctions = new ArrayList<>();
 		ctxSpecificVars = new ArrayList<>();
+		ghosts = new ArrayList<>();
 		counter = 0;
 	}
 
@@ -263,6 +269,20 @@ public class Context {
 	public void addSpecificVariable(RefinedVariable vi) {
 		ctxSpecificVars.add(vi);
 	}
+	
+	
+	
+	public void addGhostFunction(GhostFunction gh) {
+		ghosts.add(gh);
+	}
+	
+	public boolean hasGhost(String name) {
+		for(GhostFunction g: ghosts) {
+			if(g.getName().equals(name))
+				return true;
+		}
+		return false;
+	}
 
 
 	@Override
@@ -284,6 +304,10 @@ public class Context {
 			sb.append(f.toString());
 		sb.append("\n############Functions:############\n");
 		for(RefinedFunction f : ctxFunctions)
+			sb.append(f.toString());
+		
+		sb.append("\n############Ghost Functions:############\n");
+		for(GhostFunction f : ghosts)
 			sb.append(f.toString());
 		return sb.toString();
 	}

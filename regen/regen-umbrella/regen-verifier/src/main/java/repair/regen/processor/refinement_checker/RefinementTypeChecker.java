@@ -371,17 +371,17 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 	private void getGhostFunction(String value) {
-		//TODO
 		try {
 			Optional<FunctionDeclaration> ofd = 
 					RefinementParser.parseFunctionDecl(value);
 			if(ofd.isPresent()) {
 				GhostFunction gh = new GhostFunction(ofd.get(), factory); 
-				System.out.println(gh);
+				context.addGhostFunction(gh);
+				System.out.println(gh.toString());
 			}
 			
 		} catch (SyntaxException e) {
-			// TODO Auto-generated catch block
+			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
 			e.printStackTrace();
 		}
 		

@@ -19,13 +19,14 @@ public class SimpleTest {
 //	}
 	
 	@RefinementFunction("ghost boolean open(int)")
+	@Refinement("open(1) == True")
 	public int add() {
 		return 1;
 	}
 	
 	public static void main(String[] args) {
-//		@Refinement("a > 5")
-//		int a = 10;
+		@Refinement("a > 5")
+		int a = 10;
 		//CHECK
 //		@Refinement("i >= 10")
 //		int i = sum(10);
