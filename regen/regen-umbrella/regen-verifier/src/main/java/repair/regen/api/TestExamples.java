@@ -339,7 +339,16 @@ public class TestExamples {
 	public void errorRecursion1() {
 		testWrong(testPath+"ErrorRecursion1.java");
 	}
+
+	@Test
+	public void errorGhostArgsTypes() {
+		testWrong(testPath+"ErrorGhostArgsTypes.java");
+	}
 	
+	@Test
+	public void errorGhostNumberArgs() {
+		testWrong(testPath+"ErrorGhostNumberArgs.java");
+	}
 	
 	@Test
 	public void errorSyntax1() {

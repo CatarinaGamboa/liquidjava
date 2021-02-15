@@ -1,6 +1,13 @@
 package regen.test.project;
 
 
+// public static void main(String[] args) {
+// @Refinement("a > 5")
+// int a = 10;
+// //CHECK
+// //		@Refinement("i >= 10")
+// //		int i = sum(10);
+// }
 // //correctImplies -rever!!!
 // @Refinement("_ > 5")
 // int x = 10;
@@ -21,18 +28,21 @@ public class SimpleTest {
     // return 0 - n;
     // 
     // }
-    @repair.regen.specification.RefinementFunction("ghost boolean open(int)")
-    @repair.regen.specification.Refinement("open(1, 2) == true")
-    public int add() {
-        return 1;
-    }
-
+    // @RefinementFunction("ghost boolean open(int)")
+    // @Refinement("open(4.5) == true")
+    // public int one() {
+    // return 1;
+    // }
+    // 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("a > 5")
-        int a = 10;
-        // CHECK
-        // @Refinement("i >= 10")
-        // int i = sum(10);
+        @repair.regen.specification.Refinement("_ < 10")
+        int a = 5;
+        if (a > 0) {
+            @repair.regen.specification.Refinement("b > 0")
+            int b = a;
+            b++;
+            a = 10;
+        }
     }
 }
 

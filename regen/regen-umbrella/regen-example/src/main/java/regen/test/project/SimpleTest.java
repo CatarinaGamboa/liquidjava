@@ -18,19 +18,33 @@ public class SimpleTest {
 //		
 //	}
 	
-	@RefinementFunction("ghost boolean open(int)")
-	@Refinement("open(1, 2) == true")
-	public int add() {
-		return 1;
+//	@RefinementFunction("ghost boolean open(int)")
+//	@Refinement("open(4.5) == true")
+//	public int one() {
+//		return 1;
+//	}
+//	
+	public static void main(String[] args) {
+		@Refinement("_ < 10")
+		int a = 5;
+
+		if(a > 0) {
+			@Refinement("b > 0")
+			int b = a;
+			b++;
+			a = 10;
+
+		}
+
 	}
 	
-	public static void main(String[] args) {
-		@Refinement("a > 5")
-		int a = 10;
-		//CHECK
-//		@Refinement("i >= 10")
-//		int i = sum(10);
-	}
+//	public static void main(String[] args) {
+//		@Refinement("a > 5")
+//		int a = 10;
+//		//CHECK
+////		@Refinement("i >= 10")
+////		int i = sum(10);
+//	}
 
 
 

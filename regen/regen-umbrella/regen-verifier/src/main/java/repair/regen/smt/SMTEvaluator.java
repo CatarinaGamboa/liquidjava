@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.microsoft.z3.Status;
+import com.microsoft.z3.Z3Exception;
 
 import repair.regen.language.Expression;
 import repair.regen.language.parser.RefinementParser;
@@ -37,8 +38,9 @@ public class SMTEvaluator {
 		} catch (SyntaxException e1) {
 			System.out.println("Could not parse: " + toVerify);
 			e1.printStackTrace();
-		} catch(Exception e) {
-			if(e.getLocalizedMessage().substring(0, 24).equals("Wrong number of argument"))
+		} catch(Z3Exception e) {
+			if(e.getLocalizedMessage().substring(0, 24).equals("Wrong number of argument") ||
+					e.getLocalizedMessage().substring(0, 13).equals("Sort mismatch"))
 				throw new GhostFunctionError(e.getLocalizedMessage());
 			else
 				e.printStackTrace();
