@@ -1,4 +1,4 @@
-package regen.test.project;
+
 
 
 
@@ -18,6 +18,7 @@ public interface MathRefinements {
 	public int max(int a, int b);
 	@Refinement("(a > b)? (_ == b):(_ == a)")
 	public int min(int a, int b);
+	
 	
 	@Refinement("(arg0 > 0)?( _ == arg0):(_ == -arg0)")
 	public int abs(int arg0);
@@ -54,7 +55,7 @@ public interface MathRefinements {
 	
 
 	@Refinement(" _ > 0.0 && _ < 1.0")
-	public long random(long a, long b);
+	public long random();
 	
 	@Refinement("((sig > 0)?(_ > 0):(_ < 0)) && (( _ == arg)||(_ == -arg))")
 	public float copySign(float arg, float sig);

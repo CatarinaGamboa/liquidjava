@@ -32,6 +32,7 @@ public class TranslatorToZ3 {
 	
 	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx, List<GhostFunction> l ) {
 		translateVariables(ctx);
+		addBuiltinFunctions();
 		if(!l.isEmpty()) {
 			for(GhostFunction gh: l) {
 				List<CtTypeReference<?>> paramTypes = gh.getParametersTypes();
@@ -43,6 +44,10 @@ public class TranslatorToZ3 {
 				funcTranslation.put(gh.getName(), z3.mkFuncDecl(gh.getName(), d, ret));
 			}
 		}
+	}
+
+	private void addBuiltinFunctions() {
+		funcTranslation.put("length", z3.mkFuncDecl("length", getSort("int[]"), getSort("int")));
 	}
 
 	public void translateVariables(Map<String, CtTypeReference<?>> ctx) {

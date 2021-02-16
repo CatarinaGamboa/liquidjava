@@ -8,6 +8,7 @@ import java.util.Optional;
 import repair.regen.language.function.FunctionDeclaration;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.IfThenElse;
@@ -15,6 +16,7 @@ import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -39,6 +41,7 @@ import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.support.reflect.code.CtVariableWriteImpl;
+import spoon.support.reflect.reference.CtArrayTypeReferenceImpl;
 
 public class RefinementTypeChecker extends TypeChecker {
 	// This class should do the following:
@@ -116,13 +119,38 @@ public class RefinementTypeChecker extends TypeChecker {
 			context.addVarToContext(varName, localVariable.getType(), new Predicate());
 			checkVariableRefinements(refinementFound, varName, localVariable);
 
+			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
+				checkArray(localVariable);
 		}
+	}
+
+	private void checkArray(CtVariable<?> localVariable) {
+		String name = localVariable.getSimpleName();
+		Optional<VariableInstance> orv = context.getLastVariableInstance(name);
+		if(orv.isPresent()) {
+			//Add creation info to mainRefinement
+			VariableInstance vi = orv.get();
+			Constraint ic = vi.getRefinement();
+			RefinedVariable rv = context.getVariableByName(name);
+			Constraint k = Conjunction.createConjunction(rv.getMainRefinement(), 
+					ic.substituteVariable(vi.getName(), rv.getName()));
+			rv.setRefinement(k);
+		}
+		
 	}
 
 	@Override
 	public <T> void visitCtNewArray(CtNewArray<T> newArray) {
 		super.visitCtNewArray(newArray);
+		List<CtExpression<Integer>> l = newArray.getDimensionExpressions();
+		//TODO only working for 1 dimension
+		for(CtExpression<?> exp:l) {
+			Constraint c = getExpressionRefinements(exp);
+			EqualsPredicate ep = new EqualsPredicate("length("+WILD_VAR+")", c);
+			newArray.putMetadata(REFINE_KEY, ep);
+		}
 	}
+	
 	
 	
 	@Override
@@ -147,6 +175,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
 			vcChecker.removePathVariableThatIncludes(name);//AQUI!!
 			checkVariableRefinements(refinementFound, name, varDecl);
+			
+			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
+				checkArray(varDecl);
 
 		}
 	}
@@ -330,6 +361,8 @@ public class RefinementTypeChecker extends TypeChecker {
 		//smt check
 		checkSMT(cEt, variable);//TODO CHANGE
 		context.addRefinementToVariableInContext(variable, cet);
+		
+		
 
 
 	}

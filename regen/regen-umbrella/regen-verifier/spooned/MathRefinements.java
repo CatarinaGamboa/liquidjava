@@ -54,7 +54,7 @@ public interface MathRefinements {
     public int incrementExact(long a);
 
     @repair.regen.specification.Refinement(" _ > 0.0 && _ < 1.0")
-    public long random(long a, long b);
+    public long random();
 
     @repair.regen.specification.Refinement("((sig > 0)?(_ > 0):(_ < 0)) && (( _ == arg)||(_ == -arg))")
     public float copySign(float arg, float sig);
