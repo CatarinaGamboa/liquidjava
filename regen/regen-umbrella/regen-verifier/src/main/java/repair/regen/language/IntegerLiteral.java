@@ -1,6 +1,7 @@
 package repair.regen.language;
 
 import org.modelcc.IModel;
+import org.modelcc.Pattern;
 import org.modelcc.Priority;
 import org.modelcc.Value;
 

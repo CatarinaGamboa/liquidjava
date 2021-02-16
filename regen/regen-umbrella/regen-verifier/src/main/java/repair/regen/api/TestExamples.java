@@ -132,6 +132,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctSearchIndexIntArray() {
+		testCorrect(testPath+"CorrectSearchIndexIntArray.java");
+	}
+	
+	@Test
 	public void correctMethodInvocation() {
 		testCorrect(testPath+"CorrectMethodInvocation.java");
 	}

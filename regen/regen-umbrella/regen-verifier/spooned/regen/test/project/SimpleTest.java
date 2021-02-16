@@ -17,24 +17,25 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     // @RefinementFunction("ghost int length(int[])")
-    public void something() {
-    }
-
-    public static void searchIndex(int[] l, @repair.regen.specification.Refinement("i >= 0")
-    int i) {
-        if (i >= (l.length))
-            return;
-        else {
-            @repair.regen.specification.Refinement(" _ <= length(l)")
-            int i2 = i + 1;
-            regen.test.project.SimpleTest.searchIndex(l, i2);
-        }
-    }
-
+    // public void something() {}
+    // 
+    // 
+    // 
+    // public static void searchIndex(int[] l, @Refinement("i >= 0") int i) {
+    // if(i >= l.length)
+    // return;
+    // else {
+    // @Refinement(" _ <= length(l)")
+    // int i2 = i+1;
+    // searchIndex(l, i2);
+    // }
+    // }
     public static void main(java.lang.String[] args) {
+        @repair.regen.specification.Refinement("_ == 3.141592653589793")
+        double p = 0;
         @repair.regen.specification.Refinement("a.length == 15")
         int[] a = new int[15];
-        regen.test.project.SimpleTest.searchIndex(a, 0);
+        // searchIndex(a, 0);
         // @Refinement("_ >= 0 && _ < length(a)")
         // int index = 14;
         // 

@@ -20,7 +20,7 @@ public class ObjectFieldInvocation extends Expression implements IModel{
 ////	@Optional
 //	Argument mv;
 //	ParenthesisRight pr;
-
+//
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
 		Expr[] e = new Expr[1];
@@ -28,9 +28,9 @@ public class ObjectFieldInvocation extends Expression implements IModel{
 		return ctx.makeFunctionInvocation(name.toString(), e);
 	}
 	
-	public Variable getVariable() {
-		return var;
-	}
+//	public Variable getVariable() {
+//		return var;
+//	}
 	
 	public String getFunctionName() {
 		return name.toString();
