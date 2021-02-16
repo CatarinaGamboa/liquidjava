@@ -20,22 +20,24 @@ public class SimpleTest {
     public void something() {
     }
 
-    public void searchIndex(int[] l, @repair.regen.specification.Refinement("i < len(l)")
+    public static void searchIndex(int[] l, @repair.regen.specification.Refinement("i >= 0")
     int i) {
         if (i >= (l.length))
             return;
         else {
-            @repair.regen.specification.Refinement(" _ < len(l)")
+            @repair.regen.specification.Refinement(" _ <= length(l)")
             int i2 = i + 1;
-            searchIndex(l, i2);
+            regen.test.project.SimpleTest.searchIndex(l, i2);
         }
     }
 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("length(_) == 15")
+        @repair.regen.specification.Refinement("a.length == 15")
         int[] a = new int[15];
-        @repair.regen.specification.Refinement("_ >= 0 && _ < length(a)")
-        int index = 14;
+        regen.test.project.SimpleTest.searchIndex(a, 0);
+        // @Refinement("_ >= 0 && _ < length(a)")
+        // int index = 14;
+        // 
         // @Refinement("_.length(x) >= 0") ==
         // @Refinement("length(_, x) >= 0")
         // int[] a1 = new int[5]; //Cannot prove - len() built-in

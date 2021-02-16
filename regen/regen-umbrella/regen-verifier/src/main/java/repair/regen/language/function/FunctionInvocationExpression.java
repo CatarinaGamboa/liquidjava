@@ -19,7 +19,7 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 	ParenthesisLeft pl;
 	
 //	@Multiplicity(minimum=0,maximum=1000)
-//	@Optional
+//	@Optional -> no args not allowed by z3
 	Argument mv;
 
 	ParenthesisRight pr;

@@ -9,26 +9,29 @@ public class SimpleTest {
 	public void something() {}
 	
 	
-//	
-//	public void searchIndex(int[] l, @Refinement("i < length(l)") int i) {
-//		if(i >= l.length)
-//			return;
-//		else {
-//			@Refinement(" _ < length(l)")
-//			int i2 = i+1;
-//			searchIndex(l, i2);		
-//		}
-//	}
+	
+	public static void searchIndex(int[] l, @Refinement("i >= 0") int i) {
+		if(i >= l.length)
+			return;
+		else {
+			@Refinement(" _ <= length(l)")
+			int i2 = i+1;
+			searchIndex(l, i2);		
+		}
+	}
 
 	
 
 	public static void main(String[] args) {
 
-		@Refinement("length(_) == 15")
+		@Refinement("a.length == 15")
 		int[] a = new int[15];
-		@Refinement("_ >= 0 && _ < length(a)")
-		int index = 14;
-	
+		//searchIndex(a, 0);
+		
+		
+//		@Refinement("_ >= 0 && _ < length(a)")
+//		int index = 14;
+//	
 		
 		
 		//@Refinement("_.length(x) >= 0") ==

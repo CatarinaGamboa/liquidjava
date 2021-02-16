@@ -125,6 +125,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 	private void checkArray(CtVariable<?> localVariable) {
+		//TODO DOING NOTHING NOW
 		String name = localVariable.getSimpleName();
 		Optional<VariableInstance> orv = context.getLastVariableInstance(name);
 		if(orv.isPresent()) {
@@ -134,9 +135,9 @@ public class RefinementTypeChecker extends TypeChecker {
 			RefinedVariable rv = context.getVariableByName(name);
 			Constraint k = Conjunction.createConjunction(rv.getMainRefinement(), 
 					ic.substituteVariable(vi.getName(), rv.getName()));
-			rv.setRefinement(k);
+			//rv.setRefinement(k);
 		}
-		
+
 	}
 
 	@Override
@@ -150,9 +151,9 @@ public class RefinementTypeChecker extends TypeChecker {
 			newArray.putMetadata(REFINE_KEY, ep);
 		}
 	}
-	
-	
-	
+
+
+
 	@Override
 	public <T,A extends T> void visitCtAssignment(CtAssignment<T,A> assignement) {
 		super.visitCtAssignment(assignement);
@@ -175,7 +176,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 			vcChecker.removePathVariableThatIncludes(name);//AQUI!!
 			checkVariableRefinements(refinementFound, name, varDecl);
-			
+
 			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
 				checkArray(varDecl);
 
@@ -199,11 +200,14 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
 		System.out.println("fieldRead:"+fieldRead);
+		System.out.println(fieldRead.getVariable().getSimpleName());
 		String fieldName = fieldRead.toString().replace("(", "").replace(")", "");
 		if(context.hasVariable(fieldName)) {
 			Constraint c = context.getVariableRefinements(fieldName);
 			fieldRead.putMetadata(REFINE_KEY, c);
-		} else {
+		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
+			fieldRead.putMetadata(REFINE_KEY, new Predicate(fieldRead.toString()));
+		}else{
 			fieldRead.putMetadata(REFINE_KEY, new Predicate());
 			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
 		}
@@ -342,7 +346,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 
 	//############################### SMT Evaluation ##########################################
-	
+
 	@Override
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtVariable<?> variable) {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
@@ -361,8 +365,8 @@ public class RefinementTypeChecker extends TypeChecker {
 		//smt check
 		checkSMT(cEt, variable);//TODO CHANGE
 		context.addRefinementToVariableInContext(variable, cet);
-		
-		
+
+
 
 
 	}
@@ -419,12 +423,12 @@ public class RefinementTypeChecker extends TypeChecker {
 				context.addGhostFunction(gh);
 				System.out.println(gh.toString());
 			}
-			
+
 		} catch (SyntaxException e) {
 			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
 			e.printStackTrace();
 		}
-		
+
 	}
 
 	@Override

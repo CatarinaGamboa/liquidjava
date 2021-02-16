@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.language.BinaryExpression;
-import repair.regen.language.BooleanLiteral;
 import repair.regen.language.Expression;
 import repair.regen.language.ExpressionGroup;
 import repair.regen.language.IfElseExpression;
@@ -15,6 +14,7 @@ import repair.regen.language.Variable;
 import repair.regen.language.function.Argument;
 import repair.regen.language.function.FollowUpArgument;
 import repair.regen.language.function.FunctionInvocationExpression;
+import repair.regen.language.function.ObjectFieldInvocation;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
 
@@ -95,6 +95,8 @@ public class Predicate extends Constraint{
 		}else if(exp2 instanceof FunctionInvocationExpression) {
 			FunctionInvocationExpression fie = (FunctionInvocationExpression) exp2;
 			auxSubstitute(fie.getArgument(), from, to);
+		}else if(exp2 instanceof ObjectFieldInvocation) {
+			auxSubstitute(((ObjectFieldInvocation)exp2).getVariable(), from, to);
 		}
 
 	}
@@ -144,6 +146,8 @@ public class Predicate extends Constraint{
 		}else if(exp2 instanceof FunctionInvocationExpression) {
 			FunctionInvocationExpression fie = (FunctionInvocationExpression) exp2;
 			auxGetVariableNames(fie.getArgument(), l);
+		}else if(exp2 instanceof ObjectFieldInvocation) {
+			auxGetVariableNames(((ObjectFieldInvocation)exp2).getVariable(), l);
 		}
 	}
 	

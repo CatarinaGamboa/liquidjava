@@ -14,6 +14,7 @@ import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtExpression;
+import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
@@ -155,7 +156,10 @@ class OperationsChecker {
 	 */
 	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWriteImpl<?> parentVar, 
 			CtExpression<?> element) {
-		if(element instanceof CtVariableRead<?>) {
+		if(element instanceof CtFieldRead<?>) {
+			return new Predicate(element.toString());
+			
+		}else if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			String elemName = elemVar.getVariable().getSimpleName();
 			Constraint elem_ref = rtc.context.getVariableRefinements(elemName);
