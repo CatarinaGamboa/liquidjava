@@ -18,6 +18,7 @@ import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
+import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConditional;
@@ -119,26 +120,11 @@ public class RefinementTypeChecker extends TypeChecker {
 			context.addVarToContext(varName, localVariable.getType(), new Predicate());
 			checkVariableRefinements(refinementFound, varName, localVariable);
 
-			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
-				checkArray(localVariable);
+//			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
+//				checkArray(localVariable);
 		}
 	}
 
-	private void checkArray(CtVariable<?> localVariable) {
-		//TODO DOING NOTHING NOW
-		String name = localVariable.getSimpleName();
-		Optional<VariableInstance> orv = context.getLastVariableInstance(name);
-		if(orv.isPresent()) {
-			//Add creation info to mainRefinement
-			VariableInstance vi = orv.get();
-			Constraint ic = vi.getRefinement();
-			RefinedVariable rv = context.getVariableByName(name);
-			Constraint k = Conjunction.createConjunction(rv.getMainRefinement(), 
-					ic.substituteVariable(vi.getName(), rv.getName()));
-			//rv.setRefinement(k);
-		}
-
-	}
 
 	@Override
 	public <T> void visitCtNewArray(CtNewArray<T> newArray) {
@@ -177,9 +163,14 @@ public class RefinementTypeChecker extends TypeChecker {
 			vcChecker.removePathVariableThatIncludes(name);//AQUI!!
 			checkVariableRefinements(refinementFound, name, varDecl);
 
-			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
-				checkArray(varDecl);
+//			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
+//				checkArray(varDecl);
 
+		}
+		if(ex instanceof CtArrayWrite) {
+			Constraint c = getRefinement(ex);
+			//TODO continue
+			//c.substituteVariable(WILD_VAR, );
 		}
 	}
 
@@ -292,6 +283,16 @@ public class RefinementTypeChecker extends TypeChecker {
 		vcChecker.removePathVariable(freshRV);
 		context.exitContext();
 		context.variablesCombineFromIf();
+	}
+	
+	
+	@Override
+	public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
+		super.visitCtArrayWrite(arrayWrite);
+		CtExpression<?> index = arrayWrite.getIndexExpression();
+		arrayWrite.putMetadata(REFINE_KEY, 
+				String.format("addToIndex(%s, %s, %s)", arrayWrite.getTarget(), 
+						index, WILD_VAR));
 	}
 
 

@@ -361,6 +361,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void errorLenZeroIntArray() {
+		testWrong(testPath+"ErrorLenZeroIntArray.java");
+	}
+	
+	@Test
 	public void errorSyntax1() {
 		testWrong(testPath+"ErrorSyntax1.java");
 	}

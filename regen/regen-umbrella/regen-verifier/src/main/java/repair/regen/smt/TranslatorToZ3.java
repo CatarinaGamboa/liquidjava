@@ -2,12 +2,14 @@ package repair.regen.smt;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.microsoft.z3.ArithExpr;
+import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
@@ -48,6 +50,13 @@ public class TranslatorToZ3 {
 
 	private void addBuiltinFunctions() {
 		funcTranslation.put("length", z3.mkFuncDecl("length", getSort("int[]"), getSort("int")));
+		//TODO add built-in function
+		Sort[] s = Arrays.asList(getSort("int[]"), getSort("int"), getSort("int")).stream().toArray(Sort[]::new);	
+		funcTranslation.put("addToIndex", z3.mkFuncDecl("addToIndex", s, getSort("void")));
+		
+		s = Arrays.asList(getSort("int[]"), getSort("int")).stream().toArray(Sort[]::new);	
+		funcTranslation.put("getFromIndex", z3.mkFuncDecl("getFromIndex", s, getSort("int")));
+		
 	}
 
 	public void translateVariables(Map<String, CtTypeReference<?>> ctx) {
@@ -89,6 +98,7 @@ public class TranslatorToZ3 {
 		case "double":return z3.mkFPSortDouble();
 		case "int[]": return z3.mkArraySort(z3.mkIntSort(), z3.mkIntSort());
 		case "String":return z3.getStringSort();
+		case "void": return z3.mkUninterpretedSort("void");
 		//case "List":return z3.mkListSort(name, elemSort)
 		default:
 			return null;
@@ -129,10 +139,27 @@ public class TranslatorToZ3 {
 	}
 	
 	public Expr makeFunctionInvocation(String name, Expr[] params) {
+		if(name.equals("addToIndex"))
+			return makeStore(name, params);
+		if(name.equals("getFromIndex"))
+			return makeSelect(name, params);
+		
 		FuncDecl fd = funcTranslation.get(name);
 		return z3.mkApp(fd, params);
 	}
 
+
+	private Expr makeSelect(String name, Expr[] params) {
+		if(params.length == 2 && params[0] instanceof ArrayExpr)
+			return z3.mkSelect((ArrayExpr)params[0], params[1]);
+		return null;
+	}
+
+	private Expr makeStore(String name, Expr[] params) {
+		if(params.length == 3 && params[0] instanceof ArrayExpr)
+			return z3.mkStore((ArrayExpr) params[0], params[1], params[2]);
+		return null;
+	}
 
 	//#####################Boolean Operations#####################
 	public Expr makeEquals(Expr e1, Expr e2) {
