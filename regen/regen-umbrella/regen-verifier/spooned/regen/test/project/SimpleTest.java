@@ -25,8 +25,8 @@ public class SimpleTest {
             return;
         else {
             @repair.regen.specification.Refinement(" _ <= length(l)")
-            int i2 = i + 1;
-            regen.test.project.SimpleTest.searchIndex(l, i2);
+            int p = i + 1;
+            regen.test.project.SimpleTest.searchIndex(l, p);
         }
     }
 
@@ -34,9 +34,7 @@ public class SimpleTest {
         @repair.regen.specification.Refinement("length(a) == 15")
         int[] a = new int[15];// Remove comments predicate
 
-        // searchIndex(a, 0);
-        // 
-        // 
+        regen.test.project.SimpleTest.searchIndex(a, 0);
         // //		@Refinement("_ >= 0 && _ < length(a)")
         // //		int index = 14;
         // //

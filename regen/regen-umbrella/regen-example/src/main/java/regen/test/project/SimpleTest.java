@@ -5,8 +5,6 @@ import repair.regen.specification.RefinementFunction;
 
 public class SimpleTest {	
 
-	
-
 //	@RefinementFunction("ghost int length(int[])")
 //	public void something() {}
 //	
@@ -17,20 +15,20 @@ public class SimpleTest {
 			return;
 		else {
 			@Refinement(" _ <= length(l)")
-			int i2 = i+1;
-			searchIndex(l, i2);		
+			int p = i+1;
+			searchIndex(l, p);		
 		}
 	}
-
 	
 
-	public static void main(String[] args) {
 
+	public static void main(String[] args) {
 		@Refinement("length(a) == 15")
 		int[] a = new int[15];//Remove comments predicate
-//		searchIndex(a, 0);
-//		
-//		
+
+		
+		searchIndex(a, 0);
+		
 ////		@Refinement("_ >= 0 && _ < length(a)")
 ////		int index = 14;
 ////	

@@ -1,9 +1,9 @@
 package repair.regen.processor.refinement_checker;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import repair.regen.processor.constraints.Conjunction;
@@ -12,14 +12,17 @@ import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
+import repair.regen.processor.context.VariableInstance;
+import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
+import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
-import spoon.reflect.reference.CtTypeReference;
 
 public class MethodsFunctionsChecker {
 
@@ -73,58 +76,66 @@ public class MethodsFunctionsChecker {
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName) {
 		RefinedFunction f = rtc.context.getFunctionByName(methodName);
-		Constraint methodRef = f.getRenamedReturn();
-		Constraint metRef = f.getRenamedReturn();
-
-		Constraint metRefOriginal = f.getRefReturn(); 
-		List<RefinedVariable> saveVars = new ArrayList<>();
-
-
-		HashMap<String, String> newNames = new HashMap<>();
-
+		Map<String,String> map = mapInvocation(invocation, f);
+		
+		checkParameters(invocation, f, map);
+		
+		Constraint methodRef = f.getRefReturn(); 
 		if(methodRef != null) {
-			//Checking Parameters
-			List<CtExpression<?>> exps = invocation.getArguments();
-			List<Variable> params = f.getArguments();
-			for (int i = 0; i < params.size(); i++) {
-				RefinedVariable pinfo = params.get(i);
-				CtExpression<?> exp = exps.get(i);
-				String paramOriginalName = pinfo.getName();
-				String newParamName = String.format(rtc.instanceFormat, paramOriginalName, rtc.context.getCounter());
-				newNames.put(paramOriginalName, newParamName);
-
-				Constraint rP = f.getRefinementsForParamIndex(i);
-				Constraint refPar = f.getRefinementsForParamIndex(i).substituteVariable(paramOriginalName, newParamName);
-				Constraint refInv = rtc.getRefinement(exp).substituteVariable(rtc.WILD_VAR, newParamName);
-
-				List<String> names = refPar.getVariableNames();
-				for(String entry: newNames.keySet()) {
-					if(!entry.equals(paramOriginalName) && names.contains(entry))
-						refPar = refPar.substituteVariable(entry, newNames.get(entry));
-
-				}
-
-				RefinedVariable vi = rtc.context.addInstanceToContext(newParamName, pinfo.getType(), refInv);
-				rtc.context.newRefinementToVariableInContext(newParamName, refInv);
-
-				metRefOriginal = metRefOriginal.substituteVariable(pinfo.getName(), newParamName);
-
-				if(exp instanceof CtVariableRead<?>) {
-					String name = ((CtVariableRead) exp).getVariable().getSimpleName();
-					RefinedVariable rv = rtc.context.addVarToContext(name,
-							((CtVariableRead) exp).getType(), refPar);
-					metRef = metRef.substituteVariable(newParamName, name);
-				}
-				rtc.checkSMT(refPar, invocation);
-				saveVars.add(vi);
-				rtc.context.addRefinementInstanceToVariable(pinfo.getName(), vi.getName());
-			}
-
-			invocation.putMetadata(rtc.REFINE_KEY, metRefOriginal);
+			List<String> vars = methodRef.getVariableNames(); 
+			for(String s:vars) 
+				if(map.containsKey(s))
+					methodRef = methodRef.substituteVariable(s, map.get(s));
+			invocation.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
+	}
+	
+	private <R> Map<String, String> mapInvocation(CtInvocation<R> invocation, RefinedFunction f){
+		Map<String, String> mapInvocation = new HashMap<>();
+		List<CtExpression<?>> invocationParams = invocation.getArguments();
+		List<Variable> functionParams = f.getArguments();
+		for (int i = 0; i < invocationParams.size(); i++) {
+			Variable fArg = functionParams.get(i);
+			CtExpression<?> iArg = invocationParams.get(i);
+			String invStr;
+			if(iArg instanceof CtLiteral)
+				invStr = iArg.toString();
+			else if(iArg instanceof CtVariableRead) {
+				CtVariableRead<?> vr = (CtVariableRead<?>)iArg;
+				Optional<VariableInstance> ovi= rtc.context
+						.getLastVariableInstance(vr.getVariable().getSimpleName());
+				invStr = (ovi.isPresent())? ovi.get().getName() : vr.toString();
+			}else { //create new variable with the argument refinement
+				Constraint met = (Constraint) iArg.getMetadata(rtc.REFINE_KEY);
+				invStr= String.format(rtc.instanceFormat, fArg.getName(),
+							rtc.context.getCounter());
+				rtc.context.addVarToContext(invStr, fArg.getType(), 
+							met.substituteVariable(rtc.WILD_VAR, invStr));
+				
+			}
+				
+			mapInvocation.put(fArg.getName(), invStr);
+		}
+		return mapInvocation;
 	}
 
 	
+	private <R> void checkParameters(CtInvocation<R> invocation, RefinedFunction f, Map<String, String> map) {	
+		List<CtExpression<?>> invocationParams = invocation.getArguments();
+		List<Variable> functionParams = f.getArguments();
+		for (int i = 0; i < invocationParams.size(); i++) {
+			Variable fArg = functionParams.get(i);
+			Constraint c = fArg.getRefinement();
+			c = c.substituteVariable(fArg.getName(), map.get(fArg.getName()));
+			List<String> vars = c.getVariableNames();
+			for(String s: vars)
+				if(map.containsKey(s))
+					c = c.substituteVariable(s, map.get(s));
+			rtc.checkSMT(c, invocation);
+		}
+		
+	}
+
 	<R> void getMethodRefinements(CtMethod<R> method) {
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getSimpleName());
