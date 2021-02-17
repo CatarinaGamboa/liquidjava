@@ -1,9 +1,6 @@
 package regen.test.project;
 
 
-// CHECK
-// @Refinement("i >= 0")
-// int i = sum(10);
 // //correctImplies -rever!!!
 // @Refinement("_ > 5")
 // int x = 10;
@@ -19,15 +16,14 @@ public class SimpleTest {
     // @RefinementFunction("ghost int length(int[])")
     // public void something() {}
     // 
-    public static void searchIndex(int[] l, @repair.regen.specification.Refinement("i >= 0")
+    public static void searchIndex(@repair.regen.specification.Refinement("length(l) > 0")
+    int[] l, @repair.regen.specification.Refinement("i >= 0 && i <= length(l)")
     int i) {
-        if (i >= (l.length))
+        if (i > (l.length))
             return;
-        else {
-            @repair.regen.specification.Refinement(" _ <= length(l)")
-            int p = i + 1;
-            regen.test.project.SimpleTest.searchIndex(l, p);
-        }
+        else
+            regen.test.project.SimpleTest.searchIndex(l, (i + 1));
+
     }
 
     public static void main(java.lang.String[] args) {

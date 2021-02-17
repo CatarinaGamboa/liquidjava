@@ -10,14 +10,12 @@ public class SimpleTest {
 //	
 	
 
-	public static void searchIndex(int[] l, @Refinement("i >= 0") int i) {
+	public static void searchIndex(@Refinement("length(l) > 0")int[] l, 
+			@Refinement("i >= 0 && i <= length(l)") int i) {
 		if(i >= l.length)
 			return;
-		else {
-			@Refinement(" _ <= length(l)")
-			int p = i+1;
-			searchIndex(l, p);		
-		}
+		else
+			searchIndex(l, i+1);		
 	}
 	
 
@@ -50,10 +48,6 @@ public class SimpleTest {
 	
 	
 	
-
-	//CHECK
-	//	@Refinement("i >= 0")
-	//	int i = sum(10);
 
 	////correctImplies -rever!!!
 	//	@Refinement("_ > 5")

@@ -356,6 +356,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void errorSearchIntArray() {
+		testWrong(testPath+"ErrorSearchIntArray.java");
+	}
+	
+	@Test
 	public void errorSyntax1() {
 		testWrong(testPath+"ErrorSyntax1.java");
 	}
