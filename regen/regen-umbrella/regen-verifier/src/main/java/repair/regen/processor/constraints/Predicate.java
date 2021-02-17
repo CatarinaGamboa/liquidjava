@@ -51,7 +51,7 @@ public class Predicate extends Constraint{
 	private Expression parse(String ref) {
 		try{
 			Optional<Expression> oe = RefinementParser.parse(ref);
-			System.out.println(oe.toString());
+			//System.out.println(oe.toString());
 			if(oe.isPresent()) {
 				Expression e = oe.get();
 				return e;

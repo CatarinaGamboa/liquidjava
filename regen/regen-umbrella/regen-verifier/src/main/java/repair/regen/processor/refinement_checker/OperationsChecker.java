@@ -157,9 +157,11 @@ class OperationsChecker {
 	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWriteImpl<?> parentVar, 
 			CtExpression<?> element) {
 		if(element instanceof CtFieldRead<?>) {
-			return new Predicate(element.toString());
-			
-		}else if(element instanceof CtVariableRead<?>) {
+			if(((CtFieldRead<?>)element).getVariable().getSimpleName().equals("length"))
+				return rtc.getRefinement(element);
+		}
+
+		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			String elemName = elemVar.getVariable().getSimpleName();
 			Constraint elem_ref = rtc.context.getVariableRefinements(elemName);

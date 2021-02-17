@@ -206,7 +206,9 @@ public class RefinementTypeChecker extends TypeChecker {
 			Constraint c = context.getVariableRefinements(fieldName);
 			fieldRead.putMetadata(REFINE_KEY, c);
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
-			fieldRead.putMetadata(REFINE_KEY, new Predicate(fieldRead.toString()));
+			String targetName = fieldRead.getTarget().toString();
+			System.out.println("Target:"+targetName);
+			fieldRead.putMetadata(REFINE_KEY, new Predicate("length("+targetName+")"));
 		}else{
 			fieldRead.putMetadata(REFINE_KEY, new Predicate());
 			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
