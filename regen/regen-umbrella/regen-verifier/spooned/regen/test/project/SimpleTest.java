@@ -30,9 +30,10 @@ public class SimpleTest {
     }
 
     public static void main(java.lang.String[] args) {
+        int max = java.lang.Integer.MAX_VALUE;
         int[] a = new int[10];
-        regen.test.project.SimpleTest.getIndexWithValue(a, 0, 6);
-        // getIndexWithValue(a, a.length, 6);
+        regen.test.project.SimpleTest.getIndexWithValue(a, 0, max);
+        regen.test.project.SimpleTest.getIndexWithValue(a, a.length, max);
         // a = new int[0];
         // getIndexWithValue(a, 0, 6);
         // //@Refinement("_.length(x) >= 0") ==
