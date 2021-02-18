@@ -252,13 +252,18 @@ public class RefinementTypeChecker extends TypeChecker {
 		CtExpression<Boolean> exp = ifElement.getCondition();
 		context.variablesSetBeforeIf();
 		context.enterContext();
-
+		
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
 		Constraint nExpRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
 		nExpRefs = substituteAllVariablesForLastInstance(nExpRefs);
 
-
+		if(nExpRefs.getVariableNames().contains("null"))
+			nExpRefs = new Predicate();
+		
+		System.out.println(nExpRefs);
+		
+		
 		RefinedVariable freshRV = context.addVarToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, nExpRefs);
 		vcChecker.addPathVariable(freshRV);

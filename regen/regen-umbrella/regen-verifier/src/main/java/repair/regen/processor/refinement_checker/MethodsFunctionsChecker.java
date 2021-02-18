@@ -8,6 +8,7 @@ import java.util.Optional;
 
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
@@ -15,6 +16,7 @@ import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtExpression;
+import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
@@ -27,6 +29,8 @@ import spoon.reflect.declaration.CtParameter;
 public class MethodsFunctionsChecker {
 
 	private TypeChecker rtc;
+	
+	private static String retNameFormat = "#ret_%d";
 
 	public MethodsFunctionsChecker(TypeChecker rtc) {
 		this.rtc = rtc; 
@@ -100,19 +104,16 @@ public class MethodsFunctionsChecker {
 			String invStr;
 			if(iArg instanceof CtLiteral)
 				invStr = iArg.toString();
-			else if(iArg instanceof CtVariableRead) {
+			else if(iArg instanceof CtFieldRead) {
+				invStr = createVariableRepresentingArgument(iArg, fArg);
+			}else if(iArg instanceof CtVariableRead) {
 				CtVariableRead<?> vr = (CtVariableRead<?>)iArg;
 				Optional<VariableInstance> ovi= rtc.context
 						.getLastVariableInstance(vr.getVariable().getSimpleName());
 				invStr = (ovi.isPresent())? ovi.get().getName() : vr.toString();
-			}else { //create new variable with the argument refinement
-				Constraint met = (Constraint) iArg.getMetadata(rtc.REFINE_KEY);
-				invStr= String.format(rtc.instanceFormat, fArg.getName(),
-							rtc.context.getCounter());
-				rtc.context.addVarToContext(invStr, fArg.getType(), 
-							met.substituteVariable(rtc.WILD_VAR, invStr));
-				
-			}
+			}else //create new variable with the argument refinement
+				invStr = createVariableRepresentingArgument(iArg, fArg);				
+			
 				
 			mapInvocation.put(fArg.getName(), invStr);
 		}
@@ -120,6 +121,18 @@ public class MethodsFunctionsChecker {
 	}
 
 	
+	
+	private String createVariableRepresentingArgument(CtExpression<?> iArg, Variable fArg) {
+		Constraint met = (Constraint) iArg.getMetadata(rtc.REFINE_KEY);
+		if(!met.getVariableNames().contains(rtc.WILD_VAR))
+			met = new EqualsPredicate(rtc.WILD_VAR, met);
+		String nVar = String.format(rtc.instanceFormat, fArg.getName(),
+					rtc.context.getCounter());
+		rtc.context.addVarToContext(nVar, fArg.getType(), 
+					met.substituteVariable(rtc.WILD_VAR, nVar));
+		return nVar;
+	}
+
 	private <R> void checkParameters(CtInvocation<R> invocation, RefinedFunction f, Map<String, String> map) {	
 		List<CtExpression<?>> invocationParams = invocation.getArguments();
 		List<Variable> functionParams = f.getArguments();
@@ -210,7 +223,7 @@ public class MethodsFunctionsChecker {
 			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
 			
 			//Both return and the method have metadata
-			String returnVarName = "RET_"+rtc.context.getCounter();
+			String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
 			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
 			Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
 
