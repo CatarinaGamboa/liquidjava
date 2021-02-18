@@ -176,6 +176,12 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectFunctionsTutorial.java");
 	}
 	
+	@Test
+	public void correctSearchValueIndexArray() {
+		testCorrect(testPath+"CorrectSearchValueIndexArray.java");
+	}
+	
+	
 	
 	@Test
 	public void errorSimpleAssignment() {
@@ -368,6 +374,21 @@ public class TestExamples {
 	@Test
 	public void errorSyntax1() {
 		testWrong(testPath+"ErrorSyntax1.java");
+	}
+	
+	@Test
+	public void errorSearchValueIntArray1() {
+		testWrong(testPath+"ErrorSearchValueIntArray1.java");
+	}
+	
+	@Test
+	public void errorSearchValueIntArray2() {
+		testWrong(testPath+"ErrorSearchValueIntArray2.java");
+	}
+	
+	@Test
+	public void errorImplementationSearchValueIntArray() {
+		testWrong(testPath+"ErrorImplementationSearchValueIntArray.java");
 	}
 	
 

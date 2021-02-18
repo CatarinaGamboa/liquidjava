@@ -1,6 +1,18 @@
 package regen.test.project;
 
 
+// @RefinementFunction("ghost int length(int[])")
+// @Refinement("(_ >= -1) && (_ < length(l))")
+// public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l,
+// @Refinement("i >= 0 && i < length(l)") int i,
+// int val) {
+// if(l[i] == val)
+// return i;
+// if(i >= l.length -1)//with or without -1
+// return -1;
+// else
+// return getIndexWithValue(l, i+1, val);
+// }
 // //correctImplies -rever!!!
 // @Refinement("_ > 5")
 // int x = 10;
@@ -22,7 +34,7 @@ public class SimpleTest {
             return i;
 
         // with or without -1
-        if (i >= ((l.length) - 1))
+        if (i >= (l.length))
             return -1;
         else
             return regen.test.project.SimpleTest.getIndexWithValue(l, (i + 1), val);
@@ -30,10 +42,11 @@ public class SimpleTest {
     }
 
     public static void main(java.lang.String[] args) {
-        int max = java.lang.Integer.MAX_VALUE;
-        int[] a = new int[10];
-        regen.test.project.SimpleTest.getIndexWithValue(a, 0, max);
-        regen.test.project.SimpleTest.getIndexWithValue(a, a.length, max);
+        // int[] arr = new int[0];
+        // getIndexWithValue(arr, 0, 1000);
+        // int[] a = new int[10];
+        // getIndexWithValue(a, 0, max);
+        // getIndexWithValue(a, a.length, max);
         // a = new int[0];
         // getIndexWithValue(a, 0, 6);
         // //@Refinement("_.length(x) >= 0") ==
