@@ -11,6 +11,7 @@ import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
+import repair.regen.processor.constraints.FunctionPredicate;
 import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
@@ -133,7 +134,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		//TODO only working for 1 dimension
 		for(CtExpression<?> exp:l) {
 			Constraint c = getExpressionRefinements(exp);
-			EqualsPredicate ep = new EqualsPredicate("length("+WILD_VAR+")", c);
+			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR), c);
 			newArray.putMetadata(REFINE_KEY, ep);
 		}
 	}
@@ -299,9 +300,9 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
 		super.visitCtArrayWrite(arrayWrite);
 		CtExpression<?> index = arrayWrite.getIndexExpression();
-		arrayWrite.putMetadata(REFINE_KEY, 
-				String.format("addToIndex(%s, %s, %s)", arrayWrite.getTarget(), 
-						index, WILD_VAR));
+		FunctionPredicate fp = FunctionPredicate.builtin_addToIndex(
+				arrayWrite.getTarget().toString(), index.toString(), WILD_VAR);
+		arrayWrite.putMetadata(REFINE_KEY, fp);
 	}
 
 

@@ -4,6 +4,7 @@ import java.util.List;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
+import repair.regen.processor.constraints.FunctionPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
@@ -22,15 +23,7 @@ public class TestInsideClasses {
 		Constraint c2 = vi2.getRenamedRefinements("_");
 		
 		
-		EqualsPredicate ep = new EqualsPredicate("_", "7+8");
-		
-		Constraint cc = Conjunction.createConjunction(c2, ep);
-		
-		Constraint ss = cc.clone();
-		List<String> ls = cc.getVariableNames();
-		for(String s : ls)
-			System.out.println(s);
-		
+		FunctionPredicate fp = new FunctionPredicate("ola", "a", "b");
 
 		System.out.println(c2.toString());
 	}

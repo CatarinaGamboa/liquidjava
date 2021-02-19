@@ -1,12 +1,6 @@
 package regen.test.project;
 
 
-// public static void main(String[] args) {
-// int[] a = new int[10];
-// getIndexWithValue(a, 0, max);
-// getIndexWithValue(a, a.length, max);
-// a = new int[0];
-// getIndexWithValue(a, 0, 6);
 // //@Refinement("_.length(x) >= 0") ==
 // //	@Refinement("length(_, x) >= 0")
 // //	int[] a1 = new int[5]; //Cannot prove - len() built-in
@@ -38,26 +32,11 @@ public class SimpleTest {
     // result = getIndexWithValue(l, i+1, val);
     // return result;
     // }
-    @repair.regen.specification.Refinement("_ > 0")
-    public static int toPositive(@repair.regen.specification.Refinement("a < 0")
-    int a) {
-        return -a;
-    }
-
-    @repair.regen.specification.Refinement("_ < 0")
-    public static int toNegative(@repair.regen.specification.Refinement("a > 0")
-    int a) {
-        return -a;
-    }
-
     public static void main(java.lang.String[] args) {
-        // EXAMPLE 2
-        @repair.regen.specification.Refinement("_ < 10")
-        int ex_a = 5;
-        if (ex_a > 0) {
-            @repair.regen.specification.Refinement("_ < ex_a")
-            int ex_c = -10;
-        }
+        int[] a = new int[10];
+        // getIndexWithValue(a, 0, 50);
+        a[0] = 5;
+        // getIndexWithValue(a, 0, 6);
     }
 }
 
