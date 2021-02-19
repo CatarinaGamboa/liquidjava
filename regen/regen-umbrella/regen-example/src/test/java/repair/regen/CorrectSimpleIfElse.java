@@ -13,6 +13,7 @@ public class CorrectSimpleIfElse {
 	public static int toNegative(@Refinement("a > 0")int a) {
 		return -a;
 	}
+
 	
 	public static void main(String[] args) {
 		@Refinement("_ < 10")

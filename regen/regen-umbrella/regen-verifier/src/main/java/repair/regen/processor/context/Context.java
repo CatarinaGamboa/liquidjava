@@ -157,11 +157,11 @@ public class Context {
 			if(vi instanceof Variable)
 				((Variable)vi).saveInstanceElse();
 	}
-	public void variablesCombineFromIf() {
+	public void variablesCombineFromIf(Constraint cond) {
 		for(RefinedVariable vi: getAllVariables()) {
 			if(vi instanceof Variable) {
 				Optional<VariableInstance>ovi = 
-						((Variable) vi).getIfInstanceCombination(getCounter());
+						((Variable) vi).getIfInstanceCombination(getCounter(), cond);
 				if(ovi.isPresent()) {
 					RefinedVariable vii = ovi.get();
 					addVarToContext(vii);

@@ -20,19 +20,45 @@ public class SimpleTest {
 //		return result;
 //	}
 	
-	@Refinement("(_ == -1) || (_ == a*b)")
-	public int getPositiveMult(int a, int b) {
-		int result;
-		if(a > 0 && b > 0)
-			result = a*b;
-		else
-			result = -1;
-		return result;
+	@Refinement("_ > 0")
+	public static int toPositive(@Refinement("a < 0") int a) {
+		return -a;
 	}
-
 	
+	@Refinement("_ < 0")
+	public static int toNegative(@Refinement("a > 0")int a) {
+		return -a;
+	}
 	
 	public static void main(String[] args) {
+//		//EXAMPLE 2
+//		@Refinement("_ < 10")
+//		int ex_a = 5;
+//		if(ex_a < 0) {
+//			@Refinement("_ >= 10")
+//			int ex_b = toPositive(ex_a)*10;
+//		}else {
+//			if(ex_a != 0) {
+//				@Refinement("_ < 0")
+//				int ex_d = toNegative(ex_a);
+//			}
+//			@Refinement("_ < ex_a")
+//			int ex_c = -10;
+//		}
+
+}
+	
+	
+	public void have2(int a, int b) {
+		@Refinement("pos > 0")
+		int pos = 10;
+		if(a > 0) {
+			if(a > b)
+				pos = a-b;
+		}
+	}
+	
+//	public static void main(String[] args) {
 
 		
 		
@@ -52,7 +78,7 @@ public class SimpleTest {
 		////	int[] a1 = new int[5]; //Cannot prove - len() built-in
 		//K(.., ..)
 
-	}
+//	}
 
 	////correctImplies -rever!!!
 	//	@Refinement("_ > 5")

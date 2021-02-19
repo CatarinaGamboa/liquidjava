@@ -3,6 +3,16 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class CorrectIfThen {
+	
+	public void have2(int a, int b) {
+		@Refinement("pos > 0")
+		int pos = 10;
+		if(a > 0) {
+			if(a > b)
+				pos = a-b;
+		}
+	}
+	
 	public static void main(String[] args) {
 		@Refinement("_ < 10")
 		int a = 5;

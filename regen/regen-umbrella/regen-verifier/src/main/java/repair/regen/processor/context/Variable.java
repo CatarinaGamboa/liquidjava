@@ -8,6 +8,7 @@ import java.util.Stack;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
+import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -102,44 +103,86 @@ public class Variable extends RefinedVariable{
 	 * The values depend on the calls to saveInstanceBeforeIf,
 	 * saveInstanceThen and saveInstanceElse
 	 * @param counter A number to create a new variable name
+	 * @param cond 
 	 * @return A new VariableInfo created by the combination of 
 	 * 		   refinements or an empty Optional
 	 */
-	Optional<VariableInstance> getIfInstanceCombination(int counter) {
-		if(ifBefore == null && ifThen==null && ifElse==null)
+	Optional<VariableInstance> getIfInstanceCombination(int counter, Constraint cond) {
+		if(!has(ifThen) && !has(ifElse))
 			return Optional.empty();
 		String name = super.getName();
 		CtTypeReference<?> type = super.getType();
 		//TODO CHANGE ALMOST ALL
-		String nName = name+"_"+counter+"_";
-		String refinement = "";
-		//no else 
-		if(ifElse == null) {
-			if(ifBefore != null && ifThen != null){
-				Constraint ref1 = ifBefore.getRenamedRefinements(nName);
-				Constraint ref2 = ifThen.getRenamedRefinements(nName);
-				refinement = String.format("(%s)||(%s)", ref1.toString(), ref2.toString());//TODO CHANGE
-			}else if(ifBefore == null) {//no value before if but has inside
-				refinement = ifThen.getRenamedRefinements(nName).toString();
-			}
-		}else {//has else
-			if(ifBefore != null && ifThen == null) {//no value in if
-				String ref1 = ifBefore.getRenamedRefinements(nName).toString();
-				String ref2 = ifElse.getRenamedRefinements(nName).toString();
-				refinement = String.format("(%s)||(%s)", ref1, ref2);
-			}else if(ifThen != null) {
-				String ref1 = ifThen.getRenamedRefinements(nName).toString();
-				String ref2 = ifElse.getRenamedRefinements(nName).toString();
-				refinement = String.format("(%s)||(%s)", ref1, ref2);
-			}else {//no value before and no value on if
-				refinement = ifElse.getRenamedRefinements(nName).toString();
-			}
+		String nName = String.format("#%s_%d",name,counter);
+		Constraint ref = new Predicate();
+		if(!has(ifElse)) {
+			if(has(ifBefore) && has(ifThen)) 	//value before if and inside then
+				ref = createITEConstraint(nName, cond, ifThen, ifBefore);
+			else if(!has(ifBefore))				//only value inside then
+				ref = createITEConstraint(nName, cond, ifThen);
+		}else {
+			if(has(ifThen))						//value in then and in else
+				ref = createITEConstraint(nName, cond, ifThen, ifElse);
+			else if(has(ifBefore))				//value before and in else
+				ref = createITEConstraint(nName, cond, ifBefore, ifElse);
+			else
+				ref = createITEConstraint(nName, cond.negate(), ifElse);	
 		}
+		
+		
+//		String refinement = "";
+//		//no else 
+//		
+//		
+//		if(ifElse == null) {
+//			if(ifBefore != null && ifThen != null){
+//				Constraint ref1 = ifBefore.getRenamedRefinements(nName);
+//				Constraint ref2 = ifThen.getRenamedRefinements(nName);
+//				refinement = String.format("(%s)||(%s)", ref1.toString(), ref2.toString());//TODO CHANGE
+//			}else if(ifBefore == null) {//no value before if but has inside
+//				refinement = ifThen.getRenamedRefinements(nName).toString();
+//			}
+//		}else {//has else
+//			if(ifBefore != null && ifThen == null) {//no value in if
+//				String ref1 = ifBefore.getRenamedRefinements(nName).toString();
+//				String ref2 = ifElse.getRenamedRefinements(nName).toString();
+//				refinement = String.format("(%s)||(%s)", ref1, ref2);
+//			}else if(ifThen != null) {
+//				String ref1 = ifThen.getRenamedRefinements(nName).toString();
+//				String ref2 = ifElse.getRenamedRefinements(nName).toString();
+//				refinement = String.format("(%s)||(%s)", ref1, ref2);
+//			}else {//no value before and no value on if
+//				refinement = ifElse.getRenamedRefinements(nName).toString();
+//			}
+//		}
+//		
+		
 		ifBefore=null;ifThen=null;ifElse=null;
-		return Optional.of(new VariableInstance(nName, type, new Predicate(refinement)));//TODO CHANGE
+		return Optional.of(new VariableInstance(nName, type, ref));
 	}
 	
-	
+	private boolean has(VariableInstance v) {
+		return v!=null;
+	}
+
+	/**
+	 * Creates an ITE where the else is true
+	 * @param nName 
+	 * @param cond
+	 * @param ifThen
+	 * @return
+	 */
+	private Constraint createITEConstraint(String nName, Constraint cond, VariableInstance then) {
+		Constraint ref1 = then.getRenamedRefinements(nName);
+		return new IfThenElse(cond, ref1, new Predicate());
+	}
+
+	private Constraint createITEConstraint(String nName, Constraint cond, VariableInstance then, VariableInstance els) {
+		Constraint ref1 = then.getRenamedRefinements(nName);
+		Constraint ref2 = els.getRenamedRefinements(nName);
+		return new IfThenElse(cond, ref1, ref2);
+	}
+
 	@Override
 	public String toString() {
 		return "VariableInfo [name=" + super.getName() + ", type=" + super.getType() + ", refinement=" +

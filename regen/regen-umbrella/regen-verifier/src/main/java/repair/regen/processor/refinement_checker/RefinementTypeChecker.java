@@ -255,15 +255,16 @@ public class RefinementTypeChecker extends TypeChecker {
 		
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
-		Constraint nExpRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
-		nExpRefs = substituteAllVariablesForLastInstance(nExpRefs);
+		expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
+		expRefs = substituteAllVariablesForLastInstance(expRefs);
 
-		if(nExpRefs.getVariableNames().contains("null"))
-			nExpRefs = new Predicate();
+		//TODO Change in future
+		if(expRefs.getVariableNames().contains("null"))
+			expRefs = new Predicate();
 		
 				
 		RefinedVariable freshRV = context.addVarToContext(freshVarName, 
-				factory.Type().INTEGER_PRIMITIVE, nExpRefs);
+				factory.Type().INTEGER_PRIMITIVE, expRefs);
 		vcChecker.addPathVariable(freshRV);
 
 		//VISIT THEN
@@ -275,8 +276,8 @@ public class RefinementTypeChecker extends TypeChecker {
 		//VISIT ELSE
 		if(ifElement.getElseStatement() != null) {
 			context.getVariableByName(freshVarName);
-			expRefs = expRefs.negate();
-			context.newRefinementToVariableInContext(freshVarName, expRefs);
+			//expRefs = expRefs.negate();
+			context.newRefinementToVariableInContext(freshVarName, expRefs.negate());
 			context.enterContext();
 			visitCtBlock(ifElement.getElseStatement());
 			context.variablesSetElseIf();
@@ -285,7 +286,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		//end
 		vcChecker.removePathVariable(freshRV);
 		context.exitContext();
-		context.variablesCombineFromIf();
+		context.variablesCombineFromIf(expRefs);
 	}
 	
 	

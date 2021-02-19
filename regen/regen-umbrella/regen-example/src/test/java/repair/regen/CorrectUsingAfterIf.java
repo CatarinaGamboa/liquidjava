@@ -3,6 +3,7 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 
 public class CorrectUsingAfterIf {
+	
 	public static void main(String[] args) {
 		//Example 1
 		@Refinement("_ > 5")
@@ -11,7 +12,7 @@ public class CorrectUsingAfterIf {
 			a = 20;
 		else
 			a = 30;
-		@Refinement("_ == 30 || _ == 20")
+		@Refinement("_ == 30")
 		int b = a;
 
 		//Example 2
