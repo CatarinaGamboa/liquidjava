@@ -87,7 +87,7 @@ class OperationsChecker {
 	 */
 	public <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) {
 		CtExpression<T> ex = operator.getOperand();
-		String name = rtc.FRESH;
+		String name = rtc.freshFormat;
 		Constraint all;
 		if(ex instanceof CtVariableWrite) {
 			CtVariableWrite<T> w = (CtVariableWrite<T>) ex;
@@ -117,8 +117,11 @@ class OperationsChecker {
 		}
 
 		Constraint metadata = rtc.getRefinement(ex);
-		
-		String newName = String.format(rtc.instanceFormat, name, rtc.context.getCounter());
+		String newName;
+		if(!name.equals(rtc.freshFormat))
+			newName = String.format(rtc.instanceFormat, name, rtc.context.getCounter());
+		else
+			newName = String.format(name, rtc.context.getCounter());
 		Constraint newMeta = metadata.substituteVariable(rtc.WILD_VAR, newName);
 		
 		Constraint unOp = getOperatorFromKind(operator.getKind());
@@ -210,7 +213,7 @@ class OperationsChecker {
 			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
 			Constraint innerRefs = fi.getRenamedRefinements();
 			//Substitute _ by the variable that we send
-			String newName = rtc.FRESH + rtc.context.getCounter();
+			String newName = String.format(rtc.freshFormat, rtc.context.getCounter());
 			
 			innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
 			RefinedVariable rv = rtc.context.addVarToContext(newName, fi.getType(), innerRefs);

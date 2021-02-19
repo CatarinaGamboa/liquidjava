@@ -1,6 +1,7 @@
 package regen.test.project;
 
 
+// type AliasName (int x) { x >= 0 && x <= 20 }
 // //@Refinement("_.length(x) >= 0") ==
 // //	@Refinement("length(_, x) >= 0")
 // //	int[] a1 = new int[5]; //Cannot prove - len() built-in
@@ -17,26 +18,9 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
+@repair.regen.specification.RefinementAlias("type PtGrade(int x) { x >= 0 && x <= 20}")
 public class SimpleTest {
-    // @RefinementFunction("ghost int length(int[])")
-    // @Refinement("(_ >= -1) && (_ < length(l))")
-    // public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l,
-    // @Refinement("i >= 0 && i < length(l)") int i,
-    // int val) {
-    // int result;
-    // if(l[i] == val)
-    // result = i;
-    // else if(i >= l.length-1)
-    // result = -1;
-    // else
-    // result = getIndexWithValue(l, i+1, val);
-    // return result;
-    // }
     public static void main(java.lang.String[] args) {
-        int[] a = new int[10];
-        // getIndexWithValue(a, 0, 50);
-        a[0] = 5;
-        // getIndexWithValue(a, 0, 6);
     }
 }
 

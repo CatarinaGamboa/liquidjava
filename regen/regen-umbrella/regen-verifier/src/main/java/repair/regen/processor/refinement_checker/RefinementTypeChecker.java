@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.language.alias.Alias;
 import repair.regen.language.function.FunctionDeclaration;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
@@ -70,6 +71,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtClass(CtClass<T> ctClass) {
 		System.out.println("CTCLASS:"+ctClass.getSimpleName());
 		context.reinitializeContext();
+		getRefinementFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
 	}
 
@@ -199,8 +201,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			fieldRead.putMetadata(REFINE_KEY, c);
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
 			String targetName = fieldRead.getTarget().toString();
-			System.out.println("Target:"+targetName);
-			fieldRead.putMetadata(REFINE_KEY, new Predicate("length("+targetName+")"));
+			fieldRead.putMetadata(REFINE_KEY, FunctionPredicate.builtin_length(targetName));
 		}else{
 			fieldRead.putMetadata(REFINE_KEY, new Predicate());
 			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
@@ -256,7 +257,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		context.enterContext();
 		
 		Constraint expRefs = getExpressionRefinements(exp);
-		String freshVarName = FRESH+context.getCounter();
+		String freshVarName = String.format(freshFormat ,context.getCounter());
 		expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
 		Constraint lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
 		expRefs = Conjunction.createConjunction(expRefs, lastExpRefs);
@@ -303,6 +304,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		FunctionPredicate fp = FunctionPredicate.builtin_addToIndex(
 				arrayWrite.getTarget().toString(), index.toString(), WILD_VAR);
 		arrayWrite.putMetadata(REFINE_KEY, fp);
+		//TODO fazer mais...? faz sentido
 	}
 
 
@@ -378,10 +380,6 @@ public class RefinementTypeChecker extends TypeChecker {
 		//smt check
 		checkSMT(cEt, variable);//TODO CHANGE
 		context.addRefinementToVariableInContext(variable, cet);
-
-
-
-
 	}
 
 
@@ -419,6 +417,10 @@ public class RefinementTypeChecker extends TypeChecker {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 				getGhostFunction(s.getValue());
 				ref = Optional.empty();
+			}else if( an.contentEquals("repair.regen.specification.RefinementAlias")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				handleAlias(s.getValue());
+				ref = Optional.empty();
 			}
 		}
 		if(ref.isPresent()) 
@@ -426,6 +428,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 		return constr;
 	}
+
 
 	private void getGhostFunction(String value) {
 		try {
@@ -443,6 +446,19 @@ public class RefinementTypeChecker extends TypeChecker {
 		}
 
 	}
+	
+
+	private void handleAlias(String value) {
+		System.out.println("o");
+		try {
+			Optional<Alias> oa = RefinementParser.parseAlias(value);
+			System.out.println(oa);
+		} catch (SyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 
 	@Override
 	void checkSMT(Constraint expectedType, CtElement element) {
@@ -450,18 +466,5 @@ public class RefinementTypeChecker extends TypeChecker {
 		element.putMetadata(REFINE_KEY, expectedType);	
 	}
 
-
-
-
-	//	private Optional<String> getExternalRefinement(CtInterface<?> intrface) {
-	//		Optional<String> ref = Optional.empty();
-	//		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
-	//			if( ann.getActualAnnotation().annotationType().getCanonicalName()
-	//					.contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
-	//				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-	//				ref = Optional.of(s.getValue());
-	//			}		
-	//		return ref;
-	//	}
 
 }

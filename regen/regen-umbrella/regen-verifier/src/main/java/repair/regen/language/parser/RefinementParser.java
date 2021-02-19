@@ -12,6 +12,7 @@ import org.modelcc.parser.ParserException;
 import org.modelcc.parser.ParserFactory;
 
 import repair.regen.language.Expression;
+import repair.regen.language.alias.Alias;
 import repair.regen.language.function.FunctionDeclaration;
 
 public class RefinementParser {
@@ -40,12 +41,30 @@ public class RefinementParser {
 	@SuppressWarnings("unchecked")
 	public static Optional<FunctionDeclaration> parseFunctionDecl(String code) throws SyntaxException {
 		try {
-			//System.out.println("Parsing: " + code);
 			LanguageModel m = JavaModelReader.read(FunctionDeclaration.class);
 			Parser<FunctionDeclaration> parser = ParserFactory.create(m, ParserFactory.WHITESPACE);
 	
 			FunctionDeclaration modeled = parser.parse(code);
-			//System.out.println("modeled: " + modeled);
+			return Optional.of(modeled);
+			
+		} catch (ParserException e) {
+			String m = e.getMessage();
+			if(m.equals("Syntax error"))
+				throw new SyntaxException("Syntax error in: "+code);
+		} catch (Exception e) {
+			System.out.println("Could not parse: " + code);
+			e.printStackTrace();
+		}
+		return Optional.empty();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static Optional<Alias> parseAlias(String code) throws SyntaxException {
+		try {
+			LanguageModel m = JavaModelReader.read(Alias.class);
+			Parser<Alias> parser = ParserFactory.create(m, ParserFactory.WHITESPACE);
+	
+			Alias modeled = parser.parse(code);
 			return Optional.of(modeled);
 			
 		} catch (ParserException e) {
