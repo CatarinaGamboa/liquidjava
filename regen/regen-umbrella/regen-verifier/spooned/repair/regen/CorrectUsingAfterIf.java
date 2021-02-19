@@ -11,7 +11,7 @@ public class CorrectUsingAfterIf {
         else
             a = 30;
 
-        @repair.regen.specification.Refinement("_ == 30 || _ == 20")
+        @repair.regen.specification.Refinement("_ == 30")
         int b = a;
         // Example 2
         @repair.regen.specification.Refinement("y < 100")

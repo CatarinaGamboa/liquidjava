@@ -14,7 +14,7 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class Variable extends RefinedVariable{
 	//Specific Values
-	private Stack<List<VariableInstance>> instances;
+	private List<VariableInstance> instances;
 	
 	//To combine if values
 	private VariableInstance ifBefore;
@@ -38,48 +38,34 @@ public class Variable extends RefinedVariable{
 	
 	public Variable(String name, CtTypeReference<?> type, Constraint ref) {
 		super(name, type, ref);
-		this.instances = new Stack<>();
-		this.instances.push(new ArrayList<VariableInstance>());
+		this.instances = new ArrayList<VariableInstance>();
 	}
 
 	
 	//INSTANCES
 	public void enterContext() {
-		instances.push(new ArrayList<>());
+		//instances.push(new ArrayList<>());
 	}
 	public void exitContext() {
-		instances.pop();
+		//instances.pop();
 	}
 	
 	public void addInstance(VariableInstance vi) {
-		instances.peek().add(vi);
+		//instances.peek().add(vi);
+		instances.add(vi);
 	}
 	
 	public void removeLastInstance() {
 		if(instances.size() > 0) 
-			instances.peek().remove(instances.size()-1);
+			instances.remove(instances.size()-1);
 	}
 	
 	public Optional<VariableInstance> getLastInstance() {
-		Stack<List<VariableInstance>> backup = new Stack<>();
-		while(instances.size() > 0) {
-			List<VariableInstance> lvi = instances.peek();
-			if(lvi.size() > 0) {//last list in stack has a value
-				reloadFromBackup(backup);
-				return Optional.of(lvi.get(lvi.size()-1));
-			}else {
-				backup.add(instances.pop());
-			}
-		}
-		reloadFromBackup(backup);
+		if(instances.size()>0)
+			return Optional.of(instances.get(instances.size()-1));
 		return Optional.empty();
 	}
 	
-	private void reloadFromBackup(Stack<List<VariableInstance>> backup) {
-		while(backup.size() > 0) {
-			instances.add(backup.pop());
-		}
-	}
 	
 	//IFS
 	void saveInstanceBeforeIf() {
@@ -110,11 +96,10 @@ public class Variable extends RefinedVariable{
 	Optional<VariableInstance> getIfInstanceCombination(int counter, Constraint cond) {
 		if(!has(ifThen) && !has(ifElse))
 			return Optional.empty();
-		String name = super.getName();
-		CtTypeReference<?> type = super.getType();
-		//TODO CHANGE ALMOST ALL
-		String nName = String.format("#%s_%d",name,counter);
+		
+		String nName = String.format("#%s_%d",super.getName(),counter);
 		Constraint ref = new Predicate();
+		
 		if(!has(ifElse)) {
 			if(has(ifBefore) && has(ifThen)) 	//value before if and inside then
 				ref = createITEConstraint(nName, cond, ifThen, ifBefore);
@@ -128,37 +113,9 @@ public class Variable extends RefinedVariable{
 			else
 				ref = createITEConstraint(nName, cond.negate(), ifElse);	
 		}
-		
-		
-//		String refinement = "";
-//		//no else 
-//		
-//		
-//		if(ifElse == null) {
-//			if(ifBefore != null && ifThen != null){
-//				Constraint ref1 = ifBefore.getRenamedRefinements(nName);
-//				Constraint ref2 = ifThen.getRenamedRefinements(nName);
-//				refinement = String.format("(%s)||(%s)", ref1.toString(), ref2.toString());//TODO CHANGE
-//			}else if(ifBefore == null) {//no value before if but has inside
-//				refinement = ifThen.getRenamedRefinements(nName).toString();
-//			}
-//		}else {//has else
-//			if(ifBefore != null && ifThen == null) {//no value in if
-//				String ref1 = ifBefore.getRenamedRefinements(nName).toString();
-//				String ref2 = ifElse.getRenamedRefinements(nName).toString();
-//				refinement = String.format("(%s)||(%s)", ref1, ref2);
-//			}else if(ifThen != null) {
-//				String ref1 = ifThen.getRenamedRefinements(nName).toString();
-//				String ref2 = ifElse.getRenamedRefinements(nName).toString();
-//				refinement = String.format("(%s)||(%s)", ref1, ref2);
-//			}else {//no value before and no value on if
-//				refinement = ifElse.getRenamedRefinements(nName).toString();
-//			}
-//		}
-//		
-		
+
 		ifBefore=null;ifThen=null;ifElse=null;
-		return Optional.of(new VariableInstance(nName, type, ref));
+		return Optional.of(new VariableInstance(nName, super.getType(), ref));
 	}
 	
 	private boolean has(VariableInstance v) {

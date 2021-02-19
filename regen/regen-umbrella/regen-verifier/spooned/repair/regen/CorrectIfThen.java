@@ -2,6 +2,28 @@ package repair.regen;
 
 
 public class CorrectIfThen {
+    public void have2(int a, int b) {
+        @repair.regen.specification.Refinement("pos > 0")
+        int pos = 10;
+        if (a > 0) {
+            if (a > b)
+                pos = a - b;
+
+        }
+    }
+
+    public void have1(int a) {
+        @repair.regen.specification.Refinement("pos > 0")
+        int pos = 10;
+        if (a > 0) {
+            pos = 5;
+            pos = 8;
+            pos = 30;
+        }
+        @repair.regen.specification.Refinement("_ == 30 || _ == 10")
+        int u = pos;
+    }
+
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("_ < 10")
         int a = 5;
