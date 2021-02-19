@@ -52,28 +52,18 @@ public class SimpleTest {
 
     public static void main(java.lang.String[] args) {
         // //EXAMPLE 2
-        // @Refinement("_ < 10")
-        // int ex_a = 5;
-        // if(ex_a < 0) {
-        // @Refinement("_ >= 10")
-        // int ex_b = toPositive(ex_a)*10;
-        // }else {
-        // if(ex_a != 0) {
-        // @Refinement("_ < 0")
-        // int ex_d = toNegative(ex_a);
-        // }
-        // @Refinement("_ < ex_a")
-        // int ex_c = -10;
-        // }
-    }
-
-    public void have2(int a, int b) {
-        @repair.regen.specification.Refinement("pos > 0")
-        int pos = 10;
-        if (a > 0) {
-            if (a > b)
-                pos = a - b;
-
+        @repair.regen.specification.Refinement("_ < 10")
+        int ex_a = 5;
+        if (ex_a < 0) {
+            @repair.regen.specification.Refinement("_ >= 10")
+            int ex_b = (regen.test.project.SimpleTest.toPositive(ex_a)) * 10;
+        } else {
+            if (ex_a != 0) {
+                @repair.regen.specification.Refinement("_ < 0")
+                int ex_d = regen.test.project.SimpleTest.toNegative(ex_a);
+            }
+            @repair.regen.specification.Refinement("_ < ex_a")
+            int ex_c = -10;
         }
     }
 }

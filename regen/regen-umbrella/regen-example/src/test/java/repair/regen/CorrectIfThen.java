@@ -13,6 +13,18 @@ public class CorrectIfThen {
 		}
 	}
 	
+	public void have1(int a) {
+		@Refinement("pos > 0")
+		int pos = 10;
+		if(a > 0) {
+			pos = 5;
+			pos = 8;
+			pos = 30;
+		}
+		@Refinement("_ == 30 || _ == 10")
+		int u = pos;
+	}
+	
 	public static void main(String[] args) {
 		@Refinement("_ < 10")
 		int a = 5;
