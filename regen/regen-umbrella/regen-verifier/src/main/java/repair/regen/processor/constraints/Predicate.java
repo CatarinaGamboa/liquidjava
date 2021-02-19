@@ -161,7 +161,7 @@ public class Predicate extends Constraint{
 		}
 	}
 
-	boolean isBooleanTrue() {
+	public boolean isBooleanTrue() {
 		return toString().equals("true") || toString().equals("(true)") ;	
 	}
 

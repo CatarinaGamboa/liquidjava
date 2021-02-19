@@ -261,9 +261,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		if(nExpRefs.getVariableNames().contains("null"))
 			nExpRefs = new Predicate();
 		
-		System.out.println(nExpRefs);
-		
-		
+				
 		RefinedVariable freshRV = context.addVarToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, nExpRefs);
 		vcChecker.addPathVariable(freshRV);

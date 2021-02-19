@@ -17,5 +17,6 @@ public class CorrectFunctionInvocation {
     	p = posMult(10, 3);
     	p = posMult(10, 15-6);
 	}
+	
 
 }

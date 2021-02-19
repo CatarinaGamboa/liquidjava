@@ -130,7 +130,7 @@ class OperationsChecker {
 		else
 			all = new EqualsPredicate(rtc.WILD_VAR, opS);//TODO SEE IF () IN OPS IS NEEDED
 		
-		RefinedVariable rv = rtc.context.addVarToContext(newName, ex.getType(), newMeta);
+		rtc.context.addInstanceToContext(newName, ex.getType(), newMeta);
 		operator.putMetadata(rtc.REFINE_KEY, all);
 
 	}

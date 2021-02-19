@@ -28,5 +28,16 @@ public class CorrectFunctionDeclarations {
     int x) {
         return (x + x) + x;
     }
+
+    @repair.regen.specification.Refinement("(_ == -1) || (_ == a*b)")
+    public int getPositiveMult(int a, int b) {
+        int result;
+        if ((a > 0) && (b > 0))
+            result = a * b;
+        else
+            result = -1;
+
+        return result;
+    }
 }
 

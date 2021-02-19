@@ -5,37 +5,35 @@ import repair.regen.specification.RefinementFunction;
 
 public class SimpleTest {	
 	
-	@RefinementFunction("ghost int length(int[])")
-	@Refinement("(_ >= -1) && (_ < length(l))")
-	public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l, 
-										  @Refinement("i >= 0 && i < length(l)") int i, 
-										  int val) {
-		if(l[i] == val)
-			return i;
-		if(i >= l.length)//with or without -1
-			return -1;
+//	@RefinementFunction("ghost int length(int[])")
+//	@Refinement("(_ >= -1) && (_ < length(l))")
+//	public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l, 
+//										  @Refinement("i >= 0 && i < length(l)") int i, 
+//										  int val) {
+//		int result;
+//		if(l[i] == val)
+//			result = i;
+//		else if(i >= l.length-1)
+//			result = -1;
+//		else
+//			result = getIndexWithValue(l, i+1, val);
+//		return result;
+//	}
+	
+	@Refinement("(_ == -1) || (_ == a*b)")
+	public int getPositiveMult(int a, int b) {
+		int result;
+		if(a > 0 && b > 0)
+			result = a*b;
 		else
-			return getIndexWithValue(l, i+1, val);	
+			result = -1;
+		return result;
 	}
 
 	
+	
 	public static void main(String[] args) {
-//		int[] arr = new int[0];
-//		getIndexWithValue(arr, 0, 1000);
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
 		
 		
 		
@@ -55,32 +53,6 @@ public class SimpleTest {
 		//K(.., ..)
 
 	}
-
-
-
-
-
-
-//	@RefinementFunction("ghost int length(int[])")
-//	@Refinement("(_ >= -1) && (_ < length(l))")
-//	public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l, 
-//										  @Refinement("i >= 0 && i < length(l)") int i, 
-//										  int val) {
-//		if(l[i] == val)
-//			return i;
-//		if(i >= l.length -1)//with or without -1
-//			return -1;
-//		else
-//			return getIndexWithValue(l, i+1, val);	
-//	}
-
-
-
-
-
-
-
-
 
 	////correctImplies -rever!!!
 	//	@Refinement("_ > 5")

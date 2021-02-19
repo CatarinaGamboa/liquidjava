@@ -87,7 +87,8 @@ public class VCChecker {
 				addAllDiferent(lrv, lm);
 			}
 		}
-
+		if(expectedType instanceof Predicate && ((Predicate)expectedType).isBooleanTrue())
+			return;
 		process(expectedType, element, mainVars, lrv);
 	}
 

@@ -110,7 +110,8 @@ public class Context {
 	
 	public RefinedVariable addInstanceToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
 		RefinedVariable vi = new VariableInstance(simpleName, type, c);
-		addVarToContext(vi);
+		if(!ctxSpecificVars.contains(vi))
+			addSpecificVariable(vi);
 		return vi;
 	}
 	
@@ -122,16 +123,6 @@ public class Context {
 		}else {
 			addVarToContext(name, variable.getType(), et);
 		}
-	}
-
-	//TODO ERASE
-	public void newRefinementToVariableInContext(CtVariable<?> variable, Constraint expectedType) {
-		String name = variable.getSimpleName();
-		if(hasVariable(name)){
-			RefinedVariable vi = getVariableByName(name);
-			vi.setRefinement(expectedType);
-		}else
-			addVarToContext(name, variable.getType(), expectedType);
 	}
 
 	/**
