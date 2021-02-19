@@ -21,6 +21,8 @@ package regen.test.project;
 @repair.regen.specification.RefinementAlias("type PtGrade(int x) { x >= 0 && x <= 20}")
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
+        @repair.regen.specification.Refinement("PtGrade(_)")
+        int a = 15;
     }
 }
 
