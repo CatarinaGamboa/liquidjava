@@ -157,6 +157,20 @@ public class Context {
 			if(vi instanceof Variable)
 				((Variable)vi).saveInstanceElse();
 	}
+
+	public void variablesNewIfCombination() {
+		for(RefinedVariable vi: getAllVariables())
+			if(vi instanceof Variable)
+				((Variable)vi).newIfCombination();
+		
+	}
+
+	public void variablesFinishIfCombination() {
+		for(RefinedVariable vi: getAllVariables())
+			if(vi instanceof Variable)
+				((Variable)vi).finishIfCombination();
+	}
+
 	public void variablesCombineFromIf(Constraint cond) {
 		for(RefinedVariable vi: getAllVariables()) {
 			if(vi instanceof Variable) {
@@ -261,8 +275,7 @@ public class Context {
 		ctxSpecificVars.add(vi);
 	}
 	
-	
-	
+
 	public void addGhostFunction(GhostFunction gh) {
 		ghosts.add(gh);
 	}
@@ -307,8 +320,5 @@ public class Context {
 			sb.append(f.toString());
 		return sb.toString();
 	}
-
-
-
 
 }

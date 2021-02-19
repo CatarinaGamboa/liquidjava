@@ -2,16 +2,18 @@ package repair.regen;
 
 
 public class ErrorAfterIf {
-    public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("y < 100")
-        int y = 5;
-        if (y > 2)
-            y = 3;
-        else
-            y = 9;
+    public void have2(int a, int b) {
+        @repair.regen.specification.Refinement("pos > 0")
+        int pos = 10;
+        if ((a > 0) && (b > 0)) {
+            pos = a;
+        } else {
+            if (b > 0)
+                pos = b;
 
-        @repair.regen.specification.Refinement("z < 7")
-        int z = y;
+        }
+        @repair.regen.specification.Refinement("_ == a || _ == b")
+        int r = pos;
     }
 }
 

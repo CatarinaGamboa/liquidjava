@@ -250,6 +250,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public void visitCtIf(CtIf ifElement) {
 		CtExpression<Boolean> exp = ifElement.getCondition();
+		context.variablesNewIfCombination();
 		context.variablesSetBeforeIf();
 		context.enterContext();
 		
@@ -263,7 +264,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			expRefs = new Predicate();
 		
 				
-		RefinedVariable freshRV = context.addVarToContext(freshVarName, 
+		RefinedVariable freshRV = context.addInstanceToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, expRefs);
 		vcChecker.addPathVariable(freshRV);
 
@@ -272,14 +273,16 @@ public class RefinementTypeChecker extends TypeChecker {
 		visitCtBlock(ifElement.getThenStatement());
 		context.variablesSetThenIf();
 		context.exitContext();
+		
 
 		//VISIT ELSE
 		if(ifElement.getElseStatement() != null) {
 			context.getVariableByName(freshVarName);
 			//expRefs = expRefs.negate();
 			context.newRefinementToVariableInContext(freshVarName, expRefs.negate());
+			
 			context.enterContext();
-			visitCtBlock(ifElement.getElseStatement());
+			visitCtBlock(ifElement.getElseStatement());		
 			context.variablesSetElseIf();
 			context.exitContext();
 		}
@@ -287,6 +290,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		vcChecker.removePathVariable(freshRV);
 		context.exitContext();
 		context.variablesCombineFromIf(expRefs);
+		context.variablesFinishIfCombination();
 	}
 	
 	

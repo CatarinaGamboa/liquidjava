@@ -14,12 +14,24 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class Variable extends RefinedVariable{
 	//Specific Values
-	private List<VariableInstance> instances;
+	private Stack<List<VariableInstance>> instances;
 	
 	//To combine if values
-	private VariableInstance ifBefore;
-	private VariableInstance ifThen;
-	private VariableInstance ifElse;
+	private static final int ifbeforeIndex = 0;
+	private static final int ifthenIndex = 1;
+	private static final int ifelseIndex = 2;
+	
+	private Stack<Object[]> ifCombiner;//Optional<VariableInstance>
+
+	
+	public Variable(String name, CtTypeReference<?> type, Constraint ref) {
+		super(name, type, ref);
+		this.instances = new Stack<>();
+		this.instances.push(new ArrayList<VariableInstance>());
+		ifCombiner = new Stack<>();
+	}
+
+	
 	
 	public Constraint getRefinement() {
 		Constraint c = super.getRefinement();
@@ -35,54 +47,68 @@ public class Variable extends RefinedVariable{
 		return super.getRefinement();
 	}
 	
-	
-	public Variable(String name, CtTypeReference<?> type, Constraint ref) {
-		super(name, type, ref);
-		this.instances = new ArrayList<VariableInstance>();
-	}
 
 	
 	//INSTANCES
 	public void enterContext() {
-		//instances.push(new ArrayList<>());
-	}
-	public void exitContext() {
-		//instances.pop();
+		instances.push(new ArrayList<>());
 	}
 	
+	public void exitContext() {
+		instances.pop();
+		
+	}
+
 	public void addInstance(VariableInstance vi) {
-		//instances.peek().add(vi);
-		instances.add(vi);
+		instances.peek().add(vi);
 	}
 	
 	public void removeLastInstance() {
 		if(instances.size() > 0) 
-			instances.remove(instances.size()-1);
+			instances.peek().remove(instances.size()-1);
 	}
 	
 	public Optional<VariableInstance> getLastInstance() {
-		if(instances.size()>0)
-			return Optional.of(instances.get(instances.size()-1));
+		Stack<List<VariableInstance>> backup = new Stack<>();
+		while(instances.size() > 0) {
+			List<VariableInstance> lvi = instances.peek();
+			if(lvi.size() > 0) {//last list in stack has a value
+				reloadFromBackup(backup);
+				return Optional.of(lvi.get(lvi.size()-1));
+			}else {
+				backup.add(instances.pop());
+			}
+		}
+		reloadFromBackup(backup);
 		return Optional.empty();
+	}
+	
+	private void reloadFromBackup(Stack<List<VariableInstance>> backup) {
+		while(backup.size() > 0)
+			instances.add(backup.pop());
 	}
 	
 	
 	//IFS
+	public void newIfCombination() {
+		ifCombiner.push(new Object[ifelseIndex+1]);
+	}
+	public void finishIfCombination() {
+		ifCombiner.pop();
+	}
 	void saveInstanceBeforeIf() {
-		Optional<VariableInstance> b = getLastInstance();
-		if(b.isPresent())
-			ifBefore = b.get();
+		if(!ifCombiner.isEmpty() && getLastInstance().isPresent())
+			ifCombiner.peek()[ifbeforeIndex] = getLastInstance().get();
 	}
 	void saveInstanceThen() {
-		Optional<VariableInstance> b = getLastInstance();
-		if(b.isPresent())
-			ifThen = b.get();
+		if(!ifCombiner.isEmpty() && getLastInstance().isPresent())
+			ifCombiner.peek()[ifthenIndex] = getLastInstance().get();
 	}
 	void saveInstanceElse() {
-		Optional<VariableInstance> b = getLastInstance();
-		if(b.isPresent())
-			ifElse = b.get();
+		if(!ifCombiner.isEmpty() && getLastInstance().isPresent())
+			ifCombiner.peek()[ifelseIndex] = getLastInstance().get();
 	}
+	
 	
 	/**
 	 * Creates a combination of the values introduced during the if then else
@@ -94,32 +120,39 @@ public class Variable extends RefinedVariable{
 	 * 		   refinements or an empty Optional
 	 */
 	Optional<VariableInstance> getIfInstanceCombination(int counter, Constraint cond) {
-		if(!has(ifThen) && !has(ifElse))
+		if(ifCombiner.isEmpty() ||
+		  (!has(ifthenIndex) && !has(ifelseIndex) && !has(ifbeforeIndex)))
 			return Optional.empty();
 		
 		String nName = String.format("#%s_%d",super.getName(),counter);
 		Constraint ref = new Predicate();
 		
-		if(!has(ifElse)) {
-			if(has(ifBefore) && has(ifThen)) 	//value before if and inside then
-				ref = createITEConstraint(nName, cond, ifThen, ifBefore);
-			else if(!has(ifBefore))				//only value inside then
-				ref = createITEConstraint(nName, cond, ifThen);
+		if(!has(ifelseIndex)) {
+			if(has(ifbeforeIndex) && has(ifthenIndex)) 	//value before if and inside then
+				ref = createITEConstraint(nName, cond, get(ifthenIndex), get(ifbeforeIndex));
+			else if(!has(ifbeforeIndex))				//only value inside then
+				ref = createITEConstraint(nName, cond, get(ifthenIndex));
 		}else {
-			if(has(ifThen))						//value in then and in else
-				ref = createITEConstraint(nName, cond, ifThen, ifElse);
-			else if(has(ifBefore))				//value before and in else
-				ref = createITEConstraint(nName, cond, ifBefore, ifElse);
+			if(has(ifthenIndex))						//value in then and in else
+				ref = createITEConstraint(nName, cond, get(ifthenIndex), get(ifelseIndex));
+			else if(has(ifbeforeIndex))				//value before and in else
+				ref = createITEConstraint(nName, cond, get(ifbeforeIndex), get(ifelseIndex));
 			else
-				ref = createITEConstraint(nName, cond.negate(), ifElse);	
+				ref = createITEConstraint(nName, cond.negate(), get(ifelseIndex));	
 		}
-
-		ifBefore=null;ifThen=null;ifElse=null;
 		return Optional.of(new VariableInstance(nName, super.getType(), ref));
 	}
+
+
+	private boolean has(int index) {
+		Object[] l = ifCombiner.peek();
+		Object o = ifCombiner.peek()[index];
+		boolean b = o != null && (o instanceof VariableInstance);
+		return b;
+	}
 	
-	private boolean has(VariableInstance v) {
-		return v!=null;
+	private VariableInstance get(int index) {
+		return (VariableInstance) ifCombiner.peek()[index];
 	}
 
 	/**
@@ -145,6 +178,8 @@ public class Variable extends RefinedVariable{
 		return "VariableInfo [name=" + super.getName() + ", type=" + super.getType() + ", refinement=" +
 				super.getRefinement() +"]";
 	}
+
+
 
 
 }
