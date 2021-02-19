@@ -5,52 +5,25 @@ import repair.regen.specification.RefinementFunction;
 
 public class SimpleTest {	
 	
-//	@RefinementFunction("ghost int length(int[])")
-//	@Refinement("(_ >= -1) && (_ < length(l))")
-//	public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l, 
-//										  @Refinement("i >= 0 && i < length(l)") int i, 
-//										  int val) {
-//		int result;
-//		if(l[i] == val)
-//			result = i;
-//		else if(i >= l.length-1)
-//			result = -1;
-//		else
-//			result = getIndexWithValue(l, i+1, val);
-//		return result;
-//	}
-	@Refinement("_ > 0")
-	public static int toPositive(@Refinement("a < 0") int a) {
-		return -a;
+	@RefinementFunction("ghost int length(int[])")
+	@Refinement("(_ >= -1) && (_ < length(l))")
+	public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l, 
+										  @Refinement("i >= 0 && i < length(l)") int i, 
+										  int val) {
+		int result;
+		if(l[i] == val)
+			result = i;
+		else if(i >= l.length-1)
+			result = -1;
+		else
+			result = getIndexWithValue(l, i+1, val);
+		return result;
 	}
-	
-	@Refinement("_ < 0")
-	public static int toNegative(@Refinement("a > 0")int a) {
-		return -a;
-	}
-
 	
 	public static void main(String[] args) {
-		//EXAMPLE 2
-		@Refinement("_ < 10")
-		int ex_a = 5;
-		if(ex_a < 0) {
-			@Refinement("_ >= 10")
-			int ex_b = toPositive(ex_a)*10;
-		}else {
-			if(ex_a != 0) {
-				@Refinement("_ < 0")
-				int ex_d = toNegative(ex_a);
-			}
-			@Refinement("_ < ex_a")
-			int ex_c = -10;
-		}
-		
+	
+	
 	}
-//	public static void main(String[] args) {
-
-		
-		
 		
 //		int[] a = new int[10];
 //		getIndexWithValue(a, 0, max);

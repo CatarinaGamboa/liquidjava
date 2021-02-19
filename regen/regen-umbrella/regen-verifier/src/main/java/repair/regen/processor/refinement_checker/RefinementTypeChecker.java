@@ -257,8 +257,9 @@ public class RefinementTypeChecker extends TypeChecker {
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = FRESH+context.getCounter();
 		expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
-		expRefs = substituteAllVariablesForLastInstance(expRefs);
-
+		Constraint lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
+		expRefs = Conjunction.createConjunction(expRefs, lastExpRefs);
+		
 		//TODO Change in future
 		if(expRefs.getVariableNames().contains("null"))
 			expRefs = new Predicate();

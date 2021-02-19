@@ -54,14 +54,7 @@ public class SimpleTest {
         // EXAMPLE 2
         @repair.regen.specification.Refinement("_ < 10")
         int ex_a = 5;
-        if (ex_a < 0) {
-            @repair.regen.specification.Refinement("_ >= 10")
-            int ex_b = (regen.test.project.SimpleTest.toPositive(ex_a)) * 10;
-        } else {
-            if (ex_a != 0) {
-                @repair.regen.specification.Refinement("_ < 0")
-                int ex_d = regen.test.project.SimpleTest.toNegative(ex_a);
-            }
+        if (ex_a > 0) {
             @repair.regen.specification.Refinement("_ < ex_a")
             int ex_c = -10;
         }
