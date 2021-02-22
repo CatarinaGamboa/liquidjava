@@ -25,4 +25,9 @@ public class UnaryExpression extends Expression implements IModel {
 		return e;
 	}
 	
+	@Override
+	public void substituteVariable(String from, String to) {
+		e.substituteVariable(from, to);
+	}
+	
 }

@@ -34,4 +34,12 @@ public class Variable extends Expression implements IModel {
 		this.name = name; 
 	}
 	
+	@Override
+	public void substituteVariable(String from, String to) {
+		//End leaf
+		if(this.name.equals(from))
+			changeName(to);
+	}
+	
+	
 }

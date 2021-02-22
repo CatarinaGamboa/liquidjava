@@ -7,8 +7,11 @@ import repair.regen.specification.RefinementAlias;
 public class SimpleTest {	
 
 	public static void main(String[] args) {
-		@Refinement("PtGrade(_)")
+		//@Refinement("PtGrade(_)")
+		@Refinement("_ > 0")
 		int a = 15;
+		@Refinement("b < a")
+		int b = -a;
 
 	}
 

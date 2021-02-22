@@ -28,5 +28,10 @@ public class BooleanLiteral extends LiteralExpression implements IModel {
 	public boolean getValue() {
 		return value;
 	}
+
+	@Override
+	public void substituteVariable(String from, String to) {
+		//End leaf - boolean literal
+	}
 	
 }

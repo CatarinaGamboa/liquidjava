@@ -26,5 +26,11 @@ public class AliasUsage extends Expression implements IModel{
 	public String toString() {
 		return name.toString()+"("+var.toString()+")";
 	}
+	
+	@Override
+	public void substituteVariable(String from, String to) {
+		var.substituteVariable(from, to);
+	}
+	
 
 }

@@ -26,4 +26,9 @@ public class ExpressionGroup extends Expression implements IModel {
 	public Expression getExpression() {
 		return e;
 	}
+	@Override
+	public void substituteVariable(String from, String to) {
+		e.substituteVariable(from, to);
+	}
+	
 }

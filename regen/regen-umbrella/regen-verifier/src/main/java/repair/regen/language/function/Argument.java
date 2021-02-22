@@ -41,5 +41,12 @@ public class Argument implements IModel{
 	public String toString() {
 		return v.toString() + (fua == null? "":fua.toString());
 	}
+	
+	public void substituteVariable(String from, String to) {
+		v.substituteVariable(from, to);
+		if(fua != null)
+			fua.substituteVariable(from, to);
+	}
+	
 
 }

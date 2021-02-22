@@ -32,4 +32,11 @@ public class BinaryExpression extends Expression implements IModel {
 	public Expression getSecondExpression() {
 		return e2;
 	}
+	
+	@Override
+	public void substituteVariable(String from, String to) {
+		e1.substituteVariable(from, to);
+		e2.substituteVariable(from, to);
+	}
+	
 }

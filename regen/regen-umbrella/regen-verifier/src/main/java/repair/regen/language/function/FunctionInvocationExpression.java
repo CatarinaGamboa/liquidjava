@@ -47,6 +47,11 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 		return sb.toString();
 	}
 	
+	@Override
+	public void substituteVariable(String from, String to) {
+		mv.substituteVariable(from, to);
+	}
+	
 	
 	
 	

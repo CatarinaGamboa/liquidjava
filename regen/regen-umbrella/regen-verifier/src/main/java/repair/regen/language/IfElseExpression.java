@@ -31,6 +31,15 @@ public class IfElseExpression  extends Expression implements IModel {
 	public Expression getElseExpression() {
 		return els;
 	}
+	
+	@Override
+	public void substituteVariable(String from, String to) {
+		//go inside all expressions
+		cond.substituteVariable(from, to);
+		then.substituteVariable(from, to);
+		els.substituteVariable(from, to);
+	}
+	
 
 	@Override
 	public String toString() {

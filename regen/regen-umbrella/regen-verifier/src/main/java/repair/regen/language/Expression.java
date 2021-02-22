@@ -10,4 +10,6 @@ public abstract class Expression implements IModel {
 	public abstract Expr eval(TranslatorToZ3 ctx);
 	
 	public abstract String toString();
+	
+	public abstract void substituteVariable(String from, String to);
 }

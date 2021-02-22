@@ -29,4 +29,10 @@ public class RealLiteral extends LiteralExpression implements IModel {
 	public String toString() {
 		return Double.toString(value);
 	}
+	
+	@Override
+	public void substituteVariable(String from, String to) {
+		//End leaf - real literal
+	}
+	
 }

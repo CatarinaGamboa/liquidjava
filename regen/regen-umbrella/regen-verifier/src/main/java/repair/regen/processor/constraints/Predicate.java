@@ -44,7 +44,7 @@ public class Predicate extends Constraint{
 	@Override
 	public Constraint substituteVariable(String from, String to) {
 		Predicate c = (Predicate) this.clone();
-		auxSubstitute(c.exp, from, to);
+		c.exp.substituteVariable(from, to);
 		return c;
 	}
 
@@ -72,42 +72,6 @@ public class Predicate extends Constraint{
 		System.out.println("______________________________________________________");
 		System.exit(2);
 		
-	}
-
-	private void auxSubstitute(Expression exp2, String from, String to) {
-		if(exp2 instanceof Variable && 
-				((Variable) exp2).getName().equals(from)){
-			((Variable) exp2).changeName(to);
-		}else if(exp2 instanceof BinaryExpression) {
-			BinaryExpression be = (BinaryExpression) exp2;
-			auxSubstitute(be.getFirstExpression(), from, to);
-			auxSubstitute(be.getSecondExpression(), from, to);
-		}else if(exp2 instanceof UnaryExpression) {
-			UnaryExpression ue = (UnaryExpression)exp2;
-			auxSubstitute(ue.getExpression(), from, to);
-		}else if(exp2 instanceof ExpressionGroup) {
-			auxSubstitute(((ExpressionGroup)exp2).getExpression(), from, to);
-		}else if(exp2 instanceof IfElseExpression) {
-			IfElseExpression ite = (IfElseExpression)exp2;
-			auxSubstitute(ite.getCondition(), from, to);
-			auxSubstitute(ite.getThenExpression(), from, to);
-			auxSubstitute(ite.getElseExpression(), from, to);
-		}else if(exp2 instanceof FunctionInvocationExpression) {
-			FunctionInvocationExpression fie = (FunctionInvocationExpression) exp2;
-			auxSubstitute(fie.getArgument(), from, to);
-		}
-//		else if(exp2 instanceof ObjectFieldInvocation) {
-//			auxSubstitute(((ObjectFieldInvocation)exp2).getVariable(), from, to);
-//		}
-
-	}
-
-	private void auxSubstitute(Argument arg, String from, String to) {
-		auxSubstitute(arg.getExpression(), from, to);
-		if(arg.hasFollowUpArgument()) {
-			FollowUpArgument fua = arg.getFollowUpArgument();
-			auxSubstitute(fua.getArgument(), from, to);
-		}
 	}
 
 	@Override

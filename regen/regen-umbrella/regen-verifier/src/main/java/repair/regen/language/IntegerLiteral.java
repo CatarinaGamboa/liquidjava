@@ -27,4 +27,9 @@ public class IntegerLiteral extends LiteralExpression implements IModel {
 	public String toString() {
 		return Integer.toString(value);
 	}
+	@Override
+	public void substituteVariable(String from, String to) {
+		//End leaf - int literal
+	}
+	
 }

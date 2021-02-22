@@ -33,4 +33,8 @@ public class FollowUpArgument implements IModel {
 		arg.eval(ctx, l);
 	}
 
+	public void substituteVariable(String from, String to) {
+		arg.substituteVariable(from, to);		
+	}
+
 }
