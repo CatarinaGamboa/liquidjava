@@ -47,6 +47,13 @@ public class Argument implements IModel{
 		if(fua != null)
 			fua.substituteVariable(from, to);
 	}
+
+	public void getVariableNames(List<String> l) {
+		v.getVariableNames(l);
+		if(fua != null)
+			fua.getVariableNames(l);
+		
+	}
 	
 
 }

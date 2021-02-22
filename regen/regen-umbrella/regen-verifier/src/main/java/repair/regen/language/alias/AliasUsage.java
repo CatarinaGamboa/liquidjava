@@ -1,5 +1,7 @@
 package repair.regen.language.alias;
 
+import java.util.List;
+
 import org.modelcc.IModel;
 
 import com.microsoft.z3.Expr;
@@ -32,5 +34,9 @@ public class AliasUsage extends Expression implements IModel{
 		var.substituteVariable(from, to);
 	}
 	
+	@Override
+	public void getVariableNames(List<String> l) {
+		var.getVariableNames(l);
+	}
 
 }

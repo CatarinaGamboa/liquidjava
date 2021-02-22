@@ -1,5 +1,7 @@
 package repair.regen.language;
 
+import java.util.List;
+
 import org.modelcc.IModel;
 
 import com.microsoft.z3.Expr;
@@ -28,6 +30,11 @@ public class UnaryExpression extends Expression implements IModel {
 	@Override
 	public void substituteVariable(String from, String to) {
 		e.substituteVariable(from, to);
+	}
+	
+	@Override
+	public void getVariableNames(List<String> l) {
+		e.getVariableNames(l);
 	}
 	
 }

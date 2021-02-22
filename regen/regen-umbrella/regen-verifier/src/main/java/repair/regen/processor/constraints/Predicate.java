@@ -87,42 +87,8 @@ public class Predicate extends Constraint{
 	@Override
 	public List<String> getVariableNames() {
 		List<String> l = new ArrayList<>();
-		auxGetVariableNames(exp, l);
+		exp.getVariableNames(l);
 		return l;
-	}
-
-	private void auxGetVariableNames(Expression exp2, List<String> l) {
-		if(exp2 instanceof Variable){
-			l.add(((Variable) exp2).getName());
-		}else if(exp2 instanceof BinaryExpression) {
-			BinaryExpression be = (BinaryExpression) exp2;
-			auxGetVariableNames(be.getFirstExpression(), l);
-			auxGetVariableNames(be.getSecondExpression(), l);
-		}else if(exp2 instanceof UnaryExpression) {
-			UnaryExpression ue = (UnaryExpression)exp2;
-			auxGetVariableNames(ue.getExpression(), l);
-		}else if(exp2 instanceof ExpressionGroup) {
-			auxGetVariableNames(((ExpressionGroup)exp2).getExpression(), l);
-		}else if(exp2 instanceof IfElseExpression) {
-			IfElseExpression ite = (IfElseExpression)exp2;
-			auxGetVariableNames(ite.getCondition(),l);
-			auxGetVariableNames(ite.getThenExpression(), l);
-			auxGetVariableNames(ite.getElseExpression(), l);
-		}else if(exp2 instanceof FunctionInvocationExpression) {
-			FunctionInvocationExpression fie = (FunctionInvocationExpression) exp2;
-			auxGetVariableNames(fie.getArgument(), l);
-		}
-//		else if(exp2 instanceof ObjectFieldInvocation) {
-//			auxGetVariableNames(((ObjectFieldInvocation)exp2).getVariable(), l);
-//		}
-	}
-	
-	private void auxGetVariableNames(Argument arg, List<String> l) {
-		auxGetVariableNames(arg.getExpression(), l);
-		if(arg.hasFollowUpArgument()) {
-			FollowUpArgument fua = arg.getFollowUpArgument();
-			auxGetVariableNames(fua.getArgument(), l);
-		}
 	}
 
 	public boolean isBooleanTrue() {

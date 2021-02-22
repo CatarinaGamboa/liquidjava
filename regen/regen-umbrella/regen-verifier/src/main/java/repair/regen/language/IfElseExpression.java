@@ -1,5 +1,7 @@
 package repair.regen.language;
 
+import java.util.List;
+
 import org.modelcc.IModel;
 
 import com.microsoft.z3.Expr;
@@ -38,6 +40,13 @@ public class IfElseExpression  extends Expression implements IModel {
 		cond.substituteVariable(from, to);
 		then.substituteVariable(from, to);
 		els.substituteVariable(from, to);
+	}
+	
+	@Override
+	public void getVariableNames(List<String> l) {
+		cond.getVariableNames(l);
+		then.getVariableNames(l);
+		els.getVariableNames(l);
 	}
 	
 

@@ -37,4 +37,8 @@ public class FollowUpArgument implements IModel {
 		arg.substituteVariable(from, to);		
 	}
 
+	public void getVariableNames(List<String> l) {
+		arg.getVariableNames(l);
+	}
+
 }

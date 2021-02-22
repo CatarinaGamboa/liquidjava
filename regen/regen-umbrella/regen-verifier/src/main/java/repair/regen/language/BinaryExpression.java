@@ -1,5 +1,7 @@
 package repair.regen.language;
 
+import java.util.List;
+
 import org.modelcc.IModel;
 import org.modelcc.Priority;
 
@@ -37,6 +39,12 @@ public class BinaryExpression extends Expression implements IModel {
 	public void substituteVariable(String from, String to) {
 		e1.substituteVariable(from, to);
 		e2.substituteVariable(from, to);
+	}
+	
+	@Override
+	public void getVariableNames(List<String> l) {
+		e1.getVariableNames(l);
+		e2.getVariableNames(l);
 	}
 	
 }

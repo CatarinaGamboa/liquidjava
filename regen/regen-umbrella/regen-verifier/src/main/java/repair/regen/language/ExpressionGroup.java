@@ -1,5 +1,7 @@
 package repair.regen.language;
 
+import java.util.List;
+
 import org.modelcc.IModel;
 import org.modelcc.Prefix;
 import org.modelcc.Suffix;
@@ -29,6 +31,11 @@ public class ExpressionGroup extends Expression implements IModel {
 	@Override
 	public void substituteVariable(String from, String to) {
 		e.substituteVariable(from, to);
+	}
+	
+	@Override
+	public void getVariableNames(List<String> l) {
+		e.getVariableNames(l);
 	}
 	
 }

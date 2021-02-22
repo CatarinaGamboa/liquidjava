@@ -1,5 +1,7 @@
 package repair.regen.language;
 
+import java.util.List;
+
 import org.modelcc.IModel;
 
 import com.microsoft.z3.Expr;
@@ -12,4 +14,6 @@ public abstract class Expression implements IModel {
 	public abstract String toString();
 	
 	public abstract void substituteVariable(String from, String to);
+	
+	public abstract void getVariableNames(List<String> l);
 }

@@ -1,5 +1,7 @@
 package repair.regen.language;
 
+import java.util.List;
+
 import org.modelcc.IModel;
 import org.modelcc.Pattern;
 import org.modelcc.Priority;
@@ -32,6 +34,11 @@ public class RealLiteral extends LiteralExpression implements IModel {
 	
 	@Override
 	public void substituteVariable(String from, String to) {
+		//End leaf - real literal
+	}
+	
+	@Override
+	public void getVariableNames(List<String> l) {
 		//End leaf - real literal
 	}
 	

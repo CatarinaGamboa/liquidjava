@@ -1,5 +1,7 @@
 package repair.regen.language;
 
+import java.util.List;
+
 import org.modelcc.IModel;
 import org.modelcc.Pattern;
 import org.modelcc.Priority;
@@ -39,6 +41,12 @@ public class Variable extends Expression implements IModel {
 		//End leaf
 		if(this.name.equals(from))
 			changeName(to);
+	}
+	
+	@Override
+	public void getVariableNames(List<String> l) {
+		if(!l.contains(name))
+			l.add(name);
 	}
 	
 	
