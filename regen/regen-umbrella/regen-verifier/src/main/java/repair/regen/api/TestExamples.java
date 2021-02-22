@@ -186,6 +186,12 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectAlias.java");
 	}
 	
+	@Test
+	public void correctAliasMultiple() {
+		testCorrect(testPath+"CorrectAliasMultiple.java");
+	}
+	
+	
 	
 	
 	@Test
@@ -394,6 +400,16 @@ public class TestExamples {
 	@Test
 	public void errorImplementationSearchValueIntArray() {
 		testWrong(testPath+"ErrorImplementationSearchValueIntArray.java");
+	}
+	
+	@Test
+	public void errorAliasSimple() {
+		testWrong(testPath+"ErrorAliasSimple.java");
+	}
+	
+	@Test
+	public void errorAliasTypeMismatch() {
+		testWrong(testPath+"ErrorAliasTypeMismatch.java");
 	}
 	
 

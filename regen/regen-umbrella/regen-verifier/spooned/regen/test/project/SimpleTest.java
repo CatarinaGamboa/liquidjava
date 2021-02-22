@@ -17,13 +17,14 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
-@repair.regen.specification.RefinementAlias("type PtGrade(int x) { x >= 0 && x <= 20}")
+@repair.regen.specification.RefinementAlias("type Positive(int x) { x > 0}")
+@repair.regen.specification.RefinementAlias("type PtGrade(double x) { x >= 0 && x <= 20}")
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("_ > 5 && _ < 18")
-        int nGrade = 10;
-        @repair.regen.specification.Refinement("PtGrade(_) && PtGrade(nGrade)")
-        int positiveGrade = 15;
+        @repair.regen.specification.Refinement("PtGrade(_)")
+        double positiveGrade2 = (20 * 0.5) + (20 * 0.5);
+        @repair.regen.specification.Refinement("Positive(_)")
+        double positive = positiveGrade2;
     }
 }
 
