@@ -452,7 +452,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		try {
 			Optional<Alias> oa = RefinementParser.parseAlias(value);
 			if(oa.isPresent()) {
-				AliasWrapper a = new AliasWrapper(oa.get());
+				AliasWrapper a = new AliasWrapper(oa.get(), factory);
 				context.addAlias(a);
 			}
 			System.out.println(oa);

@@ -34,7 +34,7 @@ public class TranslatorToZ3 {
 
 	private Context z3 = new Context();
 	private Map<String, Expr> varTranslation = new HashMap<>();
-	private Map<String, Alias> aliasTranslation = new HashMap<>();
+	private Map<String, AliasWrapper> aliasTranslation = new HashMap<>();
 	private Map<String, FuncDecl> funcTranslation = new HashMap<>();
 
 	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx, List<GhostFunction> l, List<AliasWrapper> alias) {
@@ -56,7 +56,7 @@ public class TranslatorToZ3 {
 
 	private void addAlias(List<AliasWrapper> alias) {
 		for(AliasWrapper a: alias) {
-			aliasTranslation.put(a.getName(), a.getAlias());
+			aliasTranslation.put(a.getName(), a);
 		}
 
 	}
@@ -308,15 +308,15 @@ public class TranslatorToZ3 {
 
 
 	public Expression makeAlias(AliasName name, Variable var) throws TypeMismatchError {
-		Alias al = aliasTranslation.get(name.toString());
-		Expression e = al.getExpression();
+		AliasWrapper al = aliasTranslation.get(name.toString());
+		Expression e = al.getClonedConstraint().getExpression();//cloning
 		String nVarName = var.getName();
 
 		//check type
 		Expr varE = varTranslation.get(var.getName());
 		Sort varSort = varE.getSort();
 		if(varSort.equals(getSort(al.getType().toString()))) {
-			e.substituteVariable(al.getVar().toString(), nVarName);
+			e.substituteVariable(al.getVarName(), nVarName);
 			System.out.println("Make Alias:" + e.toString());
 			return e;
 		}

@@ -34,6 +34,11 @@ public class Predicate extends Constraint{
 			exp = parse(String.format("(%s)", ref));
 		}
 	}
+	
+	public Predicate(Expression exp) {
+		this.exp = parse(exp.toString());
+	}
+	
 	@Override
 	public Constraint negate() {
 		Predicate c = (Predicate)this.clone();
@@ -72,6 +77,10 @@ public class Predicate extends Constraint{
 		System.out.println("______________________________________________________");
 		System.exit(2);
 		
+	}
+	
+	public Expression getExpression() {
+		return exp;
 	}
 
 	@Override
