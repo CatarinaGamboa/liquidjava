@@ -15,10 +15,10 @@ import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.FunctionPredicate;
 import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.RefinedVariable;
-import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
@@ -44,7 +44,6 @@ import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.support.reflect.code.CtVariableWriteImpl;
-import spoon.support.reflect.reference.CtArrayTypeReferenceImpl;
 
 public class RefinementTypeChecker extends TypeChecker {
 	// This class should do the following:
@@ -452,6 +451,10 @@ public class RefinementTypeChecker extends TypeChecker {
 		System.out.println("o");
 		try {
 			Optional<Alias> oa = RefinementParser.parseAlias(value);
+			if(oa.isPresent()) {
+				AliasWrapper a = new AliasWrapper(oa.get());
+				context.addAlias(a);
+			}
 			System.out.println(oa);
 		} catch (SyntaxException e) {
 			// TODO Auto-generated catch block

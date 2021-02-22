@@ -20,6 +20,7 @@ public class Context {
 	private List<RefinedFunction> ctxGlobalFunctions;
 	
 	private List<GhostFunction> ghosts;
+	private List<AliasWrapper> alias;
 	
 
 	public int counter;
@@ -35,6 +36,7 @@ public class Context {
 		ctxGlobalVars = new ArrayList<>();
 		ctxGlobalFunctions = new ArrayList<>();
 		
+		alias = new ArrayList<>();
 		ghosts = new ArrayList<>();
 		counter = 0;
 
@@ -52,6 +54,7 @@ public class Context {
 		ctxVars.add(new ArrayList<>());//global vars
 		ctxFunctions = new ArrayList<>();
 		ctxSpecificVars = new ArrayList<>();
+		alias = new ArrayList<>();
 		ghosts = new ArrayList<>();
 		counter = 0;
 	}
@@ -290,6 +293,15 @@ public class Context {
 	
 	public List<GhostFunction> getGhosts() {
 		return ghosts;
+	}
+	
+	public void addAlias(AliasWrapper aw) {
+		if(!alias.contains(aw))
+			alias.add(aw);
+	}
+	
+	public List<AliasWrapper> getAlias() {
+		return alias;
 	}
 
 

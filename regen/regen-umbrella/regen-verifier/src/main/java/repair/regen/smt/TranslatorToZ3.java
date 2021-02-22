@@ -23,6 +23,10 @@ import com.microsoft.z3.Sort;
 import com.microsoft.z3.Status;
 
 import repair.regen.language.Expression;
+import repair.regen.language.Variable;
+import repair.regen.language.alias.Alias;
+import repair.regen.language.alias.AliasName;
+import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -30,9 +34,10 @@ public class TranslatorToZ3 {
 
 	private Context z3 = new Context();
 	private Map<String, Expr> varTranslation = new HashMap<>();
+	private Map<String, Alias> aliasTranslation = new HashMap<>();
 	private Map<String, FuncDecl> funcTranslation = new HashMap<>();
 	
-	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx, List<GhostFunction> l ) {
+	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx, List<GhostFunction> l, List<AliasWrapper> alias) {
 		translateVariables(ctx);
 		addBuiltinFunctions();
 		if(!l.isEmpty()) {
@@ -46,6 +51,14 @@ public class TranslatorToZ3 {
 				funcTranslation.put(gh.getName(), z3.mkFuncDecl(gh.getName(), d, ret));
 			}
 		}
+		addAlias(alias);
+	}
+
+	private void addAlias(List<AliasWrapper> alias) {
+		for(AliasWrapper a: alias) {
+			aliasTranslation.put(a.getName(), a.getAlias());
+		}
+		
 	}
 
 	private void addBuiltinFunctions() {
@@ -292,4 +305,15 @@ public class TranslatorToZ3 {
 		return null;
 	}
 
+	
+	
+	public Expression makeAlias(AliasName name, Variable var) {
+		Alias al = aliasTranslation.get(name.toString());
+		Expression e = al.getExpression();
+		String nVarName = var.getName();
+		e.substituteVariable(al.getVar().toString(), nVarName);
+		System.out.println("Make Alias:" + e.toString());
+		return e;
+		
+	}
 }

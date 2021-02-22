@@ -20,9 +20,9 @@ public class AliasUsage extends Expression implements IModel{
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {
-		// TODO Auto-generated method stub
-		return null;
+		return ctx.makeAlias(name, var).eval(ctx);
 	}
+
 
 	@Override
 	public String toString() {
