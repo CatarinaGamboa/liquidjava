@@ -11,7 +11,7 @@ import repair.regen.smt.TranslatorToZ3;
 
 @Associativity(AssociativityType.LEFT_TO_RIGHT)
 public abstract class BinaryOperator implements IModel {
-	public abstract Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2);
+	public abstract Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) throws Exception;
 
 	public abstract String toString();
 }

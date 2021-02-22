@@ -36,7 +36,7 @@ public class TranslatorToZ3 {
 	private Map<String, Expr> varTranslation = new HashMap<>();
 	private Map<String, Alias> aliasTranslation = new HashMap<>();
 	private Map<String, FuncDecl> funcTranslation = new HashMap<>();
-	
+
 	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx, List<GhostFunction> l, List<AliasWrapper> alias) {
 		translateVariables(ctx);
 		addBuiltinFunctions();
@@ -58,7 +58,7 @@ public class TranslatorToZ3 {
 		for(AliasWrapper a: alias) {
 			aliasTranslation.put(a.getName(), a.getAlias());
 		}
-		
+
 	}
 
 	private void addBuiltinFunctions() {
@@ -66,10 +66,10 @@ public class TranslatorToZ3 {
 		//TODO add built-in function
 		Sort[] s = Arrays.asList(getSort("int[]"), getSort("int"), getSort("int")).stream().toArray(Sort[]::new);	
 		funcTranslation.put("addToIndex", z3.mkFuncDecl("addToIndex", s, getSort("void")));
-		
+
 		s = Arrays.asList(getSort("int[]"), getSort("int")).stream().toArray(Sort[]::new);	
 		funcTranslation.put("getFromIndex", z3.mkFuncDecl("getFromIndex", s, getSort("int")));
-		
+
 	}
 
 	public void translateVariables(Map<String, CtTypeReference<?>> ctx) {
@@ -101,7 +101,7 @@ public class TranslatorToZ3 {
 		varTranslation.put("false", z3.mkBool(false));
 
 	}
-	
+
 	private Sort getSort(String sort) {
 		switch(sort) {
 		case "int": return z3.getIntSort();
@@ -118,7 +118,7 @@ public class TranslatorToZ3 {
 		}	
 	}
 
-	public Status verifyExpression(Expression e) {
+	public Status verifyExpression(Expression e) throws Exception {
 		Solver s = z3.mkSolver();
 		s.add((BoolExpr) e.eval(this));
 		Status st = s.check();
@@ -150,13 +150,13 @@ public class TranslatorToZ3 {
 	public Expr makeVariable(String name) {
 		return varTranslation.get(name);//int[] not in varTranslation
 	}
-	
+
 	public Expr makeFunctionInvocation(String name, Expr[] params) {
 		if(name.equals("addToIndex"))
 			return makeStore(name, params);
 		if(name.equals("getFromIndex"))
 			return makeSelect(name, params);
-		
+
 		FuncDecl fd = funcTranslation.get(name);
 		return z3.mkApp(fd, params);
 	}
@@ -178,7 +178,7 @@ public class TranslatorToZ3 {
 	public Expr makeEquals(Expr e1, Expr e2) {
 		if(e1 instanceof FPExpr || e2 instanceof FPExpr) 
 			return z3.mkFPEq(toFP(e1), toFP(e2));
-		
+
 		return z3.mkEq(e1, e2);
 	}
 
@@ -187,7 +187,7 @@ public class TranslatorToZ3 {
 	public Expr makeLt(Expr e1, Expr e2) {
 		if(e1 instanceof FPExpr || e2 instanceof FPExpr) 		
 			return z3.mkFPLt(toFP(e1), toFP(e2));
-		
+
 		return z3.mkLt((ArithExpr) e1,(ArithExpr) e2);
 	}
 
@@ -201,14 +201,14 @@ public class TranslatorToZ3 {
 	public Expr makeGt(Expr e1, Expr e2) {
 		if(e1 instanceof FPExpr || e2 instanceof FPExpr) 
 			return z3.mkFPGt(toFP(e1), toFP(e2));
-		
+
 		return z3.mkGt((ArithExpr) e1,(ArithExpr) e2);		
 	}
 
 	public Expr makeGtEq(Expr e1, Expr e2) {
 		if(e1 instanceof FPExpr || e2 instanceof FPExpr) 
 			return z3.mkFPGEq(toFP(e1), toFP(e2));
-		
+
 		return z3.mkGe((ArithExpr) e1,(ArithExpr) e2);
 	}
 
@@ -228,11 +228,11 @@ public class TranslatorToZ3 {
 	public Expr makeOr(Expr eval, Expr eval2) {
 		return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
 	}
-	
-//	public Expr makeIf(Expr eval, Expr eval2) {
-//		z3.mkI
-//		return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
-//	}
+
+	//	public Expr makeIf(Expr eval, Expr eval2) {
+	//		z3.mkI
+	//		return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
+	//	}
 
 	//##################### Unary Operations #####################
 	public Expr makeMinus(Expr eval) {
@@ -245,7 +245,7 @@ public class TranslatorToZ3 {
 	public Expr makeAdd(Expr eval, Expr eval2) {
 		if(eval instanceof FPExpr || eval2 instanceof FPExpr) 
 			return z3.mkFPAdd(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
-		
+
 		return z3.mkAdd((ArithExpr) eval, (ArithExpr) eval2);
 
 	}
@@ -253,14 +253,14 @@ public class TranslatorToZ3 {
 	public Expr makeSub(Expr eval, Expr eval2) {
 		if(eval instanceof FPExpr || eval2 instanceof FPExpr) 
 			return z3.mkFPSub(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
-		
+
 		return z3.mkSub((ArithExpr) eval, (ArithExpr) eval2);
 	}
 
 	public Expr makeMul(Expr eval, Expr eval2) {
 		if(eval instanceof FPExpr || eval2 instanceof FPExpr) 
 			return z3.mkFPMul(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
-		
+
 
 		return z3.mkMul((ArithExpr) eval, (ArithExpr) eval2);
 	}
@@ -268,7 +268,7 @@ public class TranslatorToZ3 {
 	public Expr makeDiv(Expr eval, Expr eval2) {
 		if(eval instanceof FPExpr || eval2 instanceof FPExpr)
 			return z3.mkFPDiv(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
-		
+
 		return z3.mkDiv((ArithExpr) eval, (ArithExpr) eval2);
 	}
 
@@ -296,8 +296,8 @@ public class TranslatorToZ3 {
 		}
 		return f;
 	}
-	
-	
+
+
 	public Expr makeIte(Expr c, Expr t, Expr e) {
 		if(c instanceof BoolExpr)
 			return z3.mkITE((BoolExpr)c, t, e);
@@ -305,15 +305,27 @@ public class TranslatorToZ3 {
 		return null;
 	}
 
-	
-	
-	public Expression makeAlias(AliasName name, Variable var) {
+
+
+	public Expression makeAlias(AliasName name, Variable var) throws TypeMismatchError {
 		Alias al = aliasTranslation.get(name.toString());
 		Expression e = al.getExpression();
 		String nVarName = var.getName();
-		e.substituteVariable(al.getVar().toString(), nVarName);
-		System.out.println("Make Alias:" + e.toString());
-		return e;
-		
+
+		//check type
+		Expr varE = varTranslation.get(var.getName());
+		Sort varSort = varE.getSort();
+		if(varSort.equals(getSort(al.getType().toString()))) {
+			e.substituteVariable(al.getVar().toString(), nVarName);
+			System.out.println("Make Alias:" + e.toString());
+			return e;
+		}
+		else {
+			throw new TypeMismatchError("Type mismatch in alias usage: using "+varSort.toString()
+			+" expecting "+al.getType().toString());
+			
+		}
+
+
 	}
 }

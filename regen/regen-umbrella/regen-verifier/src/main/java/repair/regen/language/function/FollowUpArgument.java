@@ -29,7 +29,7 @@ public class FollowUpArgument implements IModel {
 	}
 
 
-	public void eval(TranslatorToZ3 ctx, List<Expr> l) {
+	public void eval(TranslatorToZ3 ctx, List<Expr> l) throws Exception{
 		arg.eval(ctx, l);
 	}
 

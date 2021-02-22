@@ -20,7 +20,7 @@ public class IfElseExpression  extends Expression implements IModel {
 	
 
 	@Override
-	public Expr eval(TranslatorToZ3 ctx) {
+	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return ctx.makeIte(cond.eval(ctx), then.eval(ctx), els.eval(ctx));
 	}
 	

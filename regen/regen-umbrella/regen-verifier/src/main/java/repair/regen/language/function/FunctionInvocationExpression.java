@@ -25,7 +25,7 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 	ParenthesisRight pr;
 
 	@Override
-	public Expr eval(TranslatorToZ3 ctx) {
+	public Expr eval(TranslatorToZ3 ctx) throws Exception{
 		List<Expr> params = new ArrayList<>();
 		mv.eval(ctx, params);
 		Expr[] ps = params.stream().toArray(Expr[]::new);

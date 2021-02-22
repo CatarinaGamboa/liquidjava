@@ -11,6 +11,7 @@ import repair.regen.language.Variable;
 import repair.regen.language.symbols.ParenthesisLeft;
 import repair.regen.language.symbols.ParenthesisRight;
 import repair.regen.smt.TranslatorToZ3;
+import repair.regen.smt.TypeCheckError;
 
 public class AliasUsage extends Expression implements IModel{
 	AliasName name;
@@ -19,7 +20,7 @@ public class AliasUsage extends Expression implements IModel{
 	ParenthesisRight pr;
 
 	@Override
-	public Expr eval(TranslatorToZ3 ctx) {
+	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return ctx.makeAlias(name, var).eval(ctx);
 	}
 

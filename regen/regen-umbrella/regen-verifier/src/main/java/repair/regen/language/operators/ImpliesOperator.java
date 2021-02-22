@@ -13,7 +13,7 @@ import repair.regen.smt.TranslatorToZ3;
 public class ImpliesOperator extends BinaryOperator {
 
 	@Override
-	public Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) {
+	public Expr eval(TranslatorToZ3 ctx, Expression e1, Expression e2) throws Exception{
 		return ctx.makeImplies(e1.eval(ctx), e2.eval(ctx));
 	}
 	

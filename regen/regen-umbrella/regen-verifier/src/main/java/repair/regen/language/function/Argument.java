@@ -19,7 +19,7 @@ public class Argument implements IModel{
 	@Optional
 	FollowUpArgument fua;
 	
-	public void eval(TranslatorToZ3 ctx, List<Expr> l) {
+	public void eval(TranslatorToZ3 ctx, List<Expr> l) throws Exception{
 		l.add(v.eval(ctx));
 		if(hasFollowUpArgument())
 			fua.eval(ctx, l);

@@ -13,6 +13,7 @@ import repair.regen.processor.context.RefinedVariable;
 import repair.regen.smt.GhostFunctionError;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
+import repair.regen.smt.TypeMismatchError;
 import spoon.reflect.declaration.CtElement;
 
 public class VCChecker {
@@ -157,12 +158,17 @@ public class VCChecker {
 
 		}catch (GhostFunctionError e) {
 			printErrorArgs(element, expectedType, e.getMessage());
+		}catch(TypeMismatchError e) {
+			printErrorTypeMismatch(element, expectedType, e.getMessage());
+		}catch (Exception e) {
+			System.out.println("Unknown error:"+e.getMessage());
 		}
 		//catch(NullPointerException e) {
 		//	printErrorUnknownVariable(element, expectedType, correctRefinement);
 		//}
 
 	}
+
 
 	//################################# PRINTS ########################################
 	private void printVCs(String string, String stringSMT, Constraint expectedType) {
@@ -210,5 +216,16 @@ public class VCChecker {
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(2);
+	}
+
+	private void printErrorTypeMismatch(CtElement element, Constraint expectedType, String message) {
+		System.out.println("______________________________________________________");
+		System.err.println(message);
+		System.out.println();
+		System.out.println(element);
+		System.out.println("Location: " + element.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(2);
+		
 	}
 }

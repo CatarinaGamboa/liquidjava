@@ -16,7 +16,7 @@ public class ExpressionGroup extends Expression implements IModel {
 	Expression e;
 
 	@Override
-	public Expr eval(TranslatorToZ3 ctx) {
+	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return e.eval(ctx);
 	}
 

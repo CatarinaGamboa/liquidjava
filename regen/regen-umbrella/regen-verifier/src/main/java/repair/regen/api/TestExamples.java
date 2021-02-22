@@ -181,6 +181,11 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectSearchValueIndexArray.java");
 	}
 	
+	@Test
+	public void correctAlias() {
+		testCorrect(testPath+"CorrectAlias.java");
+	}
+	
 	
 	
 	@Test

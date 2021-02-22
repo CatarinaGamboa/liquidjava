@@ -10,9 +10,9 @@ import repair.regen.language.Expression;
 import repair.regen.smt.TranslatorToZ3;
 @Priority(1)
 @Pattern(regExp = "\\!")
-public class NotOperator extends UnaryOperator implements IModel {
+public class NotOperator extends UnaryOperator implements IModel  {
 	@Override
-	public Expr eval(TranslatorToZ3 ctx, Expression e1) {
+	public Expr eval(TranslatorToZ3 ctx, Expression e1) throws Exception{
 		return ctx.mkNot(e1.eval(ctx));
 	}
 	@Override

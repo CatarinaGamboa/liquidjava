@@ -13,7 +13,7 @@ import repair.regen.smt.TranslatorToZ3;
 @Pattern(regExp = "-")
 public class MinusOperator extends UnaryOperator implements IModel {
 	@Override
-	public Expr eval(TranslatorToZ3 ctx, Expression e) {
+	public Expr eval(TranslatorToZ3 ctx, Expression e) throws Exception{
 		return ctx.makeMinus(e.eval(ctx));
 	}
 	

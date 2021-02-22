@@ -3,12 +3,12 @@ package regen.test.project;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 
-@RefinementAlias("type PtGrade(int x) { x >= 0 && x <= 20}")//type AliasName (int x) { x >= 0 && x <= 20 }
+@RefinementAlias("type PtGrade(int x) { x >= 0 && x <= 20}")
 public class SimpleTest {	
 
 	public static void main(String[] args) {
-		@Refinement("PtGrade(_)")
-		int a = 15;
+		@Refinement("PtGrade(_) && _ >= 10")
+		double positiveGrade = 15;
 
 	}
 

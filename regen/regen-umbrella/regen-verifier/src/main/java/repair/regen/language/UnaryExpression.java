@@ -14,7 +14,7 @@ public class UnaryExpression extends Expression implements IModel {
 	Expression e;
 
 	@Override
-	public Expr eval(TranslatorToZ3 ctx) {
+	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return op.eval(ctx, e);
 	}
 

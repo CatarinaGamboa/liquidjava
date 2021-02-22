@@ -19,7 +19,7 @@ public class SMTEvaluator {
 
 
 	public void verifySubtype(String subRef, String supRef, Map<String, CtTypeReference<?>> ctx, 
-			List<GhostFunction> ghosts, List<AliasWrapper> alias) throws TypeCheckError, GhostFunctionError {
+			List<GhostFunction> ghosts, List<AliasWrapper> alias) throws TypeCheckError, GhostFunctionError, Exception {
 		// TODO: create a parser for our SMT-ready refinement language
 		// TODO: discharge the verification to z3 
 
@@ -46,7 +46,6 @@ public class SMTEvaluator {
 			else
 				e.printStackTrace();
 		}
-		// TODO: Unknown should emit an error
 
 	}
 

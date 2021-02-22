@@ -1,7 +1,6 @@
 package regen.test.project;
 
 
-// type AliasName (int x) { x >= 0 && x <= 20 }
 // //@Refinement("_.length(x) >= 0") ==
 // //	@Refinement("length(_, x) >= 0")
 // //	int[] a1 = new int[5]; //Cannot prove - len() built-in
@@ -21,10 +20,8 @@ package regen.test.project;
 @repair.regen.specification.RefinementAlias("type PtGrade(int x) { x >= 0 && x <= 20}")
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("PtGrade(_)")
-        int a = 15;
-        @repair.regen.specification.Refinement("PtGrade(_)")
-        int b = a;
+        @repair.regen.specification.Refinement("PtGrade(_) && _ >= 10")
+        double positiveGrade = 15;
     }
 }
 
