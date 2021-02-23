@@ -99,6 +99,12 @@ public class Context {
 		RefinedVariable vi = new Variable(simpleName, type, c);
 		ctxGlobalVars.add(vi);
 	}
+	
+	public void addGlobalVariableToContext(String simpleName, String location,
+			CtTypeReference<?> type, Constraint c) {
+		RefinedVariable vi = new Variable(simpleName, location, type, c);
+		ctxGlobalVars.add(vi);
+	}
 
 	public void addVarToContext(RefinedVariable var) {
 		if(!hasVariable(var.getName()))

@@ -15,6 +15,7 @@ import spoon.reflect.reference.CtTypeReference;
 public class Variable extends RefinedVariable{
 	//Specific Values
 	private Stack<List<VariableInstance>> instances;
+	private String location;
 	
 	//To combine if values
 	private static final int ifbeforeIndex = 0;
@@ -26,12 +27,22 @@ public class Variable extends RefinedVariable{
 	
 	public Variable(String name, CtTypeReference<?> type, Constraint ref) {
 		super(name, type, ref);
+		startVariables();
+		
+	}
+	
+	public Variable(String name, String location, CtTypeReference<?> type, Constraint ref) {
+		super(name, type, ref);
+		this.location = location;
+		startVariables();
+		
+	}	
+	
+	private void startVariables() {
 		this.instances = new Stack<>();
 		this.instances.push(new ArrayList<VariableInstance>());
 		ifCombiner = new Stack<>();
 	}
-
-	
 	
 	public Constraint getRefinement() {
 		Constraint c = super.getRefinement();
@@ -47,6 +58,14 @@ public class Variable extends RefinedVariable{
 		return super.getRefinement();
 	}
 	
+
+	public boolean hasLocation() {
+		return location != null;
+	}
+	
+	public Optional<String> getLocation() {
+		return location == null? Optional.empty():Optional.of(location);
+	}
 
 	
 	//INSTANCES

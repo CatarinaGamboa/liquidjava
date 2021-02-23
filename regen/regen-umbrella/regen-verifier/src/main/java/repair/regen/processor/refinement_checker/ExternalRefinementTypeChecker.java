@@ -46,7 +46,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	public <T> void visitCtField(CtField<T> f) {
 		Optional<Constraint> oc = getRefinementFromAnnotation(f);
 		Constraint c = oc.isPresent()?oc.get():new Predicate();
-		context.addGlobalVariableToContext(String.format("%s.%s", prefix, f.getSimpleName()), 
+		context.addGlobalVariableToContext(f.getSimpleName(), prefix, 
 				f.getType(), c);
 		super.visitCtField(f);
 	}

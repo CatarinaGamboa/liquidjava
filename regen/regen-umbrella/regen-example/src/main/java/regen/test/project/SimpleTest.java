@@ -2,16 +2,20 @@ package regen.test.project;
 
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
-@RefinementAlias("type Positive(int x) { x > 0}")
-@RefinementAlias("type PtGrade(double x) { x >= 0 && x <= 20}")
-public class SimpleTest {	
+public class SimpleTest {
+	
+	@Refinement("_ > 7")
+	public int v() {
+		int a = Integer.MAX_VALUE;
+		return a;
+	}
 
 	public static void main(String[] args) {
-		@Refinement("PtGrade(_)")
-		double positiveGrade2 = 20 * 0.5 + 20*0.5;
-		
-		@Refinement("Positive(_)")
-		double positive = positiveGrade2;
+//		@Refinement("a > 5")
+//		int a = 10;
+//		
+//		@Refinement("b == a")
+//		int b = a;
 	}
 
 	//		//@Refinement("_.length(x) >= 0") ==

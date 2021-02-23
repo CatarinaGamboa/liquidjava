@@ -161,7 +161,10 @@ public class VCChecker {
 		}catch(TypeMismatchError e) {
 			printErrorTypeMismatch(element, expectedType, e.getMessage());
 		}catch (Exception e) {
-			System.out.println("Unknown error:"+e.getMessage());
+			System.err.println("Unknown error:"+e.getMessage());
+			e.printStackTrace();
+			System.exit(7);
+			
 		}
 		//catch(NullPointerException e) {
 		//	printErrorUnknownVariable(element, expectedType, correctRefinement);

@@ -19,6 +19,7 @@ import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
@@ -39,6 +40,7 @@ import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
@@ -189,15 +191,28 @@ public class RefinementTypeChecker extends TypeChecker {
 		}
 	}	
 
+	
+	@Override
+	public <T> void visitCtField(CtField<T> f) {
+		super.visitCtField(f);
+		Optional<Constraint> c = getRefinementFromAnnotation(f);
+		context.addVarToContext(f.getSimpleName(), f.getType(), 
+				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
+						      : new Predicate());
+	}
+
+	
 
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
-		System.out.println("fieldRead:"+fieldRead);
-		System.out.println(fieldRead.getVariable().getSimpleName());
-		String fieldName = fieldRead.toString().replace("(", "").replace(")", "");
+		String fieldName =  fieldRead.getVariable().getSimpleName();
 		if(context.hasVariable(fieldName)) {
-			Constraint c = context.getVariableRefinements(fieldName);
-			fieldRead.putMetadata(REFINE_KEY, c);
+			RefinedVariable rv = context.getVariableByName(fieldName);
+			if(rv instanceof Variable && ((Variable)rv).getLocation().isPresent() &&
+				((Variable)rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
+				fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
+			}else
+				fieldRead.putMetadata(REFINE_KEY, 	new EqualsPredicate(WILD_VAR, fieldName));
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
 			String targetName = fieldRead.getTarget().toString();
 			fieldRead.putMetadata(REFINE_KEY, FunctionPredicate.builtin_length(targetName));
