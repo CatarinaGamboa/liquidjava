@@ -167,6 +167,8 @@ class OperationsChecker {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			String elemName = elemVar.getVariable().getSimpleName();
+			if(elemVar instanceof CtFieldRead)
+				elemName = String.format(rtc.thisFormat, elemName);
 			Constraint elem_ref = rtc.context.getVariableRefinements(elemName);
 
 			String returnName = elemName;

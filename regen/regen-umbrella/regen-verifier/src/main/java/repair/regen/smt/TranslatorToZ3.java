@@ -148,7 +148,10 @@ public class TranslatorToZ3 {
 	}
 
 	public Expr makeVariable(String name) {
-		return varTranslation.get(name);//int[] not in varTranslation
+		Expr e= varTranslation.get(name);
+		if(e == null)
+			e = varTranslation.get(String.format("this#%s", name));
+		return e;//int[] not in varTranslation
 	}
 
 	public Expr makeFunctionInvocation(String name, Expr[] params) {

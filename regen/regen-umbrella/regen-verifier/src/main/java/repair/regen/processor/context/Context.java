@@ -107,7 +107,7 @@ public class Context {
 	}
 
 	public void addVarToContext(RefinedVariable var) {
-		if(!hasVariable(var.getName()))
+		//if(!hasVariable(var.getName()))
 			ctxVars.peek().add(var);
 	}
 

@@ -18,6 +18,7 @@ public abstract class TypeChecker extends CtScanner{
 	public final String WILD_VAR = "_";
 	public final String freshFormat = "#fresh_%d";
 	public final String instanceFormat = "#%s_%d";
+	public final String thisFormat = "this#%s";
 	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double", "int[]"}; //TODO add types
 	
 	Context context;

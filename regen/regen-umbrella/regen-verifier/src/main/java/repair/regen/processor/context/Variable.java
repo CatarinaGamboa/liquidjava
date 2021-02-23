@@ -59,8 +59,8 @@ public class Variable extends RefinedVariable{
 	}
 	
 
-	public boolean hasLocation() {
-		return location != null;
+	public void setLocation(String location) {
+		this.location = location;
 	}
 	
 	public Optional<String> getLocation() {

@@ -164,7 +164,8 @@ public class RefinementTypeChecker extends TypeChecker {
 		}else if(ex instanceof CtFieldWrite) {
 			CtFieldReference<?> cr = ((CtFieldWrite<?>) ex).getVariable();
 			CtField<?> f= ((CtFieldWrite<?>) ex).getVariable().getDeclaration();
-			checkAssignment(cr.getSimpleName(), cr.getType(), ex, assignement.getAssignment(), f);
+			String name = String.format(thisFormat, cr.getSimpleName());
+			checkAssignment(name, cr.getType(), ex, assignement.getAssignment(), f);
 			
 		}
 		if(ex instanceof CtArrayWrite) {
@@ -213,9 +214,16 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtField(CtField<T> f) {
 		super.visitCtField(f);
 		Optional<Constraint> c = getRefinementFromAnnotation(f);
-		context.addVarToContext(f.getSimpleName(), f.getType(), 
+//		context.addVarToContext(f.getSimpleName(), f.getType(), 
+//				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
+//						      : new Predicate());
+		
+		RefinedVariable v = context.addVarToContext(String.format(thisFormat, f.getSimpleName()), f.getType(), 
 				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
 						      : new Predicate());
+		if(v instanceof Variable)
+			((Variable)v).setLocation("this");
+			
 	}
 
 	
@@ -230,6 +238,10 @@ public class RefinementTypeChecker extends TypeChecker {
 				fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
 			}else
 				fieldRead.putMetadata(REFINE_KEY, 	new EqualsPredicate(WILD_VAR, fieldName));
+		}else if(context.hasVariable(String.format(thisFormat, fieldName))){
+			String thisName = String.format(thisFormat, fieldName);
+			fieldRead.putMetadata(REFINE_KEY, new EqualsPredicate(WILD_VAR, thisName));
+			
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
 			String targetName = fieldRead.getTarget().toString();
 			fieldRead.putMetadata(REFINE_KEY, FunctionPredicate.builtin_length(targetName));
