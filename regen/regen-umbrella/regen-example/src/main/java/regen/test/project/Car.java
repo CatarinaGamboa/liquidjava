@@ -12,8 +12,8 @@ public class Car {
 	@Refinement("Positive(_)")
 	private int seats;
 	
-	public void setYear(@Refinement("_ > 1900 && _ < 2000") int year) {
-		this.year = year + 10;
+	public void setYear(@Refinement("CarAcceptableYears(_)") int year) {
+		this.year = year;
 	}
 	
 	@Refinement("_ == year")

@@ -5,11 +5,14 @@ import org.modelcc.Optional;
 import org.modelcc.Pattern;
 import org.modelcc.Value;
 
+import repair.regen.language.Variable;
 import repair.regen.language.symbols.Coma;
 
 public class MultipleTypes implements IModel{
 
 	Type t;
+	@Optional
+	Variable v;
 	@Optional
 	Coma c;
 	

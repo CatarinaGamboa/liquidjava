@@ -18,11 +18,11 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    // @Refinement("_ > 7")
-    // public int v() {
-    // int a = Integer.MAX_VALUE;
-    // return a;
-    // }
+    @repair.regen.specification.RefinementFunction("int length(int x)")
+    public int v(int a) {
+        return a;
+    }
+
     public static void main(java.lang.String[] args) {
     }
 }

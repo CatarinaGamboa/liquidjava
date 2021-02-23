@@ -2,13 +2,15 @@ package regen.test.project;
 
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
+import repair.regen.specification.RefinementFunction;
 public class SimpleTest {
 	
-//	@Refinement("_ > 7")
-//	public int v() {
-//		int a = Integer.MAX_VALUE;
-//		return a;
-//	}
+	@RefinementFunction("int length(int x)")
+	public int v(int a) {
+		return a;
+	}
+	
+	
 
 	public static void main(String[] args) {
 

@@ -10,7 +10,7 @@ import repair.regen.language.symbols.ParenthesisLeft;
 import repair.regen.language.symbols.ParenthesisRight;
 
 public class FunctionDeclaration implements IModel{
-
+	@Optional
 	GhostKeyword g;
 	Type retType;
 	FunctionName name;

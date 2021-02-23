@@ -14,9 +14,9 @@ public class Car {
     @repair.regen.specification.Refinement("Positive(_)")
     private int seats;
 
-    public void setYear(@repair.regen.specification.Refinement("_ > 1900 && _ < 2000")
+    public void setYear(@repair.regen.specification.Refinement("CarAcceptableYears(_)")
     int year) {
-        this.year = year + 10;
+        this.year = year;
     }
 
     @repair.regen.specification.Refinement("_ == year")
