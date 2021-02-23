@@ -93,7 +93,7 @@ class OperationsChecker {
 			CtVariableWrite<T> w = (CtVariableWrite<T>) ex;
 			name = w.getVariable().getSimpleName();
 			all = getRefinementUnaryVariableWrite(ex, operator, w, name);
-			rtc.checkVariableRefinements(all, name,  w.getType(), w);//w.getVariable().getDeclaration()
+			rtc.checkVariableRefinements(all, name,  w.getType(), w.getVariable().getDeclaration());
 			return;
 
 		}else if (ex instanceof CtVariableRead){

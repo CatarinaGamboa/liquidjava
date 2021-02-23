@@ -11,14 +11,19 @@ public class Car {
 	@Refinement("Positive(_)")
 	private int seats;
 	
-	public void setYear(@Refinement("CarAcceptableYears(_)") int y) {
-		this.year = y;
+	public void setYear(@Refinement("CarAcceptableYears(_)") int year) {
+		this.year = year;
 	}
 	
 	@Refinement("_ == year")
 	public int getYear() {
 		return year;
 	}
+	
+//	@Refinement("_ == year")
+//	public int getAge(int yearNow) {
+//		return (yearNow+1) - year;
+//	}
 	
 
 }

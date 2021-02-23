@@ -24,11 +24,12 @@ public class SimpleTest {
     // return a;
     // }
     public static void main(java.lang.String[] args) {
-        // @Refinement("a > 5")
-        // int a = 10;
-        // 
-        // @Refinement("b == a")
-        // int b = a;
+        @repair.regen.specification.Refinement("_ < 10")
+        int v = 3;
+        v--;
+        @repair.regen.specification.Refinement("_ >= 10")
+        int s = 10;
+        s--;
     }
 }
 
