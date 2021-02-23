@@ -15,6 +15,7 @@ import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
+import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 
 public class ExternalRefinementTypeChecker extends TypeChecker{
@@ -74,8 +75,10 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		// TODO Auto-generated method stub
 	}
 
+
 	@Override
-	void checkVariableRefinements(Constraint all, String name, CtVariable<?> declaration) {
+	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type,
+			CtElement variable) {
 		// TODO Auto-generated method stub
 		
 	}

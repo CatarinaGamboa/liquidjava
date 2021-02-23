@@ -124,13 +124,12 @@ public class Context {
 		return vi;
 	}
 	
-	public void addRefinementToVariableInContext(CtVariable<?> variable, Constraint et) {
-		String name = variable.getSimpleName();
+	public void addRefinementToVariableInContext(String name, CtTypeReference<?> type, Constraint et) {
 		if(hasVariable(name)){
 			RefinedVariable vi = getVariableByName(name);
 			vi.setRefinement(et);
 		}else {
-			addVarToContext(name, variable.getType(), et);
+			addVarToContext(name, type, et);
 		}
 	}
 

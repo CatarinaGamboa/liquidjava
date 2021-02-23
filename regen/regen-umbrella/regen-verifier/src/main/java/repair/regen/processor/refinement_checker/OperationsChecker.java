@@ -55,7 +55,7 @@ class OperationsChecker {
 		Constraint oper;
 		CtElement parent = operator.getParent();
 		if(parent instanceof CtAssignment<?, ?>) {
-			CtVariableWriteImpl<?> parentVar = (CtVariableWriteImpl<?>)((CtAssignment) parent)
+			CtVariableWrite<?> parentVar = (CtVariableWrite<?>)((CtAssignment) parent)
 					.getAssigned();
 			oper = getOperationRefinements(operator, parentVar, operator);
 		}else {
@@ -93,7 +93,7 @@ class OperationsChecker {
 			CtVariableWrite<T> w = (CtVariableWrite<T>) ex;
 			name = w.getVariable().getSimpleName();
 			all = getRefinementUnaryVariableWrite(ex, operator, w, name);
-			rtc.checkVariableRefinements(all, name, w.getVariable().getDeclaration());
+			rtc.checkVariableRefinements(all, name,  w.getType(), w);//w.getVariable().getDeclaration()
 			return;
 
 		}else if (ex instanceof CtVariableRead){
@@ -157,7 +157,7 @@ class OperationsChecker {
 	 * @param element CtExpression that represent an Binary Operation or one of the operands
 	 * @return String with the operation refinements
 	 */
-	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWriteImpl<?> parentVar, 
+	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWrite<?> parentVar, 
 			CtExpression<?> element) {
 		if(element instanceof CtFieldRead<?>) {
 			if(((CtFieldRead<?>)element).getVariable().getSimpleName().equals("length"))

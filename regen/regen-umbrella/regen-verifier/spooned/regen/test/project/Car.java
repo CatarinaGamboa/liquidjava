@@ -9,11 +9,11 @@ public class Car {
     @repair.regen.specification.Refinement("Positive(_)")
     private int seats;
 
-    // @Refinement("year == y")
-    // public void setYear(int y) {
-    // this.year = y;
-    // }
-    // 
+    public void setYear(@repair.regen.specification.Refinement("y < 0")
+    int y) {
+        this.year = y - 20;
+    }
+
     @repair.regen.specification.Refinement("_ == year")
     public int getYear() {
         return year;

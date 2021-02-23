@@ -27,6 +27,7 @@ import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConditional;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
+import spoon.reflect.code.CtFieldWrite;
 import spoon.reflect.code.CtIf;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
@@ -44,6 +45,8 @@ import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.reference.CtFieldReference;
+import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
@@ -122,7 +125,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			if (refinementFound == null)
 				refinementFound = new Predicate();
 			context.addVarToContext(varName, localVariable.getType(), new Predicate());
-			checkVariableRefinements(refinementFound, varName, localVariable);
+			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable);
 
 //			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
 //				checkArray(localVariable);
@@ -153,29 +156,44 @@ public class RefinementTypeChecker extends TypeChecker {
 			CtVariableReference<?> var = ((CtVariableAccess<?>) ex).getVariable();
 			CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
 			String name = var.getSimpleName();
-
-			getPutVariableMetadada(ex, varDecl);
-
-			Constraint refinementFound = getRefinement(assignement.getAssignment());
-			if (refinementFound == null) {
-				refinementFound = new Predicate();
-			}
-			Optional<VariableInstance> r = context.getLastVariableInstance(name);
-			if(r.isPresent())
-				vcChecker.removePathVariableThatIncludes(r.get().getName());//AQUI!!
-
-			vcChecker.removePathVariableThatIncludes(name);//AQUI!!
-			checkVariableRefinements(refinementFound, name, varDecl);
-
+			checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), varDecl);
+			
 //			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
 //				checkArray(varDecl);
 
+		}else if(ex instanceof CtFieldWrite) {
+			CtFieldReference cr = ((CtFieldWrite) ex).getVariable();
+			CtFieldWrite cw = (CtFieldWrite) ex;
+			CtField f= cw.getVariable().getDeclaration();
+			checkAssignment(cr.getSimpleName(), cr.getType(), ex, assignement.getAssignment(), assignement);
+			
 		}
 		if(ex instanceof CtArrayWrite) {
 			Constraint c = getRefinement(ex);
 			//TODO continue
 			//c.substituteVariable(WILD_VAR, );
 		}
+	}
+
+	private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, 
+			CtExpression<?> assignment, CtElement elem) {
+		getPutVariableMetadada(ex, name);
+
+		Constraint refinementFound = getRefinement(assignment);
+		if (refinementFound == null) {
+			RefinedVariable rv =context.getVariableByName(name);
+			if(rv instanceof Variable)
+				refinementFound = rv.getMainRefinement();
+			else
+				refinementFound = new Predicate();
+		}
+		Optional<VariableInstance> r = context.getLastVariableInstance(name);
+		if(r.isPresent())
+			vcChecker.removePathVariableThatIncludes(r.get().getName());//AQUI!!
+
+		vcChecker.removePathVariableThatIncludes(name);//AQUI!!
+		checkVariableRefinements(refinementFound, name, type, elem);
+		
 	}
 
 	@Override
@@ -229,7 +247,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
 		super.visitCtVariableRead(variableRead);
 		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
-		getPutVariableMetadada(variableRead, varDecl);
+		getPutVariableMetadada(variableRead, varDecl.getSimpleName());
 	}
 
 	/**
@@ -377,7 +395,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	//############################### SMT Evaluation ##########################################
 
 	@Override
-	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtVariable<?> variable) {
+	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type, CtElement variable) {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
 		Constraint cEt = expectedType.isPresent()?expectedType.get():new Predicate();
 
@@ -389,11 +407,11 @@ public class RefinementTypeChecker extends TypeChecker {
 		cEt = cEt.substituteVariable(simpleName, newName);
 
 		//Substitute variable in verification
-		RefinedVariable rv= context.addInstanceToContext(newName, variable.getType(), correctNewRefinement);
+		RefinedVariable rv= context.addInstanceToContext(newName, type, correctNewRefinement);
 		context.addRefinementInstanceToVariable(simpleName, newName);
 		//smt check
 		checkSMT(cEt, variable);//TODO CHANGE
-		context.addRefinementToVariableInContext(variable, cet);
+		context.addRefinementToVariableInContext(simpleName,type , cet);
 	}
 
 
@@ -405,17 +423,16 @@ public class RefinementTypeChecker extends TypeChecker {
 	/**
 	 * 
 	 * @param <T>
-	 * @param variable
+	 * @param elem
 	 * @param varDecl Cannot be null
 	 */
-	private <T> void getPutVariableMetadada(CtElement variable, CtVariable<T> varDecl) {
-		String name = varDecl.getSimpleName();
+	private <T> void getPutVariableMetadada(CtElement elem, String name) {
 		Constraint cref = new EqualsPredicate(WILD_VAR, name);
 		Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent())
 			cref = new EqualsPredicate(WILD_VAR, ovi.get().getName());
 
-		variable.putMetadata(REFINE_KEY, cref);
+		elem.putMetadata(REFINE_KEY, cref);
 	}
 
 

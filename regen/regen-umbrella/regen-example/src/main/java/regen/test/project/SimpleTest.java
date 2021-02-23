@@ -4,13 +4,15 @@ import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 public class SimpleTest {
 	
-	@Refinement("_ > 7")
-	public int v() {
-		int a = Integer.MAX_VALUE;
-		return a;
-	}
+//	@Refinement("_ > 7")
+//	public int v() {
+//		int a = Integer.MAX_VALUE;
+//		return a;
+//	}
 
 	public static void main(String[] args) {
+
+		
 //		@Refinement("a > 5")
 //		int a = 10;
 //		
