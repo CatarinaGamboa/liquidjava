@@ -162,10 +162,9 @@ public class RefinementTypeChecker extends TypeChecker {
 //				checkArray(varDecl);
 
 		}else if(ex instanceof CtFieldWrite) {
-			CtFieldReference cr = ((CtFieldWrite) ex).getVariable();
-			CtFieldWrite cw = (CtFieldWrite) ex;
-			CtField f= cw.getVariable().getDeclaration();
-			checkAssignment(cr.getSimpleName(), cr.getType(), ex, assignement.getAssignment(), assignement);
+			CtFieldReference<?> cr = ((CtFieldWrite<?>) ex).getVariable();
+			CtField<?> f= ((CtFieldWrite<?>) ex).getVariable().getDeclaration();
+			checkAssignment(cr.getSimpleName(), cr.getType(), ex, assignement.getAssignment(), f);
 			
 		}
 		if(ex instanceof CtArrayWrite) {
