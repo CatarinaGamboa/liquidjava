@@ -13,11 +13,12 @@ public class AliasWrapper {
 	private Predicate expression;
 	
 
-	public AliasWrapper(Alias alias, Factory factory) {
+	public AliasWrapper(Alias alias, Factory factory, String wildvar) {
 		name = alias.getName();
 		this.varName = alias.getVar().toString();
 		this.varType = Utils.getType(alias.getType().toString(), factory);
 		this.expression = new Predicate(alias.getExpression());
+		expression = (Predicate) expression.substituteVariable(wildvar, varName);
 	}
 
 	public String getName() {
