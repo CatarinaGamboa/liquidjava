@@ -1,6 +1,7 @@
 package repair.regen.language.alias;
 
 import org.modelcc.IModel;
+import org.modelcc.Optional;
 
 import repair.regen.language.Expression;
 import repair.regen.language.function.Type;
@@ -11,6 +12,7 @@ import repair.regen.language.symbols.ParenthesisRight;
 import repair.regen.language.symbols.TypeKeyword;
 
 public class Alias implements IModel{
+	@Optional
 	TypeKeyword tk;
 	AliasName name;
 	
