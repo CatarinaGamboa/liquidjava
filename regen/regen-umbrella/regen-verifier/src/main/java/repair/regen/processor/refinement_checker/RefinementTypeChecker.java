@@ -217,10 +217,11 @@ public class RefinementTypeChecker extends TypeChecker {
 //		context.addVarToContext(f.getSimpleName(), f.getType(), 
 //				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
 //						      : new Predicate());
-		
-		RefinedVariable v = context.addVarToContext(String.format(thisFormat, f.getSimpleName()), f.getType(), 
-				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
-						      : new Predicate());
+		String nname = String.format(thisFormat, f.getSimpleName());
+		Constraint ret = new Predicate();
+		if(c.isPresent())
+			 ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
+		RefinedVariable v = context.addVarToContext(nname, f.getType(),ret);
 		if(v instanceof Variable)
 			((Variable)v).setLocation("this");
 			

@@ -8,6 +8,7 @@ import org.modelcc.Optional;
 import com.microsoft.z3.Expr;
 
 import repair.regen.language.Expression;
+import repair.regen.language.Variable;
 import repair.regen.smt.TranslatorToZ3;
 /*
  * FArgs = emp | Arguments
@@ -52,6 +53,14 @@ public class Argument implements IModel{
 		v.getVariableNames(l);
 		if(fua != null)
 			fua.getVariableNames(l);
+	}
+	
+
+
+	public void getAllExpressions(List<Expression> lv) {
+		lv.add(v);
+		if(fua != null)
+			fua.getAllExpressions(lv);
 		
 	}
 	

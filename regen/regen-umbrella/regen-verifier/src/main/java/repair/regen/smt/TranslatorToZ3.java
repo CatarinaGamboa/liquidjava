@@ -2,6 +2,7 @@ package repair.regen.smt;
 
 import static org.junit.Assert.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -117,6 +118,13 @@ public class TranslatorToZ3 {
 			return null;
 		}	
 	}
+	
+	private Expr getVariableTranslation(String name) {
+		Expr e= varTranslation.get(name);
+		if(e == null)
+			e = varTranslation.get(String.format("this#%s", name));
+		return e;
+	}
 
 	public Status verifyExpression(Expression e) throws Exception {
 		Solver s = z3.mkSolver();
@@ -148,10 +156,7 @@ public class TranslatorToZ3 {
 	}
 
 	public Expr makeVariable(String name) {
-		Expr e= varTranslation.get(name);
-		if(e == null)
-			e = varTranslation.get(String.format("this#%s", name));
-		return e;//int[] not in varTranslation
+		return getVariableTranslation(name);//int[] not in varTranslation
 	}
 
 	public Expr makeFunctionInvocation(String name, Expr[] params) {
@@ -310,25 +315,35 @@ public class TranslatorToZ3 {
 
 
 
-	public Expression makeAlias(AliasName name, Variable var) throws TypeMismatchError {
+	public Expression makeAlias(AliasName name, List<Expression> list) throws TypeMismatchError {
 		AliasWrapper al = aliasTranslation.get(name.toString());
 		Expression e = al.getClonedConstraint().getExpression();//cloning
-		String nVarName = var.getName();
 
-		//check type
-		Expr varE = varTranslation.get(var.getName());
-		Sort varSort = varE.getSort();
-		if(varSort.equals(getSort(al.getType().toString()))) {
-			e.substituteVariable(al.getVarName(), nVarName);
-			System.out.println("Make Alias:" + e.toString());
-			return e;
-		}
-		else {
-			throw new TypeMismatchError("Type mismatch in alias usage: using "+varSort.toString()
-			+" expecting "+al.getType().toString());
+		List<String> decVarNames = al.getVarNames();
+		List<String> decTypes = new ArrayList<>();
+		for(CtTypeReference<?> t:al.getTypes())
+			decTypes.add(t.getQualifiedName());
+
+		//FOR ...
+		for (int i = 0; i < decVarNames.size(); i++) {
+			String decVar = decVarNames.get(i);
+			//Sort decType = getSort(decTypes.get(i));
 			
+			String argVar = list.get(i).toString();
+			if(!varTranslation.containsKey(argVar) && 
+					varTranslation.containsKey(String.format("this#%s", argVar)))
+				argVar = String.format("this#%s", argVar);
+				
+			//Sort argType = varTranslation.get(argVar).getSort();
+			
+			//if(decType.equals(argType)) {
+				e.substituteVariable(decVar, argVar);
+//			} else {
+//				throw new TypeMismatchError("Type mismatch in alias usage: using "+decType.toString()
+//				+" expecting " + argType.toString());
+//			}
 		}
-
-
+		System.out.println("Make Alias:" + e.toString());
+		return e;
 	}
 }

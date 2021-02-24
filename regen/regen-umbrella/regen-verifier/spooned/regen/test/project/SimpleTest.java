@@ -3,7 +3,7 @@ package regen.test.project;
 
 // //@Refinement("_.length(x) >= 0") ==
 // //	@Refinement("length(_, x) >= 0")
-// //	int[] a1 = new int[5]; //Cannot prove - len() built-in
+// //	int[] a1 = new int[5];
 // K(.., ..)
 // }
 // //correctImplies -rever!!!
@@ -17,13 +17,13 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
+@repair.regen.specification.RefinementAlias("Greater(int x, int y) {x > y}")
 public class SimpleTest {
-    @repair.regen.specification.RefinementFunction("int length(int x)")
-    public int v(int a) {
-        return a;
-    }
-
     public static void main(java.lang.String[] args) {
+        @repair.regen.specification.Refinement("_ < 5")
+        int a = 1;
+        @repair.regen.specification.Refinement("Greater(a, i)")
+        int i = 10;
     }
 }
 

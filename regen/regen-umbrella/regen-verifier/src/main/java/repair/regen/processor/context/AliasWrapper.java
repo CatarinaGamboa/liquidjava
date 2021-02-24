@@ -1,5 +1,8 @@
 package repair.regen.processor.context;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import repair.regen.language.alias.Alias;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
@@ -8,28 +11,31 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class AliasWrapper {
 	private String name;
-	private CtTypeReference<?> varType;
-	private String varName;
+	private List<CtTypeReference<?>> varTypes;
+	private List<String> varNames;
 	private Predicate expression;
 	
 
 	public AliasWrapper(Alias alias, Factory factory, String wildvar) {
 		name = alias.getName();
-		this.varName = alias.getVar().toString();
-		this.varType = Utils.getType(alias.getType().toString(), factory);
+		this.varNames = alias.getVariableNames();
+		this.varTypes = new ArrayList<>();
+		for(String t:alias.getTypesNames())
+			this.varTypes.add(Utils.getType(t, factory));
 		this.expression = new Predicate(alias.getExpression());
-		expression = (Predicate) expression.substituteVariable(wildvar, varName);
 	}
 
 	public String getName() {
 		return name;
 	}
 	
-	public CtTypeReference getType() {
-		return varType;
+	public List<CtTypeReference<?>> getTypes() {
+		return varTypes;
 	}
-	public String getVarName() {
-		return varName;
+	
+	
+	public List<String> getVarNames() {
+		return varNames;
 	}
 	public Predicate getClonedConstraint() {
 		return (Predicate) expression.clone();

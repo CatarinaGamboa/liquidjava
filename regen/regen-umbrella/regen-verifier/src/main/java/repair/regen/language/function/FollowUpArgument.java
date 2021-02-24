@@ -41,4 +41,9 @@ public class FollowUpArgument implements IModel {
 		arg.getVariableNames(l);
 	}
 
+	public void getAllExpressions(List<Expression> lv) {
+		arg.getAllExpressions(lv);
+		
+	}
+
 }
