@@ -3,8 +3,6 @@ package repair.regen.processor.refinement_checker;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.jdt.internal.compiler.ast.Wildcard;
-
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -24,12 +22,12 @@ import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.code.CtVariableWrite;
 import spoon.reflect.code.UnaryOperatorKind;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.declaration.ParentNotInitializedException;
 import spoon.support.reflect.code.CtIfImpl;
-import spoon.support.reflect.code.CtVariableWriteImpl;
 /**
  * Auxiliar class for handling the type checking of Unary and Binary
  * operations
@@ -212,7 +210,8 @@ class OperationsChecker {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
 			CtExecutable<?> method = inv.getExecutable().getDeclaration();
 			//Get function refinements with non_used variables
-			RefinedFunction fi = rtc.context.getFunction(method.getSimpleName(), inv.getTarget().getType().toString());//TODO check
+			String met = ((CtClass)method.getParent()).getQualifiedName();//TODO check
+			RefinedFunction fi = rtc.context.getFunction(method.getSimpleName(), met);
 			Constraint innerRefs = fi.getRenamedRefinements(rtc.context);
 			//Substitute _ by the variable that we send
 			String newName = String.format(rtc.freshFormat, rtc.context.getCounter());

@@ -41,10 +41,10 @@ public class MethodsFunctionsChecker {
 		if(method == null) {
 			Method m = invocation.getExecutable().getActualMethod();
 			if(m != null) searchMethodInLibrary(m, invocation);
-		}else {
-			String ctype = invocation.getTarget().getType().toString();
+		}else if(method.getParent() instanceof CtClass){
+			String ctype = ((CtClass)method.getParent()).getQualifiedName();
 			if(rtc.context.getFunction(method.getSimpleName(), ctype) != null) {//inside rtc.context
-				checkInvocationRefinements(invocation, method.getSimpleName());
+				checkInvocationRefinements(invocation, method.getSimpleName(), ctype);
 				
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
@@ -64,25 +64,25 @@ public class MethodsFunctionsChecker {
 
 
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
-		String ctype =  invocation.getTarget().getType().toString();
+		String ctype = m.getDeclaringClass().getCanonicalName();
 		if(rtc.context.getFunction(m.getName(),ctype) != null) {//inside rtc.context
-			checkInvocationRefinements(invocation, m.getName());
+			checkInvocationRefinements(invocation, m.getName(), ctype);
 			return;
 		}else {
 			String name = m.getName();
 			String prefix = m.getDeclaringClass().getCanonicalName();
 			String completeName = String.format("%s.%s", prefix, name);
 			if(rtc.context.getFunction(completeName, ctype) != null) {
-				checkInvocationRefinements(invocation, completeName);
+				checkInvocationRefinements(invocation, completeName, ctype);
 			}
 
 		}
 
 	}
 
-	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName) {
+	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName, String className) {
 //		invocation.getTarget().getType().toString()
-		RefinedFunction f = rtc.context.getFunction(methodName, invocation.getTarget().getType().toString());
+		RefinedFunction f = rtc.context.getFunction(methodName, className);
 		Map<String,String> map = mapInvocation(invocation, f);
 		
 		checkParameters(invocation, f, map);
