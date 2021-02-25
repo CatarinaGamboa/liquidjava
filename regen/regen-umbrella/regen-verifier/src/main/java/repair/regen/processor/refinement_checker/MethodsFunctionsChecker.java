@@ -14,14 +14,13 @@ import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
-import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
-import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
@@ -43,8 +42,8 @@ public class MethodsFunctionsChecker {
 			Method m = invocation.getExecutable().getActualMethod();
 			if(m != null) searchMethodInLibrary(m, invocation);
 		}else {
-			if(rtc.context.getFunctionByName(method.getSimpleName()) != null) {//inside rtc.context
-				checkInvocationRefinements(invocation, method.getSimpleName());
+			 if(rtc.context.getFunctionByName(method.getSimpleName()) != null) {//inside rtc.context
+				checkInvocationRefinements(invocation, method.getSimpleName());	
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
 				if(cet instanceof CtMethod) {
@@ -79,7 +78,12 @@ public class MethodsFunctionsChecker {
 	}
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName) {
-		RefinedFunction f = rtc.context.getFunctionByName(methodName);
+//		invocation.getTarget().getType().toString()
+		RefinedFunction f;
+		if(invocation.getTarget() != null)
+			f = rtc.context.getFunction(methodName, invocation.getTarget().getType().toString());
+		else
+			f = rtc.context.getFunctionByName(methodName);
 		Map<String,String> map = mapInvocation(invocation, f);
 		
 		checkParameters(invocation, f, map);
@@ -154,6 +158,10 @@ public class MethodsFunctionsChecker {
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
 		f.setRefReturn(new Predicate());
+		if(method.getParent() instanceof CtClass) {
+			CtClass klass = (CtClass)method.getParent();
+			f.setClass(klass.getQualifiedName());
+		}
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 		

@@ -33,6 +33,7 @@ import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtNewArray;
+import spoon.reflect.code.CtNewClass;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
@@ -492,19 +493,24 @@ public class RefinementTypeChecker extends TypeChecker {
 	
 
 	private void handleAlias(String value) {
-		System.out.println("o");
 		try {
 			Optional<Alias> oa = RefinementParser.parseAlias(value);
 			if(oa.isPresent()) {
 				AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR);
 				context.addAlias(a);
 			}
-			System.out.println(oa);
+//			System.out.println(oa);
 		} catch (SyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
+	}
+	
+	@Override
+	public <T> void visitCtNewClass(CtNewClass<T> newClass) {
+		super.visitCtNewClass(newClass);
+		System.out.println("new class");
 	}
 
 	@Override

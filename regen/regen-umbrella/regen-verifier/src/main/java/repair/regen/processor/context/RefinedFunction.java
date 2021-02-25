@@ -15,6 +15,8 @@ public class RefinedFunction extends Refined{
 	
 	private Context context;
 	
+	private String targetClass;
+	
 	public RefinedFunction() {
 		argRefinements= new ArrayList<>();
 		context = Context.getInstance();
@@ -41,6 +43,15 @@ public class RefinedFunction extends Refined{
 	
 	public void setRefReturn(Constraint ref) {
 		super.setRefinement(ref);
+	}
+	
+	
+	public void setClass(String klass) {
+		this.targetClass = klass;
+	}
+	
+	public String getTargetClass() {
+		return targetClass;
 	}
 	
 	public Constraint getRenamedRefinements() {

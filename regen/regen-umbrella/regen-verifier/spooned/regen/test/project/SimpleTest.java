@@ -17,13 +17,17 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
-@repair.regen.specification.RefinementAlias("Greater(int x, int y) {x > y}")
 public class SimpleTest {
+    // @Refinement("_ > 1800")
+    // public static int getYear() {
+    // return 1856;
+    // }
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("_ < 5")
-        int a = 1;
-        @repair.regen.specification.Refinement("Greater(a, i)")
-        int i = 10;
+        int a = 1998;
+        regen.test.project.Car c = new regen.test.project.Car();
+        c.setYear(a);
+        // @Refinement("_ > 1700")
+        // int j = getYear();
     }
 }
 

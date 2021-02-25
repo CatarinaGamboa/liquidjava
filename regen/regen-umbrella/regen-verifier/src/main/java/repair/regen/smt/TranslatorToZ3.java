@@ -75,27 +75,28 @@ public class TranslatorToZ3 {
 
 	public void translateVariables(Map<String, CtTypeReference<?>> ctx) {
 		for (String name : ctx.keySet()) {
-			if (ctx.get(name).getQualifiedName().contentEquals("int"))
+			String typeName = ctx.get(name).getQualifiedName();
+			if (typeName.contentEquals("int"))
 				varTranslation.put(name, z3.mkIntConst(name));
-			else if (ctx.get(name).getQualifiedName().contentEquals("short")) 
+			else if (typeName.contentEquals("short")) 
 				varTranslation.put(name, z3.mkIntConst(name));
-			else if (ctx.get(name).getQualifiedName().contentEquals("boolean")) 
+			else if (typeName.contentEquals("boolean")) 
 				varTranslation.put(name, z3.mkBoolConst(name));
-			else if (ctx.get(name).getQualifiedName().contentEquals("long"))
+			else if (typeName.contentEquals("long"))
 				varTranslation.put(name, z3.mkRealConst(name));
-			else if (ctx.get(name).getQualifiedName().contentEquals("float")) {
+			else if (typeName.contentEquals("float")) {
 				FPExpr k = (FPExpr)z3.mkConst(name, z3.mkFPSort64());
 				varTranslation.put(name, k);
-			}else if (ctx.get(name).getQualifiedName().contentEquals("double")) {
+			}else if (typeName.contentEquals("double")) {
 				FPExpr k = (FPExpr)z3.mkConst(name, z3.mkFPSort64());
 				varTranslation.put(name, k);
-			}else if (ctx.get(name).getQualifiedName().contentEquals("int[]")) {
+			}else if (typeName.contentEquals("int[]")) {
 				varTranslation.put(name, 
 						z3.mkArrayConst(name, z3.mkIntSort(), z3.mkIntSort()));	
 			}else {
-				System.out.println(name + ":"+ctx.get(name).getQualifiedName());
-				//TODO ADD OTHER TYPES
-				System.out.println("Not implemented yet!");
+				Sort nSort = z3.mkUninterpretedSort(typeName);
+				varTranslation.put(name, z3.mkConst(name, nSort));	
+				System.out.println("Add new type: "+typeName);
 			}
 		}
 		varTranslation.put("true", z3.mkBool(true));

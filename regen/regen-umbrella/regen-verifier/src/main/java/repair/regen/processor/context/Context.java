@@ -52,11 +52,11 @@ public class Context {
 	public void reinitializeContext() {
 		ctxVars = new Stack<>();
 		ctxVars.add(new ArrayList<>());//global vars
-		ctxFunctions = new ArrayList<>();
+//		ctxFunctions = new ArrayList<>();
 		ctxSpecificVars = new ArrayList<>();
-		alias = new ArrayList<>();
+//		alias = new ArrayList<>();
 		ghosts = new ArrayList<>();
-		counter = 0;
+//		counter = 0;
 	}
 
 	public void enterContext() {
@@ -212,6 +212,18 @@ public class Context {
 		}
 		for(RefinedFunction fi: ctxGlobalFunctions) {
 			if(fi.getName().equals(name))
+				return fi;
+		}
+		return null;
+	}
+	
+	public RefinedFunction getFunction(String name, String target) {
+		for(RefinedFunction fi: ctxFunctions) {
+			if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
+				return fi;
+		}
+		for(RefinedFunction fi: ctxGlobalFunctions) {
+			if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
 				return fi;
 		}
 		return null;

@@ -5,6 +5,7 @@ import repair.regen.specification.RefinementAlias;
 
 @RefinementAlias("Positive(int x) { x > 0}")
 @RefinementAlias("type CarAcceptableYears(int x) { x > 1800 && x < 2050}")
+@RefinementAlias("GreaterThan(int x, int y) {x > y}")	
 public class Car {
 	
 	@Refinement("CarAcceptableYears(year)")
@@ -14,7 +15,7 @@ public class Car {
 	private int seats;
 	
 	
-	public void setYear(@Refinement(" _ > 1900 && _ < 2000") int year) {
+	public void setYear(@Refinement("CarAcceptableYears(_)") int year) {
 		this.year = year;
 	}
 	
@@ -24,16 +25,20 @@ public class Car {
 	}
 	
 	
+	@Refinement("_ == GreaterThan(year, y)")
+	public boolean isOlderThan(int y) {
+		return this.year > y;
+	}
+	
 //	@Refinement("_ == old(year) + i")
 //	public int addYear(int i) {
 //		return year + i;
 //	}
 	
+//	open(Car)
 	
-//	@Refinement("_ == year")
-//	public int getAge(int yearNow) {
-//		return (yearNow+1) - year;
-//	}
 	
+	
+		
 
 }
