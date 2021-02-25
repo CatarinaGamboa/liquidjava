@@ -219,7 +219,8 @@ public class Context {
 	
 	public RefinedFunction getFunction(String name, String target) {
 		for(RefinedFunction fi: ctxFunctions) {
-			if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
+			if(fi.getTargetClass() != null &&
+			   fi.getName().equals(name) && fi.getTargetClass().equals(target))
 				return fi;
 		}
 		for(RefinedFunction fi: ctxGlobalFunctions) {

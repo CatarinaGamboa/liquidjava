@@ -191,8 +191,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectAliasMultiple.java");
 	}
 	
-	
-	
+	@Test
+	public void correctSimpleCarTest() {
+		testCorrect(testPath+"/classes");
+	}
 	
 	@Test
 	public void errorSimpleAssignment() {

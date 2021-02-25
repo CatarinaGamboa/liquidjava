@@ -171,6 +171,8 @@ public class MethodsFunctionsChecker {
 		f.setName(String.format("%s.%s", prefix, method.getSimpleName()));
 		f.setType(method.getType());
 		f.setRefReturn(new Predicate());
+		f.setClass(prefix);
+		rtc.context.addFunctionToContext(f);
 		rtc.context.addGlobalFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 	}
