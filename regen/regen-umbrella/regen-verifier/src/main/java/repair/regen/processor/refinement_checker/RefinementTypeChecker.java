@@ -58,6 +58,8 @@ public class RefinementTypeChecker extends TypeChecker {
 	// 2. Do type checking and inference
 	VCChecker vcChecker = new VCChecker();
 	Factory factory;
+	
+	String className;
 
 	//Auxiliar TypeCheckers
 	OperationsChecker otc;
@@ -78,6 +80,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		context.reinitializeContext();
 		getRefinementFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
+		className = ctClass.getQualifiedName();
 	}
 
 	@Override

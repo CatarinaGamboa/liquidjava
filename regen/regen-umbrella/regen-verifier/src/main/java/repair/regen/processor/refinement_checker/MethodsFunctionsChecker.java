@@ -42,8 +42,10 @@ public class MethodsFunctionsChecker {
 			Method m = invocation.getExecutable().getActualMethod();
 			if(m != null) searchMethodInLibrary(m, invocation);
 		}else {
-			 if(rtc.context.getFunctionByName(method.getSimpleName()) != null) {//inside rtc.context
-				checkInvocationRefinements(invocation, method.getSimpleName());	
+			String ctype = invocation.getTarget().getType().toString();
+			if(rtc.context.getFunction(method.getSimpleName(), ctype) != null) {//inside rtc.context
+				checkInvocationRefinements(invocation, method.getSimpleName());
+				
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
 				if(cet instanceof CtMethod) {
@@ -62,14 +64,15 @@ public class MethodsFunctionsChecker {
 
 
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
-		if(rtc.context.getFunctionByName(m.getName()) != null) {//inside rtc.context
+		String ctype =  invocation.getTarget().getType().toString();
+		if(rtc.context.getFunction(m.getName(),ctype) != null) {//inside rtc.context
 			checkInvocationRefinements(invocation, m.getName());
 			return;
 		}else {
 			String name = m.getName();
 			String prefix = m.getDeclaringClass().getCanonicalName();
 			String completeName = String.format("%s.%s", prefix, name);
-			if(rtc.context.getFunctionByName(completeName) != null) {
+			if(rtc.context.getFunction(completeName, ctype) != null) {
 				checkInvocationRefinements(invocation, completeName);
 			}
 
@@ -79,11 +82,7 @@ public class MethodsFunctionsChecker {
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName) {
 //		invocation.getTarget().getType().toString()
-		RefinedFunction f;
-		if(invocation.getTarget() != null)
-			f = rtc.context.getFunction(methodName, invocation.getTarget().getType().toString());
-		else
-			f = rtc.context.getFunctionByName(methodName);
+		RefinedFunction f = rtc.context.getFunction(methodName, invocation.getTarget().getType().toString());
 		Map<String,String> map = mapInvocation(invocation, f);
 		
 		checkParameters(invocation, f, map);
@@ -228,16 +227,19 @@ public class MethodsFunctionsChecker {
 			//check if method has refinements
 			if(rtc.getRefinement(method) == null)
 				return;
-			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
-			
-			//Both return and the method have metadata
-			String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
-			Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
-			Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
-
-			RefinedVariable rv = rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
-			rtc.checkSMT(cexpectedType, ret);
-			rtc.context.newRefinementToVariableInContext(returnVarName, cexpectedType);
+			if (method.getParent() instanceof CtClass) {
+				RefinedFunction fi = rtc.context.getFunction(method.getSimpleName(), 
+						((CtClass)method.getParent()).getQualifiedName());
+				
+				//Both return and the method have metadata
+				String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
+				Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
+				Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
+	
+				RefinedVariable rv = rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
+				rtc.checkSMT(cexpectedType, ret);
+				rtc.context.newRefinementToVariableInContext(returnVarName, cexpectedType);
+			}
 		}
 	}
 

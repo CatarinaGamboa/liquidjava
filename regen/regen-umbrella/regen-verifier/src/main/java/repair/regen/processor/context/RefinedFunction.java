@@ -11,15 +11,11 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction extends Refined{
 	
-	private List<Variable> argRefinements;
-	
-	private Context context;
-	
+	private List<Variable> argRefinements;	
 	private String targetClass;
 	
 	public RefinedFunction() {
 		argRefinements= new ArrayList<>();
-		context = Context.getInstance();
 	}
 	
 	
@@ -54,11 +50,11 @@ public class RefinedFunction extends Refined{
 		return targetClass;
 	}
 	
-	public Constraint getRenamedRefinements() {
-		return getRenamedRefinements(getAllRefinements());
+	public Constraint getRenamedRefinements(Context c) {
+		return getRenamedRefinements(getAllRefinements(), c);
 	}
 	
-	private Constraint getRenamedRefinements(Constraint place) {
+	private Constraint getRenamedRefinements(Constraint place, Context context) {
 		Constraint update = place.clone();
 		for(Variable p: argRefinements) {
 			String varName = p.getName();
@@ -73,10 +69,7 @@ public class RefinedFunction extends Refined{
 		}
 		return update;
 	}
-	
-	public Constraint getRenamedReturn() {
-		return getRenamedRefinements(super.getRefinement());
-	}
+
 
 	public Constraint getAllRefinements() {
 		Constraint c = new Predicate();
@@ -103,7 +96,41 @@ public class RefinedFunction extends Refined{
 	@Override
 	public String toString() {
 		return "Function [name=" + super.getName() + ", argRefinements=" +
-					argRefinements + ", refReturn=" + super.getRefinement() + "]";
+					argRefinements + ", refReturn=" + super.getRefinement() + 
+					", targetClass="+targetClass+"]";
+	}
+
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((argRefinements == null) ? 0 : argRefinements.hashCode());
+		result = prime * result + ((targetClass == null) ? 0 : targetClass.hashCode());
+		return result;
+	}
+
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RefinedFunction other = (RefinedFunction) obj;
+		if (argRefinements == null) {
+			if (other.argRefinements != null)
+				return false;
+		} else if (!argRefinements.equals(other.argRefinements))
+			return false;
+		if (targetClass == null) {
+			if (other.targetClass != null)
+				return false;
+		} else if (!targetClass.equals(other.targetClass))
+			return false;
+		return true;
 	}
 	
 

@@ -212,8 +212,8 @@ class OperationsChecker {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
 			CtExecutable<?> method = inv.getExecutable().getDeclaration();
 			//Get function refinements with non_used variables
-			RefinedFunction fi = rtc.context.getFunctionByName(method.getSimpleName());
-			Constraint innerRefs = fi.getRenamedRefinements();
+			RefinedFunction fi = rtc.context.getFunction(method.getSimpleName(), inv.getTarget().getType().toString());//TODO check
+			Constraint innerRefs = fi.getRenamedRefinements(rtc.context);
 			//Substitute _ by the variable that we send
 			String newName = String.format(rtc.freshFormat, rtc.context.getCounter());
 			

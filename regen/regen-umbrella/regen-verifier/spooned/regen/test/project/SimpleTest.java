@@ -18,16 +18,17 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    // @Refinement("_ > 1800")
-    // public static int getYear() {
-    // return 1856;
-    // }
+    @repair.regen.specification.Refinement("_ < 10")
+    public static int getYear() {
+        return 8;
+    }
+
     public static void main(java.lang.String[] args) {
-        int a = 1998;
-        regen.test.project.Car c = new regen.test.project.Car();
-        c.setYear(a);
-        // @Refinement("_ > 1700")
-        // int j = getYear();
+        // int a = 1998;
+        // Car c = new Car();
+        // c.setYear(a);
+        @repair.regen.specification.Refinement("_ < 11")
+        int j = regen.test.project.SimpleTest.getYear();
     }
 }
 

@@ -205,17 +205,17 @@ public class Context {
 			ctxGlobalFunctions.add(f);
 	}
 
-	public RefinedFunction getFunctionByName(String name) {
-		for(RefinedFunction fi: ctxFunctions) {
-			if(fi.getName().equals(name))
-				return fi;
-		}
-		for(RefinedFunction fi: ctxGlobalFunctions) {
-			if(fi.getName().equals(name))
-				return fi;
-		}
-		return null;
-	}
+//	public RefinedFunction getFunctionByName(String name) {
+//		for(RefinedFunction fi: ctxFunctions) {
+//			if(fi.getName().equals(name))
+//				return fi;
+//		}
+//		for(RefinedFunction fi: ctxGlobalFunctions) {
+//			if(fi.getName().equals(name))
+//				return fi;
+//		}
+//		return null;
+//	}
 	
 	public RefinedFunction getFunction(String name, String target) {
 		for(RefinedFunction fi: ctxFunctions) {

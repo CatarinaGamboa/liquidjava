@@ -7,18 +7,18 @@ import repair.regen.specification.RefinementFunction;
 
 public class SimpleTest {
 
-//	@Refinement("_ > 1800")
-//	public static int getYear() {
-//		return 1856;
-//	}
+	@Refinement("_ < 10")
+	public static int getYear() {
+		return 8;
+	}
 
 	public static void main(String[] args) {
-		int a = 1998;
-		Car c = new Car();
-		c.setYear(a);
+//		int a = 1998;
+//		Car c = new Car();
+//		c.setYear(a);
 
-//		@Refinement("_ > 1700")
-//		int j = getYear();
+		@Refinement("_ < 11")
+		int j = getYear();
 		
 	}
 
