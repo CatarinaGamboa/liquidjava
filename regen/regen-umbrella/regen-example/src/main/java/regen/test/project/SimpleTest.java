@@ -4,12 +4,19 @@ import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementFunction;
 
-@RefinementAlias("GreaterThan(int x, int y) {x > y}")	
+@RefinementAlias("InRange(int val, int low, int up) {low < val && val < up}")	
 public class SimpleTest {
-
+	
+	@Refinement("InRange( _, 10, 16)")
+	public static int getNum() {
+		return 15;
+	}
+	
 	public static void main(String[] args) {
-		@Refinement("GreaterThan(j , 1)")
-		int j = 5;
+		@Refinement("a == 10")
+		int a = 10;
+		@Refinement("InRange( _, a, 122)")
+		int j = getNum();
 		
 	}
 

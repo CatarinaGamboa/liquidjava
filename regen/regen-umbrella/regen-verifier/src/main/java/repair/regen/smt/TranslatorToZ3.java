@@ -38,6 +38,8 @@ public class TranslatorToZ3 {
 	private Map<String, Expr> varTranslation = new HashMap<>();
 	private Map<String, AliasWrapper> aliasTranslation = new HashMap<>();
 	private Map<String, FuncDecl> funcTranslation = new HashMap<>();
+	
+	private List<Expression> premisesToAdd = new ArrayList<>();
 
 	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx, List<GhostFunction> l, List<AliasWrapper> alias) {
 		translateVariables(ctx);
@@ -131,6 +133,9 @@ public class TranslatorToZ3 {
 	public Status verifyExpression(Expression e) throws Exception {
 		Solver s = z3.mkSolver();
 		s.add((BoolExpr) e.eval(this));
+		for(Expression ex: premisesToAdd)
+			s.add((BoolExpr) ex.eval(this));
+		
 		Status st = s.check();
 		if (st.equals(Status.SATISFIABLE)) {
 			// Example of values
@@ -324,9 +329,11 @@ public class TranslatorToZ3 {
 		list.size()+", expected size:"+al.getVarNames().size());
 		
 		List<String> newNames = al.getNewVariables();
-		Expression e = al.getNewExpression(list, newNames);
 		translateVariables(al.getTypes(newNames));
+		Expression e = al.getNewExpression(newNames);
 		
+		Expression add = al.getPremises(list, newNames);
+		premisesToAdd.add(add);
 
 		System.out.println("Make Alias:" + e.toString());
 		return e;

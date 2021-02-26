@@ -10,6 +10,7 @@ import repair.regen.language.Expression;
 import repair.regen.language.alias.Alias;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Disjunction;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.factory.Factory;
@@ -51,19 +52,23 @@ public class AliasWrapper {
 		return (Predicate) expression.clone();
 	}
 
-	public Expression getNewExpression(List<Expression> list, List<String> newNames) {
-		List<Predicate> invocationPredicates = getPredicatesFromExpression(list);
-		Constraint a = getClonedConstraint();
-		for (int i = 0; i < list.size(); i++) {
-			a = a.substituteVariable(varNames.get(i), newNames.get(i));
+	public Expression getNewExpression(List<String> newNames) {
+		Constraint expr = getClonedConstraint();
+		for (int i = 0; i < newNames.size(); i++) {
+			expr = expr.substituteVariable(varNames.get(i), newNames.get(i));
 		}
+		return (new Predicate(expr.toString())).getExpression();		
+	}
+	
+	
+	public Expression getPremises(List<Expression> list, List<String> newNames){
+		List<Predicate> invocationPredicates = getPredicatesFromExpression(list);
+		Constraint prem = new Predicate();
 		for (int i = 0; i < invocationPredicates.size(); i++) {
-			a = Conjunction.createConjunction(a, 
+			prem = Conjunction.createConjunction(prem, 
 					new EqualsPredicate(newNames.get(i), invocationPredicates.get(i)));
 		}
-		Expression e = (new Predicate(a.toString())).getExpression();
-		System.out.println();
-		return e;		
+		return (new Predicate(prem.toString())).getExpression();
 	}
 
 	private List<Predicate> getPredicatesFromExpression(List<Expression> list) {

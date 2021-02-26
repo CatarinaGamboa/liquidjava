@@ -17,11 +17,18 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
-@repair.regen.specification.RefinementAlias("GreaterThan(int x, int y) {x > y}")
+@repair.regen.specification.RefinementAlias("InRange(int val, int low, int up) {low < val && val < up}")
 public class SimpleTest {
+    @repair.regen.specification.Refinement("InRange( _, 10, 16)")
+    public static int getNum() {
+        return 15;
+    }
+
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("GreaterThan(j , 1)")
-        int j = 5;
+        @repair.regen.specification.Refinement("a == 10")
+        int a = 10;
+        @repair.regen.specification.Refinement("InRange( _, a, 122)")
+        int j = regen.test.project.SimpleTest.getNum();
     }
 }
 
