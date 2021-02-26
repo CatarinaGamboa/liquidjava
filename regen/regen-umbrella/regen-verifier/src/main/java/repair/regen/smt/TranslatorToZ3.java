@@ -28,6 +28,7 @@ import repair.regen.language.Expression;
 import repair.regen.language.Variable;
 import repair.regen.language.alias.Alias;
 import repair.regen.language.alias.AliasName;
+import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.reference.CtTypeReference;
@@ -123,10 +124,12 @@ public class TranslatorToZ3 {
 		}	
 	}
 	
-	private Expr getVariableTranslation(String name) {
+	private Expr getVariableTranslation(String name) throws Exception {
 		Expr e= varTranslation.get(name);
 		if(e == null)
 			e = varTranslation.get(String.format("this#%s", name));
+		if(e == null)
+			throw new SyntaxException("Unknown variable:"+name);
 		return e;
 	}
 
@@ -162,7 +165,7 @@ public class TranslatorToZ3 {
 		return z3.mkBool(value);
 	}
 
-	public Expr makeVariable(String name) {
+	public Expr makeVariable(String name) throws Exception {
 		return getVariableTranslation(name);//int[] not in varTranslation
 	}
 

@@ -52,10 +52,12 @@ class OperationsChecker {
 		CtExpression<?> left = operator.getLeftHandOperand();
 		Constraint oper;
 		CtElement parent = operator.getParent();
-		if(parent instanceof CtAssignment<?, ?>) {
-			CtVariableWrite<?> parentVar = (CtVariableWrite<?>)((CtAssignment) parent)
-					.getAssigned();
-			oper = getOperationRefinements(operator, parentVar, operator);
+		if(parent instanceof CtAssignment<?, ?>  &&
+			((CtAssignment) parent).getAssigned() instanceof CtVariableWrite<?>) {
+				CtVariableWrite<?> parentVar = (CtVariableWrite<?>)((CtAssignment) parent)
+						.getAssigned();
+				oper = getOperationRefinements(operator, parentVar, operator);
+			
 		}else {
 			Constraint varRight = getOperationRefinements(operator, right);
 			Constraint varLeft = getOperationRefinements(operator, left);
