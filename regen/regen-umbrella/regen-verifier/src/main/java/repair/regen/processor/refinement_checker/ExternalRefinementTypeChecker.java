@@ -56,6 +56,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
 		mfc.getMethodRefinements(method, prefix);
 		super.visitCtMethod(method);
+		System.out.println("visited method external");
 	}
 
 

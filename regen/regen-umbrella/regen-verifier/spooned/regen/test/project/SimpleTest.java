@@ -17,10 +17,11 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
+@repair.regen.specification.RefinementAlias("GreaterThan(int x, int y) {x > y}")
 public class SimpleTest {
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("_ < 11")
-        int j = java.lang.Math.abs((-5));
+        @repair.regen.specification.Refinement("GreaterThan(j , 1)")
+        int j = 5;
     }
 }
 

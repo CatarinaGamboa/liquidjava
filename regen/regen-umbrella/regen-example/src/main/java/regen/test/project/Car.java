@@ -1,8 +1,9 @@
-package regen.test.project;
-
-import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
-
+//package regen.test.project;
+//
+//
+//import repair.regen.specification.Refinement;
+//import repair.regen.specification.RefinementAlias;
+//
 //@RefinementAlias("Positive(int x) { x > 0}")
 //@RefinementAlias("type CarAcceptableYears(int x) { x > 1800 && x < 2050}")
 //@RefinementAlias("GreaterThan(int x, int y) {x > y}")	
@@ -30,15 +31,15 @@ import repair.regen.specification.RefinementAlias;
 //		return this.year > y;
 //	}
 //	
-//	@Refinement("_ == old(year) + i")
-//	public int addYear(int i) {
-//		return year + i;
-//	}
-	
-//	open(Car)
-	
-	
-	
-		
-
+////	@Refinement("_ == old(year) + i")
+////	public int addYear(int i) {
+////		return year + i;
+////	}
+//	
+////	open(Car)
+//	
+//	
+//	
+//		
+//
 //}

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -318,32 +319,15 @@ public class TranslatorToZ3 {
 
 	public Expression makeAlias(AliasName name, List<Expression> list) throws TypeMismatchError {
 		AliasWrapper al = aliasTranslation.get(name.toString());
-		Expression e = al.getClonedConstraint().getExpression();//cloning
+		if(al.getVarNames().size() != list.size())
+			throw new TypeMismatchError("Arguments do not match: invocation size "+
+		list.size()+", expected size:"+al.getVarNames().size());
+		
+		List<String> newNames = al.getNewVariables();
+		Expression e = al.getNewExpression(list, newNames);
+		translateVariables(al.getTypes(newNames));
+		
 
-		List<String> decVarNames = al.getVarNames();
-		List<String> decTypes = new ArrayList<>();
-		for(CtTypeReference<?> t:al.getTypes())
-			decTypes.add(t.getQualifiedName());
-
-		//FOR ...
-		for (int i = 0; i < decVarNames.size(); i++) {
-			String decVar = decVarNames.get(i);
-			//Sort decType = getSort(decTypes.get(i));
-			
-			String argVar = list.get(i).toString();
-			if(!varTranslation.containsKey(argVar) && 
-					varTranslation.containsKey(String.format("this#%s", argVar)))
-				argVar = String.format("this#%s", argVar);
-				
-			//Sort argType = varTranslation.get(argVar).getSort();
-			
-			//if(decType.equals(argType)) {
-				e.substituteVariable(decVar, argVar);
-//			} else {
-//				throw new TypeMismatchError("Type mismatch in alias usage: using "+decType.toString()
-//				+" expecting " + argType.toString());
-//			}
-		}
 		System.out.println("Make Alias:" + e.toString());
 		return e;
 	}

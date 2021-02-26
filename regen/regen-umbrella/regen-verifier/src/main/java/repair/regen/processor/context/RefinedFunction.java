@@ -119,11 +119,11 @@ public class RefinedFunction extends Refined{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		RefinedFunction other = (RefinedFunction) obj;
+		RefinedFunction other = (RefinedFunction) obj;	
 		if (argRefinements == null) {
 			if (other.argRefinements != null)
 				return false;
-		} else if (!argRefinements.equals(other.argRefinements))
+		} else if (argRefinements.size() != other.argRefinements.size())
 			return false;
 		if (targetClass == null) {
 			if (other.targetClass != null)

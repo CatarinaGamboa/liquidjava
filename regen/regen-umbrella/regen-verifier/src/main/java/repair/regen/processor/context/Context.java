@@ -17,7 +17,6 @@ public class Context {
 	private List<RefinedVariable> ctxSpecificVars;
 	
 	private List<RefinedVariable> ctxGlobalVars;
-	private List<RefinedFunction> ctxGlobalFunctions;
 	
 	private List<GhostFunction> ghosts;
 	private List<AliasWrapper> alias;
@@ -34,7 +33,7 @@ public class Context {
 		ctxSpecificVars = new ArrayList<>();
 		//globals
 		ctxGlobalVars = new ArrayList<>();
-		ctxGlobalFunctions = new ArrayList<>();
+//		ctxGlobalFunctions = new ArrayList<>();
 		
 		alias = new ArrayList<>();
 		ghosts = new ArrayList<>();
@@ -200,10 +199,10 @@ public class Context {
 		if(!ctxFunctions.contains(f))
 			ctxFunctions.add(f);
 	}
-	public void addGlobalFunctionToContext(RefinedFunction f) {
-		if(!ctxGlobalFunctions.contains(f))
-			ctxGlobalFunctions.add(f);
-	}
+//	public void addGlobalFunctionToContext(RefinedFunction f) {
+//		if(!ctxGlobalFunctions.contains(f))
+//			ctxGlobalFunctions.add(f);
+//	}
 
 //	public RefinedFunction getFunctionByName(String name) {
 //		for(RefinedFunction fi: ctxFunctions) {
@@ -223,10 +222,10 @@ public class Context {
 			   fi.getName().equals(name) && fi.getTargetClass().equals(target))
 				return fi;
 		}
-		for(RefinedFunction fi: ctxGlobalFunctions) {
-			if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
-				return fi;
-		}
+//		for(RefinedFunction fi: ctxGlobalFunctions) {
+//			if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
+//				return fi;
+//		}
 		return null;
 	}
 
@@ -338,9 +337,9 @@ public class Context {
 			}
 			sb.append("}\n");
 		}
-		sb.append("\n############Global Functions:############\n");
-		for(RefinedFunction f : ctxGlobalFunctions)
-			sb.append(f.toString());
+//		sb.append("\n############Global Functions:############\n");
+//		for(RefinedFunction f : ctxGlobalFunctions)
+//			sb.append(f.toString());
 		sb.append("\n############Functions:############\n");
 		for(RefinedFunction f : ctxFunctions)
 			sb.append(f.toString());

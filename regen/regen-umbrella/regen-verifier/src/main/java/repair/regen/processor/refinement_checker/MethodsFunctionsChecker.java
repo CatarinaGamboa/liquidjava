@@ -173,7 +173,6 @@ public class MethodsFunctionsChecker {
 		f.setRefReturn(new Predicate());
 		f.setClass(prefix);
 		rtc.context.addFunctionToContext(f);
-		rtc.context.addGlobalFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 	}
 	

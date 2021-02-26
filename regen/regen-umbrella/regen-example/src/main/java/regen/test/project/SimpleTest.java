@@ -4,12 +4,12 @@ import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementFunction;
 
-
+@RefinementAlias("GreaterThan(int x, int y) {x > y}")	
 public class SimpleTest {
 
 	public static void main(String[] args) {
-		@Refinement("_ < 11")
-		int j = Math.abs(-5);
+		@Refinement("GreaterThan(j , 1)")
+		int j = 5;
 		
 	}
 
