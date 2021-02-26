@@ -14,7 +14,7 @@ public class SimpleTest {
 	
 	public static void main(String[] args) {
 		@Refinement("a == 10")
-		int a = 10;
+		double a = 10;
 		@Refinement("InRange( _, a, 122)")
 		int j = getNum();
 		

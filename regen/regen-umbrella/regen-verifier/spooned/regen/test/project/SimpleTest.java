@@ -26,7 +26,7 @@ public class SimpleTest {
 
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("a == 10")
-        int a = 10;
+        double a = 10;
         @repair.regen.specification.Refinement("InRange( _, a, 122)")
         int j = regen.test.project.SimpleTest.getNum();
     }

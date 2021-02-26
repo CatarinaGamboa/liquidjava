@@ -322,20 +322,33 @@ public class TranslatorToZ3 {
 
 
 
-	public Expression makeAlias(AliasName name, List<Expression> list) throws TypeMismatchError {
+	public Expression makeAlias(AliasName name, List<Expression> list) throws TypeMismatchError, Exception {
 		AliasWrapper al = aliasTranslation.get(name.toString());
 		if(al.getVarNames().size() != list.size())
 			throw new TypeMismatchError("Arguments do not match: invocation size "+
 		list.size()+", expected size:"+al.getVarNames().size());
-		
 		List<String> newNames = al.getNewVariables();
 		translateVariables(al.getTypes(newNames));
-		Expression e = al.getNewExpression(newNames);
 		
+		checkTypes(list, al.getTypes());
+		
+		Expression e = al.getNewExpression(newNames);
 		Expression add = al.getPremises(list, newNames);
 		premisesToAdd.add(add);
 
 		System.out.println("Make Alias:" + e.toString());
 		return e;
 	}
+
+	private void checkTypes(List<Expression> list, List<CtTypeReference<?>> types) throws Exception {
+		for (int i = 0; i < list.size(); i++) {
+			Sort se = (list.get(i).eval(this)).getSort();
+			Sort st = getSort(types.get(i).getQualifiedName());
+			if(!se.equals(st))
+				throw new TypeMismatchError("Types of arguments do not match. Got "+
+						list.get(i)+":"+se.toString()+" but expected "+st.toString());
+		}
+		
+	}
+
 }

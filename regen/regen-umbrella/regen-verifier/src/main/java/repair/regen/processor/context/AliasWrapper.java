@@ -85,6 +85,7 @@ public class AliasWrapper {
 			n.add(String.format(newAliasFormat, varNames.get(i), context.getCounter()));
 		return n;
 	}
+	
 	public Map<String, CtTypeReference<?>> getTypes(List<String> names){
 		Map<String, CtTypeReference<?>> m = new HashMap<>();
 		for (int i = 0; i < names.size(); i++) {
