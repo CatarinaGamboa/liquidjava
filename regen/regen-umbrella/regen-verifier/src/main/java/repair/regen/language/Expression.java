@@ -18,7 +18,5 @@ public abstract class Expression implements IModel {
 	public abstract void substituteVariable(String from, String to);
 	
 	public abstract void getVariableNames(List<String> l);
-
-	public abstract Expr beforeEval(TranslatorToZ3 translatorToZ3) throws Exception;
 	
 }

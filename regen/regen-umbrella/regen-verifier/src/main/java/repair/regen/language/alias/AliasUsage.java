@@ -26,12 +26,6 @@ public class AliasUsage extends Expression implements IModel{
 //		return null;
 	}
 	
-	@Override
-	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
-		//adicionar vars e igualdade
-		return null;
-	}
-
 
 	@Override
 	public String toString() {

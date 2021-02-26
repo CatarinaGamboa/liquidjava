@@ -19,12 +19,7 @@ public class BinaryExpression extends Expression implements IModel {
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return op.eval(ctx, e1, e2);
 	}
-	
-	@Override
-	public Expr beforeEval(TranslatorToZ3 translatorToZ3) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
 	
 
 	@Override

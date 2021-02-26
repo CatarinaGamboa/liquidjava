@@ -21,11 +21,6 @@ public class ExpressionGroup extends Expression implements IModel {
 	}
 	
 	@Override
-	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
-		return e.beforeEval(ctx);
-	}
-
-	@Override
 	public String toString() {
 		return String.format("(%s)", e.toString());
 	}

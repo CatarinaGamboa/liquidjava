@@ -33,12 +33,6 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 		
 	}
 	
-	@Override
-	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
-		return null; //TODO complete
-	}
-	
-	
 	public Argument getArgument() {
 		return mv;
 	}
