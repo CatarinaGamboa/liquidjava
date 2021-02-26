@@ -23,6 +23,13 @@ public class AliasUsage extends Expression implements IModel{
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return (ctx.makeAlias(name, getExpressions())).eval(ctx);
+//		return null;
+	}
+	
+	@Override
+	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
+		//adicionar vars e igualdade
+		return null;
 	}
 
 

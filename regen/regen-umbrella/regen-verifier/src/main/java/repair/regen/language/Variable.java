@@ -22,6 +22,12 @@ public class Variable extends Expression implements IModel {
 		//System.out.println("IN VAR");
 		return ctx.makeVariable(name);
 	}
+	
+	@Override
+	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public String toString() {

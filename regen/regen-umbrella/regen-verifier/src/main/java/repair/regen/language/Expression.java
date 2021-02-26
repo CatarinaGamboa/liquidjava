@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.modelcc.IModel;
 
+import com.microsoft.z3.BoolExpr;
 import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
@@ -17,4 +18,7 @@ public abstract class Expression implements IModel {
 	public abstract void substituteVariable(String from, String to);
 	
 	public abstract void getVariableNames(List<String> l);
+
+	public abstract Expr beforeEval(TranslatorToZ3 translatorToZ3) throws Exception;
+	
 }

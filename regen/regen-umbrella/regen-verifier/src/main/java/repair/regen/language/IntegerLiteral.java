@@ -24,6 +24,12 @@ public class IntegerLiteral extends LiteralExpression implements IModel {
 	public Expr eval(TranslatorToZ3 ctx) {
 		return ctx.makeIntegerLiteral(value);
 	}
+	
+	@Override
+	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public String toString() {

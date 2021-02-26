@@ -130,6 +130,8 @@ public class TranslatorToZ3 {
 
 	public Status verifyExpression(Expression e) throws Exception {
 		Solver s = z3.mkSolver();
+		BoolExpr b = (BoolExpr) e.beforeEval(this); 
+		s.add( b==null ? z3.mkBool(true) : b);
 		s.add((BoolExpr) e.eval(this));
 		Status st = s.check();
 		if (st.equals(Status.SATISFIABLE)) {

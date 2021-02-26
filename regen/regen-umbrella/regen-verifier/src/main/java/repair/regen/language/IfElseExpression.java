@@ -24,6 +24,12 @@ public class IfElseExpression  extends Expression implements IModel {
 		return ctx.makeIte(cond.eval(ctx), then.eval(ctx), els.eval(ctx));
 	}
 	
+	@Override
+	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 	public Expression getCondition() {
 		return cond;
 	}

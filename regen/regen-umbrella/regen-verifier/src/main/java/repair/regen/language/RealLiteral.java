@@ -26,6 +26,12 @@ public class RealLiteral extends LiteralExpression implements IModel {
 		}
 		return ctx.makeDoubleLiteral(value);
 	}
+	
+	@Override
+	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	@Override
 	public String toString() {

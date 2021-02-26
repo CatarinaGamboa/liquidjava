@@ -19,6 +19,11 @@ public class ExpressionGroup extends Expression implements IModel {
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return e.eval(ctx);
 	}
+	
+	@Override
+	public Expr beforeEval(TranslatorToZ3 ctx) throws Exception {
+		return e.beforeEval(ctx);
+	}
 
 	@Override
 	public String toString() {
