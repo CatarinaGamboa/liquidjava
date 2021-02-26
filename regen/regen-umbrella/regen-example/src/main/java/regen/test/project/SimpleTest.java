@@ -9,17 +9,13 @@ public class SimpleTest {
 	
 	@Refinement("InRange( _, 10, 16)")
 	public static int getNum() {
-		return 15;
+		return 14;
 	}
 	
 	public static void main(String[] args) {
-		@Refinement("a == 10")
-		double a = 10;
-		@Refinement("InRange( _, a, 122)")
+		@Refinement("InRange( _, 10, 15)")
 		int j = getNum();
-		
 	}
-
 	
 	
 	

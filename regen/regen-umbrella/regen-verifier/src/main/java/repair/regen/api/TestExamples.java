@@ -192,6 +192,11 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void correctAliasExpressions() {
+		testCorrect(testPath+"CorrectAliasExpressions.java");
+	}
+	
+	@Test
 	public void correctSimpleCarTest() {
 		testCorrect(testPath+"/classes");
 	}
@@ -410,9 +415,20 @@ public class TestExamples {
 	}
 	
 	@Test
+	public void  errorAlias() {
+		testWrong(testPath+"ErrorAlias.java");
+	}
+	
+	@Test
 	public void errorAliasTypeMismatch() {
 		testWrong(testPath+"ErrorAliasTypeMismatch.java");
 	}
+	
+	@Test
+	public void errorAliasArgumentSize() {
+		testWrong(testPath+"ErrorAliasArgumentSize.java");
+	}
+	
 	
 
 	

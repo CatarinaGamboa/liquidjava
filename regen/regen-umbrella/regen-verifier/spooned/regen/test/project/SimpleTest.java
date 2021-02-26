@@ -21,13 +21,11 @@ package regen.test.project;
 public class SimpleTest {
     @repair.regen.specification.Refinement("InRange( _, 10, 16)")
     public static int getNum() {
-        return 15;
+        return 14;
     }
 
     public static void main(java.lang.String[] args) {
-        @repair.regen.specification.Refinement("a == 10")
-        double a = 10;
-        @repair.regen.specification.Refinement("InRange( _, a, 122)")
+        @repair.regen.specification.Refinement("InRange( _, 10, 15)")
         int j = regen.test.project.SimpleTest.getNum();
     }
 }
