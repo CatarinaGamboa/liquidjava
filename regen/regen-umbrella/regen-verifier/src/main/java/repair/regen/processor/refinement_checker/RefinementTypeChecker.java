@@ -90,16 +90,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	@Override
 	public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
-		//VISITS CREATION OF ANNOTATIONS
-		//Probably will have to use the context to store annotations
-		//		System.out.println("AnnTYpe:"+annotationType);
-		//		for(CtAnnotation ann : annotationType.getAnnotations())
-		//			if( ann.getActualAnnotation().annotationType().getCanonicalName()
-		//				.contentEquals("repair.regen.specification.Refinement")) {
-		//				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-		//				annotationType.putMetadata(REFINE_KEY, s);
-		//			}
-
 		super.visitCtAnnotationType(annotationType);
 	}
 
@@ -144,7 +134,13 @@ public class RefinementTypeChecker extends TypeChecker {
 		//TODO only working for 1 dimension
 		for(CtExpression<?> exp:l) {
 			Constraint c = getExpressionRefinements(exp);
-			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR), c);
+			String name = String.format(freshFormat, context.getCounter());
+			if(c.getVariableNames().contains(WILD_VAR))
+				c = c.substituteVariable(WILD_VAR, name);
+			else
+				c = new EqualsPredicate(name, c);
+			context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c);
+			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR), name);
 			newArray.putMetadata(REFINE_KEY, ep);
 		}
 	}
@@ -249,7 +245,8 @@ public class RefinementTypeChecker extends TypeChecker {
 			
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
 			String targetName = fieldRead.getTarget().toString();
-			fieldRead.putMetadata(REFINE_KEY, FunctionPredicate.builtin_length(targetName));
+			fieldRead.putMetadata(REFINE_KEY, 
+					new EqualsPredicate(WILD_VAR, FunctionPredicate.builtin_length(targetName)));
 		}else{
 			fieldRead.putMetadata(REFINE_KEY, new Predicate());
 			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE

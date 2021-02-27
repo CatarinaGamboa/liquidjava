@@ -15,11 +15,11 @@ public class CorrectImplies {
 		@Refinement("_ > 5")
 		int x = 10;
 		
-		@Refinement("(x > 50) --> (y > 50)")
-		int y = x;
-		
-		@Refinement("y > 1 --> z > 2")
-		int z = y*2;
+//		@Refinement("(x > 50) --> (y > 50)")
+//		int y = x;
+//		
+//		@Refinement("y > 1 --> z > 2")
+//		int z = y*2;
 		
 		@Refinement("_ == 12")
 		int z0 = getPositiveDouble(6);

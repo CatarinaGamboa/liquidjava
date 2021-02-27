@@ -160,8 +160,12 @@ class OperationsChecker {
 	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWrite<?> parentVar, 
 			CtExpression<?> element) {
 		if(element instanceof CtFieldRead<?>) {
-			if(((CtFieldRead<?>)element).getVariable().getSimpleName().equals("length"))
-				return rtc.getRefinement(element);
+			if(((CtFieldRead<?>)element).getVariable().getSimpleName().equals("length")) {
+				String name = String.format(rtc.freshFormat, rtc.context.getCounter());
+				rtc.context.addVarToContext(name, element.getType(), 
+						rtc.getRefinement(element).substituteVariable(rtc.WILD_VAR, name));
+				return new Predicate(name);
+			}
 		}
 
 		if(element instanceof CtVariableRead<?>) {

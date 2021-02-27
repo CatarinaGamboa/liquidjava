@@ -14,10 +14,11 @@ public class CorrectImplies {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("_ > 5")
         int x = 10;
-        @repair.regen.specification.Refinement("(x > 50) --> (y > 50)")
-        int y = x;
-        @repair.regen.specification.Refinement("y > 1 --> z > 2")
-        int z = y * 2;
+        // @Refinement("(x > 50) --> (y > 50)")
+        // int y = x;
+        // 
+        // @Refinement("y > 1 --> z > 2")
+        // int z = y*2;
         @repair.regen.specification.Refinement("_ == 12")
         int z0 = repair.regen.CorrectImplies.getPositiveDouble(6);
         // @Refinement("z > 0 --> _ > 0") //works but takes 1min to run

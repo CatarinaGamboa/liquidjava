@@ -6,41 +6,23 @@ import repair.regen.specification.RefinementFunction;
 
 public class SimpleTest {
 	
-
-	@Refinement("_ >= 0 && _ >= n")
-	public static int sum(int n) {
-		if(n <= 0)
-			return 0;
-		else {
-			int t1 = sum(n-1);
-			return n + t1;
-		}
-	}
-	
-	@Refinement("_ >= 0 && _ >= n")
-	public static int absolute(int n) {
-		if(0 <= n)
-			return n;
+	@RefinementFunction("ghost int length(int[])")
+	@Refinement("(_ >= -1) && (_ < length(l))")
+	public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l, 
+										  @Refinement("i >= 0 && i < length(l)") int i, 
+										  int val) {
+		if(l[i] == val)
+			return i;
+		if(i >= l.length - 1)
+			return -1;
 		else
-			return 0 - n;
-	}
-	
-	//From LiquidHaskell tutorial
-	@Refinement("length(_) == length(vec1)")
-	static int[] sumVectors(int[] vec1, @Refinement("length(vec1) == length(vec2)") int[] vec2) {
-		int[] add = new int[vec1.length];
-		auxSum(add, vec1, vec2, 0);
-		return add;
+			return getIndexWithValue(l, i+1, val);	
 	}
 
-	private static void auxSum(int[] add, int[] vec1, 
-							@Refinement("length(vec1) == length(vec2) && length(_) == length(add)")
-							int[] vec2, 
-							@Refinement("_ >= 0 && _ < length(vec2)")
-							int i) {
-		add[i] = vec1[i]+vec2[i];
-		if(i < add.length - 1)
-			auxSum(add, vec1, vec2, i+1);
+	
+	public static void main(String[] args) {
+		int[] arr = new int[10+6];
+		getIndexWithValue(arr, 0, 1000);
 	}
 	
 	

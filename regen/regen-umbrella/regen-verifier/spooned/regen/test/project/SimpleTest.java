@@ -18,41 +18,24 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("_ >= 0 && _ >= n")
-    public static int sum(int n) {
-        if (n <= 0)
-            return 0;
-        else {
-            int t1 = regen.test.project.SimpleTest.sum((n - 1));
-            return n + t1;
-        }
-    }
+    @repair.regen.specification.RefinementFunction("ghost int length(int[])")
+    @repair.regen.specification.Refinement("(_ >= -1) && (_ < length(l))")
+    public static int getIndexWithValue(@repair.regen.specification.Refinement("length(l) > 0")
+    int[] l, @repair.regen.specification.Refinement("i >= 0 && i < length(l)")
+    int i, int val) {
+        if ((l[i]) == val)
+            return i;
 
-    @repair.regen.specification.Refinement("_ >= 0 && _ >= n")
-    public static int absolute(int n) {
-        if (0 <= n)
-            return n;
+        if (i >= ((l.length) - 1))
+            return -1;
         else
-            return 0 - n;
+            return regen.test.project.SimpleTest.getIndexWithValue(l, (i + 1), val);
 
     }
 
-    // From LiquidHaskell tutorial
-    @repair.regen.specification.Refinement("length(_) == length(vec1)")
-    static int[] sumVectors(int[] vec1, @repair.regen.specification.Refinement("length(vec1) == length(vec2)")
-    int[] vec2) {
-        int[] add = new int[vec1.length];
-        regen.test.project.SimpleTest.auxSum(add, vec1, vec2, 0);
-        return add;
-    }
-
-    private static void auxSum(int[] add, int[] vec1, @repair.regen.specification.Refinement("length(vec1) == length(vec2) && length(_) == length(add)")
-    int[] vec2, @repair.regen.specification.Refinement("_ >= 0 && _ < length(vec2)")
-    int i) {
-        add[i] = (vec1[i]) + (vec2[i]);
-        if (i < ((add.length) - 1))
-            regen.test.project.SimpleTest.auxSum(add, vec1, vec2, (i + 1));
-
+    public static void main(java.lang.String[] args) {
+        int[] arr = new int[10 + 6];
+        regen.test.project.SimpleTest.getIndexWithValue(arr, 0, 1000);
     }
 }
 

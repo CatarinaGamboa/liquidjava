@@ -6,6 +6,10 @@ public class EqualsPredicate extends Predicate {
 		super("("+c1.toString()+" == "+ c2.toString()+")");
 	}
 	
+	public EqualsPredicate(Constraint c1, String c2) {
+		super("("+c1.toString()+" == "+ c2+")");
+	}
+	
 	public EqualsPredicate(String variable, Constraint c) {
 		super("("+variable+" == "+ c.toString()+")");
 	}
