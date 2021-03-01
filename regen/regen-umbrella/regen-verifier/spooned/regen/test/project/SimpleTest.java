@@ -31,12 +31,51 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
-@repair.regen.specification.RefinementAlias("PTgrade(int x) {x >= 0 && x <= 20}")
+@repair.regen.specification.RefinementAlias("PtGrade(int x) {x >= 0 && x <= 20}")
 public class SimpleTest {
+    @repair.regen.specification.Refinement("(a > b)? (_ == a):( _ == b)")
+    public static int max(@repair.regen.specification.Refinement("true")
+    int a, int b) {
+        if (a > b)
+            return a;
+        else
+            return b;
+
+    }
+
+    @repair.regen.specification.Refinement("_ > 0")
+    public int fun(int[] arr) {
+        return regen.test.project.SimpleTest.max(arr[0], 1);
+    }
+
+    // @Refinement("_ > 0 &&  (_ == b - a)")
+    // public int range(@Refinement("a > 0")int a, @Refinement("b > a")int b) {
+    // return b-a;
+    // }
+    public static int getIndexWithValue(@repair.regen.specification.Refinement("length(arr) > 0")
+    int[] arr, @repair.regen.specification.Refinement("i >= 0 && i < length(arr)")
+    int i, int val) {
+        if ((arr[i]) == val)
+            return i;
+
+        if (i > ((arr.length) - 1))
+            return -1;
+        else
+            return regen.test.project.SimpleTest.getIndexWithValue(arr, (i + 1), val);
+
+    }
+
     public static void main(java.lang.String[] args) {
-        int[] a = new int[10 + 3];
-        @repair.regen.specification.Refinement("length(b) > 5")
-        int[] b = a;
+        @repair.regen.specification.Refinement("length(arr) > 0")
+        int[] arr = new int[10];
+        // @Refinement("PtGrade(_) && positive >= 10")
+        // int positive = 15;
+        // positive = 9;
+        // @Refinement("PtGrade(_) && _ < 10")
+        // int negative = 5;
+        // positive = max(positive, negative);
+        // 
+        // int m2 = Math.max(positive, negative);
     }
 }
 
