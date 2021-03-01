@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
+@Target({ ElementType.METHOD, ElementType.CONSTRUCTOR })
 public @interface RefineState {
-	public String from();
-	public String to();
+	public String from() default "";
+	public String to()  default "";
 
 }

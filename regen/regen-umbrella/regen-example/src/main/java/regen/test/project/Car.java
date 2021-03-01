@@ -12,8 +12,6 @@ public class Car {
 	@Refinement("IntBetween(_, 1800, 2050)")
 	private int year;
 	
-	private boolean isOpen;
-	
 	
 	public void setYear(@Refinement("IntBetween(_, 1900, 2000)") int year) {
 		this.year = year;
@@ -37,11 +35,25 @@ public class Car {
 //		year = year + i;
 //		return year;
 //	}
+
+	
+	
+	private boolean isOpen;
+	
+	@RefineState(to = "!open(this)")
+	public Car() {
+		isOpen = false;
+	}
 	
 
 	@RefineState(from = "!open(this)", to = "open(this)")
 	public void openCar() {
 		isOpen = true;
+	}
+	
+	@RefineState(from = "open(this)")
+	public void passagerEnters() {
+		//...
 	}
 	
 //	open(Car)
