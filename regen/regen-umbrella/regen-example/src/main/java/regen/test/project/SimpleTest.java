@@ -10,11 +10,18 @@ import repair.regen.specification.RefinementFunction;
 public class SimpleTest {
 
 	public static void main(String[] args) {
-		int[] a = new int[10+3];
-		@Refinement("length(b) > 5")
-		int[] b = a;
+		int a = 10;
 		
+		a = 15;
+		int b = a;
+		//a
+		//instances: a0, a1
+		//a0 == 10
+		//a1 == 15
 		
+		//b
+		//instances: b0
+		//b0 == a1
 	}
 	
 	
