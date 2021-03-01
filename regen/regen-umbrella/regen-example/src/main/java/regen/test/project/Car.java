@@ -2,6 +2,7 @@ package regen.test.project;
 
 
 
+
 import repair.regen.specification.RefineState;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
@@ -37,25 +38,24 @@ public class Car {
 //	}
 
 	
-	
-	private boolean isOpen;
-	
-	@RefineState(to = "!open(this)")
-	public Car() {
-		isOpen = false;
-	}
-	
+//REFINE STATE
+//	private boolean isOpen;
+//	
+//	@RefineState(to = "!open(this)")
+//	public Car() {
+//		isOpen = false;
+//	}
+//	
+//
+//	@RefineState(from = "!open(this)", to = "open(this)")
+//	public void openCar() {
+//		isOpen = true;
+//	}
+//	
+//	@RefineState(from = "open(this)")
+//	public void passagerEnters() {
+//		//...
+//	}
 
-	@RefineState(from = "!open(this)", to = "open(this)")
-	public void openCar() {
-		isOpen = true;
-	}
-	
-	@RefineState(from = "open(this)")
-	public void passagerEnters() {
-		//...
-	}
-	
-//	open(Car)
 
 }
