@@ -1,4 +1,3 @@
-package regen.test.project;
 
 
 // @Refinement("_ == GreaterThan(year, y)")
@@ -8,7 +7,8 @@ package regen.test.project;
 // 
 // @Refinement("_ == old(year) + i")
 // public int addYear(int i) {
-// return year + i;
+// year = year + i;
+// return year;
 // }
 // open(Car)
 @repair.regen.specification.RefinementAlias("IntBetween(int val, int lo, int hi) { lo <= val && val <= hi}")

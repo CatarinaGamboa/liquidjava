@@ -120,7 +120,7 @@ public class TranslatorToZ3 {
 		case "void": return z3.mkUninterpretedSort("void");
 		//case "List":return z3.mkListSort(name, elemSort)
 		default:
-			return null;
+			return z3.mkUninterpretedSort(sort);
 		}	
 	}
 	
@@ -339,7 +339,7 @@ public class TranslatorToZ3 {
 		Expression add = al.getPremises(list, newNames);
 		premisesToAdd.add(add);
 
-		System.out.println("Make Alias:" + e.toString());
+//		System.out.println("Make Alias:" + e.toString());
 		return e;
 	}
 

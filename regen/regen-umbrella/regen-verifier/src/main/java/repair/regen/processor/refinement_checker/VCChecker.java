@@ -175,9 +175,9 @@ public class VCChecker {
 
 	//################################# PRINTS ########################################
 	private void printVCs(String string, String stringSMT, Constraint expectedType) {
-		System.out.println("----------------------------VC--------------------------------");
-		System.out.println("VC:"+string);
-		System.out.println("SMT subtyping:" + stringSMT + " <: " + expectedType.toString());
+		System.out.println("\n----------------------------VC--------------------------------");
+		System.out.println("VC:\n"+string);
+		System.out.println("\nSMT subtyping:" + stringSMT + " <: " + expectedType.toString());
 		System.out.println("--------------------------------------------------------------");
 
 	}

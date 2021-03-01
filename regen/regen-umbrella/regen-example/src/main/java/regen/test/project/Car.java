@@ -1,50 +1,49 @@
-//package regen.test.project;
-//
-//
-//import repair.regen.specification.Refinement;
-//import repair.regen.specification.RefinementAlias;
-//
-//@RefinementAlias("Positive(int x) { x > 0}")
-//@RefinementAlias("type CarAcceptableYears(int x) { x > 1800 && x < 2050}")
-//@RefinementAlias("GreaterThan(int x, int y) {x > y}")	
-//public class Car {
-//	
-//	@Refinement("CarAcceptableYears(year)")
-//	private int year;
-//	
-//	@Refinement("Positive(_)")
-//	private int seats;
-//	
-//	
-//	public void setYear(@Refinement("CarAcceptableYears(_)") int year) {
-//		this.year = year;
-//	}
-//	
-//	@Refinement("CarAcceptableYears(_)")
-//	public int getYear() {
-//		return year;
-//	}
-//	
-//	
-//	@Refinement("_ == GreaterThan(2000, year)")
-//	public boolean isOlderThan2000() {
-//		return 2000 > this.year;
-//	}
-//	
+package regen.test.project;
+
+
+
+import repair.regen.specification.RefineState;
+import repair.regen.specification.Refinement;
+import repair.regen.specification.RefinementAlias;
+
+@RefinementAlias("IntBetween(int val, int lo, int hi) { lo <= val && val <= hi}")
+public class Car {
+	
+	@Refinement("IntBetween(_, 1800, 2050)")
+	private int year;
+	
+	private boolean isOpen;
+	
+	
+	public void setYear(@Refinement("IntBetween(_, 1900, 2000)") int year) {
+		this.year = year;
+	}
+	
+	
+	@Refinement("IntBetween(_, 1800, 2050)")
+	public int getYear() {
+		return year;
+	}
+	
+
+	
 //	@Refinement("_ == GreaterThan(year, y)")
 //	public boolean isOlderThan(int y) {
 //		return this.year > y;
 //	}
-//	
-////	@Refinement("_ == old(year) + i")
-////	public int addYear(int i) {
-////		return year + i;
-////	}
-//	
-////	open(Car)
-//	
-//	
-//	
-//		
-//
-//}
+
+//	@Refinement("_ == old(year) + i")
+//	public int addYear(int i) {
+//		year = year + i;
+//		return year;
+//	}
+	
+
+	@RefineState(from = "!open(this)", to = "open(this)")
+	public void openCar() {
+		isOpen = true;
+	}
+	
+//	open(Car)
+
+}
