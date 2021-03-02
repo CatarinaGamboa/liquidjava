@@ -22,6 +22,7 @@ import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
+import repair.regen.specification.RefinementPredicate;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -460,7 +461,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			if( an.contentEquals("repair.regen.specification.Refinement")) {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 				ref = Optional.of(s.getValue());
-			}else if( an.contentEquals("repair.regen.specification.RefinementFunction")) {
+			}else if( an.contentEquals("repair.regen.specification.RefinementPredicate")) {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 				getGhostFunction(s.getValue());
 				ref = Optional.empty();

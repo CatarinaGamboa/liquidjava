@@ -1,6 +1,7 @@
 package repair.regen.processor.constraints;
 
 import repair.regen.language.BinaryExpression;
+import repair.regen.language.ExpressionGroup;
 import repair.regen.language.operators.AdditionOperator;
 import repair.regen.language.operators.AndOperator;
 import repair.regen.language.operators.BinaryOperator;
@@ -20,8 +21,11 @@ public class OperationPredicate extends Predicate{
 	
 	public OperationPredicate(Constraint c1, String op, Constraint c2) {
 		super();
-		setExpression(new BinaryExpression(c1.getExpression(), 
-				operationFromString(op), c2.getExpression()));
+		if(c1 != null && c2 != null && op != null)
+			setExpression(new ExpressionGroup(new BinaryExpression(c1.getExpression(), 
+					operationFromString(op), c2.getExpression())));
+		else
+			System.out.println("Something to implement later on Operation Predicate!");
 	}
 	
 	private BinaryOperator operationFromString(String s) {

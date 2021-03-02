@@ -4,6 +4,7 @@ import java.util.List;
 
 import repair.regen.language.BinaryExpression;
 import repair.regen.language.Expression;
+import repair.regen.language.ExpressionGroup;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.operators.AndOperator;
 import repair.regen.language.operators.NotOperator;
@@ -62,7 +63,7 @@ public class Disjunction extends Constraint{
 	
 	@Override
 	public Expression getExpression() {
-		return new BinaryExpression(c1.getExpression(), new OrOperator(), c2.getExpression());
+		return new ExpressionGroup(new BinaryExpression(c1.getExpression(), new OrOperator(), c2.getExpression()));
 	}
 
 

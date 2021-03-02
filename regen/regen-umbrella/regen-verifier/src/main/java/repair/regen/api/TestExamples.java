@@ -64,10 +64,10 @@ public class TestExamples {
 		testCorrect(testPath+"CorrectLongUsage.java");
 	}
 	
-//	@Test
-//	public void correctPrimitiveNumbersTypes() {
-//		testCorrect(testPath+"CorrectPrimitiveNumbersTypes.java");
-//	} //Takes a long time
+	@Test
+	public void correctPrimitiveNumbersTypes() {
+		testCorrect(testPath+"CorrectPrimitiveNumbersTypes.java");
+	} //Takes a long time
 	
 	@Test
 	public void correctFPArithmetic() {
