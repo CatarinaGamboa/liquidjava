@@ -22,28 +22,24 @@ public class Email {
 	}
 	
 	@StateRefinement(from= "state(this) == 1", to = "state(this) == 2")
-	public Email from(String s) {
+	public void from(String s) {
 		sender = s;
-		return this;
 	}
 	
 	@StateRefinement(from= "(state(this) == 2) || (state(this) == 3)", 
 					 to =  "state(this) == 3")
-	public Email to(String s) {
+	public void to(String s) {
 		receiver.add(s);
-		return this;
 	}
 	
 	@StateRefinement(from= "state(this) == 3",  to = "state(this) == 3")
-	public Email subject(String s) {//optional
+	public void subject(String s) {//optional
 		subject = s;
-		return this;
 	}
 	
 	@StateRefinement(from= "state(this) == 3", to = "state(this) == 4")
-	public Email body(String s) {
+	public void body(String s) {
 		body = s;
-		return this;
 	}
 	
 	@StateRefinement(from= "state(this) == 4", to = "state(this) == 4")

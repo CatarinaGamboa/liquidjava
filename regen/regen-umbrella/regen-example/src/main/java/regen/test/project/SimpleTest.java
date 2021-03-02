@@ -52,7 +52,10 @@ public class SimpleTest {
 		int[] arr = new int[10];
 		
 		
-		Email e = new Email().from("me").to("you");
+		Email e = new Email();
+		e.from("me");
+		e.to("you");
+		//...
 	
 //		@Refinement("PtGrade(_) && positive >= 10")
 //		int positive = 15;
