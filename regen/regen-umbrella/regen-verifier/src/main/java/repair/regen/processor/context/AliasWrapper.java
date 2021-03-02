@@ -13,6 +13,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Disjunction;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.VariablePredicate;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.filter.CatchVariableScopeFunction;
@@ -66,7 +67,7 @@ public class AliasWrapper {
 		Constraint prem = new Predicate();
 		for (int i = 0; i < invocationPredicates.size(); i++) {
 			prem = Conjunction.createConjunction(prem, 
-					new EqualsPredicate(newNames.get(i), invocationPredicates.get(i)));
+					new EqualsPredicate(new VariablePredicate(newNames.get(i)) , invocationPredicates.get(i)));
 		}
 		return prem.getExpression();
 	}

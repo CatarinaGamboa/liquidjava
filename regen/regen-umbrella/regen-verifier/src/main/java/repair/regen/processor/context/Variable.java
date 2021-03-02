@@ -10,6 +10,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.VariablePredicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public class Variable extends RefinedVariable{
@@ -49,7 +50,9 @@ public class Variable extends RefinedVariable{
 		Optional<VariableInstance> ovi =getLastInstance();
 		if(ovi.isPresent()) {
 			VariableInstance vi = ovi.get();
-			c = Conjunction.createConjunction(new EqualsPredicate(this.getName(), vi.getName()), c);
+			Constraint n = new VariablePredicate(this.getName());
+			Constraint n2 = new VariablePredicate(vi.getName());
+			c = Conjunction.createConjunction(new EqualsPredicate(n, n2), c);
 		}
 		return c;
 	}

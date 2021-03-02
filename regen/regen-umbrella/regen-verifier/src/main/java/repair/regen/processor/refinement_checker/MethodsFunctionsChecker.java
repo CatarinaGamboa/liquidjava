@@ -10,6 +10,7 @@ import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
@@ -128,7 +129,7 @@ public class MethodsFunctionsChecker {
 	private String createVariableRepresentingArgument(CtExpression<?> iArg, Variable fArg) {
 		Constraint met = (Constraint) iArg.getMetadata(rtc.REFINE_KEY);
 		if(!met.getVariableNames().contains(rtc.WILD_VAR))
-			met = new EqualsPredicate(rtc.WILD_VAR, met);
+			met = new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), met);
 		String nVar = String.format(rtc.instanceFormat, fArg.getName(),
 					rtc.context.getCounter());
 		rtc.context.addVarToContext(nVar, fArg.getType(), 

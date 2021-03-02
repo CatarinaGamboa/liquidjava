@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import repair.regen.language.Expression;
+import repair.regen.language.ExpressionGroup;
 import repair.regen.language.IfElseExpression;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.operators.NotOperator;
@@ -12,8 +13,8 @@ public class IfThenElse extends Constraint{
 	private Constraint ite;
 	
 	public IfThenElse(Constraint a, Constraint b, Constraint c) {
-		ite = new Predicate(new IfElseExpression(a.getExpression(), 
-				b.getExpression(), c.getExpression()));
+		ite = new Predicate(new ExpressionGroup(new IfElseExpression(a.getExpression(), 
+				b.getExpression(), c.getExpression())));
 	}
 	public IfThenElse(Constraint e) {
 		ite = e;

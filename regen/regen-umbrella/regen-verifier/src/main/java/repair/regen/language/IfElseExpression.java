@@ -22,7 +22,9 @@ public class IfElseExpression  extends Expression implements IModel {
 	
 	public IfElseExpression(Expression cond, Expression then, Expression els) {
 		this.cond = cond;
+		it = new IfThenOperator();
 		this.then = then;
+		ie = new IfElseOperator();
 		this.els = els;
 	}
 

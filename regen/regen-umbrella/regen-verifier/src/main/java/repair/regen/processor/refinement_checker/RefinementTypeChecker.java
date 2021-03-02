@@ -15,6 +15,7 @@ import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.FunctionPredicate;
 import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
@@ -138,9 +139,9 @@ public class RefinementTypeChecker extends TypeChecker {
 			if(c.getVariableNames().contains(WILD_VAR))
 				c = c.substituteVariable(WILD_VAR, name);
 			else
-				c = new EqualsPredicate(name, c);
+				c = new EqualsPredicate(new VariablePredicate(name), c);
 			context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c);
-			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR), name);
+			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR), new VariablePredicate(name));
 			newArray.putMetadata(REFINE_KEY, ep);
 		}
 	}
@@ -200,7 +201,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
 		List<String> types = Arrays.asList(implementedTypes);
 		if (types.contains(lit.getType().getQualifiedName())) {
-			lit.putMetadata(REFINE_KEY, new EqualsPredicate(WILD_VAR, lit.getValue().toString()));
+			lit.putMetadata(REFINE_KEY, new EqualsPredicate(new VariablePredicate(WILD_VAR), lit.getValue().toString()));
 		}else if(lit.getType().getQualifiedName().contentEquals("java.lang.String")){
 			//Only taking care of strings inside refinements
 		}else {
@@ -238,15 +239,17 @@ public class RefinementTypeChecker extends TypeChecker {
 				((Variable)rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
 				fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
 			}else
-				fieldRead.putMetadata(REFINE_KEY, 	new EqualsPredicate(WILD_VAR, fieldName));
+				fieldRead.putMetadata(REFINE_KEY, 	new EqualsPredicate(new VariablePredicate(WILD_VAR), 
+						new VariablePredicate(fieldName)));
+			
 		}else if(context.hasVariable(String.format(thisFormat, fieldName))){
 			String thisName = String.format(thisFormat, fieldName);
-			fieldRead.putMetadata(REFINE_KEY, new EqualsPredicate(WILD_VAR, thisName));
+			fieldRead.putMetadata(REFINE_KEY, new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(thisName)));
 			
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
 			String targetName = fieldRead.getTarget().toString();
 			fieldRead.putMetadata(REFINE_KEY, 
-					new EqualsPredicate(WILD_VAR, FunctionPredicate.builtin_length(targetName)));
+					new EqualsPredicate(new VariablePredicate(WILD_VAR), FunctionPredicate.builtin_length(targetName)));
 		}else{
 			fieldRead.putMetadata(REFINE_KEY, new Predicate());
 			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
@@ -440,10 +443,10 @@ public class RefinementTypeChecker extends TypeChecker {
 	 * @param varDecl Cannot be null
 	 */
 	private <T> void getPutVariableMetadada(CtElement elem, String name) {
-		Constraint cref = new EqualsPredicate(WILD_VAR, name);
+		Constraint cref = new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(name));
 		Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
 		if(ovi.isPresent())
-			cref = new EqualsPredicate(WILD_VAR, ovi.get().getName());
+			cref = new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(ovi.get().getName()));
 
 		elem.putMetadata(REFINE_KEY, cref);
 	}

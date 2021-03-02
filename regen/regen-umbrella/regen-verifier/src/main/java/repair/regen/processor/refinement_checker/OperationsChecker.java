@@ -74,9 +74,9 @@ class OperationsChecker {
 			operator.putMetadata(rtc.REFINE_KEY, oper);
 			if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?> ||
 					parent instanceof CtReturn<?>)
-				operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(rtc.WILD_VAR, oper));
+				operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), oper));
 		}else if (types.contains(type)) {
-			operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(rtc.WILD_VAR, oper));
+			operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), oper));
 		}else {
 			System.out.println("Literal type not implemented");
 		}
@@ -134,7 +134,7 @@ class OperationsChecker {
 		if(p instanceof CtIf)
 			all = opS;
 		else
-			all = new EqualsPredicate(rtc.WILD_VAR, opS);//TODO SEE IF () IN OPS IS NEEDED
+			all = new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), opS);//TODO SEE IF () IN OPS IS NEEDED
 		
 		rtc.context.addInstanceToContext(newName, ex.getType(), newMeta);
 		operator.putMetadata(rtc.REFINE_KEY, all);
@@ -256,7 +256,7 @@ class OperationsChecker {
 		Constraint c = getOperatorFromKind(operator.getKind()).substituteVariable(rtc.WILD_VAR, newName);
 		
 		RefinedVariable rv = rtc.context.addVarToContext(newName, w.getType(), metadada);
-		return new EqualsPredicate(rtc.WILD_VAR, c);
+		return new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), c);
 	}
 
 	//############################### Operations Auxiliaries ##########################################
