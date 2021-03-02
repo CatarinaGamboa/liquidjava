@@ -11,7 +11,7 @@ public abstract class Constraint {
 	public abstract Constraint clone();
 	public abstract List<String> getVariableNames();
 	public abstract String toString();
-	abstract Expression getExpression();
+	public abstract Expression getExpression();
 	
 
 }

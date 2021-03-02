@@ -47,7 +47,8 @@ public abstract class TypeChecker extends CtScanner{
 		return (Constraint)elem.getMetadata(REFINE_KEY);
 	}
 	
-	abstract void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type, CtElement variable);
+	abstract void checkVariableRefinements(Constraint refinementFound, String simpleName, 
+			CtTypeReference type, CtElement variable);
 	abstract void checkSMT(Constraint expectedType, CtElement element);
 
 	

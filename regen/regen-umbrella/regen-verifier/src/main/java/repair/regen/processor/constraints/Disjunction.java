@@ -4,7 +4,9 @@ import java.util.List;
 
 import repair.regen.language.BinaryExpression;
 import repair.regen.language.Expression;
+import repair.regen.language.UnaryExpression;
 import repair.regen.language.operators.AndOperator;
+import repair.regen.language.operators.NotOperator;
 import repair.regen.language.operators.OrOperator;
 
 public class Disjunction extends Constraint{
@@ -38,8 +40,7 @@ public class Disjunction extends Constraint{
 
 	@Override
 	public Constraint negate() {
-		Predicate p = new Predicate(this.toString());
-		return p.negate();
+		return new Predicate(new UnaryExpression(new NotOperator(), getExpression()));
 	}
 
 	@Override
@@ -60,7 +61,7 @@ public class Disjunction extends Constraint{
 	}
 	
 	@Override
-	Expression getExpression() {
+	public Expression getExpression() {
 		return new BinaryExpression(c1.getExpression(), new OrOperator(), c2.getExpression());
 	}
 

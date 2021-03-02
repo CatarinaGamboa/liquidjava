@@ -68,7 +68,7 @@ public class AliasWrapper {
 			prem = Conjunction.createConjunction(prem, 
 					new EqualsPredicate(newNames.get(i), invocationPredicates.get(i)));
 		}
-		return (new Predicate(prem.toString())).getExpression();
+		return prem.getExpression();
 	}
 
 	private List<Predicate> getPredicatesFromExpression(List<Expression> list) {

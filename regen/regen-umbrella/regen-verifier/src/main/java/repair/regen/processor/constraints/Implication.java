@@ -45,7 +45,7 @@ public class Implication extends Constraint{
 	}
 
 	@Override
-	Expression getExpression() {
+	public Expression getExpression() {
 		// TODO Auto-generated method stub
 		return null;
 	}

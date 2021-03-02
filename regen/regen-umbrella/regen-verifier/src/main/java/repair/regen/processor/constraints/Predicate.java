@@ -31,10 +31,14 @@ public class Predicate extends Constraint{
 	}
 
 	public Predicate(String ref) {
+//		long a = System.currentTimeMillis();
+//		System.out.println("Beginning new predicate");
 		exp = parse(ref);
 		if(!(exp instanceof ExpressionGroup) && !(exp instanceof LiteralExpression)) {
-			exp = parse(String.format("(%s)", ref));
+			exp = new ExpressionGroup(exp);
 		}
+//		long b = System.currentTimeMillis();
+//		System.out.println("End new predicate:" + (b-a));
 	}
 	
 	public Predicate(Expression exp) {
@@ -70,8 +74,8 @@ public class Predicate extends Constraint{
 	
 	@Override
 	public Constraint negate() {
-		Predicate c = (Predicate)this.clone();
-		c.exp = new UnaryExpression(new NotOperator(), exp);
+		Predicate c = new Predicate();
+		c.setExpression(new UnaryExpression(new NotOperator(), exp));
 		return c;
 	}
 
@@ -100,7 +104,12 @@ public class Predicate extends Constraint{
 
 	@Override
 	public Constraint clone() {
-		return new Predicate(exp.toString());
+//		System.out.println("Beginning clone");
+//		long a = System.currentTimeMillis();
+		Constraint c = new Predicate(exp.toString());
+//		long b = System.currentTimeMillis();
+//		System.out.println("End new clone:" + (b-a));
+		return c;
 	}
 
 

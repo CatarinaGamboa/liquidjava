@@ -59,7 +59,7 @@ public class Conjunction extends Constraint{
 	}
 
 	@Override
-	Expression getExpression() {
+	public Expression getExpression() {
 		return new BinaryExpression(c1.getExpression(), new AndOperator(), c2.getExpression());
 	}
 

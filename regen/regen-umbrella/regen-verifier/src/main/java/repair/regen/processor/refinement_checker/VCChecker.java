@@ -153,6 +153,7 @@ public class VCChecker {
 		try {
 			new SMTEvaluator().verifySubtype(cSMT.toString(), expectedType.toString(), 
 					context.getContext(), context.getGhosts(), context.getAlias());
+			System.out.println("End smt checking");
 		} catch (TypeCheckError e) {
 			printError(element, expectedType, cSMT);
 

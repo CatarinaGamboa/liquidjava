@@ -5,47 +5,40 @@ import java.util.List;
 
 import repair.regen.language.Expression;
 import repair.regen.language.IfElseExpression;
+import repair.regen.language.UnaryExpression;
+import repair.regen.language.operators.NotOperator;
 
 public class IfThenElse extends Constraint{
-	private Constraint condition;
-	private Constraint then;
-	private Constraint els;
+	private Constraint ite;
 	
 	public IfThenElse(Constraint a, Constraint b, Constraint c) {
-		condition = a;
-		then = b;
-		els = c;
+		ite = new Predicate(new IfElseExpression(a.getExpression(), 
+				b.getExpression(), c.getExpression()));
+	}
+	public IfThenElse(Constraint e) {
+		ite = e;
 	}
 
 	@Override
 	public Constraint substituteVariable(String from, String to) {
-		Constraint c1 = condition.substituteVariable(from, to);
-		Constraint c2 = then.substituteVariable(from, to);
-		Constraint c3 = els.substituteVariable(from, to);
-		return new IfThenElse(c1,c2, c3);
+		Constraint i = ite.substituteVariable(from, to);
+		return new IfThenElse(i);
 	}
 
 	@Override
 	public Constraint negate() {
-		Predicate p = new Predicate(this.toString());
-		return p.negate();
+		return new Predicate(new UnaryExpression(new NotOperator(), ite.getExpression()));
 	}
 
 	@Override
 	public Constraint clone() {
-		return new IfThenElse(condition.clone(), then.clone(), els.clone());
+		return new IfThenElse(ite.clone());
 	}
 
 	@Override
 	public List<String> getVariableNames() {
 		List<String> a = new ArrayList<>();
-		for(String s:condition.getVariableNames())
-			if(!a.contains(s))
-				a.add(s);
-		for(String s:then.getVariableNames())
-			if(!a.contains(s))
-				a.add(s);
-		for(String s:els.getVariableNames())
+		for(String s:ite.getVariableNames())
 			if(!a.contains(s))
 				a.add(s);
 		return a;
@@ -53,12 +46,12 @@ public class IfThenElse extends Constraint{
 
 	@Override
 	public String toString() {
-		return "("+condition.toString()+"? "+then.toString()+" : "+els.toString()+")";
+		return ite.toString();
 	}
 	
 	@Override
-	Expression getExpression() {
-		return new IfElseExpression(condition.getExpression(), then.getExpression(), els.getExpression());
+	public Expression getExpression() {
+		return ite.getExpression();
 	}
 
 }

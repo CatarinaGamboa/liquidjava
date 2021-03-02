@@ -15,6 +15,12 @@ import repair.regen.smt.TranslatorToZ3;
 public class ExpressionGroup extends Expression implements IModel {
 	Expression e;
 
+	public ExpressionGroup() {}
+	public ExpressionGroup(Expression e) {
+		this.e = e;
+	}
+	
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return e.eval(ctx);

@@ -5,7 +5,9 @@ import java.util.List;
 
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
+import repair.regen.processor.constraints.OperationPredicate;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.code.BinaryOperatorKind;
@@ -61,8 +63,9 @@ class OperationsChecker {
 		}else {
 			Constraint varRight = getOperationRefinements(operator, right);
 			Constraint varLeft = getOperationRefinements(operator, left);
-			oper = new Predicate(String.format("(%s %s %s)", 
-					varLeft, getOperatorFromKind(operator.getKind()),varRight));
+			oper = new OperationPredicate(varLeft,  getOperatorFromKind(operator.getKind()), varRight);
+//					new Predicate(String.format("(%s %s %s)", 
+//					varLeft,,varRight));
 
 		}
 		String type = operator.getType().getQualifiedName(); 
@@ -164,7 +167,7 @@ class OperationsChecker {
 				String name = String.format(rtc.freshFormat, rtc.context.getCounter());
 				rtc.context.addVarToContext(name, element.getType(), 
 						rtc.getRefinement(element).substituteVariable(rtc.WILD_VAR, name));
-				return new Predicate(name);
+				return new VariablePredicate(name);
 			}
 		}
 
@@ -191,7 +194,7 @@ class OperationsChecker {
 			
 			Constraint e = elem_ref.substituteVariable(rtc.WILD_VAR, elemName);
 			RefinedVariable rv = rtc.context.addVarToContext(elemName, elemVar.getType(), e);
-			return new Predicate(returnName);
+			return new VariablePredicate(returnName);
 		}
 
 		else if(element instanceof CtBinaryOperator<?>) {
@@ -199,7 +202,8 @@ class OperationsChecker {
 			Constraint right = getOperationRefinements(operator, parentVar, binop.getRightHandOperand());
 			Constraint left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand());
 			
-			return new Predicate(left+" "+ getOperatorFromKind(binop.getKind()) +" "+ right);
+			return new OperationPredicate(left, getOperatorFromKind(binop.getKind()), right);
+//					Predicate(left+" "+ getOperatorFromKind(binop.getKind()) +" "+ right);
 
 		}else if (element instanceof CtUnaryOperator<?>) {
 			Constraint a = (Constraint) element.getMetadata(rtc.REFINE_KEY);

@@ -39,7 +39,7 @@ public abstract class Refined {
 	public Constraint getRefinement() {
 		if(refinement != null)
 			return refinement;
-		return new Predicate("true");
+		return new Predicate();
 	}
 	
 	public Constraint getRenamedRefinements(String toReplace) {
