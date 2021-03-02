@@ -1,8 +1,9 @@
-package regen.test.project;
+
 
 import java.util.ArrayList;
 import java.util.List;
 
+import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 

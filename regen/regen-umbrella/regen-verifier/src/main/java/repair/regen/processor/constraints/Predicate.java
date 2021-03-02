@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.language.BinaryExpression;
+import repair.regen.language.BooleanLiteral;
 import repair.regen.language.Expression;
 import repair.regen.language.ExpressionGroup;
 import repair.regen.language.IfElseExpression;
@@ -15,6 +16,7 @@ import repair.regen.language.function.Argument;
 import repair.regen.language.function.FollowUpArgument;
 import repair.regen.language.function.FunctionInvocationExpression;
 import repair.regen.language.function.ObjectFieldInvocation;
+import repair.regen.language.operators.NotOperator;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
 
@@ -25,7 +27,7 @@ public class Predicate extends Constraint{
 	 * Create a predicate with the expression true
 	 */
 	public Predicate() {
-		exp = parse("true");
+		exp = new BooleanLiteral(true);
 	}
 
 	public Predicate(String ref) {
@@ -36,24 +38,11 @@ public class Predicate extends Constraint{
 	}
 	
 	public Predicate(Expression exp) {
-		this.exp = parse(exp.toString());
-	}
-	
-	@Override
-	public Constraint negate() {
-		Predicate c = (Predicate)this.clone();
-		c.exp = parse("(!("+exp.toString()+"))");
-		return c;
+		this.exp = exp;
 	}
 
-	@Override
-	public Constraint substituteVariable(String from, String to) {
-		Predicate c = (Predicate) this.clone();
-		c.exp.substituteVariable(from, to);
-		return c;
-	}
 
-	private Expression parse(String ref) {
+	protected Expression parse(String ref) {
 		try{
 			Optional<Expression> oe = RefinementParser.parse(ref);
 			//System.out.println(oe.toString());
@@ -68,21 +57,42 @@ public class Predicate extends Constraint{
 		}	
 		return null;
 	}
-
-	private void printSyntaxError(String ref) {
-		System.out.println("______________________________________________________");
-		System.err.println("Syntax error");
-		System.out.println("Found in refinement:");
-		System.out.println(ref);
-		System.out.println("______________________________________________________");
-		System.exit(2);
-		
-	}
+	
 	
 	public Expression getExpression() {
 		return exp;
 	}
+	
+	protected void setExpression(Expression e) {
+		exp = e;
+	}
+	
+	
+	@Override
+	public Constraint negate() {
+		Predicate c = (Predicate)this.clone();
+		c.exp = new UnaryExpression(new NotOperator(), exp);
+		return c;
+	}
 
+	@Override
+	public Constraint substituteVariable(String from, String to) {
+		Predicate c = (Predicate) this.clone();
+		c.exp.substituteVariable(from, to);
+		return c;
+	}
+
+	@Override
+	public List<String> getVariableNames() {
+		List<String> l = new ArrayList<>();
+		exp.getVariableNames(l);
+		return l;
+	}
+
+	public boolean isBooleanTrue() {//TODO rever
+		return toString().equals("true") || toString().equals("(true)") ;	
+	}
+	
 	@Override
 	public String toString() {
 		return exp.toString();
@@ -93,16 +103,15 @@ public class Predicate extends Constraint{
 		return new Predicate(exp.toString());
 	}
 
-	@Override
-	public List<String> getVariableNames() {
-		List<String> l = new ArrayList<>();
-		exp.getVariableNames(l);
-		return l;
-	}
 
-	public boolean isBooleanTrue() {
-		return toString().equals("true") || toString().equals("(true)") ;	
+	private void printSyntaxError(String ref) {
+		System.out.println("______________________________________________________");
+		System.err.println("Syntax error");
+		System.out.println("Found in refinement:");
+		System.out.println(ref);
+		System.out.println("______________________________________________________");
+		System.exit(2);
+		
 	}
-
 
 }

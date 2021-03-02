@@ -2,6 +2,8 @@ package repair.regen.processor.constraints;
 
 import java.util.List;
 
+import repair.regen.language.Expression;
+
 public class Implication extends Constraint{
 	
 //	 	name: str
@@ -38,6 +40,12 @@ public class Implication extends Constraint{
 
 	@Override
 	public String toString() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	Expression getExpression() {
 		// TODO Auto-generated method stub
 		return null;
 	}

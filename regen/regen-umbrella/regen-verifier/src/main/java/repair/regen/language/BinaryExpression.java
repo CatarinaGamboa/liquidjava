@@ -15,7 +15,12 @@ public class BinaryExpression extends Expression implements IModel {
 	BinaryOperator op;
 	Expression e2;
 	
-	//construtor
+	public BinaryExpression() {}
+	public BinaryExpression(Expression e1, BinaryOperator op, Expression e2) {
+		this.e1 = e1;
+		this.op = op;
+		this.e2 = e2;
+	}
 	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {

@@ -13,6 +13,12 @@ public class UnaryExpression extends Expression implements IModel {
 	UnaryOperator op;
 	Expression e;
 
+	public UnaryExpression() {}
+	public UnaryExpression(UnaryOperator u, Expression e) {
+		op = u;
+		this.e = e;
+	}
+
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return op.eval(ctx, e);

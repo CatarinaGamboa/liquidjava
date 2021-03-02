@@ -18,6 +18,13 @@ public class IfElseExpression  extends Expression implements IModel {
 	IfElseOperator ie;
 	Expression els;
 	
+	public IfElseExpression() {};
+	
+	public IfElseExpression(Expression cond, Expression then, Expression els) {
+		this.cond = cond;
+		this.then = then;
+		this.els = els;
+	}
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {

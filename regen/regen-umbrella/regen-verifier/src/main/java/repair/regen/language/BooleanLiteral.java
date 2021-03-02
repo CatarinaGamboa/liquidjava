@@ -16,6 +16,11 @@ import repair.regen.smt.TranslatorToZ3;
 public class BooleanLiteral extends LiteralExpression implements IModel {
 	@Value
 	boolean value;
+	
+	public BooleanLiteral() {};
+	public BooleanLiteral(boolean v) {
+		this.value = v;
+	}
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) {

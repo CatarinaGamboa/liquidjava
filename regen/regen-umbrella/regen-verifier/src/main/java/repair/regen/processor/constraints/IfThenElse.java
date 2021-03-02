@@ -3,6 +3,9 @@ package repair.regen.processor.constraints;
 import java.util.ArrayList;
 import java.util.List;
 
+import repair.regen.language.Expression;
+import repair.regen.language.IfElseExpression;
+
 public class IfThenElse extends Constraint{
 	private Constraint condition;
 	private Constraint then;
@@ -51,6 +54,11 @@ public class IfThenElse extends Constraint{
 	@Override
 	public String toString() {
 		return "("+condition.toString()+"? "+then.toString()+" : "+els.toString()+")";
+	}
+	
+	@Override
+	Expression getExpression() {
+		return new IfElseExpression(condition.getExpression(), then.getExpression(), els.getExpression());
 	}
 
 }
