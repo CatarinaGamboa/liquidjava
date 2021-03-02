@@ -51,7 +51,9 @@ public class SimpleTest {
 		@Refinement("length(arr) > 0")
 		int[] arr = new int[10];
 		
-
+		
+		Email e = new Email().from("me").to("you");
+	
 //		@Refinement("PtGrade(_) && positive >= 10")
 //		int positive = 15;
 //		positive = 9;

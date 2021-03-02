@@ -38,25 +38,24 @@ public class Car{
 
 	
 //REFINE STATE
-
-	
-	@StateRefinement(to = "!open(this)")
-	public Car() {
-		isOpen = false;
-	}
-	
-	@StateRefinement(from = "!open(this)", to = "open(this) != open(#old)")
-	public void openCar() {
-		isOpen = true;
-	}
-	
-	
-	@StateRefinement(from = "open(this)")
-	public void passagerEnters() {
-		//...
-	}
-	
-	int a = 10;
+//
+//	@StateRefinement(to = "!open(this)")
+//	public Car() {
+//		isOpen = false;
+//	}
+//	
+//	@StateRefinement(from = "!open(this)", to = "open(this) != open(#old)")
+//	public void openCar() {
+//		isOpen = true;
+//	}
+//	
+//	
+//	@StateRefinement(from = "open(this)")
+//	public void passagerEnters() {
+//		//...
+//	}
+//	
+//	int a = 10;
 	//a
 	//instances a1, ..., an
 	//a1 == 10
