@@ -2,12 +2,12 @@ package regen.test.project;
 
 import java.io.InputStream;
 
-import repair.regen.specification.RefinementFunction;
+import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 
 //https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
 public interface InputStreamReaderRefinements {
-	@RefinementFunction("boolean open(InputStreamReader i)")
+	@RefinementPredicate("boolean open(InputStreamReader i)")
 	@StateRefinement(to="open(this)")
 	public void InputStreamReader(InputStream in);
 

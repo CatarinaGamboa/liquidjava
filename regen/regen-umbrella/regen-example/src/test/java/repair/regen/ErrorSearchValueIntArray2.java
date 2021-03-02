@@ -1,11 +1,11 @@
 package repair.regen;
 
 import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementFunction;
+import repair.regen.specification.RefinementPredicate;
 
 public class ErrorSearchValueIntArray2 {
 	
-	@RefinementFunction("ghost int length(int[])")
+	@RefinementPredicate("ghost int length(int[])")
 	@Refinement("(_ >= -1) && (_ < length(l))")
 	public static int getIndexWithValue(  @Refinement("length(l) > 0") int[] l, 
 										  @Refinement("i >= 0 && i < length(l)") int i, 

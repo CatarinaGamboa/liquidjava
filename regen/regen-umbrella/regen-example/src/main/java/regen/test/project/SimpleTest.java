@@ -3,7 +3,7 @@ package regen.test.project;
 
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.RefinementFunction;
+import repair.regen.specification.RefinementPredicate;
 
 @RefinementAlias("PtGrade(int x) {x >= 0 && x <= 20}")
 public class SimpleTest {
@@ -30,7 +30,7 @@ public class SimpleTest {
 //		return b-a;
 //	}
 	
-	@RefinementFunction("int lessThan(int a , int[] arr)")
+	@RefinementPredicate("int lessThan(int a , int[] arr)")
 	public static int getIndexWithValue(@Refinement("length(arr) > 0")int[] arr, 
 										@Refinement("i >= 0 && i < length(arr)")int i, int val) {
 		if(arr[i] == val)

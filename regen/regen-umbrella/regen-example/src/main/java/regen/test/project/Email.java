@@ -3,7 +3,7 @@ package regen.test.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.specification.RefinementFunction;
+import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 
 //https://blog.sigplan.org/2021/03/02/fluent-api-practice-and-theory/
@@ -15,7 +15,7 @@ public class Email {
 	private String subject;
 	private String body;
 	
-	@RefinementFunction("int state(Email e)")
+	@RefinementPredicate("int state(Email e)")
 	@StateRefinement(to = "state(this) == 1")
 	public Email() {
 		receiver = new ArrayList<>();
