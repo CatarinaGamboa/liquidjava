@@ -198,8 +198,15 @@ public class TestExamples {
 	
 	@Test
 	public void correctSimpleCarTest() {
-		testCorrect(testPath+"/classes");
+		testCorrect(testPath+"/classes/car1");
 	}
+	
+	@Test
+	public void correctEmail1() {
+		testCorrect(testPath+"/classes/email1");
+	}
+	
+	
 	
 	@Test
 	public void errorSimpleAssignment() {
@@ -428,6 +435,12 @@ public class TestExamples {
 	public void errorAliasArgumentSize() {
 		testWrong(testPath+"ErrorAliasArgumentSize.java");
 	}
+	
+	@Test
+	public void errorEmail2() {
+		testWrong(testPath+"/classes/email2");
+	}
+	
 	
 	
 

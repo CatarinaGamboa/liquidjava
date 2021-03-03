@@ -1,4 +1,4 @@
-package repair.regen.classes;
+package repair.regen.classes.car1;
 import repair.regen.specification.Refinement;
 
 public class Test {

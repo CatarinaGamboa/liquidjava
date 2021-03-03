@@ -1,11 +1,8 @@
-package regen.test.project;
-
+package repair.regen.classes.email2;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 

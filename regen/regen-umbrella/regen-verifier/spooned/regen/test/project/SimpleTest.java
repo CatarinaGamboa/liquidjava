@@ -20,11 +20,10 @@ public class SimpleTest {
     public static void main(java.lang.String[] args) {
         regen.test.project.Email e = new regen.test.project.Email();
         e.from("me");
-        e.to("you");
+        // missing to
         e.subject("not important");
         e.body("body");
         e.build();
-        // ...
     }
 }
 

@@ -1,4 +1,4 @@
-package regen.test.project;
+package repair.regen.classes.email2;
 
 
 // https://blog.sigplan.org/2021/03/02/fluent-api-practice-and-theory/
