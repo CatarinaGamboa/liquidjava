@@ -6,6 +6,7 @@ import java.util.Optional;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
+import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtAnnotation;
@@ -80,6 +81,12 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	@Override
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type,
 			CtElement variable) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void checkStateSMT(Constraint prevState, Constraint expectedState, CtExpression<?> target) {
 		// TODO Auto-generated method stub
 		
 	}

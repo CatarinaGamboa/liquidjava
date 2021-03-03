@@ -6,6 +6,7 @@ import java.util.Optional;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
+import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtElement;
@@ -16,6 +17,7 @@ import spoon.reflect.visitor.CtScanner;
 public abstract class TypeChecker extends CtScanner{
 	public final String REFINE_KEY = "refinement";
 	public final String STATE_KEY = "state";
+	public final String THIS = "this";
 	public final String WILD_VAR = "_";
 	public final String freshFormat = "#fresh_%d";
 	public final String instanceFormat = "#%s_%d";
@@ -51,6 +53,9 @@ public abstract class TypeChecker extends CtScanner{
 	abstract void checkVariableRefinements(Constraint refinementFound, String simpleName, 
 			CtTypeReference type, CtElement variable);
 	abstract void checkSMT(Constraint expectedType, CtElement element);
+
+
+	protected abstract void checkStateSMT(Constraint prevState, Constraint expectedState, CtExpression<?> target);
 
 	
 	

@@ -552,5 +552,10 @@ public class RefinementTypeChecker extends TypeChecker {
 		element.putMetadata(REFINE_KEY, expectedType);	
 	}
 
+	@Override
+	protected void checkStateSMT(Constraint prevState, Constraint expectedState, CtExpression<?> target) {
+		vcChecker.smtChecking(prevState, expectedState, target);		
+	}
+
 
 }

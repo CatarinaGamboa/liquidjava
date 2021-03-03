@@ -149,9 +149,9 @@ public class VCChecker {
 	 * @param expectedType
 	 * @param element
 	 */
-	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
+	void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
 		try {
-			new SMTEvaluator().verifySubtype(cSMT.toString(), expectedType.toString(), 
+			new SMTEvaluator().verifySubtype(cSMT, expectedType, 
 					context.getContext(), context.getGhosts(), context.getAlias());
 			System.out.println("End smt checking");
 		} catch (TypeCheckError e) {
@@ -172,6 +172,7 @@ public class VCChecker {
 		//}
 
 	}
+
 
 
 	//################################# PRINTS ########################################

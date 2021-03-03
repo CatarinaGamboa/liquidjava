@@ -54,7 +54,7 @@ public class Context {
 //		ctxFunctions = new ArrayList<>();
 		ctxSpecificVars = new ArrayList<>();
 //		alias = new ArrayList<>();
-		ghosts = new ArrayList<>();
+//		ghosts = new ArrayList<>();
 //		counter = 0;
 	}
 

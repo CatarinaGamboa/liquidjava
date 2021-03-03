@@ -195,8 +195,12 @@ public class MethodsFunctionsChecker {
 			if(m != null) searchMethodInLibrary(m, invocation);
 		}else if(method.getParent() instanceof CtClass){
 			String ctype = ((CtClass)method.getParent()).getQualifiedName();
-			if(rtc.context.getFunction(method.getSimpleName(), ctype) != null) {//inside rtc.context
+			RefinedFunction f = rtc.context.getFunction(method.getSimpleName(), ctype);
+			if(f != null) {//inside rtc.context
 				checkInvocationRefinements(invocation, method.getSimpleName(), ctype);
+				
+				if(invocation.getTarget() != null)
+					checkTargetChanges(invocation.getTarget(), f);
 				
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
@@ -214,6 +218,25 @@ public class MethodsFunctionsChecker {
 
 
 
+
+	private void checkTargetChanges(CtExpression<?> target, RefinedFunction f) {
+		if(target instanceof CtVariableRead<?>) {
+			CtVariableRead<?> v = (CtVariableRead<?>)target;
+			String name = v.getVariable().getSimpleName();
+			Optional<VariableInstance> vi = rtc.context.getLastVariableInstance(name);
+			if(vi.isPresent() && f.getStateFrom().isPresent()) {
+				Constraint prevState = vi.get().getState();
+				Constraint expectedState  = f.getStateFrom().get().substituteVariable(rtc.THIS, name);
+				//criar nova var instance com o to
+				rtc.checkStateSMT(prevState, expectedState, target);
+				if(f.getStateTo().isPresent()) {
+					Constraint transitionedState = f.getStateTo().get();
+					//...
+				}
+			}
+		}
+		
+	}
 
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
 		String ctype = m.getDeclaringClass().getCanonicalName();
