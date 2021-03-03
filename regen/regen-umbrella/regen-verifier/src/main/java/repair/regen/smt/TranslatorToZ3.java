@@ -100,7 +100,7 @@ public class TranslatorToZ3 {
 			}else {
 				Sort nSort = z3.mkUninterpretedSort(typeName);
 				varTranslation.put(name, z3.mkConst(name, nSort));	
-				System.out.println("Add new type: "+typeName);
+//				System.out.println("Add new type: "+typeName);
 			}
 		}
 		varTranslation.put("true", z3.mkBool(true));

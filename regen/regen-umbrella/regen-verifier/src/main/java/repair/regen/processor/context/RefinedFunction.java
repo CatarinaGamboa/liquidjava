@@ -120,7 +120,6 @@ public class RefinedFunction extends Refined{
 			stateChange.setFrom(new Predicate(from.getValue()));
 		if(to != null)
 			stateChange.setTo(new Predicate(to.getValue()));
-		System.out.println();
 		
 	}
 	

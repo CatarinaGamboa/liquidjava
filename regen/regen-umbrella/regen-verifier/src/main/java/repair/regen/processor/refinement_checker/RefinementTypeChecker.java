@@ -542,7 +542,6 @@ public class RefinementTypeChecker extends TypeChecker {
 			c = c.substituteVariable("this", varName);
 			vi.get().setState(c);
 		}
-		System.out.println();
 	}
 
 

@@ -11,8 +11,10 @@ public static void main(String[] args) {
 	
 		Email e = new Email();
 		e.from("me");
-//		e.f(5);
-//		e.to("you");
+		e.to("you");
+		e.subject("not important");
+		e.body("body");
+		e.build();
 		//...
 }
 

@@ -57,7 +57,6 @@ public class MethodsFunctionsChecker {
 		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
 		if(an.isPresent())
 			f.setState(an.get());
-		System.out.println();
 		
 	}
 	
@@ -223,15 +222,20 @@ public class MethodsFunctionsChecker {
 		if(target instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)target;
 			String name = v.getVariable().getSimpleName();
-			Optional<VariableInstance> vi = rtc.context.getLastVariableInstance(name);
-			if(vi.isPresent() && f.getStateFrom().isPresent()) {
-				Constraint prevState = vi.get().getState();
+			Optional<VariableInstance> ovi = rtc.context.getLastVariableInstance(name);
+			if(ovi.isPresent() && f.getStateFrom().isPresent()) {
+				VariableInstance vi = ovi.get();
+				Constraint prevState = vi.getState();
 				Constraint expectedState  = f.getStateFrom().get().substituteVariable(rtc.THIS, name);
 				//criar nova var instance com o to
 				rtc.checkStateSMT(prevState, expectedState, invocation);
 				if(f.getStateTo().isPresent()) {
-					Constraint transitionedState = f.getStateTo().get();
-					
+					Constraint transitionedState = f.getStateTo().get().substituteVariable(rtc.THIS, name);
+					String name2 = String.format(rtc.instanceFormat, name, rtc.context.getCounter()); 
+					VariableInstance vi2 = (VariableInstance)rtc.context.addInstanceToContext( 
+															name2, vi.getType() , vi.getRefinement());
+					vi2.setState(transitionedState);
+					rtc.context.addRefinementInstanceToVariable(name, name2);
 				}
 			}
 		}

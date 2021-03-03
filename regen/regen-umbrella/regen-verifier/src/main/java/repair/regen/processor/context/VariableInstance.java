@@ -31,5 +31,8 @@ public class VariableInstance extends RefinedVariable{
 	public Constraint getState() {
 		return state;
 	}
+	
+	
+	
 
 }
