@@ -27,6 +27,7 @@ import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConditional;
+import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtFieldWrite;
@@ -85,10 +86,10 @@ public class RefinementTypeChecker extends TypeChecker {
 		className = ctClass.getQualifiedName();
 	}
 
-	@Override
-	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
-		super.visitCtAnnotation(annotation);
-	}
+//	@Override
+//	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
+//		super.visitCtAnnotation(annotation);
+//	}
 
 	@Override
 	public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
@@ -381,6 +382,14 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	}
 
+	
+
+	@Override
+	public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
+		super.visitCtConstructorCall(ctConstructorCall);
+		
+		System.out.println("Visti constructor of" + ctConstructorCall);
+	}
 
 
 	//############################### Inner Visitors  ##########################################

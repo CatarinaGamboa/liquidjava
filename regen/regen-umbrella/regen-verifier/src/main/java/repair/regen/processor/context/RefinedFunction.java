@@ -1,18 +1,24 @@
 package repair.regen.processor.context;
 
+import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
+import spoon.reflect.code.CtExpression;
+import spoon.reflect.code.CtLiteral;
+import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction extends Refined{
 	
 	private List<Variable> argRefinements;	
 	private String targetClass;
+	private ObjectState stateChange;
 	
 	public RefinedFunction() {
 		argRefinements= new ArrayList<>();
@@ -92,6 +98,32 @@ public class RefinedFunction extends Refined{
 			c = Conjunction.createConjunction(c, argRefinements.get(i).getRefinement());
 		return c;
 	}
+	
+	public boolean allRefinementsTrue() {
+		boolean t = true;
+		Predicate p = new Predicate(getRefReturn().getExpression());
+		t = t && p.isBooleanTrue();
+		for(Variable v: argRefinements) {
+			p = new Predicate(v.getRefinement().getExpression());
+			t = t && p.isBooleanTrue();
+		}
+		return t;
+	}
+	
+	
+	public void setState(CtAnnotation<? extends Annotation> ctAnnotation) {
+		Map<String, CtExpression> m = ctAnnotation.getAllValues();
+		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
+		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
+		stateChange = new ObjectState();
+		if(from != null)
+			stateChange.setFrom(new Predicate(from.getValue()));
+		if(to != null)
+			stateChange.setTo(new Predicate(to.getValue()));
+		System.out.println();
+		
+	}
+	
 
 	@Override
 	public String toString() {
@@ -132,6 +164,11 @@ public class RefinedFunction extends Refined{
 			return false;
 		return true;
 	}
-	
+
+
+
+
+
+
 
 }

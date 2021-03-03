@@ -7,17 +7,14 @@ import repair.regen.specification.RefinementPredicate;
 
 public class SimpleTest {
 	
-	@RefinementPredicate("ghost boolean open(int)")
-	@Refinement("open(4.5) == true")
-	public int one() {
-		return 1;
-	}
+public static void main(String[] args) {
 	
-//		Email e = new Email();
-//		e.from("me");
+		Email e = new Email();
+		e.from("me");
+		e.f(5);
 //		e.to("you");
 		//...
-
+}
 
 	
 	

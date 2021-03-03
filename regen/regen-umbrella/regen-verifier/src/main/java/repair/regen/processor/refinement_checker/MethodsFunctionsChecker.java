@@ -1,5 +1,6 @@
 package repair.regen.processor.refinement_checker;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
@@ -21,7 +22,9 @@ import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
@@ -36,6 +39,118 @@ public class MethodsFunctionsChecker {
 		this.rtc = rtc; 
 
 	}
+	
+	//################### VISIT METHOD ##############################
+	<R> void getMethodRefinements(CtMethod<R> method) {
+		RefinedFunction f = new RefinedFunction();
+		f.setName(method.getSimpleName());
+		f.setType(method.getType());
+		f.setRefReturn(new Predicate());
+		if(method.getParent() instanceof CtClass) {
+			CtClass klass = (CtClass)method.getParent();
+			f.setClass(klass.getQualifiedName());
+		}
+		rtc.context.addFunctionToContext(f);
+		auxGetMethodRefinements(method, f);
+		
+		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
+		if(an.isPresent())
+			f.setState(an.get());
+		//TODO change state
+	}
+
+	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {
+		RefinedFunction f = new RefinedFunction();
+		f.setName(String.format("%s.%s", prefix, method.getSimpleName()));
+		f.setType(method.getType());
+		f.setRefReturn(new Predicate());
+		f.setClass(prefix);
+		rtc.context.addFunctionToContext(f);
+		auxGetMethodRefinements(method, f);
+	}
+	
+	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {
+		//main cannot have refinement - for now
+		if(method.getSignature().equals("main(java.lang.String[])"))
+			return;	
+		List<CtParameter<?>> params = method.getParameters();
+		Constraint ref = handleFunctionRefinements(rf, method, params);
+		method.putMetadata(rtc.REFINE_KEY, ref);
+		
+	}
+
+	/**
+	 * Joins all the refinements from parameters and return
+	 * @param f
+	 * @param methodRef
+	 * @param params
+	 * @return Conjunction of all 
+	 */
+	private Constraint handleFunctionRefinements(RefinedFunction f, CtMethod<?> method, 
+			List<CtParameter<?>> params) {
+		Constraint joint = new Predicate();
+		
+		for(CtParameter<?> param:params) {
+			String paramName = param.getSimpleName();
+			Optional<Constraint> oc = rtc.getRefinementFromAnnotation(param);
+			Constraint c = new Predicate();
+			if(oc.isPresent()) 
+				c = oc.get().substituteVariable(rtc.WILD_VAR, paramName);
+			param.putMetadata(rtc.REFINE_KEY, c);
+			RefinedVariable v = rtc.context.addVarToContext(param.getSimpleName(), param.getType(), c);
+			if(v instanceof Variable)
+				f.addArgRefinements((Variable)v);
+			joint = Conjunction.createConjunction(joint, c);
+		}
+
+		Optional<Constraint> oret = rtc.getRefinementFromAnnotation(method);
+		Constraint ret = oret.isPresent()?oret.get():new Predicate();
+		f.setRefReturn(ret);
+		rtc.context.addFunctionToContext(f);
+		return Conjunction.createConjunction(joint, ret);
+	}
+	
+	public Optional<CtAnnotation<? extends Annotation>> getStateAnnotation(CtElement element) {
+		Optional<CtAnnotation<? extends Annotation>> constr = Optional.empty();
+		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
+			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
+			if( an.contentEquals("repair.regen.specification.StateRefinement")) {
+				constr = Optional.of(ann);
+			}
+		}
+		return constr;
+	}
+	
+
+
+
+	<R> void getReturnRefinements(CtReturn<R> ret) {
+		if(ret.getReturnedExpression() != null) {
+			//check if there are refinements
+			if(rtc.getRefinement(ret.getReturnedExpression())== null)
+				ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, new Predicate());
+			CtMethod method = ret.getParent(CtMethod.class);
+			//check if method has refinements
+			if(rtc.getRefinement(method) == null)
+				return;
+			if (method.getParent() instanceof CtClass) {
+				RefinedFunction fi = rtc.context.getFunction(method.getSimpleName(), 
+						((CtClass)method.getParent()).getQualifiedName());
+				
+				//Both return and the method have metadata
+				String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
+				Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
+				Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
+	
+				RefinedVariable rv = rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
+				rtc.checkSMT(cexpectedType, ret);
+				rtc.context.newRefinementToVariableInContext(returnVarName, cexpectedType);
+			}
+		}
+	}
+
+	
+	//############################### VISIT INVOCATION ################################3
 
 	<R> void getInvocationRefinements(CtInvocation<R> invocation) {
 		CtExecutable<?> method = invocation.getExecutable().getDeclaration();
@@ -84,6 +199,10 @@ public class MethodsFunctionsChecker {
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName, String className) {
 //		invocation.getTarget().getType().toString()
 		RefinedFunction f = rtc.context.getFunction(methodName, className);
+		if(f.allRefinementsTrue()) {
+			invocation.putMetadata(rtc.REFINE_KEY, new Predicate());
+			return;
+		}
 		Map<String,String> map = mapInvocation(invocation, f);
 		
 		checkParameters(invocation, f, map);
@@ -153,96 +272,5 @@ public class MethodsFunctionsChecker {
 		
 	}
 
-	<R> void getMethodRefinements(CtMethod<R> method) {
-		RefinedFunction f = new RefinedFunction();
-		f.setName(method.getSimpleName());
-		f.setType(method.getType());
-		f.setRefReturn(new Predicate());
-		if(method.getParent() instanceof CtClass) {
-			CtClass klass = (CtClass)method.getParent();
-			f.setClass(klass.getQualifiedName());
-		}
-		rtc.context.addFunctionToContext(f);
-		auxGetMethodRefinements(method, f);
-		
-	}
-
-	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {
-		RefinedFunction f = new RefinedFunction();
-		f.setName(String.format("%s.%s", prefix, method.getSimpleName()));
-		f.setType(method.getType());
-		f.setRefReturn(new Predicate());
-		f.setClass(prefix);
-		rtc.context.addFunctionToContext(f);
-		auxGetMethodRefinements(method, f);
-	}
-	
-	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {
-		//main cannot have refinement - for now
-		if(method.getSignature().equals("main(java.lang.String[])"))
-			return;	
-		List<CtParameter<?>> params = method.getParameters();
-		Constraint ref = handleFunctionRefinements(rf, method, params);
-		method.putMetadata(rtc.REFINE_KEY, ref);
-		
-	}
-
-	/**
-	 * Joins all the refinements from parameters and return
-	 * @param f
-	 * @param methodRef
-	 * @param params
-	 * @return Conjunction of all 
-	 */
-	private Constraint handleFunctionRefinements(RefinedFunction f, CtMethod<?> method, 
-			List<CtParameter<?>> params) {
-		Constraint joint = new Predicate();
-		
-		for(CtParameter<?> param:params) {
-			String paramName = param.getSimpleName();
-			Optional<Constraint> oc = rtc.getRefinementFromAnnotation(param);
-			Constraint c = oc.isPresent()?oc.get():new Predicate();
-			c = c.substituteVariable(rtc.WILD_VAR, paramName);
-			param.putMetadata(rtc.REFINE_KEY, c);
-			RefinedVariable v = rtc.context.addVarToContext(param.getSimpleName(), param.getType(), c);
-			if(v instanceof Variable)
-				f.addArgRefinements((Variable)v);
-			joint = Conjunction.createConjunction(joint, c);
-		}
-
-		Optional<Constraint> oret = rtc.getRefinementFromAnnotation(method);
-		Constraint ret = oret.isPresent()?oret.get():new Predicate();
-		f.setRefReturn(ret);
-		rtc.context.addFunctionToContext(f);
-		return Conjunction.createConjunction(joint, ret);
-	}
-	
-
-
-
-	<R> void getReturnRefinements(CtReturn<R> ret) {
-		if(ret.getReturnedExpression() != null) {
-			//check if there are refinements
-			if(rtc.getRefinement(ret.getReturnedExpression())== null)
-				ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, new Predicate());
-			CtMethod method = ret.getParent(CtMethod.class);
-			//check if method has refinements
-			if(rtc.getRefinement(method) == null)
-				return;
-			if (method.getParent() instanceof CtClass) {
-				RefinedFunction fi = rtc.context.getFunction(method.getSimpleName(), 
-						((CtClass)method.getParent()).getQualifiedName());
-				
-				//Both return and the method have metadata
-				String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
-				Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
-				Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
-	
-				RefinedVariable rv = rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
-				rtc.checkSMT(cexpectedType, ret);
-				rtc.context.newRefinementToVariableInContext(returnVarName, cexpectedType);
-			}
-		}
-	}
 
 }
