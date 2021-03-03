@@ -1,21 +1,23 @@
 package regen.test.project;
 
-
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
 
 public class SimpleTest {
+	@Refinement("_ < 10")
+	public static int getYear() {
+		return 8;
+	}
 
 	public static void main(String[] args) {
+		int a = 1998;
+		Car c = new Car();
+		c.setYear(a);
 
-		Email e = new Email();
-		e.from("me");
-		//missing to
-		e.subject("not important");
-		e.body("body");
-		e.build();
-
+		@Refinement("_ < 11")
+		int j = getYear();
+		
 	}
 
 

@@ -236,6 +236,7 @@ public class MethodsFunctionsChecker {
 															name2, vi.getType() , vi.getRefinement());
 					vi2.setState(transitionedState);
 					rtc.context.addRefinementInstanceToVariable(name, name2);
+					invocation.putMetadata(rtc.STATE_KEY, transitionedState);
 				}
 			}
 		}
@@ -288,9 +289,10 @@ public class MethodsFunctionsChecker {
 			Variable fArg = functionParams.get(i);
 			CtExpression<?> iArg = invocationParams.get(i);
 			String invStr;
-			if(iArg instanceof CtLiteral)
-				invStr = iArg.toString();
-			else if(iArg instanceof CtFieldRead) {
+//			if(iArg instanceof CtLiteral)
+//				invStr = iArg.toString();
+//			else 
+			if(iArg instanceof CtFieldRead) {
 				invStr = createVariableRepresentingArgument(iArg, fArg);
 			}else if(iArg instanceof CtVariableRead) {
 				CtVariableRead<?> vr = (CtVariableRead<?>)iArg;

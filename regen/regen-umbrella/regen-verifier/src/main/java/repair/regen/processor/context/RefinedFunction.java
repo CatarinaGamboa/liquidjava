@@ -124,11 +124,15 @@ public class RefinedFunction extends Refined{
 	}
 	
 	public Optional<Constraint> getStateFrom() {
-		return stateChange.getFrom();
+		if(stateChange != null)
+			return stateChange.getFrom();
+		return Optional.empty();
 	}
 	
 	public Optional<Constraint> getStateTo() {
-		return stateChange.getTo();
+		if(stateChange != null)
+			return stateChange.getTo();
+		return Optional.empty();
 	}
 	
 
