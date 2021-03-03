@@ -124,6 +124,14 @@ public class RefinedFunction extends Refined{
 		
 	}
 	
+	public Optional<Constraint> getStateFrom() {
+		return stateChange.getFrom();
+	}
+	
+	public Optional<Constraint> getStateTo() {
+		return stateChange.getTo();
+	}
+	
 
 	@Override
 	public String toString() {

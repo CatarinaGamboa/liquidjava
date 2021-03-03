@@ -27,7 +27,7 @@ public class ObjectState {
 	public Optional<Constraint> getFrom() {
 		return from != null? Optional.of(from):Optional.empty();
 	}
-	public Optional<Constraint> to() {
+	public Optional<Constraint> getTo() {
 		return to != null? Optional.of(to):Optional.empty();
 	}
 

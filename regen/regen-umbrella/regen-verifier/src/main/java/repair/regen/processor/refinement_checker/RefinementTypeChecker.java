@@ -44,11 +44,14 @@ import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.reference.CtVariableReference;
@@ -61,8 +64,6 @@ public class RefinementTypeChecker extends TypeChecker {
 	// 2. Do type checking and inference
 	VCChecker vcChecker = new VCChecker();
 	Factory factory;
-	
-	String className;
 
 	//Auxiliar TypeCheckers
 	OperationsChecker otc;
@@ -83,7 +84,6 @@ public class RefinementTypeChecker extends TypeChecker {
 		context.reinitializeContext();
 		getRefinementFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
-		className = ctClass.getQualifiedName();
 	}
 
 //	@Override
@@ -94,6 +94,14 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
 		super.visitCtAnnotationType(annotationType);
+	}
+	
+	@Override
+	public <T> void visitCtConstructor(CtConstructor<T> c) {
+		context.enterContext();
+		mfc.getConstructorRefinements(c);
+		super.visitCtConstructor(c);
+		context.exitContext();
 	}
 
 
@@ -117,13 +125,15 @@ public class RefinementTypeChecker extends TypeChecker {
 		}else {
 			String varName = localVariable.getSimpleName();
 			CtExpression<?> e = localVariable.getAssignment();
+			
 			Constraint refinementFound = getRefinement(e);
-
 			if (refinementFound == null)
 				refinementFound = new Predicate();
 			context.addVarToContext(varName, localVariable.getType(), new Predicate());
+			
 			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable);
-
+			
+			System.out.println();
 //			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
 //				checkArray(localVariable);
 		}
@@ -387,8 +397,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
 		super.visitCtConstructorCall(ctConstructorCall);
-		
-		System.out.println("Visti constructor of" + ctConstructorCall);
+		mfc.getConstructorInvocationRefinements(ctConstructorCall);
 	}
 
 

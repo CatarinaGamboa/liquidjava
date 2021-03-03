@@ -16,6 +16,7 @@ import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
+import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtInvocation;
@@ -24,10 +25,12 @@ import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
+import spoon.reflect.reference.CtExecutableReference;
 
 public class MethodsFunctionsChecker {
 
@@ -39,6 +42,40 @@ public class MethodsFunctionsChecker {
 		this.rtc = rtc; 
 
 	}
+	
+	public void getConstructorRefinements(CtConstructor<?> c) {	
+		RefinedFunction f = new RefinedFunction();
+		f.setName(c.getSimpleName());
+		f.setType(c.getType());
+		f.setRefReturn(new Predicate());
+		if(c.getParent() instanceof CtClass) {
+			CtClass klass = (CtClass)c.getParent();
+			f.setClass(klass.getQualifiedName());
+		}
+		rtc.context.addFunctionToContext(f);
+//		auxGetMethodRefinements(c, f);
+		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
+		if(an.isPresent())
+			f.setState(an.get());
+		System.out.println();
+		
+	}
+	
+
+	public void getConstructorInvocationRefinements(CtConstructorCall<?> ctConstructorCall) {
+		CtExecutableReference<?> exe = ctConstructorCall.getExecutable();
+		if(exe != null) {
+			RefinedFunction f = rtc.context.getFunction(exe.getSimpleName(), 
+					exe.getDeclaringType().getQualifiedName());
+			if(f != null) {
+				Optional<Constraint> oc = f.getStateTo();
+				if(oc.isPresent())
+					ctConstructorCall.putMetadata(rtc.STATE_KEY, oc.get());
+			}
+		}
+		
+	}
+
 	
 	//################### VISIT METHOD ##############################
 	<R> void getMethodRefinements(CtMethod<R> method) {
@@ -56,7 +93,6 @@ public class MethodsFunctionsChecker {
 		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(an.isPresent())
 			f.setState(an.get());
-		//TODO change state
 	}
 
 	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {
@@ -271,6 +307,8 @@ public class MethodsFunctionsChecker {
 		}
 		
 	}
+
+
 
 
 }

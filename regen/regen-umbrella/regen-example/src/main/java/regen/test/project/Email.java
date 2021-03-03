@@ -29,10 +29,10 @@ public class Email {
 		sender = s;
 	}
 	
-	@Refinement("_ == 1")
-	public int f(int s) {
-		return 1;
-	}
+//	@Refinement("_ == 1")
+//	public int f(int s) {
+//		return 1;
+//	}
 	
 //	@StateRefinement(from= "(state(this) == 2) || (state(this) == 3)", 
 //					 to =  "state(this) == 3")

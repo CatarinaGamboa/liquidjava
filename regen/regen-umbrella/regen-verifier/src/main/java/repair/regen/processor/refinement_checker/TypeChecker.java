@@ -15,6 +15,7 @@ import spoon.reflect.visitor.CtScanner;
 
 public abstract class TypeChecker extends CtScanner{
 	public final String REFINE_KEY = "refinement";
+	public final String STATE_KEY = "state";
 	public final String WILD_VAR = "_";
 	public final String freshFormat = "#fresh_%d";
 	public final String instanceFormat = "#%s_%d";
