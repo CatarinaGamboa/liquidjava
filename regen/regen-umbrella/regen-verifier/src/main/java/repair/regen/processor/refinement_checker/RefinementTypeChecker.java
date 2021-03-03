@@ -133,12 +133,11 @@ public class RefinementTypeChecker extends TypeChecker {
 			
 			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable);
 			
-			System.out.println();
+			addStateRefinements(varName, e);
 //			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
 //				checkArray(localVariable);
 		}
 	}
-
 
 	@Override
 	public <T> void visitCtNewArray(CtNewArray<T> newArray) {
@@ -528,6 +527,18 @@ public class RefinementTypeChecker extends TypeChecker {
 		}
 		
 	}
+	
+
+	private void addStateRefinements(String varName, CtExpression<?> e) {
+		Optional<VariableInstance> vi = context.getLastVariableInstance(varName);
+		if(vi.isPresent() && e.getMetadata(STATE_KEY) != null) {
+			Constraint c = (Constraint)e.getMetadata(STATE_KEY);
+			c = c.substituteVariable("this", varName);
+			vi.get().setState(c);
+		}
+		System.out.println();
+	}
+	
 	
 	@Override
 	public <T> void visitCtNewClass(CtNewClass<T> newClass) {

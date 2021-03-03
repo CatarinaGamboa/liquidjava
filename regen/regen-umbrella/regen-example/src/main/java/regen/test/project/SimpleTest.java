@@ -11,7 +11,7 @@ public static void main(String[] args) {
 	
 		Email e = new Email();
 		e.from("me");
-		e.f(5);
+//		e.f(5);
 //		e.to("you");
 		//...
 }
