@@ -200,7 +200,7 @@ public class MethodsFunctionsChecker {
 				checkInvocationRefinements(invocation, method.getSimpleName(), ctype);
 				
 				if(invocation.getTarget() != null)
-					checkTargetChanges(invocation.getTarget(), f);
+					checkTargetChanges(invocation.getTarget(), f, invocation);
 				
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
@@ -219,7 +219,7 @@ public class MethodsFunctionsChecker {
 
 
 
-	private void checkTargetChanges(CtExpression<?> target, RefinedFunction f) {
+	private void checkTargetChanges(CtExpression<?> target, RefinedFunction f, CtInvocation<?> invocation) {
 		if(target instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)target;
 			String name = v.getVariable().getSimpleName();
@@ -228,10 +228,10 @@ public class MethodsFunctionsChecker {
 				Constraint prevState = vi.get().getState();
 				Constraint expectedState  = f.getStateFrom().get().substituteVariable(rtc.THIS, name);
 				//criar nova var instance com o to
-				rtc.checkStateSMT(prevState, expectedState, target);
+				rtc.checkStateSMT(prevState, expectedState, invocation);
 				if(f.getStateTo().isPresent()) {
 					Constraint transitionedState = f.getStateTo().get();
-					//...
+					
 				}
 			}
 		}

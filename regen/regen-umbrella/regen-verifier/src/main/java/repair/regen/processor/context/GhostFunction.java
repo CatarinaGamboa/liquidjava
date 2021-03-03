@@ -15,15 +15,17 @@ public class GhostFunction {
 	private List<CtTypeReference<?>> param_types;
 	private CtTypeReference<?> return_type;
 	
-	public GhostFunction(FunctionDeclaration fdExp, Factory factory) {
+	public GhostFunction(FunctionDeclaration fdExp, Factory factory, String path, String klass) {
 		name = fdExp.getName().toString();
 		Type t = fdExp.getReturnType();
-		return_type = Utils.getType(t.toString(), factory);
+		return_type = Utils.getType(t.toString().equals(klass)? path: t.toString(), factory);
+			
 
 		param_types = new ArrayList<>();
 		MultipleTypes[] pts = fdExp.getArgTypes();
 		for(MultipleTypes mt: pts) {
-			param_types.add(Utils.getType(mt.getType().toString(), factory));
+			String mType = mt.getType().toString();
+			param_types.add(Utils.getType(mType.equals(klass)? path : mType, factory));
 		}
 	}
 	

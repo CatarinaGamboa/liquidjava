@@ -15,7 +15,8 @@ public class Utils {
 		case "String": return factory.Type().STRING;
 		case "List": return factory.Type().LIST;
 		default:
-			return factory.Type().OBJECT;
+//			return factory.Type().OBJECT;
+			return factory.createReference(type);
 		}
 	}
 }

@@ -44,7 +44,7 @@ public class Email {
         receiver = new java.util.ArrayList<>();
     }
 
-    @repair.regen.specification.StateRefinement(from = "state(this) == 1", to = "state(this) == 2")
+    @repair.regen.specification.StateRefinement(from = "state(this) == 2", to = "state(this) == 2")
     public void from(java.lang.String s) {
         sender = s;
     }

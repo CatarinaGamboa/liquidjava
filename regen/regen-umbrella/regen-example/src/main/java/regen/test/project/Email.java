@@ -24,7 +24,7 @@ public class Email {
 		receiver = new ArrayList<>();
 	}
 	
-	@StateRefinement(from= "state(this) == 1", to = "state(this) == 2")
+	@StateRefinement(from= "state(this) == 2", to = "state(this) == 2")
 	public void from(String s) {
 		sender = s;
 	}

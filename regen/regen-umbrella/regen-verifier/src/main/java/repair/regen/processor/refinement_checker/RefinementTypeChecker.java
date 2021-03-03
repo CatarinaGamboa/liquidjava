@@ -1,5 +1,6 @@
 package repair.regen.processor.refinement_checker;
 
+import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
@@ -51,6 +52,7 @@ import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.path.CtPath;
 import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
@@ -86,20 +88,21 @@ public class RefinementTypeChecker extends TypeChecker {
 		super.visitCtClass(ctClass);
 	}
 
-//	@Override
-//	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
-//		super.visitCtAnnotation(annotation);
-//	}
+	//	@Override
+	//	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
+	//		super.visitCtAnnotation(annotation);
+	//	}
 
 	@Override
 	public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
 		super.visitCtAnnotationType(annotationType);
 	}
-	
+
 	@Override
 	public <T> void visitCtConstructor(CtConstructor<T> c) {
 		context.enterContext();
 		mfc.getConstructorRefinements(c);
+		getRefinementFromAnnotation(c); 
 		super.visitCtConstructor(c);
 		context.exitContext();
 	}
@@ -125,17 +128,17 @@ public class RefinementTypeChecker extends TypeChecker {
 		}else {
 			String varName = localVariable.getSimpleName();
 			CtExpression<?> e = localVariable.getAssignment();
-			
+
 			Constraint refinementFound = getRefinement(e);
 			if (refinementFound == null)
 				refinementFound = new Predicate();
 			context.addVarToContext(varName, localVariable.getType(), new Predicate());
-			
+
 			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable);
-			
+
 			addStateRefinements(varName, e);
-//			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
-//				checkArray(localVariable);
+			//			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
+			//				checkArray(localVariable);
 		}
 	}
 
@@ -169,16 +172,16 @@ public class RefinementTypeChecker extends TypeChecker {
 			CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
 			String name = var.getSimpleName();
 			checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), varDecl);
-			
-//			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
-//				checkArray(varDecl);
+
+			//			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
+			//				checkArray(varDecl);
 
 		}else if(ex instanceof CtFieldWrite) {
 			CtFieldReference<?> cr = ((CtFieldWrite<?>) ex).getVariable();
 			CtField<?> f= ((CtFieldWrite<?>) ex).getVariable().getDeclaration();
 			String name = String.format(thisFormat, cr.getSimpleName());
 			checkAssignment(name, cr.getType(), ex, assignement.getAssignment(), f);
-			
+
 		}
 		if(ex instanceof CtArrayWrite) {
 			Constraint c = getRefinement(ex);
@@ -205,7 +208,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 		vcChecker.removePathVariableThatIncludes(name);//AQUI!!
 		checkVariableRefinements(refinementFound, name, type, elem);
-		
+
 	}
 
 	@Override
@@ -221,25 +224,25 @@ public class RefinementTypeChecker extends TypeChecker {
 		}
 	}	
 
-	
+
 	@Override
 	public <T> void visitCtField(CtField<T> f) {
 		super.visitCtField(f);
 		Optional<Constraint> c = getRefinementFromAnnotation(f);
-//		context.addVarToContext(f.getSimpleName(), f.getType(), 
-//				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
-//						      : new Predicate());
+		//		context.addVarToContext(f.getSimpleName(), f.getType(), 
+		//				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
+		//						      : new Predicate());
 		String nname = String.format(thisFormat, f.getSimpleName());
 		Constraint ret = new Predicate();
 		if(c.isPresent())
-			 ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
+			ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
 		RefinedVariable v = context.addVarToContext(nname, f.getType(),ret);
 		if(v instanceof Variable)
 			((Variable)v).setLocation("this");
-			
+
 	}
 
-	
+
 
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
@@ -247,16 +250,16 @@ public class RefinementTypeChecker extends TypeChecker {
 		if(context.hasVariable(fieldName)) {
 			RefinedVariable rv = context.getVariableByName(fieldName);
 			if(rv instanceof Variable && ((Variable)rv).getLocation().isPresent() &&
-				((Variable)rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
+					((Variable)rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
 				fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
 			}else
 				fieldRead.putMetadata(REFINE_KEY, 	new EqualsPredicate(new VariablePredicate(WILD_VAR), 
 						new VariablePredicate(fieldName)));
-			
+
 		}else if(context.hasVariable(String.format(thisFormat, fieldName))){
 			String thisName = String.format(thisFormat, fieldName);
 			fieldRead.putMetadata(REFINE_KEY, new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(thisName)));
-			
+
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
 			String targetName = fieldRead.getTarget().toString();
 			fieldRead.putMetadata(REFINE_KEY, 
@@ -314,18 +317,18 @@ public class RefinementTypeChecker extends TypeChecker {
 		context.variablesNewIfCombination();
 		context.variablesSetBeforeIf();
 		context.enterContext();
-		
+
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = String.format(freshFormat ,context.getCounter());
 		expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
 		Constraint lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
 		expRefs = Conjunction.createConjunction(expRefs, lastExpRefs);
-		
+
 		//TODO Change in future
 		if(expRefs.getVariableNames().contains("null"))
 			expRefs = new Predicate();
-		
-				
+
+
 		RefinedVariable freshRV = context.addInstanceToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, expRefs);
 		vcChecker.addPathVariable(freshRV);
@@ -335,14 +338,14 @@ public class RefinementTypeChecker extends TypeChecker {
 		visitCtBlock(ifElement.getThenStatement());
 		context.variablesSetThenIf();
 		context.exitContext();
-		
+
 
 		//VISIT ELSE
 		if(ifElement.getElseStatement() != null) {
 			context.getVariableByName(freshVarName);
 			//expRefs = expRefs.negate();
 			context.newRefinementToVariableInContext(freshVarName, expRefs.negate());
-			
+
 			context.enterContext();
 			visitCtBlock(ifElement.getElseStatement());		
 			context.variablesSetElseIf();
@@ -354,8 +357,8 @@ public class RefinementTypeChecker extends TypeChecker {
 		context.variablesCombineFromIf(expRefs);
 		context.variablesFinishIfCombination();
 	}
-	
-	
+
+
 	@Override
 	public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
 		super.visitCtArrayWrite(arrayWrite);
@@ -391,7 +394,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	}
 
-	
+
 
 	@Override
 	public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
@@ -480,12 +483,10 @@ public class RefinementTypeChecker extends TypeChecker {
 				ref = Optional.of(s.getValue());
 			}else if( an.contentEquals("repair.regen.specification.RefinementPredicate")) {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				getGhostFunction(s.getValue());
-				ref = Optional.empty();
+				getGhostFunction(s.getValue(), element);
 			}else if( an.contentEquals("repair.regen.specification.RefinementAlias")) {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 				handleAlias(s.getValue());
-				ref = Optional.empty();
 			}
 		}
 		if(ref.isPresent()) 
@@ -495,14 +496,19 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 
-	private void getGhostFunction(String value) {
+	private void getGhostFunction(String value, CtElement element) {
 		try {
 			Optional<FunctionDeclaration> ofd = 
 					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent()) {
-				GhostFunction gh = new GhostFunction(ofd.get(), factory); 
+			if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
+				
+				CtClass<?> klass =(CtClass<?>) element.getParent(); 
+				
+				GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
 				context.addGhostFunction(gh);
 				System.out.println(gh.toString());
+
+
 			}
 
 		} catch (SyntaxException e) {
@@ -511,7 +517,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		}
 
 	}
-	
+
 
 	private void handleAlias(String value) {
 		try {
@@ -520,14 +526,14 @@ public class RefinementTypeChecker extends TypeChecker {
 				AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context);
 				context.addAlias(a);
 			}
-//			System.out.println(oa);
+			//			System.out.println(oa);
 		} catch (SyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
+
 	}
-	
+
 
 	private void addStateRefinements(String varName, CtExpression<?> e) {
 		Optional<VariableInstance> vi = context.getLastVariableInstance(varName);
@@ -538,8 +544,8 @@ public class RefinementTypeChecker extends TypeChecker {
 		}
 		System.out.println();
 	}
-	
-	
+
+
 	@Override
 	public <T> void visitCtNewClass(CtNewClass<T> newClass) {
 		super.visitCtNewClass(newClass);
