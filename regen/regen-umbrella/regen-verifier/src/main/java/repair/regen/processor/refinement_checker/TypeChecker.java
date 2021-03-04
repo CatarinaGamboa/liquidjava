@@ -3,14 +3,23 @@ package repair.regen.processor.refinement_checker;
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 
+import repair.regen.language.alias.Alias;
+import repair.regen.language.function.FunctionDeclaration;
+import repair.regen.language.parser.RefinementParser;
+import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
+import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtAnnotation;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtVariable;
+import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 
@@ -25,30 +34,14 @@ public abstract class TypeChecker extends CtScanner{
 	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double", "int[]"}; //TODO add types
 	
 	Context context;
+	Factory factory;
 	
-	public TypeChecker(Context c) {
+	public TypeChecker(Context c, Factory fac) {
 		this.context = c;
+		this.factory = fac;
 	}
 
 	
-	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
-		Optional<Constraint> constr = Optional.empty();
-		Optional<String> ref = Optional.empty();
-		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) 
-			if( ann.getActualAnnotation().annotationType().getCanonicalName()
-					.contentEquals("repair.regen.specification.Refinement")) {
-				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				ref = Optional.of(s.getValue());
-			}		
-		if(ref.isPresent()) 
-			constr = Optional.of(new Predicate(ref.get()));
-		
-		return constr;
-	}
-
-	Constraint getRefinement(CtElement elem) {
-		return (Constraint)elem.getMetadata(REFINE_KEY);
-	}
 	
 	abstract void checkVariableRefinements(Constraint refinementFound, String simpleName, 
 			CtTypeReference type, CtElement variable);
@@ -58,6 +51,52 @@ public abstract class TypeChecker extends CtScanner{
 	protected abstract void checkStateSMT(Constraint prevState, Constraint expectedState, CtExpression<?> target);
 
 	
+	
+	
+	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
+		Optional<Constraint> constr = Optional.empty();
+		Optional<String> ref = Optional.empty();
+		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
+			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
+			if( an.contentEquals("repair.regen.specification.Refinement")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				ref = Optional.of(s.getValue());
+			}else if( an.contentEquals("repair.regen.specification.RefinementPredicate")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				getGhostFunction(s.getValue(), element);
+			}else if( an.contentEquals("repair.regen.specification.RefinementAlias")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				handleAlias(s.getValue());
+			}
+		}
+		if(ref.isPresent()) 
+			constr = Optional.of(new Predicate(ref.get()));
+
+		return constr;
+	}
+
+
+	
+	abstract protected void getGhostFunction(String value, CtElement element);
+
+
+	private void handleAlias(String value) {
+		try {
+			Optional<Alias> oa = RefinementParser.parseAlias(value);
+			if(oa.isPresent()) {
+				AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context);
+				context.addAlias(a);
+			}
+			//			System.out.println(oa);
+		} catch (SyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	Constraint getRefinement(CtElement elem) {
+		return (Constraint)elem.getMetadata(REFINE_KEY);
+	}
 	
 	
 }

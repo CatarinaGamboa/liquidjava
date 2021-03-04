@@ -3,9 +3,13 @@ package repair.regen.processor.refinement_checker;
 import java.lang.annotation.Annotation;
 import java.util.Optional;
 
+import repair.regen.language.function.FunctionDeclaration;
+import repair.regen.language.parser.RefinementParser;
+import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
+import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
@@ -16,6 +20,7 @@ import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtVariable;
+import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 
@@ -24,8 +29,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	String prefix;
 	MethodsFunctionsChecker m;
 	
-	public ExternalRefinementTypeChecker(Context context) {
-		super(context);
+	public ExternalRefinementTypeChecker(Context context, Factory fac) {
+		super(context, fac);
 		this.context = context;
 		System.out.println("ExternalRefinementTypeChecker");
 	}
@@ -70,6 +75,23 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 				ref = Optional.of(s.getValue());
 			}		
 		return ref;
+	}
+	
+	protected void getGhostFunction(String value, CtElement element) {
+		try {
+			Optional<FunctionDeclaration> ofd = 
+					RefinementParser.parseFunctionDecl(value);
+			if(ofd.isPresent() && element.getParent() instanceof CtInterface<?>) {
+				System.out.println("Interface");
+				String[] a = prefix.split("\\.");
+				String d =  a[a.length-1];
+				GhostFunction gh = new GhostFunction(ofd.get(), factory,prefix,a[a.length-1]); 
+			}
+
+		} catch (SyntaxException e) {
+			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
+			e.printStackTrace();
+		}
 	}
 
 	@Override

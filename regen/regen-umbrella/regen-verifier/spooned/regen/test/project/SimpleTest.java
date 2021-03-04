@@ -17,17 +17,7 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("_ < 10")
-    public static int getYear() {
-        return 8;
-    }
-
     public static void main(java.lang.String[] args) {
-        int a = 1998;
-        regen.test.project.Car c = new regen.test.project.Car();
-        c.setYear(a);
-        @repair.regen.specification.Refinement("_ < 11")
-        int j = regen.test.project.SimpleTest.getYear();
     }
 }
 

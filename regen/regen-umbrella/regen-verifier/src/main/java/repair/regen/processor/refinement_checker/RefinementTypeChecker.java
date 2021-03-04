@@ -72,7 +72,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	MethodsFunctionsChecker mfc;
 
 	public RefinementTypeChecker(Context context,Factory factory) {
-		super(context);
+		super(context, factory);
 		this.factory = factory;
 		otc = new OperationsChecker(this);
 		mfc = new MethodsFunctionsChecker(this);
@@ -473,66 +473,25 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 
-	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
-		Optional<Constraint> constr = Optional.empty();
-		Optional<String> ref = Optional.empty();
-		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
-			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
-			if( an.contentEquals("repair.regen.specification.Refinement")) {
-				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				ref = Optional.of(s.getValue());
-			}else if( an.contentEquals("repair.regen.specification.RefinementPredicate")) {
-				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				getGhostFunction(s.getValue(), element);
-			}else if( an.contentEquals("repair.regen.specification.RefinementAlias")) {
-				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				handleAlias(s.getValue());
-			}
-		}
-		if(ref.isPresent()) 
-			constr = Optional.of(new Predicate(ref.get()));
+	protected void getGhostFunction(String value, CtElement element) {
+			try {
+				Optional<FunctionDeclaration> ofd = 
+						RefinementParser.parseFunctionDecl(value);
+				if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
+					
+					CtClass<?> klass =(CtClass<?>) element.getParent(); 
+					
+					GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
+					context.addGhostFunction(gh);
+					System.out.println(gh.toString());
+				}
 
-		return constr;
-	}
-
-
-	private void getGhostFunction(String value, CtElement element) {
-		try {
-			Optional<FunctionDeclaration> ofd = 
-					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
-				
-				CtClass<?> klass =(CtClass<?>) element.getParent(); 
-				
-				GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
-				context.addGhostFunction(gh);
-				System.out.println(gh.toString());
-
-
+			} catch (SyntaxException e) {
+				System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
+				e.printStackTrace();
 			}
 
-		} catch (SyntaxException e) {
-			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
-			e.printStackTrace();
 		}
-
-	}
-
-
-	private void handleAlias(String value) {
-		try {
-			Optional<Alias> oa = RefinementParser.parseAlias(value);
-			if(oa.isPresent()) {
-				AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context);
-				context.addAlias(a);
-			}
-			//			System.out.println(oa);
-		} catch (SyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
 
 
 	private void addStateRefinements(String varName, CtExpression<?> e) {

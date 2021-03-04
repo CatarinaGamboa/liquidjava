@@ -92,6 +92,7 @@ public class MethodsFunctionsChecker {
 		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(an.isPresent())
 			f.setState(an.get());
+		System.out.println();
 	}
 
 	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {

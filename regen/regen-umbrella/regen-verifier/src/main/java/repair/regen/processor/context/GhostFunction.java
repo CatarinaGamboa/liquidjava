@@ -19,8 +19,6 @@ public class GhostFunction {
 		name = fdExp.getName().toString();
 		Type t = fdExp.getReturnType();
 		return_type = Utils.getType(t.toString().equals(klass)? path: t.toString(), factory);
-			
-
 		param_types = new ArrayList<>();
 		MultipleTypes[] pts = fdExp.getArgTypes();
 		for(MultipleTypes mt: pts) {
