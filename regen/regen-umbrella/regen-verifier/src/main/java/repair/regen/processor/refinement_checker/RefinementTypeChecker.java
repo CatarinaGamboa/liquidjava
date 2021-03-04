@@ -65,7 +65,6 @@ public class RefinementTypeChecker extends TypeChecker {
 	// 1. Keep track of the context variable types
 	// 2. Do type checking and inference
 	VCChecker vcChecker = new VCChecker();
-	Factory factory;
 
 	//Auxiliar TypeCheckers
 	OperationsChecker otc;
@@ -73,7 +72,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	public RefinementTypeChecker(Context context,Factory factory) {
 		super(context, factory);
-		this.factory = factory;
 		otc = new OperationsChecker(this);
 		mfc = new MethodsFunctionsChecker(this);
 		System.out.println("In RefinementTypeChecker");
@@ -478,9 +476,7 @@ public class RefinementTypeChecker extends TypeChecker {
 				Optional<FunctionDeclaration> ofd = 
 						RefinementParser.parseFunctionDecl(value);
 				if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
-					
 					CtClass<?> klass =(CtClass<?>) element.getParent(); 
-					
 					GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
 					context.addGhostFunction(gh);
 					System.out.println(gh.toString());

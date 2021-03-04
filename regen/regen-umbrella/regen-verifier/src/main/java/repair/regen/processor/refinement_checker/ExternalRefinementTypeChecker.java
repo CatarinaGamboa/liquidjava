@@ -25,13 +25,11 @@ import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 
 public class ExternalRefinementTypeChecker extends TypeChecker{
-	Context context;
 	String prefix;
 	MethodsFunctionsChecker m;
 	
 	public ExternalRefinementTypeChecker(Context context, Factory fac) {
 		super(context, fac);
-		this.context = context;
 		System.out.println("ExternalRefinementTypeChecker");
 	}
 
@@ -82,10 +80,11 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 			Optional<FunctionDeclaration> ofd = 
 					RefinementParser.parseFunctionDecl(value);
 			if(ofd.isPresent() && element.getParent() instanceof CtInterface<?>) {
-				System.out.println("Interface");
 				String[] a = prefix.split("\\.");
 				String d =  a[a.length-1];
 				GhostFunction gh = new GhostFunction(ofd.get(), factory,prefix,a[a.length-1]); 
+				context.addGhostFunction(gh);
+				System.out.println(gh.toString());
 			}
 
 		} catch (SyntaxException e) {

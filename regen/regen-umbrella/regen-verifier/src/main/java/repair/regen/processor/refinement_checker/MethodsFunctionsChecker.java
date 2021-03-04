@@ -92,17 +92,28 @@ public class MethodsFunctionsChecker {
 		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(an.isPresent())
 			f.setState(an.get());
-		System.out.println();
 	}
 
 	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {
+		String[] pac = prefix.split("\\.");
+		String k = pac[pac.length-1]; 
+		
+		String functionName = String.format("%s.%s", prefix, method.getSimpleName());
+		if(k.equals(method.getSimpleName())) {//is a constructor
+			functionName = String.format("<init>");
+		}
+		
 		RefinedFunction f = new RefinedFunction();
-		f.setName(String.format("%s.%s", prefix, method.getSimpleName()));
+		f.setName(functionName);
 		f.setType(method.getType());
 		f.setRefReturn(new Predicate());
 		f.setClass(prefix);
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
+		
+		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
+		if(an.isPresent())
+			f.setState(an.get());
 	}
 	
 	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {
@@ -193,14 +204,12 @@ public class MethodsFunctionsChecker {
 		if(method == null) {
 			Method m = invocation.getExecutable().getActualMethod();
 			if(m != null) searchMethodInLibrary(m, invocation);
+		
 		}else if(method.getParent() instanceof CtClass){
 			String ctype = ((CtClass)method.getParent()).getQualifiedName();
 			RefinedFunction f = rtc.context.getFunction(method.getSimpleName(), ctype);
 			if(f != null) {//inside rtc.context
 				checkInvocationRefinements(invocation, method.getSimpleName(), ctype);
-				
-				if(invocation.getTarget() != null)
-					checkTargetChanges(invocation.getTarget(), f, invocation);
 				
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
@@ -264,6 +273,9 @@ public class MethodsFunctionsChecker {
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName, String className) {
 //		invocation.getTarget().getType().toString()
 		RefinedFunction f = rtc.context.getFunction(methodName, className);
+		if(f.hasStateChange() && invocation.getTarget() != null)
+			checkTargetChanges(invocation.getTarget(), f, invocation);
+		
 		if(f.allRefinementsTrue()) {
 			invocation.putMetadata(rtc.REFINE_KEY, new Predicate());
 			return;
@@ -280,6 +292,8 @@ public class MethodsFunctionsChecker {
 					methodRef = methodRef.substituteVariable(s, map.get(s));
 			invocation.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
+
+			
 	}
 	
 	private <R> Map<String, String> mapInvocation(CtInvocation<R> invocation, RefinedFunction f){

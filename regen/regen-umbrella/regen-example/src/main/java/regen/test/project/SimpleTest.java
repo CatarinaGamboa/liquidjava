@@ -1,12 +1,20 @@
 package regen.test.project;
 
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
 
 public class SimpleTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+		//java.io.InputStreamReader.InputStreamReader
+		InputStreamReader is = new InputStreamReader(System.in);
+		is.read();
+		is.close();
+		is.read();
 
 		
 	}

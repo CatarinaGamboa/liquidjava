@@ -123,6 +123,11 @@ public class RefinedFunction extends Refined{
 		
 	}
 	
+	public boolean hasStateChange() {
+		return stateChange != null;
+	}
+
+	
 	public Optional<Constraint> getStateFrom() {
 		if(stateChange != null)
 			return stateChange.getFrom();
@@ -175,6 +180,8 @@ public class RefinedFunction extends Refined{
 			return false;
 		return true;
 	}
+
+
 
 
 

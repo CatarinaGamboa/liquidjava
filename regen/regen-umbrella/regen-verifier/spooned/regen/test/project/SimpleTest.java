@@ -17,7 +17,12 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    public static void main(java.lang.String[] args) {
+    public static void main(java.lang.String[] args) throws java.io.IOException {
+        // java.io.InputStreamReader.InputStreamReader
+        java.io.InputStreamReader is = new java.io.InputStreamReader(java.lang.System.in);
+        is.read();
+        is.close();
+        is.read();
     }
 }
 
