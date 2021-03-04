@@ -472,23 +472,40 @@ public class RefinementTypeChecker extends TypeChecker {
 
 
 	protected void getGhostFunction(String value, CtElement element) {
-			try {
-				Optional<FunctionDeclaration> ofd = 
-						RefinementParser.parseFunctionDecl(value);
-				if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
-					CtClass<?> klass =(CtClass<?>) element.getParent(); 
-					GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
-					context.addGhostFunction(gh);
-					System.out.println(gh.toString());
-				}
-
-			} catch (SyntaxException e) {
-				System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
-				e.printStackTrace();
+		try {
+			Optional<FunctionDeclaration> ofd = 
+					RefinementParser.parseFunctionDecl(value);
+			if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
+				CtClass<?> klass =(CtClass<?>) element.getParent(); 
+				GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
+				context.addGhostFunction(gh);
+				System.out.println(gh.toString());
 			}
 
+		} catch (SyntaxException e) {
+			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
+			e.printStackTrace();
 		}
 
+	}
+
+	protected void handleAlias(String value, CtElement element) {
+		try {
+			Optional<Alias> oa = RefinementParser.parseAlias(value);
+			if(oa.isPresent() && element instanceof CtClass) {
+				String klass = ((CtClass) element).getSimpleName();
+				String path = ((CtClass) element).getQualifiedName();
+				
+				AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
+				context.addAlias(a);
+			}
+			//			System.out.println(oa);
+		} catch (SyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
 
 	private void addStateRefinements(String varName, CtExpression<?> e) {
 		Optional<VariableInstance> vi = context.getLastVariableInstance(varName);

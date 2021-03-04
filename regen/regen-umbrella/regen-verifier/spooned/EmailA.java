@@ -1,4 +1,3 @@
-package regen.test.project;
 
 
 // https://blog.sigplan.org/2021/03/02/fluent-api-practice-and-theory/
@@ -8,7 +7,7 @@ package regen.test.project;
 @repair.regen.specification.RefinementAlias("SenderSet(Email e)   { state(e) == 2}")
 @repair.regen.specification.RefinementAlias("ReceiverSet(Email e) { state(e) == 3}")
 @repair.regen.specification.RefinementAlias("BodySet(Email e)     { state(e) == 4}")
-public class Email {
+public class EmailA {
     private java.lang.String sender;
 
     private java.util.List<java.lang.String> receiver;
@@ -19,7 +18,7 @@ public class Email {
 
     @repair.regen.specification.RefinementPredicate("int state(Email e)")
     @repair.regen.specification.StateRefinement(to = "EmptyEmail(this)")
-    public Email() {
+    public EmailA() {
         receiver = new java.util.ArrayList<>();
     }
 

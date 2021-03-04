@@ -27,12 +27,13 @@ public class AliasWrapper {
 	
 	private String newAliasFormat = "#alias_%s_%d";
 
-	public AliasWrapper(Alias alias, Factory factory, String wildvar, Context c) {
+	public AliasWrapper(Alias alias, Factory factory, String wildvar, Context c, String klass, String path) {
 		name = alias.getName();
 		this.varNames = alias.getVariableNames();
 		this.varTypes = new ArrayList<>();
 		for(String t:alias.getTypesNames())
-			this.varTypes.add(Utils.getType(t, factory));
+			this.varTypes.add(Utils.getType(t.toString().equals(klass)? path: t.toString(), factory));
+//			this.varTypes.add(Utils.getType(t, factory));
 		this.expression = new Predicate(alias.getExpression());
 		context= c;
 	}

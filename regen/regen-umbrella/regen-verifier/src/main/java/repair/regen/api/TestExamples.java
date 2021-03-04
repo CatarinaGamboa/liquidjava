@@ -442,6 +442,12 @@ public class TestExamples {
 	}
 	
 	
+	@Test
+	public void errorInputReader() {
+		testWrong(testPath+"/classes/input_reader_error");
+	}
+	
+	
 	
 
 	

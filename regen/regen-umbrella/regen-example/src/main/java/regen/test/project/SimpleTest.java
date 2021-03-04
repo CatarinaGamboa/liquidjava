@@ -9,15 +9,33 @@ import repair.regen.specification.RefinementPredicate;
 
 public class SimpleTest {
 
-	public static void main(String[] args) throws IOException {
-		//java.io.InputStreamReader.InputStreamReader
-		InputStreamReader is = new InputStreamReader(System.in);
-		is.read();
-		is.close();
-		is.read();
+	public static void main(String[] args) throws IOException{
+		
 
 		
 	}
+	
+	
+	
+	
+	
+//	InputStreamReader isr = new InputStreamReader(System.in);
+//	isr.read();
+//	isr.read();
+//	isr.read();
+//	isr.close();
+//	
+//	//...
+//	isr.read();
+
+	
+//	Email e = new Email();
+//	e.from("me");
+//	e.to("you");
+//	e.to("you2");
+//	e.subject("optional");
+////	e.body("msg");
+//	e.build();
 
 
 

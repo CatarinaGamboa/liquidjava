@@ -66,7 +66,7 @@ public abstract class TypeChecker extends CtScanner{
 				getGhostFunction(s.getValue(), element);
 			}else if( an.contentEquals("repair.regen.specification.RefinementAlias")) {
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				handleAlias(s.getValue());
+				handleAlias(s.getValue(), element);
 			}
 		}
 		if(ref.isPresent()) 
@@ -79,21 +79,8 @@ public abstract class TypeChecker extends CtScanner{
 	
 	abstract protected void getGhostFunction(String value, CtElement element);
 
-
-	private void handleAlias(String value) {
-		try {
-			Optional<Alias> oa = RefinementParser.parseAlias(value);
-			if(oa.isPresent()) {
-				AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context);
-				context.addAlias(a);
-			}
-			//			System.out.println(oa);
-		} catch (SyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
+	abstract protected void handleAlias(String value, CtElement element);
+	
 	Constraint getRefinement(CtElement elem) {
 		return (Constraint)elem.getMetadata(REFINE_KEY);
 	}

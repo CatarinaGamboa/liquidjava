@@ -97,6 +97,13 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	protected void checkSMT(Constraint refPar, CtElement invocation) {
 		// TODO Auto-generated method stub
 	}
+	
+	@Override
+	protected void handleAlias(String value, CtElement element) {
+		// TODO Auto-generated method stub
+		
+	}
+	
 
 
 	@Override
@@ -111,7 +118,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		// TODO Auto-generated method stub
 		
 	}
-	
+
+
 
 
 	
