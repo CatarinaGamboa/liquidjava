@@ -150,6 +150,7 @@ public class VCChecker {
 	 * @param element
 	 */
 	void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
+//		printVCs("", cSMT.toString(), expectedType);
 		try {
 			new SMTEvaluator().verifySubtype(cSMT, expectedType, 
 					context.getContext(), context.getGhosts(), context.getAlias());

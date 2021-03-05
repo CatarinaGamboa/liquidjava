@@ -8,9 +8,9 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-@Repeatable(MultipleAlias.class)
+@Repeatable(RefinementAliasMultiple.class)
 public @interface RefinementAlias {
-		public String value();
+	public String value();
 }
 
 

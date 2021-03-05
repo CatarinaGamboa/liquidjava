@@ -228,6 +228,15 @@ public class Context {
 //		}
 		return null;
 	}
+	
+	public RefinedFunction getFunction(String name, String target, int size) {
+		for(RefinedFunction fi: ctxFunctions) {
+			if(fi.getTargetClass() != null &&
+			   fi.getName().equals(name) && fi.getTargetClass().equals(target) && fi.getArguments().size() == size)
+				return fi;
+		}
+		return null;
+	}
 
 	public RefinedVariable getVariableByName(String name) {
 		for(List<RefinedVariable> l: ctxVars) {
@@ -349,5 +358,7 @@ public class Context {
 			sb.append(f.toString());
 		return sb.toString();
 	}
+
+
 
 }

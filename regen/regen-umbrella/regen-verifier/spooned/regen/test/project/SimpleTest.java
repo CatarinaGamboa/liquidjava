@@ -1,13 +1,14 @@
 package regen.test.project;
 
 
-// Email e = new Email();
-// e.from("me");
-// e.to("you");
-// e.to("you2");
-// e.subject("optional");
-// //	e.body("msg");
-// e.build();
+// InputStreamReader isr = new InputStreamReader(System.in);
+// isr.read();
+// isr.read();
+// isr.read();
+// isr.close();
+// 
+// //...
+// isr.read();
 // @Refinement("_ > 0")
 // public int fun (int[] arr) {
 // return max(arr[0], 1);
@@ -26,12 +27,10 @@ package regen.test.project;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         java.io.InputStreamReader isr = new java.io.InputStreamReader(java.lang.System.in);
-        isr.read();
-        isr.read();
-        isr.read();
-        isr.close();
-        // ...
-        isr.read();
+        @repair.regen.specification.Refinement("_ > -9")
+        int a = isr.read();
+        char[] arr = new char[20];
+        int b = isr.read(arr, 10, (-1));
     }
 }
 

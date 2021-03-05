@@ -2,8 +2,6 @@ package regen.test.project;
 
 
 // https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
-// @StateRefinement(from="open(this)", to="open(this)")
-// public int read(char[] cbuf, int offset, int length);
 // 
 // @StateRefinement(from="open(this)", to="open(this)")
 // public int ready();
@@ -17,9 +15,16 @@ public interface InputStreamReaderRefinements {
     public void InputStreamReader(java.io.InputStream in);
 
     @repair.regen.specification.StateRefinement(from = "open(this)", to = "open(this)")
+    @repair.regen.specification.Refinement("(_ >= -1) && (_ <= 127)")
     public int read();
 
     @repair.regen.specification.StateRefinement(from = "open(this)", to = "!open(this)")
     public void close();
+
+    @repair.regen.specification.StateRefinement(from = "open(this)", to = "open(this)")
+    @repair.regen.specification.Refinement("_ >= -1")
+    public int read(char[] cbuf, @repair.regen.specification.Refinement("_ >= 0")
+    int offset, @repair.regen.specification.Refinement("_ >= 0")
+    int length);
 }
 

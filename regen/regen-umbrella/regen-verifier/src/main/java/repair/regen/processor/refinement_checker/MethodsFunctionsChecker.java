@@ -272,7 +272,8 @@ public class MethodsFunctionsChecker {
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName, String className) {
 //		invocation.getTarget().getType().toString()
-		RefinedFunction f = rtc.context.getFunction(methodName, className);
+		int si = invocation.getArguments().size();
+		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
 		if(f.hasStateChange() && invocation.getTarget() != null)
 			checkTargetChanges(invocation.getTarget(), f, invocation);
 		

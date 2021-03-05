@@ -10,9 +10,13 @@ import repair.regen.specification.RefinementPredicate;
 public class SimpleTest {
 
 	public static void main(String[] args) throws IOException{
-		
 
-		
+		InputStreamReader isr = new InputStreamReader(System.in);
+		@Refinement("_ > -9")
+		int a = isr.read();
+		char[] arr = new char[20];		
+		int b = isr.read(arr, 10, -1);
+
 	}
 	
 	
@@ -29,13 +33,6 @@ public class SimpleTest {
 //	isr.read();
 
 	
-//	Email e = new Email();
-//	e.from("me");
-//	e.to("you");
-//	e.to("you2");
-//	e.subject("optional");
-////	e.body("msg");
-//	e.build();
 
 
 
