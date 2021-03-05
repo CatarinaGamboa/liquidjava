@@ -25,12 +25,14 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
+    @repair.regen.specification.RefinementPredicate("int length(char[] a)")
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        java.io.InputStreamReader isr = new java.io.InputStreamReader(java.lang.System.in);
+        java.io.InputStreamReader isr = new java.io.InputStreamReader(new java.io.FileInputStream("test1.txt"));
         @repair.regen.specification.Refinement("_ > -9")
         int a = isr.read();
         char[] arr = new char[20];
-        int b = isr.read(arr, 10, (-1));
+        int b = isr.read(arr, 10, 5);
+        java.lang.System.out.println(arr);
     }
 }
 

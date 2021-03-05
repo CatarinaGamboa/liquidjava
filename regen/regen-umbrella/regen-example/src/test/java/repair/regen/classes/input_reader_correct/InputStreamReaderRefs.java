@@ -1,5 +1,4 @@
-package regen.test.project;
-
+package repair.regen.classes.input_reader_correct;
 
 import java.io.InputStream;
 
@@ -10,7 +9,7 @@ import repair.regen.specification.StateRefinement;
 
 //https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
 @ExternalRefinementsFor("java.io.InputStreamReader")
-public interface InputStreamReaderRefinements {
+public interface InputStreamReaderRefs {
 	
 	@RefinementPredicate("boolean open(InputStreamReader i)")
 	@StateRefinement(to="open(this)")
@@ -27,7 +26,7 @@ public interface InputStreamReaderRefinements {
 	@StateRefinement(from="open(this)", to="open(this)")
 	@Refinement("_ >= -1")
 	public int read(@Refinement("length(cbuf) > 0") char[] cbuf, 
-					@Refinement("_ >= 0")int offset, 
+					@Refinement("_ >= 0") int offset, 
 					@Refinement("(_ >= 0) && (_ + offset) <= length(cbuf)")int length);
 //	
 //	@StateRefinement(from="open(this)", to="open(this)")

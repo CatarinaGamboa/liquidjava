@@ -67,7 +67,8 @@ public class TranslatorToZ3 {
 	}
 
 	private void addBuiltinFunctions() {
-		funcTranslation.put("length", z3.mkFuncDecl("length", getSort("int[]"), getSort("int")));
+		funcTranslation.put("length", z3.mkFuncDecl("length", getSort("int[]"), getSort("int")));//ERRRRRRRRRRRRO!!!!!!!!!!!!!
+		System.out.println("Error only working for int[] now - Change");
 		//TODO add built-in function
 		Sort[] s = Arrays.asList(getSort("int[]"), getSort("int"), getSort("int")).stream().toArray(Sort[]::new);	
 		funcTranslation.put("addToIndex", z3.mkFuncDecl("addToIndex", s, getSort("void")));

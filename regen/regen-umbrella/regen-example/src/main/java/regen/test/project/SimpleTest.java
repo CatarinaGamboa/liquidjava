@@ -1,7 +1,9 @@
 package regen.test.project;
 
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.spi.FileSystemProvider;
 
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
@@ -9,14 +11,15 @@ import repair.regen.specification.RefinementPredicate;
 
 public class SimpleTest {
 
+	@RefinementPredicate("int length(char[] a)")
 	public static void main(String[] args) throws IOException{
 
-		InputStreamReader isr = new InputStreamReader(System.in);
+		InputStreamReader isr = new InputStreamReader(new FileInputStream("test1.txt"));
 		@Refinement("_ > -9")
 		int a = isr.read();
 		char[] arr = new char[20];		
-		int b = isr.read(arr, 10, -1);
-
+		int b = isr.read(arr, 10, 5);
+		System.out.println(arr);
 	}
 	
 	

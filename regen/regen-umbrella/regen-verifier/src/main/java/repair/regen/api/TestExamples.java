@@ -207,6 +207,11 @@ public class TestExamples {
 	}
 	
 	
+//	@Test
+//	public void correctInputReaderCharArrayLongerNameEve() {
+//		testCorrect(testPath+"/classes/input_reader_correct");
+//	}
+//	
 	
 	@Test
 	public void errorSimpleAssignment() {
