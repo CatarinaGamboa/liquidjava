@@ -26,11 +26,8 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        java.io.InputStreamReader isr = new java.io.InputStreamReader(java.lang.System.in);
-        isr.read();
-        isr.close();
-        isr.getEncoding();
-        isr.read();
+        regen.test.project.Bus b = new regen.test.project.Bus();
+        b.setYear(1500);
     }
 }
 

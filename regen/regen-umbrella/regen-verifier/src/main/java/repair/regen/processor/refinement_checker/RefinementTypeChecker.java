@@ -1,6 +1,5 @@
 package repair.regen.processor.refinement_checker;
 
-import java.io.File;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
@@ -23,7 +22,6 @@ import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
-import repair.regen.specification.RefinementPredicate;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -42,22 +40,21 @@ import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
-import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtAnnotationType;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtField;
+import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.path.CtPath;
-import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.support.reflect.code.CtVariableWriteImpl;
+import spoon.support.sniper.internal.ElementSourceFragment;
 
 public class RefinementTypeChecker extends TypeChecker {
 	// This class should do the following:
@@ -82,9 +79,34 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtClass(CtClass<T> ctClass) {
 		System.out.println("CTCLASS:"+ctClass.getSimpleName());
 		context.reinitializeContext();
+		//visitInterfaces
+		if(!ctClass.getSuperInterfaces().isEmpty())
+			for(CtTypeReference<?> t :ctClass.getSuperInterfaces()) {
+				if(t.isInterface()) {
+					CtType ct = t.getDeclaration();
+					if(ct instanceof CtInterface)				
+						visitCtInterface((CtInterface<?>) ct);
+				}
+
+			}
+		//visitSubclasses
+		CtTypeReference<?> sup = ctClass.getSuperclass();
+		if(sup != null && sup.isClass()){
+			CtType ct = sup.getDeclaration();
+			if(ct instanceof CtClass)				
+				visitCtClass((CtClass<?>) ct);
+		}
+
 		getRefinementFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
 	}
+
+	@Override
+	public <T> void visitCtInterface(CtInterface<T> intrface) {
+		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
+		super.visitCtInterface(intrface);
+	}
+
 
 	//	@Override
 	//	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
@@ -495,7 +517,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			if(oa.isPresent() && element instanceof CtClass) {
 				String klass = ((CtClass) element).getSimpleName();
 				String path = ((CtClass) element).getQualifiedName();
-				
+
 				AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
 				context.addAlias(a);
 			}

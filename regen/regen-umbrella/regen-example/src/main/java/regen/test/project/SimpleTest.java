@@ -12,12 +12,8 @@ import repair.regen.specification.RefinementPredicate;
 public class SimpleTest {
 
 	public static void main(String[] args) throws IOException{
-		InputStreamReader isr = new InputStreamReader(System.in);
-		isr.read();
-		isr.close();
-		isr.getEncoding();
-		isr.read();
-		
+		Bus b = new Bus();
+		b.setYear(1500);
 	}
 	
 	

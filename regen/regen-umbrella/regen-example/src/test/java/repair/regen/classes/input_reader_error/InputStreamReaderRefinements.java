@@ -22,11 +22,5 @@ public interface InputStreamReaderRefinements {
 //faster
 //	@StateRefinement(from="open(this)", to="open(this)")
 //	public int read(char[] cbuf, int offset, int length);
-	
-//	@StateRefinement(from="open(this)", to="open(this)")
-//	public int ready();
-//	
-//	@StateRefinement(from="open(this)", to="open(this)")
-//	public String getEncoding();
-	
+
 }
