@@ -11,15 +11,13 @@ import repair.regen.specification.RefinementPredicate;
 
 public class SimpleTest {
 
-	@RefinementPredicate("int length(char[] a)")
 	public static void main(String[] args) throws IOException{
-
-		InputStreamReader isr = new InputStreamReader(new FileInputStream("test1.txt"));
-		@Refinement("_ > -9")
-		int a = isr.read();
-		char[] arr = new char[20];		
-		int b = isr.read(arr, 10, 5);
-		System.out.println(arr);
+		InputStreamReader isr = new InputStreamReader(System.in);
+		isr.read();
+		isr.close();
+		isr.getEncoding();
+		isr.read();
+		
 	}
 	
 	

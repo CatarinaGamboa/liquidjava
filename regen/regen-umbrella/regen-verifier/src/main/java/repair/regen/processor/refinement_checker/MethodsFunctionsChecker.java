@@ -228,29 +228,48 @@ public class MethodsFunctionsChecker {
 
 
 
-	private void checkTargetChanges(CtExpression<?> target, RefinedFunction f, CtInvocation<?> invocation) {
+	private void checkTargetChanges(CtExpression<?> target, RefinedFunction f, CtInvocation<?> invocation) {		
 		if(target instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)target;
 			String name = v.getVariable().getSimpleName();
 			Optional<VariableInstance> ovi = rtc.context.getLastVariableInstance(name);
-			if(ovi.isPresent() && f.getStateFrom().isPresent()) {
-				VariableInstance vi = ovi.get();
-				Constraint prevState = vi.getState();
-				Constraint expectedState  = f.getStateFrom().get().substituteVariable(rtc.THIS, name);
-				//criar nova var instance com o to
-				rtc.checkStateSMT(prevState, expectedState, invocation);
-				if(f.getStateTo().isPresent()) {
-					Constraint transitionedState = f.getStateTo().get().substituteVariable(rtc.THIS, name);
-					String name2 = String.format(rtc.instanceFormat, name, rtc.context.getCounter()); 
-					VariableInstance vi2 = (VariableInstance)rtc.context.addInstanceToContext( 
-															name2, vi.getType() , vi.getRefinement());
-					vi2.setState(transitionedState);
-					rtc.context.addRefinementInstanceToVariable(name, name2);
-					invocation.putMetadata(rtc.STATE_KEY, transitionedState);
-				}
-			}
+			Constraint ref = new Predicate();
+			if(ovi.isPresent() && f.hasStateChange() && f.getStateFrom().isPresent())
+				ref = changeState(ovi.get(), f, name, invocation);
+			if(ovi.isPresent() && !f.hasStateChange()) 
+				ref = sameState(ovi.get(), name, invocation);
+			
+			invocation.putMetadata(rtc.STATE_KEY, ref);
+
 		}
 		
+	}
+
+	private Constraint sameState(VariableInstance variableInstance, String name, CtInvocation<?> invocation) {
+		Constraint c = variableInstance.getState();
+		addInstanceWithState(name, variableInstance, c);
+		return c;
+	}
+
+	private Constraint changeState(VariableInstance vi, RefinedFunction f, String name, CtInvocation<?> invocation) {
+		Constraint prevState = vi.getState();
+		Constraint expectedState  = f.getStateFrom().get().substituteVariable(rtc.THIS, name);
+		//criar nova var instance com o to
+		rtc.checkStateSMT(prevState, expectedState, invocation);
+		if(f.getStateTo().isPresent()) {
+			Constraint transitionedState = f.getStateTo().get().substituteVariable(rtc.THIS, name);
+			addInstanceWithState(name, vi, transitionedState);
+			return transitionedState;
+		}
+		return new Predicate();
+	}
+	
+	private void addInstanceWithState(String superName, VariableInstance prevInstance, Constraint transitionedState) {
+		String name2 = String.format(rtc.instanceFormat, superName, rtc.context.getCounter()); 
+		VariableInstance vi2 = (VariableInstance)rtc.context.addInstanceToContext( 
+												name2, prevInstance.getType() , prevInstance.getRefinement());
+		vi2.setState(transitionedState);
+		rtc.context.addRefinementInstanceToVariable(superName, name2);
 	}
 
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
@@ -274,8 +293,9 @@ public class MethodsFunctionsChecker {
 //		invocation.getTarget().getType().toString()
 		int si = invocation.getArguments().size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
-		if(f.hasStateChange() && invocation.getTarget() != null)
+		if(invocation.getTarget() != null) {
 			checkTargetChanges(invocation.getTarget(), f, invocation);
+		}
 		
 		if(f.allRefinementsTrue()) {
 			invocation.putMetadata(rtc.REFINE_KEY, new Predicate());
