@@ -27,7 +27,7 @@ package regen.test.project;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         regen.test.project.Bus b = new regen.test.project.Bus();
-        b.setYear(1950);
+        b.setYear(1900);
     }
 }
 

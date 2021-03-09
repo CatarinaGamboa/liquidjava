@@ -110,13 +110,23 @@ public class MethodsFunctionsChecker {
 
 	
 	private <R> void checkFunctionInSupertypes(CtClass klass, CtMethod<R> method, RefinedFunction f) {
-		//interfaces
-		Optional<RefinedFunction> superFunction = functionInInterface(klass, 
-				method.getSimpleName(), method.getParameters().size());
-		if(superFunction.isPresent()) {
-			transferRefinements(superFunction.get(), f);
+		String name = method.getSimpleName();
+		int size = method.getParameters().size();
+		if(klass.getSuperInterfaces().size() > 0) {
+			//interfaces
+			Optional<RefinedFunction> superFunction = functionInInterface(klass, 
+					name, size);
+			if(superFunction.isPresent()) {
+				transferRefinements(superFunction.get(), f);
+			}
 		}
-		//TODO super classes
+		if(klass.getSuperclass() != null) {
+			CtTypeReference<?> t = klass.getSuperclass();
+			RefinedFunction superFunction = rtc.context.getFunction(name, t.getQualifiedName(), size);
+			if(superFunction != null) {
+				transferRefinements(superFunction, f);
+			}
+		}
 		
 	}
 
