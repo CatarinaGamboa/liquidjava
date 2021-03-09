@@ -63,5 +63,10 @@ public class Conjunction extends Constraint{
 	public Expression getExpression() {
 		return new ExpressionGroup(new BinaryExpression(c1.getExpression(), new AndOperator(), c2.getExpression()));
 	}
+	
+	@Override
+	public boolean isBooleanTrue() {
+		return c1.isBooleanTrue() && c2.isBooleanTrue();
+	}
 
 }

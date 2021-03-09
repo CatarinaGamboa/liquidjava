@@ -237,6 +237,17 @@ public class Context {
 		}
 		return null;
 	}
+	
+
+	public List<RefinedFunction> getAllMethodsWithNameSize(String name, int size) {
+		List<RefinedFunction> l = new ArrayList<>();
+		for(RefinedFunction fi: ctxFunctions) {
+			if(fi.getName().equals(name) && fi.getArguments().size() == size)
+				l.add(fi);
+		}
+		return l;
+	}
+
 
 	public RefinedVariable getVariableByName(String name) {
 		for(List<RefinedVariable> l: ctxVars) {

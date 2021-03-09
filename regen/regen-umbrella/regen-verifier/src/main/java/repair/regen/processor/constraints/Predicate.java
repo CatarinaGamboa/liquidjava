@@ -82,6 +82,8 @@ public class Predicate extends Constraint{
 	@Override
 	public Constraint substituteVariable(String from, String to) {
 		Predicate c = (Predicate) this.clone();
+		if(from.equals(to))
+			return c;
 		c.exp.substituteVariable(from, to);
 		return c;
 	}
@@ -94,7 +96,8 @@ public class Predicate extends Constraint{
 	}
 
 	public boolean isBooleanTrue() {//TODO rever
-		return toString().equals("true") || toString().equals("(true)") ;	
+		return exp instanceof BooleanLiteral; 
+//				toString().equals("true") || toString().equals("(true)") ;	
 	}
 	
 	@Override

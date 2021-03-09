@@ -50,4 +50,10 @@ public class Implication extends Constraint{
 		return null;
 	}
 
+	@Override
+	public boolean isBooleanTrue() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

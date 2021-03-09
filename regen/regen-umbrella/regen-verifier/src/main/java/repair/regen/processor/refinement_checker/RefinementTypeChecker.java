@@ -104,6 +104,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
 		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
+		getRefinementFromAnnotation(intrface);
 		super.visitCtInterface(intrface);
 	}
 
@@ -523,12 +524,22 @@ public class RefinementTypeChecker extends TypeChecker {
 	protected void handleAlias(String value, CtElement element) {
 		try {
 			Optional<Alias> oa = RefinementParser.parseAlias(value);
-			if(oa.isPresent() && element instanceof CtClass) {
-				String klass = ((CtClass) element).getSimpleName();
-				String path = ((CtClass) element).getQualifiedName();
+			if(oa.isPresent()) {
+				String klass = null;
+				String path = null;
+				if(element instanceof CtClass) {
+					klass = ((CtClass<?>) element).getSimpleName();
+					path = ((CtClass<?>) element).getQualifiedName();
+				}else if(element instanceof CtInterface<?>) {
+					klass = ((CtInterface<?>) element).getSimpleName();
+					path = ((CtInterface<?>) element).getQualifiedName();
+				}
+				if(klass != null && path != null) {
+					AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
+					context.addAlias(a);
+				}	
 
-				AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
-				context.addAlias(a);
+				
 			}
 			//			System.out.println(oa);
 		} catch (SyntaxException e) {

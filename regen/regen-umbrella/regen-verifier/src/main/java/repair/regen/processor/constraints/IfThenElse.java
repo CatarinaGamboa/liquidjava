@@ -54,5 +54,9 @@ public class IfThenElse extends Constraint{
 	public Expression getExpression() {
 		return ite.getExpression();
 	}
+	@Override
+	public boolean isBooleanTrue() {
+		return false;
+	}
 
 }

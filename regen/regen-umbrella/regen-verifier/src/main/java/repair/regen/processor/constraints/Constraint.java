@@ -12,6 +12,7 @@ public abstract class Constraint {
 	public abstract List<String> getVariableNames();
 	public abstract String toString();
 	public abstract Expression getExpression();
+	public abstract boolean isBooleanTrue();
 	
 
 }

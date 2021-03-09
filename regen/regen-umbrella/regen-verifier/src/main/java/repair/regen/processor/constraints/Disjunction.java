@@ -66,5 +66,10 @@ public class Disjunction extends Constraint{
 		return new ExpressionGroup(new BinaryExpression(c1.getExpression(), new OrOperator(), c2.getExpression()));
 	}
 
+	@Override
+	public boolean isBooleanTrue() {
+		return c1.isBooleanTrue() && c2.isBooleanTrue();
+	}
+
 
 }

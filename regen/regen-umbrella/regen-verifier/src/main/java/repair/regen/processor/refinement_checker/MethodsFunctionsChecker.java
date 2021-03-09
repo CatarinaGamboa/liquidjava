@@ -2,10 +2,13 @@ package repair.regen.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
@@ -28,9 +31,11 @@ import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
+import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
+import spoon.reflect.reference.CtTypeReference;
 
 public class MethodsFunctionsChecker {
 
@@ -82,16 +87,73 @@ public class MethodsFunctionsChecker {
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
 		f.setRefReturn(new Predicate());
+		
+		CtClass klass = null;
 		if(method.getParent() instanceof CtClass) {
-			CtClass klass = (CtClass)method.getParent();
+			klass = (CtClass)method.getParent();
 			f.setClass(klass.getQualifiedName());
+		}
+		if(method.getParent() instanceof CtInterface<?>) {
+			CtInterface<?> inter = (CtInterface<?>)method.getParent();
+			f.setClass(inter.getQualifiedName());
 		}
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 		
+		if(klass != null)
+			checkFunctionInSupertypes(klass, method, f);
+		
 		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(an.isPresent())
 			f.setState(an.get());
+	}
+
+	
+	private <R> void checkFunctionInSupertypes(CtClass klass, CtMethod<R> method, RefinedFunction f) {
+		//interfaces
+		Optional<RefinedFunction> superFunction = functionInInterface(klass, 
+				method.getSimpleName(), method.getParameters().size());
+		if(superFunction.isPresent()) {
+			transferRefinements(superFunction.get(), f);
+		}
+		//TODO super classes
+		
+	}
+
+	private void transferRefinements(RefinedFunction superFunction, RefinedFunction function) {
+		if(function.getRefinement().isBooleanTrue())
+			function.setRefinement(superFunction.getRefinement());
+		//else verify subtype
+		List<Variable> superArgs = superFunction.getArguments();
+		List<Variable> args = function.getArguments();
+		for (int i = 0; i < args.size(); i++) {
+			Variable arg = args.get(i);
+			Variable superArg = superArgs.get(i);
+			if(arg.getRefinement().isBooleanTrue())
+				arg.setRefinement(superArg.getRefinement().substituteVariable(superArg.getName(), arg.getName()));
+			//else verify subtype
+		}
+		
+	}
+
+	private Optional<RefinedFunction> functionInInterface(CtClass klass, String simpleName, int size) {
+		List<RefinedFunction> lrf = rtc.context.getAllMethodsWithNameSize(simpleName, size);
+		List<String> st = klass.getSuperInterfaces().stream().map(p->p.getQualifiedName()).collect(Collectors.toList());
+		for(RefinedFunction rf :lrf) {
+			if(st.contains(rf.getTargetClass()))
+				return Optional.of(rf);
+		}
+		return Optional.empty();
+	}
+
+	private <R> boolean overrides(CtMethod<R> method) {
+		Optional<CtAnnotation<? extends Annotation>> constr = Optional.empty();
+		for(CtAnnotation<? extends Annotation> ann :method.getAnnotations()) { 
+			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
+			if( an.contentEquals("java.lang.Override"))
+				return true;
+		}
+		return false;
 	}
 
 	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {

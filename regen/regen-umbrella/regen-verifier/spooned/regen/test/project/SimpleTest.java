@@ -1,10 +1,6 @@
 package regen.test.project;
 
 
-// public static void main(String[] args) throws IOException{
-// Bus b = new Bus();
-// b.setYear(1500);
-// }
 // InputStreamReader isr = new InputStreamReader(System.in);
 // isr.read();
 // isr.read();
@@ -29,18 +25,9 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
-    @repair.regen.specification.Refinement("(a > b)? (_ == a):( _ == b)")
-    public static int max(int a, int b) {
-        if (a > b)
-            return a;
-        else
-            return b;
-
-    }
-
-    @repair.regen.specification.Refinement("_ > 1")
-    public int fun(int[] arr) {
-        return regen.test.project.SimpleTest.max(arr[0], 1);
+    public static void main(java.lang.String[] args) throws java.io.IOException {
+        regen.test.project.Bus b = new regen.test.project.Bus();
+        b.setYear(1950);
     }
 }
 
