@@ -22,6 +22,7 @@ import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
+import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -96,7 +97,6 @@ public class RefinementTypeChecker extends TypeChecker {
 			if(ct instanceof CtClass)				
 				visitCtClass((CtClass<?>) ct);
 		}
-
 		getRefinementFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
 	}
@@ -208,6 +208,15 @@ public class RefinementTypeChecker extends TypeChecker {
 			//TODO continue
 			//c.substituteVariable(WILD_VAR, );
 		}
+	}
+	
+	@Override
+	public <T> void visitCtArrayRead(CtArrayRead<T> arrayRead) {
+		super.visitCtArrayRead(arrayRead);
+		String name = String.format(instanceFormat, "arrayAccess", context.getCounter());
+		context.addVarToContext(name, arrayRead.getType(), new Predicate());
+		arrayRead.putMetadata(REFINE_KEY, new VariablePredicate(name));
+		//TODO predicate for now is always TRUE
 	}
 
 	private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, 
