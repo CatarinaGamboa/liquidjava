@@ -13,7 +13,7 @@ public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
 		Bus b = new Bus();
-		b.setYear(1900);
+		b.setYear(1400);
 	}
 	
 	

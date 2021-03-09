@@ -1,4 +1,4 @@
-package regen.test.project;
+package repair.regen.classes.refs_from_superclass_error;
 
 
 public class Bus extends Car{

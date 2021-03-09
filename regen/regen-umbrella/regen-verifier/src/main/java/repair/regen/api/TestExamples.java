@@ -446,7 +446,6 @@ public class TestExamples {
 		testWrong(testPath+"/classes/email2");
 	}
 	
-	
 	@Test
 	public void errorInputReader() {
 		testWrong(testPath+"/classes/input_reader_error");
@@ -456,11 +455,18 @@ public class TestExamples {
 	public void errorInputReader2() {
 		testWrong(testPath+"/classes/input_reader_error2");
 	}
-	
-	
-	
 
+	@Test
+	public void errorRefsFromInterface() {
+		testWrong(testPath+"/classes/refs_from_interface_error");
+	}
 	
+	
+	@Test
+	public void errorRefsFromSuperclass() {
+		testWrong(testPath+"/classes/refs_from_superclass_error");
+	}
+
 	
 	class MySecurityManager extends SecurityManager {
 		//Handles exit(1) when the refinements are not respected
