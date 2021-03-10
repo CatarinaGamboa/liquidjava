@@ -8,7 +8,7 @@ public interface StringBuilderRefinements {
 	@StateRefinement(to="lengthS() == 0")
 	public void StringBuilder();
 	
-	@StateRefinement(from = "#i == lengthS()", to = "lengthS() == #i + 1)")
+	@StateRefinement(from = "#i == lengthS()", to = "lengthS() == (#i + 1)")
 	public StringBuilder append(char c);
 
 }

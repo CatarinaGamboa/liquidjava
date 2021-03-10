@@ -9,14 +9,17 @@ public class Bus extends Car{
 	private int seats;
 
 	@Override
-	public void setYear(@Refinement("IntBetween(_, 1000, 2010)") int x) {
+	public void setYear(@Refinement("IntBetween(x, 1000, 2100)") int x) {
 		year = x;
 	}
 
-	@Refinement(" _ > 20")
+	@Refinement(" _ > 20 && _ < h")
 	@Override
-	public int getSeats() {
-		return seats;
+	public int getSeats(int h) {
+		if( seats < h)
+			return seats;
+		else
+			return 21;//dummy
 	}
 
 	
@@ -25,7 +28,7 @@ public class Bus extends Car{
 //	public void setSeats(int k) {
 //		seats = k;
 //	}
-
+//
 
 	
 

@@ -101,82 +101,14 @@ public class MethodsFunctionsChecker {
 		auxGetMethodRefinements(method, f);
 		
 		if(klass != null)
-			checkFunctionInSupertypes(klass, method, f);
+			AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
 		
 		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(an.isPresent())
 			f.setState(an.get());
 	}
 
-	
-	private <R> void checkFunctionInSupertypes(CtClass klass, CtMethod<R> method, RefinedFunction f) {
-		String name = method.getSimpleName();
-		int size = method.getParameters().size();
-		if(klass.getSuperInterfaces().size() > 0) {			//implemented interfaces
-			Optional<RefinedFunction> superFunction = functionInInterface(klass, 
-					name, size);
-			if(superFunction.isPresent()) {
-				transferRefinements(superFunction.get(), f, method);
-			}
-		}
-		if(klass.getSuperclass() != null) { 				//extended class
-			CtTypeReference<?> t = klass.getSuperclass();
-			RefinedFunction superFunction = rtc.context.getFunction(name, t.getQualifiedName(), size);
-			if(superFunction != null) {
-				transferRefinements(superFunction, f, method);
-			}
-		}
-		
-	}
 
-	private void transferRefinements(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method) {
-		transferReturnRefinement(superFunction,function, method);
-		transferArgumentsRefinements(superFunction, function, method);
-	}
-
-	private void transferArgumentsRefinements(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method) {
-		List<Variable> superArgs = superFunction.getArguments();
-		List<Variable> args = function.getArguments();
-		List<CtParameter<?>> params = method.getParameters();
-		for (int i = 0; i < args.size(); i++) {
-			Variable arg = args.get(i);
-			Variable superArg = superArgs.get(i);
-			Constraint argRef = arg.getRefinement();
-			Constraint superArgRef = superArg.getRefinement();
-			if(argRef.isBooleanTrue())
-				arg.setRefinement(superArgRef.substituteVariable(superArg.getName(), arg.getName()));
-			else {
-				rtc.checkStateSMT(superArgRef, argRef, params.get(i));
-			}
-		}
-		
-	}
-
-	private void transferReturnRefinement(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method) {
-		Constraint functionRef =  function.getRefinement();
-		Constraint superRef = superFunction.getRefinement();
-		if(functionRef.isBooleanTrue())
-			function.setRefinement(superRef);
-		else{
-			String name = String.format(rtc.freshFormat, rtc.context.getCounter());
-			rtc.context.addVarToContext(name, superFunction.getType(), new Predicate());
-			//functionRef might be stronger than superRef -> check (superRef <: functionRef)
-			rtc.checkStateSMT(functionRef.substituteVariable(rtc.WILD_VAR, name),
-							  superRef.substituteVariable(rtc.WILD_VAR, name), 
-						      method);
-			
-		}
-	}
-
-	private Optional<RefinedFunction> functionInInterface(CtClass klass, String simpleName, int size) {
-		List<RefinedFunction> lrf = rtc.context.getAllMethodsWithNameSize(simpleName, size);
-		List<String> st = klass.getSuperInterfaces().stream().map(p->p.getQualifiedName()).collect(Collectors.toList());
-		for(RefinedFunction rf :lrf) {
-			if(st.contains(rf.getTargetClass()))
-				return Optional.of(rf);
-		}
-		return Optional.empty();
-	}
 
 
 	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {

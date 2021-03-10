@@ -30,7 +30,7 @@ public interface InputStreamReaderRefinements {
 	public int read(@Refinement("length(cbuf) > 0") char[] cbuf, 
 					@Refinement("_ >= 0")int offset, 
 					@Refinement("(_ >= 0) && (_ + offset) <= length(cbuf)")int length);
-//	
+	
 //	@StateRefinement(from="open(this)", to="open(this)")
 //	public int ready();
 //	
