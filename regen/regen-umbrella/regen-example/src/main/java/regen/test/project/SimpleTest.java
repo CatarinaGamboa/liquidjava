@@ -12,8 +12,8 @@ import repair.regen.specification.RefinementPredicate;
 public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
-//		Bus b = new Bus();
-//		b.setYear(1400);
+		Bus b = new Bus();
+		b.open();
 	}
 	
 	

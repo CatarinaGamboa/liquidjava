@@ -17,6 +17,7 @@ import com.microsoft.z3.Context;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPExpr;
 import com.microsoft.z3.FuncDecl;
+import com.microsoft.z3.FuncDecl.Parameter;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 import com.microsoft.z3.RealExpr;
@@ -177,6 +178,18 @@ public class TranslatorToZ3 {
 			return makeSelect(name, params);
 
 		FuncDecl fd = funcTranslation.get(name);
+		Parameter[] p = fd.getParameters();
+		Sort[] s  =fd.getDomain();
+		for (int i = 0; i < s.length; i++) {
+			Expr param = params[i];
+			System.out.println("Sort:" + s[i]);
+			System.out.println("Sort:" + param.getSort());
+//			if(param.isConst() && param.toString())
+//				System.out.println(param);
+				
+			
+		}
+		
 		return z3.mkApp(fd, params);
 	}
 

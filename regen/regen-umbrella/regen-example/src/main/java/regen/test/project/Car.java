@@ -2,13 +2,17 @@ package regen.test.project;
 
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
+import repair.regen.specification.RefinementPredicate;
+import repair.regen.specification.StateRefinement;
 
-@RefinementAlias("IntBetween(int val, int lo, int hi) { lo <= val && val <= hi}")
 public abstract class Car {
 
-	public abstract void setYear(@Refinement("IntBetween(y, 1600, 2050)")int y); 
+	@RefinementPredicate("boolean isOpen(Car c)")
+	@StateRefinement(from = "!isOpen(this)", to="isOpen(this)")
+	public abstract void open(); 
 	
-	@Refinement("_ >= 1 && _ < ceil")
-	public abstract int getSeats(@Refinement("_ == 50")int ceil);
+	@StateRefinement(from = "isOpen(this)", to="!isOpen(this)")
+	public abstract void close(); 
+	
 
 }

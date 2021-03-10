@@ -40,7 +40,9 @@ public class AuxHierarchyRefinememtsPassage {
 		HashMap<String, String> super2function = getParametersMap(superFunction, function);
 		transferReturnRefinement(superFunction,function, method, tc, super2function);
 		transferArgumentsRefinements(superFunction, function, method, tc, super2function);
+		transferStateRefinements(superFunction, function, method, tc);
 	}
+
 
 	private static HashMap<String, String> getParametersMap(RefinedFunction superFunction, RefinedFunction function) {
 		List<Variable> superArgs = superFunction.getArguments();
@@ -100,6 +102,22 @@ public class AuxHierarchyRefinememtsPassage {
 				return Optional.of(rf);
 		}
 		return Optional.empty();
+	}
+	
+
+	private static void transferStateRefinements(RefinedFunction superFunction, RefinedFunction function,
+			CtMethod<?> method, TypeChecker tc) {
+		if(superFunction.hasStateChange()) {
+			if(!function.hasStateChange()) {
+				Optional<Constraint> of = superFunction.getStateFrom();
+				Optional<Constraint> to = superFunction.getStateTo();
+				if(of.isPresent()) function.setChangeFrom(of.get());
+				if(to.isPresent()) function.setChangeTo(to.get());
+			}else {
+				//verify subtype
+			}
+		}
+		
 	}
 
 }

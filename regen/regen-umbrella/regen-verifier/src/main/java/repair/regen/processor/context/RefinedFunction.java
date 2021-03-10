@@ -123,6 +123,18 @@ public class RefinedFunction extends Refined{
 		
 	}
 	
+	public void setChangeTo(Constraint to) {
+		if(stateChange == null)
+			stateChange = new ObjectState();
+		stateChange.setTo(to);
+	}
+	
+	public void setChangeFrom(Constraint from) {
+		if(stateChange == null)
+			stateChange = new ObjectState();
+		stateChange.setFrom(from);
+	}
+	
 	public boolean hasStateChange() {
 		return stateChange != null;
 	}

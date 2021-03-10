@@ -2,33 +2,28 @@ package regen.test.project;
 
 import repair.regen.specification.PrivateRefinement;
 import repair.regen.specification.Refinement;
+import repair.regen.specification.StateRefinement;
 
 public class Bus extends Car{
-	private int year;
-	@Refinement("_ > 20")
-	private int seats;
 
-	@Override
-	public void setYear(@Refinement("IntBetween(x, 1000, 2100)") int x) {
-		year = x;
+	@StateRefinement(to = "!isOpen(this)")
+	public Bus() {
+		
 	}
-
-	@Refinement(" _ > 20 && _ < h")
-	@Override
-	public int getSeats(int h) {
-		if( seats < h)
-			return seats;
-		else
-			return 21;//dummy
-	}
-
 	
-//	@PrivateRefinement("this.year == k")//verified in visitCtReturn after
-//	@Refinement(" _ >= 50")
-//	public void setSeats(int k) {
-//		seats = k;
-//	}
-//
+	@Override
+	public void open() {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void close() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 	
 
