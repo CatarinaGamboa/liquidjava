@@ -206,6 +206,11 @@ public class TestExamples {
 		testCorrect(testPath+"/classes/email1");
 	}
 	
+	@Test
+	public void correctCheckRefinementsSupertype() {
+		testCorrect(testPath+"/classes/refs_from_superclasses_correct");
+	}
+	
 	
 //	@Test
 //	public void correctInputReaderCharArrayLongerNameEve() {
