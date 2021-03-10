@@ -13,13 +13,13 @@ import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.context.AliasWrapper;
+import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.reference.CtTypeReference;
 
 public class SMTEvaluator {
 
-	public void verifySubtype(Constraint subRef, Constraint supRef, Map<String, CtTypeReference<?>> ctx, 
-			List<GhostFunction> ghosts, List<AliasWrapper> alias) throws TypeCheckError, GhostFunctionError, Exception {
+	public void verifySubtype(Constraint subRef, Constraint supRef, Context c) throws TypeCheckError, GhostFunctionError, Exception {
 		// TODO: create a parser for our SMT-ready refinement language
 		// TODO: discharge the verification to z3 
 
@@ -27,7 +27,7 @@ public class SMTEvaluator {
 		System.out.println(toVerify.toString()); //TODO remover
 		try {
 			Expression e = toVerify.getExpression();
-			TranslatorToZ3 tz3 = new TranslatorToZ3(ctx, ghosts, alias);
+			TranslatorToZ3 tz3 = new TranslatorToZ3(c);
 			Status s = tz3.verifyExpression(e);
 			if (s.equals(Status.SATISFIABLE)) {
 				throw new TypeCheckError(subRef + " not a subtype of " + supRef);

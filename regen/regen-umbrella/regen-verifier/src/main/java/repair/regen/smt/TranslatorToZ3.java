@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Context;
+
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPExpr;
 import com.microsoft.z3.FuncDecl;
@@ -36,14 +36,18 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class TranslatorToZ3 {
 
-	private Context z3 = new Context();
+	private com.microsoft.z3.Context z3 = new com.microsoft.z3.Context();
 	private Map<String, Expr> varTranslation = new HashMap<>();
 	private Map<String, AliasWrapper> aliasTranslation = new HashMap<>();
 	private Map<String, FuncDecl> funcTranslation = new HashMap<>();
 	
 	private List<Expression> premisesToAdd = new ArrayList<>();
 
-	public TranslatorToZ3(Map<String, CtTypeReference<?>> ctx, List<GhostFunction> l, List<AliasWrapper> alias) {
+	public TranslatorToZ3(repair.regen.processor.context.Context c) {
+		List<GhostFunction> l = c.getGhosts();
+		List<AliasWrapper> alias = c.getAlias();
+		Map<String, CtTypeReference<?>> ctx = c.getContext();
+		
 		translateVariables(ctx);
 		addBuiltinFunctions();
 		if(!l.isEmpty()) {
