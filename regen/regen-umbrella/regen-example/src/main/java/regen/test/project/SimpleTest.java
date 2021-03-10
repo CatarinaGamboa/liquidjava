@@ -13,7 +13,9 @@ public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
 		Bus b = new Bus();
+//		b.close();//error: not yet open, not possible to close
 		b.open();
+		b.close();
 	}
 	
 	

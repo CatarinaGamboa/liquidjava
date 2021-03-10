@@ -28,8 +28,7 @@ public class Variable extends RefinedVariable{
 	
 	public Variable(String name, CtTypeReference<?> type, Constraint ref) {
 		super(name, type, ref);
-		startVariables();
-		
+		startVariables();		
 	}
 	
 	public Variable(String name, String location, CtTypeReference<?> type, Constraint ref) {
@@ -69,6 +68,7 @@ public class Variable extends RefinedVariable{
 	public Optional<String> getLocation() {
 		return location == null? Optional.empty():Optional.of(location);
 	}
+
 
 	
 	//INSTANCES

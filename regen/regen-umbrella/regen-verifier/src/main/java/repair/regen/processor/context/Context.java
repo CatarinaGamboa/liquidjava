@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Stack;
 
 import repair.regen.processor.constraints.Constraint;
@@ -97,21 +98,26 @@ public class Context {
 	public void addGlobalVariableToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
 		RefinedVariable vi = new Variable(simpleName, type, c);
 		ctxGlobalVars.add(vi);
+		vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
 	}
 	
 	public void addGlobalVariableToContext(String simpleName, String location,
 			CtTypeReference<?> type, Constraint c) {
 		RefinedVariable vi = new Variable(simpleName, location, type, c);
+		vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
 		ctxGlobalVars.add(vi);
 	}
 
 	public void addVarToContext(RefinedVariable var) {
 		//if(!hasVariable(var.getName()))
 			ctxVars.peek().add(var);
+			CtTypeReference<?> type = var.getType();
+			var.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
 	}
 
 	public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
 		RefinedVariable vi = new Variable(simpleName, type, c);
+		vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
 		addVarToContext(vi);
 		return vi;
 	}
@@ -313,6 +319,8 @@ public class Context {
 
 	public void addSpecificVariable(RefinedVariable vi) {
 		ctxSpecificVars.add(vi);
+		CtTypeReference<?> type = vi.getType();
+		vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
 	}
 	
 

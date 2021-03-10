@@ -45,6 +45,7 @@ public class TranslatorToZ3 {
 
 	public TranslatorToZ3(repair.regen.processor.context.Context c) {
 		TranslatorContextToZ3.translateVariables(z3, c.getContext(), varTranslation);
+		TranslatorContextToZ3.storeVariablesSubtypes(z3, c.getAllVariables(), varSuperTypes);
 		TranslatorContextToZ3.addAlias(z3, c.getAlias(), aliasTranslation);
 		TranslatorContextToZ3.addGhostFunctions(z3, c.getGhosts(), funcTranslation);
 	}
@@ -108,12 +109,13 @@ public class TranslatorToZ3 {
 		Sort[] s  =fd.getDomain();
 		for (int i = 0; i < s.length; i++) {
 			Expr param = params[i];
-			System.out.println("Sort:" + s[i]);
-			System.out.println("Sort:" + param.getSort());
-//			if(param.isConst() && param.toString())
-//				System.out.println(param);
-				
-			
+			if(!s[i].equals(param.getSort())) {
+				//Look if the function type is a supertype of this
+				List<Expr> le = varSuperTypes.get(param.toString());
+				for(Expr e: le) 
+					if(e.getSort().equals(s[i]))
+						params[i] = e;
+			}
 		}
 		
 		return z3.mkApp(fd, params);
