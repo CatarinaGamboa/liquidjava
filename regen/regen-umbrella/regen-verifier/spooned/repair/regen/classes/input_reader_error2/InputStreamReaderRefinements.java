@@ -2,11 +2,6 @@ package repair.regen.classes.input_reader_error2;
 
 
 // https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
-// faster
-// @StateRefinement(from="open(this)", to="open(this)")
-// public int read(char[] cbuf, int offset, int length);
-// @StateRefinement(from="open(this)", to="open(this)")
-// public int ready();
 @repair.regen.specification.ExternalRefinementsFor("java.io.InputStreamReader")
 public interface InputStreamReaderRefinements {
     @repair.regen.specification.RefinementPredicate("boolean open(InputStreamReader i)")

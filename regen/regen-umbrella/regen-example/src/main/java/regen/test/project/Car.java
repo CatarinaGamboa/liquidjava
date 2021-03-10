@@ -7,5 +7,8 @@ import repair.regen.specification.RefinementAlias;
 public abstract class Car {
 
 	public abstract void setYear(@Refinement("IntBetween(_, 1600, 2050)")int x); 
+	
+	@Refinement("_ >= 1")
+	public abstract int getSeats();
 
 }

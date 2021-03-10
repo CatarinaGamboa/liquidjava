@@ -572,8 +572,8 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 	@Override
-	protected void checkStateSMT(Constraint prevState, Constraint expectedState, CtExpression<?> target) {
-		vcChecker.smtChecking(prevState, expectedState, target);		
+	protected void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
+		vcChecker.processSubtyping(prevState, expectedState, target);		
 	}
 
 

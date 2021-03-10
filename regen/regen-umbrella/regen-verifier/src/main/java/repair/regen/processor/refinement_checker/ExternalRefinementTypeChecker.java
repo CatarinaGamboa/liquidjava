@@ -114,7 +114,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	}
 
 	@Override
-	protected void checkStateSMT(Constraint prevState, Constraint expectedState, CtExpression<?> target) {
+	protected void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -48,7 +48,7 @@ public abstract class TypeChecker extends CtScanner{
 	abstract void checkSMT(Constraint expectedType, CtElement element);
 
 
-	protected abstract void checkStateSMT(Constraint prevState, Constraint expectedState, CtExpression<?> target);
+	protected abstract void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target);
 
 	
 	

@@ -24,35 +24,29 @@ public class VCChecker {
 		context = Context.getInstance();
 		pathVariables = new Stack<>();
 	}
-
-	public void addPathVariable(RefinedVariable rv) {
-		pathVariables.add(rv);
+	
+	public void processSubtyping(Constraint expectedType, CtElement element) {
+		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
+		gatherVariables(expectedType, lrv, mainVars);
+		if(expectedType.isBooleanTrue())
+			return;
+		
+		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
+		smtChecking(premises, expectedType, element);
+	}
+	
+	public void processSubtyping(Constraint type, Constraint expectedType, CtElement element) {
+		smtChecking(type, expectedType, element);
 	}
 
-	public void removePathVariable(RefinedVariable rv) {
-		pathVariables.remove(rv);
-	}
-
-	void removePathVariableThatIncludes(String otherVar) {
-		List<RefinedVariable> toRemove = new ArrayList<>();
-		for(RefinedVariable rv:pathVariables)
-			if(rv.getRefinement().getVariableNames().contains(otherVar))
-				toRemove.add(rv);
-
-		for(RefinedVariable rv:toRemove) 
-			pathVariables.remove(rv);
-	}
-
-
-
-	private void process(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 
+	private Constraint joinConstraints(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 
 			List<RefinedVariable> vars) {
 		StringBuilder sb = new StringBuilder();
 		StringBuilder sbSMT = new StringBuilder();
 
 		//Check
 		Constraint cSMT = new Predicate();
-		for(RefinedVariable var:mainVars) {
+		for(RefinedVariable var:mainVars) {//join main refinements of mainVars
 			cSMT = Conjunction.createConjunction(cSMT, var.getMainRefinement());
 			String ref = var.getMainRefinement().toString();
 
@@ -61,7 +55,7 @@ public class VCChecker {
 			sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
 		}
 
-		for(RefinedVariable var:vars) {
+		for(RefinedVariable var:vars) {//join refinements of vars
 			cSMT = Conjunction.createConjunction(cSMT, var.getRefinement());
 			String ref = var.getRefinement().toString();
 
@@ -71,15 +65,11 @@ public class VCChecker {
 		}
 		sb.append(expectedType);
 		printVCs(sb.toString(), sbSMT.toString(), expectedType);
-
-		//check type
-		smtChecking(cSMT, expectedType, element);
+		return cSMT;
 	}
+	
 
-
-	public void processSubtyping(Constraint expectedType, CtElement element) {
-		List<RefinedVariable> lrv = new ArrayList<>();
-		List<RefinedVariable> mainVars = new ArrayList<>();
+	private void gatherVariables(Constraint expectedType, List<RefinedVariable> lrv, List<RefinedVariable> mainVars) {
 		for(String s: expectedType.getVariableNames()) {
 			if(context.hasVariable(s)) {
 				RefinedVariable rv = context.getVariableByName(s);
@@ -88,10 +78,9 @@ public class VCChecker {
 				addAllDiferent(lrv, lm);
 			}
 		}
-		if(expectedType instanceof Predicate && ((Predicate)expectedType).isBooleanTrue())
-			return;
-		process(expectedType, element, mainVars, lrv);
+		
 	}
+
 
 	private void addAllDiferent(List<RefinedVariable> toExpand, List<RefinedVariable> from) {
 		for(RefinedVariable rv:from) {
@@ -100,7 +89,7 @@ public class VCChecker {
 		}
 	}
 
-	public List<RefinedVariable> getVariables(Constraint c, String varName) {
+	private List<RefinedVariable> getVariables(Constraint c, String varName) {
 		List<RefinedVariable> allVars = new ArrayList<>();
 		getVariablesFromContext(c.getVariableNames(), allVars, varName);
 		List<String> pathNames = pathVariables.stream()
@@ -149,7 +138,7 @@ public class VCChecker {
 	 * @param expectedType
 	 * @param element
 	 */
-	void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
+	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
 //		printVCs("", cSMT.toString(), expectedType);
 		try {
 			new SMTEvaluator().verifySubtype(cSMT, expectedType, 
@@ -172,6 +161,26 @@ public class VCChecker {
 		//	printErrorUnknownVariable(element, expectedType, correctRefinement);
 		//}
 
+	}
+
+	
+
+	public void addPathVariable(RefinedVariable rv) {
+		pathVariables.add(rv);
+	}
+
+	public void removePathVariable(RefinedVariable rv) {
+		pathVariables.remove(rv);
+	}
+
+	void removePathVariableThatIncludes(String otherVar) {
+		List<RefinedVariable> toRemove = new ArrayList<>();
+		for(RefinedVariable rv:pathVariables)
+			if(rv.getRefinement().getVariableNames().contains(otherVar))
+				toRemove.add(rv);
+
+		for(RefinedVariable rv:toRemove) 
+			pathVariables.remove(rv);
 	}
 
 
