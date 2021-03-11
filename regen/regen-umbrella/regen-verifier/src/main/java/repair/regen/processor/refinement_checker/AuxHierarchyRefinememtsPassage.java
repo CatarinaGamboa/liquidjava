@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.Variable;
 import spoon.reflect.declaration.CtClass;
@@ -109,12 +110,10 @@ public class AuxHierarchyRefinememtsPassage {
 			CtMethod<?> method, TypeChecker tc) {
 		if(superFunction.hasStateChange()) {
 			if(!function.hasStateChange()) {
-				Optional<Constraint> of = superFunction.getStateFrom();
-				Optional<Constraint> to = superFunction.getStateTo();
-				if(of.isPresent()) function.setChangeFrom(of.get());
-				if(to.isPresent()) function.setChangeTo(to.get());
+				for(ObjectState o: superFunction.getAllStates())
+					function.addStates(o.clone());
 			}else {
-				//verify subtype
+				//TODO verify subtype
 			}
 		}
 		

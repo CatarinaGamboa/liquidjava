@@ -1,6 +1,8 @@
 package repair.regen.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import repair.regen.language.function.FunctionDeclaration;
@@ -43,6 +45,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		Optional<String> externalRefinements = getExternalRefinement(intrface);
 		if(externalRefinements.isPresent()) {
 			prefix = externalRefinements.get();
+			getRefinementFromAnnotation(intrface);
 			super.visitCtInterface(intrface);
 		}
 	}
@@ -92,6 +95,22 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 			e.printStackTrace();
 		}
 	}
+	
+
+	@Override
+	protected void createGhostFunction(String value, CtElement element) {
+		if(element instanceof CtInterface<?>) {
+			String[] a = prefix.split("\\.");
+			String d =  a[a.length-1];
+			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
+			List<String> params = Arrays.asList(d);
+			GhostFunction gh = new GhostFunction(value, params, ret ,factory, prefix, a[a.length-1]); 
+			context.addGhostFunction(gh);
+			System.out.println(gh.toString());
+		}		
+	}
+
+
 
 	@Override
 	protected void checkSMT(Constraint refPar, CtElement invocation) {
@@ -114,11 +133,10 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	}
 
 	@Override
-	protected void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		// TODO Auto-generated method stub
-		
+	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
+//		return vcChecker.smtChecks(prevState, expectedState, target);
+		return false;
 	}
-
 
 
 

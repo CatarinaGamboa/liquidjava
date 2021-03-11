@@ -24,17 +24,17 @@ public class VCChecker {
 		context = Context.getInstance();
 		pathVariables = new Stack<>();
 	}
-	
+
 	public void processSubtyping(Constraint expectedType, CtElement element) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		if(expectedType.isBooleanTrue())
 			return;
-		
+
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
 		smtChecking(premises, expectedType, element);
 	}
-	
+
 	public void processSubtyping(Constraint type, Constraint expectedType, CtElement element) {
 		smtChecking(type, expectedType, element);
 	}
@@ -67,7 +67,7 @@ public class VCChecker {
 		printVCs(sb.toString(), sbSMT.toString(), expectedType);
 		return cSMT;
 	}
-	
+
 
 	private void gatherVariables(Constraint expectedType, List<RefinedVariable> lrv, List<RefinedVariable> mainVars) {
 		for(String s: expectedType.getVariableNames()) {
@@ -78,7 +78,7 @@ public class VCChecker {
 				addAllDiferent(lrv, lm);
 			}
 		}
-		
+
 	}
 
 
@@ -131,6 +131,15 @@ public class VCChecker {
 	}
 
 
+	public boolean smtChecks(Constraint cSMT, Constraint expectedType, CtElement element) {
+		try {
+			new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
+		}catch (Exception e) { 
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Checks the expectedType against the cSMT constraint.
 	 * If the types do not check and error is sent and the program ends
@@ -139,22 +148,22 @@ public class VCChecker {
 	 * @param element
 	 */
 	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
-//		printVCs("", cSMT.toString(), expectedType);
+		//		printVCs("", cSMT.toString(), expectedType);
 		try {
 			new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
 			System.out.println("End smt checking");
 		} catch (TypeCheckError e) {
-			printError(element, expectedType, cSMT);
+			ErrorPrinter.printError(element, expectedType, cSMT);
 
 		}catch (GhostFunctionError e) {
-			printErrorArgs(element, expectedType, e.getMessage());
+			ErrorPrinter.printErrorArgs(element, expectedType, e.getMessage());
 		}catch(TypeMismatchError e) {
-			printErrorTypeMismatch(element, expectedType, e.getMessage());
+			ErrorPrinter.printErrorTypeMismatch(element, expectedType, e.getMessage());
 		}catch (Exception e) {
 			System.err.println("Unknown error:"+e.getMessage());
 			e.printStackTrace();
 			System.exit(7);
-			
+
 		}
 		//catch(NullPointerException e) {
 		//	printErrorUnknownVariable(element, expectedType, correctRefinement);
@@ -162,7 +171,7 @@ public class VCChecker {
 
 	}
 
-	
+
 
 	public void addPathVariable(RefinedVariable rv) {
 		pathVariables.add(rv);
@@ -182,9 +191,6 @@ public class VCChecker {
 			pathVariables.remove(rv);
 	}
 
-
-
-	//################################# PRINTS ########################################
 	private void printVCs(String string, String stringSMT, Constraint expectedType) {
 		System.out.println("\n----------------------------VC--------------------------------");
 		System.out.println("VC:\n"+string);
@@ -194,52 +200,5 @@ public class VCChecker {
 	}
 
 
-	/**
-	 * Prints the error message
-	 * @param <T>
-	 * @param var
-	 * @param expectedType
-	 * @param cSMT
-	 */
-	private <T> void printError(CtElement var, Constraint expectedType, Constraint cSMT) {
-		System.out.println("______________________________________________________");
-		System.err.println("Failed to check refinement at: ");
-		System.out.println();
-		System.out.println(var);
-		System.out.println();
-		System.out.println("Type expected:" + expectedType.toString());
-		System.out.println("Refinement found:" + cSMT.toString());
-		System.out.println("Location: " + var.getPosition());
-		System.out.println("______________________________________________________");
-		System.exit(1);
-	}
-	private <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement) {
-		System.out.println("______________________________________________________");
-		System.err.println("Encountered unknown variable");
-		System.out.println();
-		System.out.println(var);
-		System.out.println();
-		System.out.println("Location: " + var.getPosition());
-		System.out.println("______________________________________________________");
-		System.exit(2);
-	}
-	private <T> void printErrorArgs(CtElement var, Constraint expectedType, String msg) {
-		System.out.println("______________________________________________________");
-		System.err.println("Error in ghost invocation: "+ msg);
-		System.out.println(var+"\nError in refinement:" + expectedType.toString());
-		System.out.println("Location: " + var.getPosition());
-		System.out.println("______________________________________________________");
-		System.exit(2);
-	}
 
-	private void printErrorTypeMismatch(CtElement element, Constraint expectedType, String message) {
-		System.out.println("______________________________________________________");
-		System.err.println(message);
-		System.out.println();
-		System.out.println(element);
-		System.out.println("Location: " + element.getPosition());
-		System.out.println("______________________________________________________");
-		System.exit(2);
-		
-	}
 }

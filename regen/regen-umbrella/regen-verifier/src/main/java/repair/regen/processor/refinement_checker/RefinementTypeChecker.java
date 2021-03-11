@@ -158,8 +158,6 @@ public class RefinementTypeChecker extends TypeChecker {
 			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable);
 
 			addStateRefinements(varName, e);
-			//			if(localVariable.getType() instanceof CtArrayTypeReferenceImpl)
-			//				checkArray(localVariable);
 		}
 	}
 
@@ -210,7 +208,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			//c.substituteVariable(WILD_VAR, );
 		}
 	}
-	
+
 	@Override
 	public <T> void visitCtArrayRead(CtArrayRead<T> arrayRead) {
 		super.visitCtArrayRead(arrayRead);
@@ -518,8 +516,23 @@ public class RefinementTypeChecker extends TypeChecker {
 			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
 			e.printStackTrace();
 		}
+	}
+
+
+	@Override
+	protected void createGhostFunction(String value, CtElement element) {
+		if(element.getParent() instanceof CtClass<?>) {
+			CtClass<?> klass =(CtClass<?>) element.getParent(); 
+			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
+			List<String> params = Arrays.asList(klass.getSimpleName());
+			GhostFunction gh = new GhostFunction(value, params, ret ,factory, klass.getQualifiedName(), klass.getSimpleName()); 
+			context.addGhostFunction(gh);
+			System.out.println(gh.toString());
+		}
+		System.out.println();
 
 	}
+
 
 	protected void handleAlias(String value, CtElement element) {
 		try {
@@ -538,10 +551,7 @@ public class RefinementTypeChecker extends TypeChecker {
 					AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
 					context.addAlias(a);
 				}	
-
-				
 			}
-			//			System.out.println(oa);
 		} catch (SyntaxException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -572,8 +582,9 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 	@Override
-	protected void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		vcChecker.processSubtyping(prevState, expectedState, target);		
+	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
+//		vcChecker.processSubtyping(prevState, expectedState, target);
+		return vcChecker.smtChecks(prevState, expectedState, target);
 	}
 
 

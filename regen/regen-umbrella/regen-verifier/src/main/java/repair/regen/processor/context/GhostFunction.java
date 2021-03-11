@@ -27,6 +27,17 @@ public class GhostFunction {
 		}
 	}
 	
+	public GhostFunction(String name,List<String> param_types, CtTypeReference<?> return_type, 
+			Factory factory, String path, String klass) {
+		this.name = name;
+		this.return_type = Utils.getType(return_type.toString().equals(klass)? path: return_type.toString(), factory);
+		this.param_types = new ArrayList<>();
+		for (int i = 0; i < param_types.size(); i++) {
+			String mType = param_types.get(i).toString();
+			this.param_types.add(Utils.getType(mType.equals(klass)? path : mType, factory));
+		}
+	}
+	
 	public String getName() {
 		return name;
 	}

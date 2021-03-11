@@ -30,5 +30,9 @@ public class ObjectState {
 	public Optional<Constraint> getTo() {
 		return to != null? Optional.of(to):Optional.empty();
 	}
+	
+	public ObjectState clone() {
+		return new ObjectState(from.clone(), to.clone());
+	}
 
 }

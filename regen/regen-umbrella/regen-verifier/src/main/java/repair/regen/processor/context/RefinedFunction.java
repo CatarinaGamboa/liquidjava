@@ -18,10 +18,11 @@ public class RefinedFunction extends Refined{
 	
 	private List<Variable> argRefinements;	
 	private String targetClass;
-	private ObjectState stateChange;
+	private List<ObjectState> stateChange;
 	
 	public RefinedFunction() {
 		argRefinements= new ArrayList<>();
+		stateChange = new ArrayList<>();
 	}
 	
 	
@@ -111,45 +112,67 @@ public class RefinedFunction extends Refined{
 	}
 	
 	
-	public void setState(CtAnnotation<? extends Annotation> ctAnnotation) {
+	public void setState(List<CtAnnotation<? extends Annotation>> ctAnnotations) {
+		for(CtAnnotation<? extends Annotation> an: ctAnnotations) {
+			stateChange.add(getState(an));
+		}
+	}
+	
+	public List<ObjectState> getAllStates(){
+		return stateChange;
+	}
+	
+	public void setAllStates(List<ObjectState> l){
+		stateChange = l;
+	}
+	
+	private ObjectState getState(CtAnnotation<? extends Annotation> ctAnnotation) {
 		Map<String, CtExpression> m = ctAnnotation.getAllValues();
 		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
 		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
-		stateChange = new ObjectState();
+		ObjectState state = new ObjectState();
 		if(from != null)
-			stateChange.setFrom(new Predicate(from.getValue()));
+			state.setFrom(new Predicate(from.getValue()));
 		if(to != null)
-			stateChange.setTo(new Predicate(to.getValue()));
-		
+			state.setTo(new Predicate(to.getValue()));
+		return state;
 	}
 	
-	public void setChangeTo(Constraint to) {
-		if(stateChange == null)
-			stateChange = new ObjectState();
-		stateChange.setTo(to);
+	public void addStates(ObjectState e){
+		stateChange.add(e);
 	}
 	
-	public void setChangeFrom(Constraint from) {
-		if(stateChange == null)
-			stateChange = new ObjectState();
-		stateChange.setFrom(from);
-	}
+	
+//	public void setChangeTo(Constraint to) {
+//		if(stateChange == null)
+//			stateChange = new ObjectState();
+//		stateChange.setTo(to);
+//	}
+//	
+//	public void setChangeFrom(Constraint to, Constraint from) {
+//		if(stateChange == null)
+//			stateChange = new ObjectState();
+//		stateChange.setFrom(from);
+//	}
+
 	
 	public boolean hasStateChange() {
-		return stateChange != null;
+		return stateChange.size()>0;
 	}
 
 	
-	public Optional<Constraint> getStateFrom() {
-		if(stateChange != null)
-			return stateChange.getFrom();
-		return Optional.empty();
+	public List<Optional<Constraint>> getFromStates() {
+		List<Optional<Constraint>> lc = new ArrayList<>();
+		for(ObjectState os : stateChange)
+			lc.add(os.getFrom());
+		return lc;
 	}
 	
-	public Optional<Constraint> getStateTo() {
-		if(stateChange != null)
-			return stateChange.getTo();
-		return Optional.empty();
+	public List<Optional<Constraint>> getToStates() {
+		List<Optional<Constraint>> lc = new ArrayList<>();
+		for(ObjectState os : stateChange)
+			lc.add(os.getTo());
+		return lc;
 	}
 	
 

@@ -1,5 +1,7 @@
 package repair.regen.processor.refinement_checker;
 
+import static org.junit.Assert.assertFalse;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -7,7 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import repair.regen.processor.constraints.Conjunction;
@@ -15,6 +16,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
+import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
@@ -23,7 +25,6 @@ import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtAnnotation;
@@ -35,19 +36,18 @@ import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
-import spoon.reflect.reference.CtTypeReference;
 
 public class MethodsFunctionsChecker {
 
 	private TypeChecker rtc;
-	
+
 	private static String retNameFormat = "#ret_%d";
 
 	public MethodsFunctionsChecker(TypeChecker rtc) {
 		this.rtc = rtc; 
 
 	}
-	
+
 	public void getConstructorRefinements(CtConstructor<?> c) {	
 		RefinedFunction f = new RefinedFunction();
 		f.setName(c.getSimpleName());
@@ -58,13 +58,13 @@ public class MethodsFunctionsChecker {
 			f.setClass(klass.getQualifiedName());
 		}
 		rtc.context.addFunctionToContext(f);
-//		auxGetMethodRefinements(c, f);
-		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
-		if(an.isPresent())
-			f.setState(an.get());
-		
+		//		auxGetMethodRefinements(c, f);
+		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
+		if(!an.isEmpty())
+			f.setState(an);
+
 	}
-	
+
 
 	public void getConstructorInvocationRefinements(CtConstructorCall<?> ctConstructorCall) {
 		CtExecutableReference<?> exe = ctConstructorCall.getExecutable();
@@ -72,22 +72,24 @@ public class MethodsFunctionsChecker {
 			RefinedFunction f = rtc.context.getFunction(exe.getSimpleName(), 
 					exe.getDeclaringType().getQualifiedName());
 			if(f != null) {
-				Optional<Constraint> oc = f.getStateTo();
-				if(oc.isPresent())
-					ctConstructorCall.putMetadata(rtc.STATE_KEY, oc.get());
+				List<Optional<Constraint>> oc = f.getToStates();
+				if(oc.size() > 0 && oc.get(0).isPresent())
+					ctConstructorCall.putMetadata(rtc.STATE_KEY, oc.get(0).get());
+				else if(oc.size() > 1)
+					assertFalse("Constructor can only have one to state, not multiple", true);
 			}
 		}
-		
+
 	}
 
-	
+
 	//################### VISIT METHOD ##############################
 	<R> void getMethodRefinements(CtMethod<R> method) {
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
 		f.setRefReturn(new Predicate());
-		
+
 		CtClass klass = null;
 		if(method.getParent() instanceof CtClass) {
 			klass = (CtClass)method.getParent();
@@ -99,13 +101,13 @@ public class MethodsFunctionsChecker {
 		}
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
-		
+
 		if(klass != null)
 			AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
-		
-		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
-		if(an.isPresent())
-			f.setState(an.get());
+
+		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
+		if(!an.isEmpty())
+			f.setState(an);
 	}
 
 
@@ -114,12 +116,12 @@ public class MethodsFunctionsChecker {
 	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {
 		String[] pac = prefix.split("\\.");
 		String k = pac[pac.length-1]; 
-		
+
 		String functionName = String.format("%s.%s", prefix, method.getSimpleName());
 		if(k.equals(method.getSimpleName())) {//is a constructor
 			functionName = String.format("<init>");
 		}
-		
+
 		RefinedFunction f = new RefinedFunction();
 		f.setName(functionName);
 		f.setType(method.getType());
@@ -127,12 +129,12 @@ public class MethodsFunctionsChecker {
 		f.setClass(prefix);
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
-		
-		Optional<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
-		if(an.isPresent())
-			f.setState(an.get());
+
+		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
+		if(!an.isEmpty())
+			f.setState(an);
 	}
-	
+
 	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {
 		//main cannot have refinement - for now
 		if(method.getSignature().equals("main(java.lang.String[])"))
@@ -140,7 +142,7 @@ public class MethodsFunctionsChecker {
 		List<CtParameter<?>> params = method.getParameters();
 		Constraint ref = handleFunctionRefinements(rf, method, params);
 		method.putMetadata(rtc.REFINE_KEY, ref);
-		
+
 	}
 
 	/**
@@ -153,7 +155,7 @@ public class MethodsFunctionsChecker {
 	private Constraint handleFunctionRefinements(RefinedFunction f, CtMethod<?> method, 
 			List<CtParameter<?>> params) {
 		Constraint joint = new Predicate();
-		
+
 		for(CtParameter<?> param:params) {
 			String paramName = param.getSimpleName();
 			Optional<Constraint> oc = rtc.getRefinementFromAnnotation(param);
@@ -173,18 +175,18 @@ public class MethodsFunctionsChecker {
 		rtc.context.addFunctionToContext(f);
 		return Conjunction.createConjunction(joint, ret);
 	}
-	
-	public Optional<CtAnnotation<? extends Annotation>> getStateAnnotation(CtElement element) {
-		Optional<CtAnnotation<? extends Annotation>> constr = Optional.empty();
+
+	public List<CtAnnotation<? extends Annotation>> getStateAnnotation(CtElement element) {
+		List<CtAnnotation<? extends Annotation>> l = new ArrayList();
 		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
 			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
 			if( an.contentEquals("repair.regen.specification.StateRefinement")) {
-				constr = Optional.of(ann);
+				l.add(ann);
 			}
 		}
-		return constr;
+		return l;
 	}
-	
+
 
 
 
@@ -200,12 +202,12 @@ public class MethodsFunctionsChecker {
 			if (method.getParent() instanceof CtClass) {
 				RefinedFunction fi = rtc.context.getFunction(method.getSimpleName(), 
 						((CtClass)method.getParent()).getQualifiedName());
-				
+
 				//Both return and the method have metadata
 				String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
 				Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
 				Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
-	
+
 				RefinedVariable rv = rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
 				rtc.checkSMT(cexpectedType, ret);
 				rtc.context.newRefinementToVariableInContext(returnVarName, cexpectedType);
@@ -213,7 +215,7 @@ public class MethodsFunctionsChecker {
 		}
 	}
 
-	
+
 	//############################### VISIT INVOCATION ################################3
 
 	<R> void getInvocationRefinements(CtInvocation<R> invocation) {
@@ -221,13 +223,13 @@ public class MethodsFunctionsChecker {
 		if(method == null) {
 			Method m = invocation.getExecutable().getActualMethod();
 			if(m != null) searchMethodInLibrary(m, invocation);
-		
+
 		}else if(method.getParent() instanceof CtClass){
 			String ctype = ((CtClass)method.getParent()).getQualifiedName();
 			RefinedFunction f = rtc.context.getFunction(method.getSimpleName(), ctype);
 			if(f != null) {//inside rtc.context
 				checkInvocationRefinements(invocation, method.getSimpleName(), ctype);
-				
+
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
 				if(cet instanceof CtMethod) {
@@ -251,15 +253,15 @@ public class MethodsFunctionsChecker {
 			String name = v.getVariable().getSimpleName();
 			Optional<VariableInstance> ovi = rtc.context.getLastVariableInstance(name);
 			Constraint ref = new Predicate();
-			if(ovi.isPresent() && f.hasStateChange() && f.getStateFrom().isPresent())
+			if(ovi.isPresent() && f.hasStateChange() && f.getFromStates().size()>0)
 				ref = changeState(ovi.get(), f, name, invocation);
 			if(ovi.isPresent() && !f.hasStateChange()) 
 				ref = sameState(ovi.get(), name, invocation);
-			
+
 			invocation.putMetadata(rtc.STATE_KEY, ref);
 
 		}
-		
+
 	}
 
 	private Constraint sameState(VariableInstance variableInstance, String name, CtInvocation<?> invocation) {
@@ -270,21 +272,38 @@ public class MethodsFunctionsChecker {
 
 	private Constraint changeState(VariableInstance vi, RefinedFunction f, String name, CtInvocation<?> invocation) {
 		Constraint prevState = vi.getState();
-		Constraint expectedState  = f.getStateFrom().get().substituteVariable(rtc.THIS, name);
-		//criar nova var instance com o to
-		rtc.checkStateSMT(prevState, expectedState, invocation);
-		if(f.getStateTo().isPresent()) {
-			Constraint transitionedState = f.getStateTo().get().substituteVariable(rtc.THIS, name);
-			addInstanceWithState(name, vi, transitionedState);
-			return transitionedState;
+		List<ObjectState> los = f.getAllStates();
+		boolean found = false;
+		for (int i = 0; i < los.size() && !found; i++) {
+			ObjectState os = los.get(i);
+			if(os.getFrom().isPresent()) {
+				Constraint expectState = os.getFrom().get().substituteVariable(rtc.THIS, name); 
+				found = rtc.checkStateSMT(prevState, expectState, invocation);
+				if(found && os.getTo().isPresent()) {
+						Constraint transitionedState = os.getTo().get().substituteVariable(rtc.THIS, name);
+						addInstanceWithState(name, vi, transitionedState);
+						return transitionedState;
+					
+				}
+			}
 		}
+		if(!found) {
+			System.out.println("Reached end of changeState with found false");
+			String states = los.stream().map(p->p.getFrom())
+											   .filter(p->p.isPresent())
+											   .map(p->p.get().toString())
+											   .collect(Collectors.joining(","));
+			ErrorPrinter.printStateMismatch(invocation, prevState, states);
+		}
+			
+
 		return new Predicate();
 	}
-	
+
 	private void addInstanceWithState(String superName, VariableInstance prevInstance, Constraint transitionedState) {
 		String name2 = String.format(rtc.instanceFormat, superName, rtc.context.getCounter()); 
 		VariableInstance vi2 = (VariableInstance)rtc.context.addInstanceToContext( 
-												name2, prevInstance.getType() , prevInstance.getRefinement());
+				name2, prevInstance.getType() , prevInstance.getRefinement());
 		vi2.setState(transitionedState);
 		rtc.context.addRefinementInstanceToVariable(superName, name2);
 	}
@@ -307,21 +326,21 @@ public class MethodsFunctionsChecker {
 	}
 
 	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName, String className) {
-//		invocation.getTarget().getType().toString()
+		//		invocation.getTarget().getType().toString()
 		int si = invocation.getArguments().size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
 		if(invocation.getTarget() != null) {
 			checkTargetChanges(invocation.getTarget(), f, invocation);
 		}
-		
+
 		if(f.allRefinementsTrue()) {
 			invocation.putMetadata(rtc.REFINE_KEY, new Predicate());
 			return;
 		}
 		Map<String,String> map = mapInvocation(invocation, f);
-		
+
 		checkParameters(invocation, f, map);
-		
+
 		Constraint methodRef = f.getRefReturn(); 
 		if(methodRef != null) {
 			List<String> vars = methodRef.getVariableNames(); 
@@ -331,9 +350,9 @@ public class MethodsFunctionsChecker {
 			invocation.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
 
-			
+
 	}
-	
+
 	private <R> Map<String, String> mapInvocation(CtInvocation<R> invocation, RefinedFunction f){
 		Map<String, String> mapInvocation = new HashMap<>();
 		List<CtExpression<?>> invocationParams = invocation.getArguments();
@@ -342,9 +361,9 @@ public class MethodsFunctionsChecker {
 			Variable fArg = functionParams.get(i);
 			CtExpression<?> iArg = invocationParams.get(i);
 			String invStr;
-//			if(iArg instanceof CtLiteral)
-//				invStr = iArg.toString();
-//			else 
+			//			if(iArg instanceof CtLiteral)
+			//				invStr = iArg.toString();
+			//			else 
 			if(iArg instanceof CtFieldRead) {
 				invStr = createVariableRepresentingArgument(iArg, fArg);
 			}else if(iArg instanceof CtVariableRead) {
@@ -354,23 +373,23 @@ public class MethodsFunctionsChecker {
 				invStr = (ovi.isPresent())? ovi.get().getName() : vr.toString();
 			}else //create new variable with the argument refinement
 				invStr = createVariableRepresentingArgument(iArg, fArg);				
-			
-				
+
+
 			mapInvocation.put(fArg.getName(), invStr);
 		}
 		return mapInvocation;
 	}
 
-	
-	
+
+
 	private String createVariableRepresentingArgument(CtExpression<?> iArg, Variable fArg) {
 		Constraint met = (Constraint) iArg.getMetadata(rtc.REFINE_KEY);
 		if(!met.getVariableNames().contains(rtc.WILD_VAR))
 			met = new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), met);
 		String nVar = String.format(rtc.instanceFormat, fArg.getName(),
-					rtc.context.getCounter());
+				rtc.context.getCounter());
 		rtc.context.addVarToContext(nVar, fArg.getType(), 
-					met.substituteVariable(rtc.WILD_VAR, nVar));
+				met.substituteVariable(rtc.WILD_VAR, nVar));
 		return nVar;
 	}
 
@@ -387,7 +406,7 @@ public class MethodsFunctionsChecker {
 					c = c.substituteVariable(s, map.get(s));
 			rtc.checkSMT(c, invocation);
 		}
-		
+
 	}
 
 

@@ -26,10 +26,9 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        regen.test.project.Bus b = new regen.test.project.Bus();
-        // b.close();//error: not yet open, not possible to close
-        b.open();
-        b.close();
+        java.io.InputStreamReader isr = new java.io.InputStreamReader(java.lang.System.in);
+        isr.close();
+        isr.read();
     }
 }
 
