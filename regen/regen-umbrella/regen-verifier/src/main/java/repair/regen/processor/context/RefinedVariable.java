@@ -30,10 +30,10 @@ public abstract class RefinedVariable extends Refined{
 	}
 
 	public void addSuperTypes(CtTypeReference<?> ts, Set<CtTypeReference<?>> sts) {
-		if(!supertypes.contains(ts))
+		if(ts != null && !supertypes.contains(ts))
 			supertypes.add(ts);
 		for(CtTypeReference<?> ct: sts)
-			if(!supertypes.contains(ct))
+			if(ct!=null && !supertypes.contains(ct))
 				supertypes.add(ct);
 		
 	}

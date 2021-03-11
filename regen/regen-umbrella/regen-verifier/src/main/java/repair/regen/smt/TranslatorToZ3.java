@@ -112,9 +112,10 @@ public class TranslatorToZ3 {
 			if(!s[i].equals(param.getSort())) {
 				//Look if the function type is a supertype of this
 				List<Expr> le = varSuperTypes.get(param.toString());
-				for(Expr e: le) 
-					if(e.getSort().equals(s[i]))
-						params[i] = e;
+				if(le != null)
+					for(Expr e: le) 
+						if(e.getSort().equals(s[i]))
+							params[i] = e;
 			}
 		}
 		

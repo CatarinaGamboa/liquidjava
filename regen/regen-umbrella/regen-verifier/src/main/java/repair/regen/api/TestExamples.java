@@ -211,6 +211,11 @@ public class TestExamples {
 		testCorrect(testPath+"/classes/refs_from_superclasses_correct");
 	}
 	
+	@Test
+	public void correctStateFromSuperclass() {
+		testCorrect(testPath+"/classes/state_from_superclass_correct");
+	}
+	
 	
 //	@Test
 //	public void correctInputReaderCharArrayLongerNameEve() {
