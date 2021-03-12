@@ -7,10 +7,8 @@ import java.io.InputStream;
 
 import repair.regen.specification.ExternalRefinementsFor;
 import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
-import repair.regen.specification.States;
 
 //https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
 @ExternalRefinementsFor("java.io.InputStreamReader")
@@ -18,7 +16,7 @@ import repair.regen.specification.States;
 @StateSet({"alreadyRead", "nothingRead"})
 public interface InputStreamReaderRefinements {
 	
-	@StateRefinement(to="open(this) && nothingRead(this) && close(this)")
+	@StateRefinement(to="open(this) && nothingRead(this)")
 	public void InputStreamReader(InputStream in);
 
 	@StateRefinement(from="open(this)", to="open(this) && alreadyRead(this)")

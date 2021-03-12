@@ -1,13 +1,13 @@
 package repair.regen.classes.state_multiple_cases;
 import java.io.InputStream;
+
 import repair.regen.specification.ExternalRefinementsFor;
-import repair.regen.specification.Refinement;
 import repair.regen.specification.StateRefinement;
-import repair.regen.specification.States;
+import repair.regen.specification.StateSet;
 
 //https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
 @ExternalRefinementsFor("java.io.InputStreamReader")
-@States({"open",  "close"})
+@StateSet({"open",  "close"})
 //@StateSet({"alreadyRead", "nothingRead"})
 public interface InputStreamReaderRefinements {
 	

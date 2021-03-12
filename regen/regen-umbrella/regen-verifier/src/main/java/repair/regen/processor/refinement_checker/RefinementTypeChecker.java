@@ -62,8 +62,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	// 1. Keep track of the context variable types
 	// 2. Do type checking and inference
-	VCChecker vcChecker = new VCChecker();
-
+	
 	//Auxiliar TypeCheckers
 	OperationsChecker otc;
 	MethodsFunctionsChecker mfc;
@@ -522,16 +521,24 @@ public class RefinementTypeChecker extends TypeChecker {
 
 
 	@Override
-	protected void createGhostFunction(String value, int set, CtElement element) {
+	protected Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element) {
+		CtClass<?> klass = null; 
+		
 		if(element.getParent() instanceof CtClass<?>) {
-			CtClass<?> klass =(CtClass<?>) element.getParent(); 
+			klass =(CtClass<?>) element.getParent();
+		}else if(element instanceof CtClass<?>) {
+			klass = (CtClass<?>) element;
+		}
+		if(klass != null) {
 			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
 			List<String> params = Arrays.asList(klass.getSimpleName());
 			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
 												klass.getQualifiedName(), klass.getSimpleName(), set); 
-			context.addGhostFunction(gh);
+//			context.addGhostFunction(gh);
 			System.out.println(gh.toString());
+			return Optional.of(gh);
 		}
+		return Optional.empty();
 	}
 
 

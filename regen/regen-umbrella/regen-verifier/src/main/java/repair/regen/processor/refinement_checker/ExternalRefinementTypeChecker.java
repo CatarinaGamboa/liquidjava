@@ -99,16 +99,18 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	
 
 	@Override
-	protected void createGhostFunction(String value, int set, CtElement element)  {
+	protected Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element)  {
 		if(element instanceof CtInterface<?>) {
 			String[] a = prefix.split("\\.");
 			String klass =  a[a.length-1];
 			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
 			List<String> params = Arrays.asList(klass);
 			GhostFunction gh = new GhostFunction(value, params, ret ,factory, prefix, klass, set); 
-			context.addGhostFunction(gh);
+//			context.addGhostFunction(gh);
 			System.out.println(gh.toString());
+			return Optional.of(gh);
 		}		
+		return Optional.empty();
 	}
 
 
@@ -133,8 +135,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 
 	@Override
 	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-//		return vcChecker.smtChecks(prevState, expectedState, target);
-		return false;
+		return vcChecker.smtChecks(prevState, expectedState, target);
 	}
 
 

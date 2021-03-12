@@ -30,6 +30,7 @@ public abstract class TypeChecker extends CtScanner{
 	
 	Context context;
 	Factory factory;
+	VCChecker vcChecker = new VCChecker();;
 	
 	public TypeChecker(Context c, Factory fac) {
 		this.context = c;
@@ -44,9 +45,6 @@ public abstract class TypeChecker extends CtScanner{
 
 
 	protected abstract boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target);
-
-	
-	
 	
 	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
 		Optional<Constraint> constr = Optional.empty();
@@ -85,7 +83,9 @@ public abstract class TypeChecker extends CtScanner{
 				for(CtExpression<?> ce : ls)
 					if(ce instanceof CtLiteral<?>) {
 						CtLiteral<String> s = (CtLiteral<String>)ce;
-						createGhostFunction(s.getValue(), set, element);
+						Optional<GhostFunction> gh = createGhostFunction(s.getValue(), set, element);
+						if(gh.isPresent() && !context.hasGhost(gh.get().getName()))
+							context.addGhostFunction(gh.get());
 					}
 			}	
 		}
@@ -94,7 +94,7 @@ public abstract class TypeChecker extends CtScanner{
 
 
 	
-	protected abstract void createGhostFunction(String value, int set, CtElement element);
+	protected abstract Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element);
 
 	abstract protected void getGhostFunction(String value, CtElement element);
 

@@ -155,7 +155,7 @@ public class RefinedFunction extends Refined{
 				if(!dfl.contains(gf.getGroupSet()))
 					dfl.add(gf.getGroupSet());
 				else
-					ErrorPrinter.printSameStateSetError(e, name, dfl);
+					ErrorPrinter.printSameStateSetError(e, p, name, dfl);
 				
 			}
 		}

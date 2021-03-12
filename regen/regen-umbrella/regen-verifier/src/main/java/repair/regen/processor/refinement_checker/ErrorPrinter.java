@@ -3,6 +3,7 @@ package repair.regen.processor.refinement_checker;
 import java.util.List;
 
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.declaration.CtElement;
 
 public class ErrorPrinter {
@@ -72,12 +73,13 @@ public class ErrorPrinter {
 
 	}
 
-	public static void printSameStateSetError(CtElement element, String name, List<Integer> dfl) {
+	public static void printSameStateSetError(CtElement element, Predicate p, String name, List<Integer> dfl) {
 		System.out.println("______________________________________________________");
 		System.err.println(" Error found multiple states from a State Set in a refinement");
 		System.out.println();
 		System.out.println(element);
 		System.out.println();
+		System.out.println("In predicate:" + p.toString());
 		System.out.println("In class:" + name);
 		System.out.println("Location: " + element.getPosition());
 		System.out.println("______________________________________________________");

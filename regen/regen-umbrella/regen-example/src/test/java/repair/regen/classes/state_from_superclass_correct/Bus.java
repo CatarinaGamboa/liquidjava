@@ -4,7 +4,7 @@ import repair.regen.specification.StateRefinement;
 
 public class Bus extends Car{
 
-	@StateRefinement(to = "!isOpen(this)")
+	@StateRefinement(to = "close(this)")
 	public Bus() {
 		
 	}

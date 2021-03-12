@@ -105,7 +105,6 @@ public class TranslatorToZ3 {
 			return makeSelect(name, params);
 
 		FuncDecl fd = funcTranslation.get(name);
-		Parameter[] p = fd.getParameters();
 		Sort[] s  =fd.getDomain();
 		for (int i = 0; i < s.length; i++) {
 			Expr param = params[i];
@@ -117,6 +116,7 @@ public class TranslatorToZ3 {
 						if(e.getSort().equals(s[i]))
 							params[i] = e;
 			}
+			System.out.println(params[i].toString() +":"+ params[i].getSort() );
 		}
 		
 		return z3.mkApp(fd, params);
