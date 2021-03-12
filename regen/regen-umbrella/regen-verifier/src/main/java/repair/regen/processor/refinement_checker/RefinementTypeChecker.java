@@ -98,6 +98,7 @@ public class RefinementTypeChecker extends TypeChecker {
 				visitCtClass((CtClass<?>) ct);
 		}
 		getRefinementFromAnnotation(ctClass);
+		handleStateSetsFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
 	}
 
@@ -105,6 +106,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
 		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
 		getRefinementFromAnnotation(intrface);
+		handleStateSetsFromAnnotation(intrface);
 		super.visitCtInterface(intrface);
 	}
 
@@ -520,17 +522,16 @@ public class RefinementTypeChecker extends TypeChecker {
 
 
 	@Override
-	protected void createGhostFunction(String value, CtElement element) {
+	protected void createGhostFunction(String value, int set, CtElement element) {
 		if(element.getParent() instanceof CtClass<?>) {
 			CtClass<?> klass =(CtClass<?>) element.getParent(); 
 			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
 			List<String> params = Arrays.asList(klass.getSimpleName());
-			GhostFunction gh = new GhostFunction(value, params, ret ,factory, klass.getQualifiedName(), klass.getSimpleName()); 
+			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
+												klass.getQualifiedName(), klass.getSimpleName(), set); 
 			context.addGhostFunction(gh);
 			System.out.println(gh.toString());
 		}
-		System.out.println();
-
 	}
 
 
@@ -583,7 +584,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	@Override
 	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-//		vcChecker.processSubtyping(prevState, expectedState, target);
 		return vcChecker.smtChecks(prevState, expectedState, target);
 	}
 

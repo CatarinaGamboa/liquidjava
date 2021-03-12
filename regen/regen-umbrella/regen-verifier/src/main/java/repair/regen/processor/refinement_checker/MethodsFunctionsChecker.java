@@ -295,8 +295,6 @@ public class MethodsFunctionsChecker {
 											   .collect(Collectors.joining(","));
 			ErrorPrinter.printStateMismatch(invocation, prevState, states);
 		}
-			
-
 		return new Predicate();
 	}
 

@@ -15,6 +15,9 @@ public class GhostFunction {
 	private List<CtTypeReference<?>> param_types;
 	private CtTypeReference<?> return_type;
 	
+	private String klassName;
+	private int setGroup;
+	
 	public GhostFunction(FunctionDeclaration fdExp, Factory factory, String path, String klass) {
 		name = fdExp.getName().toString();
 		Type t = fdExp.getReturnType();
@@ -28,7 +31,7 @@ public class GhostFunction {
 	}
 	
 	public GhostFunction(String name,List<String> param_types, CtTypeReference<?> return_type, 
-			Factory factory, String path, String klass) {
+			Factory factory, String path, String klass, int group) {
 		this.name = name;
 		this.return_type = Utils.getType(return_type.toString().equals(klass)? path: return_type.toString(), factory);
 		this.param_types = new ArrayList<>();
@@ -36,6 +39,8 @@ public class GhostFunction {
 			String mType = param_types.get(i).toString();
 			this.param_types.add(Utils.getType(mType.equals(klass)? path : mType, factory));
 		}
+		this.klassName = klass;
+		this.setGroup = group;
 	}
 	
 	public String getName() {

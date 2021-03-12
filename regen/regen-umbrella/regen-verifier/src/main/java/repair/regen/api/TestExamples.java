@@ -216,6 +216,10 @@ public class TestExamples {
 		testCorrect(testPath+"/classes/state_from_superclass_correct");
 	}
 	
+	@Test
+	public void correctStateCases() {
+		testCorrect(testPath+"/classes/state_multiple_cases");
+	}
 	
 //	@Test
 //	public void correctInputReaderCharArrayLongerNameEve() {

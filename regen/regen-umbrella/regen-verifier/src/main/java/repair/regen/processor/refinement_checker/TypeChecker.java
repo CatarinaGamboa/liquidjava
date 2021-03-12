@@ -1,12 +1,14 @@
 package repair.regen.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
+import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtNewArray;
@@ -63,18 +65,6 @@ public abstract class TypeChecker extends CtScanner{
 				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
 				handleAlias(s.getValue(), element);
 			
-			}else if(an.contentEquals("repair.regen.specification.States")) {
-				CtNewArray<String> e = (CtNewArray<String>)ann.getAllValues().get("value");
-				List<CtExpression<?>> ls = e.getElements();
-				for(CtExpression<?> ce : ls) {
-					if(ce instanceof CtLiteral<?>) {
-						CtLiteral<String> s = (CtLiteral<String>)ce;
-						createGhostFunction(s.getValue(), element);
-						
-					}
-//					System.out.println();
-				}
-//				System.out.println("here");
 			}
 				
 		}
@@ -83,12 +73,28 @@ public abstract class TypeChecker extends CtScanner{
 
 		return constr;
 	}
+	
+	public void handleStateSetsFromAnnotation(CtElement element) {
+		int set = 0;
+		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
+			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
+			if(an.contentEquals("repair.regen.specification.StateSet")) {
+				CtNewArray<String> e = (CtNewArray<String>)ann.getAllValues().get("value");
+				List<CtExpression<?>> ls = e.getElements();
+				set++;
+				for(CtExpression<?> ce : ls)
+					if(ce instanceof CtLiteral<?>) {
+						CtLiteral<String> s = (CtLiteral<String>)ce;
+						createGhostFunction(s.getValue(), set, element);
+					}
+			}	
+		}
+	}
+		
 
 
 	
-	protected abstract void createGhostFunction(String value, CtElement element);
-
-
+	protected abstract void createGhostFunction(String value, int set, CtElement element);
 
 	abstract protected void getGhostFunction(String value, CtElement element);
 

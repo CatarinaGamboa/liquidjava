@@ -46,6 +46,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		if(externalRefinements.isPresent()) {
 			prefix = externalRefinements.get();
 			getRefinementFromAnnotation(intrface);
+			handleStateSetsFromAnnotation(intrface);
 			super.visitCtInterface(intrface);
 		}
 	}
@@ -98,13 +99,13 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	
 
 	@Override
-	protected void createGhostFunction(String value, CtElement element) {
+	protected void createGhostFunction(String value, int set, CtElement element)  {
 		if(element instanceof CtInterface<?>) {
 			String[] a = prefix.split("\\.");
-			String d =  a[a.length-1];
+			String klass =  a[a.length-1];
 			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
-			List<String> params = Arrays.asList(d);
-			GhostFunction gh = new GhostFunction(value, params, ret ,factory, prefix, a[a.length-1]); 
+			List<String> params = Arrays.asList(klass);
+			GhostFunction gh = new GhostFunction(value, params, ret ,factory, prefix, klass, set); 
 			context.addGhostFunction(gh);
 			System.out.println(gh.toString());
 		}		
@@ -123,8 +124,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		
 	}
 	
-
-
 	@Override
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type,
 			CtElement variable) {

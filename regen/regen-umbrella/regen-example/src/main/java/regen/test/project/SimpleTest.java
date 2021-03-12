@@ -8,6 +8,7 @@ import java.nio.file.spi.FileSystemProvider;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
+import repair.regen.specification.StateSet;
 
 public class SimpleTest {
 	
@@ -15,7 +16,8 @@ public class SimpleTest {
 		InputStreamReader isr = new InputStreamReader(System.in);
 		
 		isr.close();
-		isr.read();
+		isr.close();
+//		isr.read();
 		
 
 	}
