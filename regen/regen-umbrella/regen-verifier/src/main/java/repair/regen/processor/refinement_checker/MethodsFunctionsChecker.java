@@ -16,6 +16,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
+import repair.regen.processor.context.Context;
 import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
@@ -61,7 +62,7 @@ public class MethodsFunctionsChecker {
 		//		auxGetMethodRefinements(c, f);
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
 		if(!an.isEmpty())
-			f.setState(an);
+			f.setState(an, rtc.context.getGhosts(), c);
 
 	}
 
@@ -107,7 +108,7 @@ public class MethodsFunctionsChecker {
 
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(!an.isEmpty())
-			f.setState(an);
+			f.setState(an, rtc.context.getGhosts(), method);
 	}
 
 
@@ -132,7 +133,7 @@ public class MethodsFunctionsChecker {
 
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(!an.isEmpty())
-			f.setState(an);
+			f.setState(an, rtc.context.getGhosts(), method);
 	}
 
 	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {

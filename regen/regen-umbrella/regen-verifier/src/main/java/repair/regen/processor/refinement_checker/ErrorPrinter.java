@@ -1,5 +1,7 @@
 package repair.regen.processor.refinement_checker;
 
+import java.util.List;
+
 import repair.regen.processor.constraints.Constraint;
 import spoon.reflect.declaration.CtElement;
 
@@ -68,6 +70,19 @@ public class ErrorPrinter {
 		System.out.println("______________________________________________________");
 		System.exit(2);
 
+	}
+
+	public static void printSameStateSetError(CtElement element, String name, List<Integer> dfl) {
+		System.out.println("______________________________________________________");
+		System.err.println(" Error found multiple states from a State Set in a refinement");
+		System.out.println();
+		System.out.println(element);
+		System.out.println();
+		System.out.println("In class:" + name);
+		System.out.println("Location: " + element.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(1);
+		
 	}
 
 }

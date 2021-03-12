@@ -28,6 +28,8 @@ public class GhostFunction {
 			String mType = mt.getType().toString();
 			param_types.add(Utils.getType(mType.equals(klass)? path : mType, factory));
 		}
+		this.klassName = klass;
+		this.setGroup = 0;//does not have a group
 	}
 	
 	public GhostFunction(String name,List<String> param_types, CtTypeReference<?> return_type, 
@@ -42,6 +44,7 @@ public class GhostFunction {
 		this.klassName = klass;
 		this.setGroup = group;
 	}
+
 	
 	public String getName() {
 		return name;
@@ -66,6 +69,18 @@ public class GhostFunction {
 		sb.delete(sb.length()-2, sb.length());
 		sb.append(")");
 		return sb.toString();
+	}
+	
+	public String getParentClassName() {
+		return klassName;
+	}
+	
+	public int getGroupSet() {
+		return setGroup;
+	}
+	
+	public boolean belongsToGroupSet() {
+		return setGroup > 0;
 	}
 
 }

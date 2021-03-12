@@ -25,7 +25,6 @@ public class AliasUsage extends Expression implements IModel{
 		return (ctx.makeAlias(name, getExpressions())).eval(ctx);
 //		return null;
 	}
-	
 
 	@Override
 	public String toString() {
@@ -42,7 +41,7 @@ public class AliasUsage extends Expression implements IModel{
 		arg.getVariableNames(l);
 	}
 	
-	private List<Expression> getExpressions() {
+	public List<Expression> getExpressions() {
 		List<Expression> lv = new ArrayList<>();
 		arg.getAllExpressions(lv);
 		return lv;

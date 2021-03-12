@@ -12,6 +12,8 @@ import repair.regen.language.IfElseExpression;
 import repair.regen.language.LiteralExpression;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.Variable;
+import repair.regen.language.alias.Alias;
+import repair.regen.language.alias.AliasUsage;
 import repair.regen.language.function.Argument;
 import repair.regen.language.function.FollowUpArgument;
 import repair.regen.language.function.FunctionInvocationExpression;
@@ -19,6 +21,8 @@ import repair.regen.language.function.ObjectFieldInvocation;
 import repair.regen.language.operators.NotOperator;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
+import repair.regen.processor.context.Context;
+import repair.regen.processor.context.GhostFunction;
 
 public class Predicate extends Constraint{
 	private Expression exp;
@@ -123,6 +127,37 @@ public class Predicate extends Constraint{
 		System.out.println(ref);
 		System.out.println("______________________________________________________");
 		System.exit(2);
+		
+	}
+
+	public List<GhostFunction> getGhostInvocations(List<GhostFunction> contextGhosts) {
+		List<GhostFunction> gh = new ArrayList<>();
+		auxGetGhostInvocations(exp, gh, contextGhosts);
+		return gh;
+	}
+
+	private void auxGetGhostInvocations(Expression exp, List<GhostFunction> gh, List<GhostFunction> contextGhosts) {
+		if(exp instanceof UnaryExpression)
+			auxGetGhostInvocations(((UnaryExpression) exp).getExpression(), gh, contextGhosts);
+		else if(exp instanceof BinaryExpression) {
+			auxGetGhostInvocations(((BinaryExpression) exp).getFirstExpression(), gh, contextGhosts);
+			auxGetGhostInvocations(((BinaryExpression) exp).getSecondExpression(), gh, contextGhosts);
+		}else if(exp instanceof ExpressionGroup) {
+			auxGetGhostInvocations(((ExpressionGroup) exp).getExpression(), gh, contextGhosts);	
+		}else if(exp instanceof IfElseExpression) {
+			auxGetGhostInvocations(((IfElseExpression) exp).getCondition(), gh, contextGhosts);
+			auxGetGhostInvocations(((IfElseExpression) exp).getThenExpression(), gh, contextGhosts);
+			auxGetGhostInvocations(((IfElseExpression) exp).getElseExpression(), gh, contextGhosts);
+		}else if(exp instanceof AliasUsage) {
+			for(Expression e :((AliasUsage)exp).getExpressions())
+				auxGetGhostInvocations(e, gh, contextGhosts);
+		}else if(exp instanceof FunctionInvocationExpression) {
+			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
+			for(GhostFunction f: contextGhosts) {
+				if(f.getName().equals(fie.getFunctionName()))
+					gh.add(f);
+			}
+		}
 		
 	}
 

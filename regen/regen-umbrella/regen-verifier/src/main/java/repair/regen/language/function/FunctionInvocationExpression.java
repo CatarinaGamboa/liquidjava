@@ -33,6 +33,10 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 		
 	}
 	
+	public String getFunctionName() {
+		return name.toString();
+	}
+	
 	public Argument getArgument() {
 		return mv;
 	}

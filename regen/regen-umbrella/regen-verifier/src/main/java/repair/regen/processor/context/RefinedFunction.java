@@ -2,6 +2,7 @@ package repair.regen.processor.context;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -9,9 +10,11 @@ import java.util.Optional;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.refinement_checker.ErrorPrinter;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtAnnotation;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction extends Refined{
@@ -112,9 +115,10 @@ public class RefinedFunction extends Refined{
 	}
 	
 	
-	public void setState(List<CtAnnotation<? extends Annotation>> ctAnnotations) {
+	public void setState(List<CtAnnotation<? extends Annotation>> ctAnnotations, 
+			List<GhostFunction> c, CtElement e) {
 		for(CtAnnotation<? extends Annotation> an: ctAnnotations) {
-			stateChange.add(getState(an));
+			stateChange.add(getState(an, c, e));
 		}
 	}
 	
@@ -126,18 +130,40 @@ public class RefinedFunction extends Refined{
 		stateChange = l;
 	}
 	
-	private ObjectState getState(CtAnnotation<? extends Annotation> ctAnnotation) {
+	private ObjectState getState(CtAnnotation<? extends Annotation> ctAnnotation, List<GhostFunction> c, CtElement e) {
 		Map<String, CtExpression> m = ctAnnotation.getAllValues();
 		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
 		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
 		ObjectState state = new ObjectState();
 		if(from != null)
-			state.setFrom(new Predicate(from.getValue()));
+			state.setFrom(createStateConstraint(from.getValue(), c, e));
 		if(to != null)
-			state.setTo(new Predicate(to.getValue()));
+			state.setTo(createStateConstraint(to.getValue(), c, e));
 		return state;
 	}
 	
+	private Constraint createStateConstraint(String value, List<GhostFunction> c, CtElement e) {
+		Predicate p = new Predicate(value);
+		List<GhostFunction> lgf = p.getGhostInvocations(c);
+		Map<String,List<Integer>> differentSets = new HashMap<>();
+		for(GhostFunction gf: lgf) {
+			if(gf.belongsToGroupSet()) {//belongs to a set state
+				String name = gf.getParentClassName();
+				if(!differentSets.containsKey(name))
+					differentSets.put(name, new ArrayList());
+				List<Integer> dfl = differentSets.get(name);
+				if(!dfl.contains(gf.getGroupSet()))
+					dfl.add(gf.getGroupSet());
+				else
+					ErrorPrinter.printSameStateSetError(e, name, dfl);
+				
+			}
+		}
+		
+		return p;
+	}
+
+
 	public void addStates(ObjectState e){
 		stateChange.add(e);
 	}

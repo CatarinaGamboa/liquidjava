@@ -18,10 +18,10 @@ import repair.regen.specification.States;
 @StateSet({"alreadyRead", "nothingRead"})
 public interface InputStreamReaderRefinements {
 	
-	@StateRefinement(to="open(this)")
+	@StateRefinement(to="open(this) && nothingRead(this) && close(this)")
 	public void InputStreamReader(InputStream in);
 
-	@StateRefinement(from="open(this)", to="open(this)")
+	@StateRefinement(from="open(this)", to="open(this) && alreadyRead(this)")
 	@Refinement("(_ >= -1) && (_ <= 127)")
 	public int read();
 	
