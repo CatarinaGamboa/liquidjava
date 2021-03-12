@@ -26,6 +26,7 @@ import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtAnnotation;
@@ -59,11 +60,16 @@ public class MethodsFunctionsChecker {
 			f.setClass(klass.getQualifiedName());
 		}
 		rtc.context.addFunctionToContext(f);
-		//		auxGetMethodRefinements(c, f);
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
-		if(!an.isEmpty())
+		if(!an.isEmpty()) {
+			for(CtAnnotation<? extends Annotation> a: an) {
+				Map<String, CtExpression> m = a.getAllValues();
+				CtLiteral<String> from = (CtLiteral<String>)m.get("from");
+				if(from != null)
+					ErrorPrinter.printErrorConstructorFromState(c, from);
+			}
 			f.setState(an, rtc.context.getGhosts(), c);
-
+		}
 	}
 
 

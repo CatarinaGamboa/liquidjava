@@ -4,6 +4,8 @@ import java.util.List;
 
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
+import spoon.reflect.code.CtLiteral;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 
 public class ErrorPrinter {
@@ -81,6 +83,19 @@ public class ErrorPrinter {
 		System.out.println();
 		System.out.println("In predicate:" + p.toString());
 		System.out.println("In class:" + name);
+		System.out.println("Location: " + element.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(1);
+		
+	}
+
+	public static void printErrorConstructorFromState(CtElement element, CtLiteral<String> from) {
+		System.out.println("______________________________________________________");
+		System.err.println(" Error found constructor with FROM state (Constructor's should only have a TO state)");
+		System.out.println();
+		System.out.println(element);
+		System.out.println();
+		System.out.println("State found:" + from);
 		System.out.println("Location: " + element.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);
