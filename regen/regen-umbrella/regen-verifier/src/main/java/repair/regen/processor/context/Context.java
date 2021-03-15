@@ -58,6 +58,17 @@ public class Context {
 //		ghosts = new ArrayList<>();
 //		counter = 0;
 	}
+	
+
+	public void reinitializeAllContext() {
+		reinitializeContext();
+		ctxFunctions = new ArrayList<>();
+		alias = new ArrayList<>();
+		ghosts = new ArrayList<>();
+		counter = 0;
+		
+	}
+
 
 	public void enterContext() {
 		ctxVars.push(new ArrayList<>());

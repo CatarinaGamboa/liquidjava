@@ -68,17 +68,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	}
 
 
-	private Optional<String> getExternalRefinement(CtInterface<?> intrface) {
-		Optional<String> ref = Optional.empty();
-		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
-			if( ann.getActualAnnotation().annotationType().getCanonicalName()
-					.contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
-				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				ref = Optional.of(s.getValue());
-			}		
-		return ref;
-	}
-	
+
 	protected void getGhostFunction(String value, CtElement element) {
 		try {
 			Optional<FunctionDeclaration> ofd = 

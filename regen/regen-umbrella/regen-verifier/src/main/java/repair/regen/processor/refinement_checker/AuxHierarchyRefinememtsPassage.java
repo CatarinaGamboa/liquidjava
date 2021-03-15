@@ -69,7 +69,9 @@ public class AuxHierarchyRefinememtsPassage {
 			if(argRef.isBooleanTrue())
 				arg.setRefinement(superArgRef);
 			else {
-				tc.checkStateSMT(superArgRef, argRef, params.get(i));
+				boolean f = tc.checkStateSMT(superArgRef, argRef, params.get(i));
+				if(!f)
+					ErrorPrinter.printError(method, argRef, superArgRef);
 			}
 		}
 		
@@ -88,8 +90,9 @@ public class AuxHierarchyRefinememtsPassage {
 			superRef = superRef.substituteVariable(tc.WILD_VAR, name);
 			for(String m:super2function.keySet()) 
 				superRef  = superRef.substituteVariable(m, super2function.get(m));
-			tc.checkStateSMT(functionRef, superRef, method);
-			
+			boolean f = tc.checkStateSMT(functionRef, superRef, method);
+			if(!f)
+				ErrorPrinter.printError(method, superRef, functionRef);
 		}
 	}
 

@@ -480,6 +480,16 @@ public class TestExamples {
 	public void errorRefsFromSuperclass() {
 		testWrong(testPath+"/classes/refs_from_superclass_error");
 	}
+	
+	@Test
+	public void errorStatesSameSet() {
+		testWrong(testPath+"/classes/state_multiple_error");
+	}
+	
+	@Test
+	public void errorConstructorWithFromCase() {
+		testWrong(testPath+"/classes/MyStreamReader.java");
+	}
 
 	
 	class MySecurityManager extends SecurityManager {

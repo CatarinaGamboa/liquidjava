@@ -14,6 +14,7 @@ import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtNewArray;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
@@ -92,6 +93,17 @@ public abstract class TypeChecker extends CtScanner{
 	}
 		
 
+	Optional<String> getExternalRefinement(CtInterface<?> intrface) {
+		Optional<String> ref = Optional.empty();
+		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
+			if( ann.getActualAnnotation().annotationType().getCanonicalName()
+					.contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				ref = Optional.of(s.getValue());
+			}		
+		return ref;
+	}
+	
 
 	
 	protected abstract Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element);

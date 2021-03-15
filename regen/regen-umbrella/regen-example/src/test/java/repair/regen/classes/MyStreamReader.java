@@ -1,4 +1,4 @@
-package regen.test.project;
+package repair.regen.classes;
 
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;

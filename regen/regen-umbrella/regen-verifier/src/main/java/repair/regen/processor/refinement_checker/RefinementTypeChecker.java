@@ -48,6 +48,7 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
@@ -75,6 +76,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 	//--------------------- Visitors -----------------------------------
+
 	@Override
 	public <T> void visitCtClass(CtClass<T> ctClass) {
 		System.out.println("CTCLASS:"+ctClass.getSimpleName());
@@ -104,6 +106,8 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
 		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
+		if(getExternalRefinement(intrface).isPresent())
+			return;
 		getRefinementFromAnnotation(intrface);
 		handleStateSetsFromAnnotation(intrface);
 		super.visitCtInterface(intrface);

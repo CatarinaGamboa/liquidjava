@@ -1,4 +1,4 @@
-package regen.test.project;
+package repair.regen.classes.state_multiple_error;
 
 
 
@@ -16,7 +16,7 @@ import repair.regen.specification.StateSet;
 @StateSet({"alreadyRead", "nothingRead"})
 public interface InputStreamReaderRefinements {
 	
-	@StateRefinement(to="open(this)")
+	@StateRefinement(to="open(this) && close(this)")
 	public void InputStreamReader(InputStream in);
 
 	@StateRefinement(from="open(this)", to="open(this) && alreadyRead(this)")

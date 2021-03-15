@@ -29,6 +29,7 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
 			Set<CtPackage> sp = pkg.getPackages();
 			visitedPackages.add(pkg);
 			Context c = Context.getInstance();
+			c.reinitializeAllContext();
 			pkg.accept(new ExternalRefinementTypeChecker(c, factory));
 			pkg.accept(new RefinementTypeChecker(c, factory));
 		}
