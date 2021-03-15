@@ -61,6 +61,10 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 		mv.getVariableNames(l);
 	}
 
+	public void setArgument(int i, Expression e) {
+		mv.setExpression(i, e);
+	}
+
 	
 	
 }

@@ -160,5 +160,55 @@ public class Predicate extends Constraint{
 		}
 		
 	}
+	
+	public Constraint changeOldMentions(String previousName, String newName) {
+		Constraint c = this.clone();
+		auxChangeOldMentions(c.getExpression(), previousName, newName);
+		return c;
+	}
+
+	private Expression auxChangeOldMentions(Expression exp, String previousName, String newName) {
+		Expression e = null;
+		if(exp instanceof UnaryExpression) {
+			e = auxChangeOldMentions(((UnaryExpression) exp).getExpression(), previousName, newName);
+			if(e != null) ((UnaryExpression) exp).setExpression(e);
+		}else if(exp instanceof BinaryExpression) {
+			e = auxChangeOldMentions(((BinaryExpression) exp).getFirstExpression(), previousName, newName);
+			if(e!=null) ((BinaryExpression) exp).setFirstExpression(e);
+			e = auxChangeOldMentions(((BinaryExpression) exp).getSecondExpression(),previousName, newName);
+			if(e!=null) ((BinaryExpression) exp).setSecondExpression(e);
+		}else if(exp instanceof ExpressionGroup) {
+			e = auxChangeOldMentions(((ExpressionGroup) exp).getExpression(),previousName, newName);
+			if(e!=null) ((ExpressionGroup) exp).setExpression(e);
+		}else if(exp instanceof IfElseExpression) {
+			e = auxChangeOldMentions(((IfElseExpression) exp).getCondition(), previousName, newName);
+			if(e!=null) ((IfElseExpression) exp).setCondition(e);
+			e = auxChangeOldMentions(((IfElseExpression) exp).getThenExpression(), previousName, newName);
+			if(e!=null) ((IfElseExpression) exp).setThen(e);
+			e = auxChangeOldMentions(((IfElseExpression) exp).getElseExpression(), previousName, newName);
+			if(e!=null) ((IfElseExpression) exp).setElse(e);
+		}else if(exp instanceof AliasUsage) {
+			List<Expression> l = ((AliasUsage)exp).getExpressions();
+			for (int i = 0; i < l.size(); i++) {
+				e = auxChangeOldMentions(l.get(i), previousName, newName);
+				if (e!=null) ((AliasUsage)exp).setExpression(i, e);
+			}
+		}else if(exp instanceof FunctionInvocationExpression) {
+			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
+			if(fie.getFunctionName().equals("old")) {
+				System.out.println("FOUND AN OLD!!!!!");
+				return new Variable(previousName);
+			}
+			if(fie.getArgument() != null) {
+				List<Expression> le = new ArrayList();
+				fie.getArgument().getAllExpressions(le);
+				for (int i = 0; i < le.size(); i++) {
+					e = auxChangeOldMentions(le.get(i), previousName, newName);
+					if(e!=null) fie.setArgument(i, e);
+				}
+			}
+		}
+		return null;
+	}
 
 }

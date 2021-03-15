@@ -65,4 +65,17 @@ public class IfElseExpression  extends Expression implements IModel {
 				then.toString(), ie.toString(), els.toString());
 	}
 
+	public void setCondition(Expression e) {
+		cond = e;
+	}
+
+	public void setThen(Expression e) {
+		then = e;
+	}
+
+	public void setElse(Expression e) {
+		els = e;
+		
+	}
+
 }

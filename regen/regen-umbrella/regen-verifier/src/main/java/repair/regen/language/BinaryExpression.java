@@ -55,6 +55,14 @@ public class BinaryExpression extends Expression implements IModel {
 		e1.getVariableNames(l);
 		e2.getVariableNames(l);
 	}
+	public void setFirstExpression(Expression e) {
+		e1 = e;
+		
+	}
+	public void setSecondExpression(Expression e) {
+		e2 = e;
+		
+	}
 
 
 }

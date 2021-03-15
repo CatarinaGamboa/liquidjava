@@ -47,4 +47,8 @@ public class AliasUsage extends Expression implements IModel{
 		return lv;
 	}
 
+	public void setExpression(int i, Expression e) {
+		arg.setExpression(i, e);
+	}
+
 }

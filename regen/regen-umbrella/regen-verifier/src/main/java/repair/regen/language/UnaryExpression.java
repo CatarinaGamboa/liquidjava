@@ -43,4 +43,8 @@ public class UnaryExpression extends Expression implements IModel {
 		e.getVariableNames(l);
 	}
 	
+	public void setExpression(Expression e2) {
+		e = e2;
+	}
+	
 }

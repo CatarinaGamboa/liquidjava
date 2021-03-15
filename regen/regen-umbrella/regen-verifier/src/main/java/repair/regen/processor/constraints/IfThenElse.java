@@ -58,5 +58,9 @@ public class IfThenElse extends Constraint{
 	public boolean isBooleanTrue() {
 		return false;
 	}
+	@Override
+	public Constraint changeOldMentions(String previousName, String newName) {
+		return ite.changeOldMentions(previousName, newName);
+	}
 
 }

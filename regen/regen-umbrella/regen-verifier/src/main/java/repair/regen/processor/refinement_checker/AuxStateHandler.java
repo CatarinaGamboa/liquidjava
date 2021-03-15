@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.omg.PortableInterceptor.INACTIVE;
+
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
@@ -119,7 +121,7 @@ public class AuxStateHandler {
 		Constraint prevState = vi.getState().substituteVariable(name, instanceName);
 		List<ObjectState> los = f.getAllStates();
 		boolean found = false;
-		for (int i = 0; i < los.size() && !found; i++) {
+		for (int i = 0; i < los.size() && !found; i++) {//TODO: only working for 1 state annotation
 			ObjectState os = los.get(i);
 			if(os.hasFrom()) {
 				Constraint expectState = os.getFrom().substituteVariable(tc.THIS, instanceName); 
@@ -127,6 +129,7 @@ public class AuxStateHandler {
 				if(found && os.hasTo()) {
 						String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
 						Constraint transitionedState = os.getTo().substituteVariable(tc.THIS, newInstanceName);
+						transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
 						addInstanceWithState(tc, name, newInstanceName, vi, transitionedState);
 						return transitionedState;
 					
@@ -142,6 +145,11 @@ public class AuxStateHandler {
 		return new Predicate();
 	}
 	
+
+	private static Constraint checkOldMentions(Constraint transitionedState, String instanceName,
+			String newInstanceName) {
+		return transitionedState.changeOldMentions(instanceName, newInstanceName);
+	}
 
 	/**
 	 * Copies the previous state to the new variable instance

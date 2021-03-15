@@ -56,4 +56,10 @@ public class Implication extends Constraint{
 		return false;
 	}
 
+	@Override
+	public Constraint changeOldMentions(String previousName, String newName) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

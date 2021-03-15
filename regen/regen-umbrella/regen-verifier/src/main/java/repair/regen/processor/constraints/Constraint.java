@@ -13,6 +13,7 @@ public abstract class Constraint {
 	public abstract String toString();
 	public abstract Expression getExpression();
 	public abstract boolean isBooleanTrue();
+	public abstract Constraint changeOldMentions(String previousName, String newName);
 	
 
 }

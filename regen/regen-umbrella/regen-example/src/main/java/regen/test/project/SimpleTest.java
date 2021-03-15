@@ -17,7 +17,8 @@ public class SimpleTest {
 		Order o = new Order();
 		o.addItem("shirt", 5)
 		 .addItem("shirt", 10)
-		 .pay(55);
+		 .addItem("h", 20)
+		 .hasThree();
 //		 .addItem("h", 6);
 
 	}

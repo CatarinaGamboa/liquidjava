@@ -43,4 +43,7 @@ public class ExpressionGroup extends Expression implements IModel {
 	public void getVariableNames(List<String> l) {
 		e.getVariableNames(l);
 	}
+	public void setExpression(Expression e2) {
+		e = e2;
+	}
 }

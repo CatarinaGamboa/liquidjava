@@ -27,7 +27,7 @@ package regen.test.project;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         regen.test.project.Order o = new regen.test.project.Order();
-        o.addItem("shirt", 5).addItem("shirt", 10).pay(55);
+        o.addItem("shirt", 5).addItem("shirt", 10).addItem("h", 20).hasThree();
         // .addItem("h", 6);
     }
 }

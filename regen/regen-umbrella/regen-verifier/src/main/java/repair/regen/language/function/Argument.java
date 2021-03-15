@@ -64,4 +64,15 @@ public class Argument implements IModel{
 		
 	}
 
+	public void setExpression(int i, Expression e) {
+		if(i == 0)
+			v = e;
+		else if(fua != null)
+			fua.getArgument().setExpression(i-1, e);
+		else {
+			System.out.println("Expression index not found: "+ i);
+			assert(false);
+		}
+	}
+
 }

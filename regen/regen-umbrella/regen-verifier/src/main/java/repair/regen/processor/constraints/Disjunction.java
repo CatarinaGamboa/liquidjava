@@ -71,5 +71,12 @@ public class Disjunction extends Constraint{
 		return c1.isBooleanTrue() && c2.isBooleanTrue();
 	}
 
+	@Override
+	public Constraint changeOldMentions(String previousName, String newName) {
+		Constraint c1_ = c1.changeOldMentions(previousName, newName);
+		Constraint c2_ = c2.changeOldMentions(previousName, newName);
+		return new Disjunction(c1_, c2_);
+	}
+
 
 }
