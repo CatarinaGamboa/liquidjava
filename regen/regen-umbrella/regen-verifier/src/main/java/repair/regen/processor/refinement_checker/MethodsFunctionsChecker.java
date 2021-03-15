@@ -1,7 +1,5 @@
 package repair.regen.processor.refinement_checker;
 
-import static org.junit.Assert.assertFalse;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -9,15 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
-import repair.regen.processor.context.Context;
-import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
@@ -26,7 +21,6 @@ import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtAnnotation;
@@ -38,8 +32,6 @@ import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
-import spoon.reflect.visitor.filter.TypeFilter;
-import spoon.support.reflect.code.CtInvocationImpl;
 
 public class MethodsFunctionsChecker {
 
@@ -62,16 +54,7 @@ public class MethodsFunctionsChecker {
 			f.setClass(klass.getQualifiedName());
 		}
 		rtc.context.addFunctionToContext(f);
-		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
-		if(!an.isEmpty()) {
-			for(CtAnnotation<? extends Annotation> a: an) {
-				Map<String, CtExpression> m = a.getAllValues();
-				CtLiteral<String> from = (CtLiteral<String>)m.get("from");
-				if(from != null)
-					ErrorPrinter.printErrorConstructorFromState(c, from);
-			}
-			f.setState(an, rtc.context.getGhosts(), c);
-		}
+		AuxStateHandler.handleConstructorState(c, f, rtc.context);
 	}
 
 
@@ -80,13 +63,8 @@ public class MethodsFunctionsChecker {
 		if(exe != null) {
 			RefinedFunction f = rtc.context.getFunction(exe.getSimpleName(), 
 					exe.getDeclaringType().getQualifiedName());
-			if(f != null) {
-				List<Constraint> oc = f.getToStates();
-				if(oc.size() > 0 )//&& !oc.get(0).isBooleanTrue())
-					ctConstructorCall.putMetadata(rtc.STATE_KEY, oc.get(0));
-				else if(oc.size() > 1)
-					assertFalse("Constructor can only have one to state, not multiple", true);
-			}
+			if(f != null)
+				AuxStateHandler.constructorStateMetadata(rtc.STATE_KEY, f, ctConstructorCall);
 		}
 
 	}
@@ -111,10 +89,7 @@ public class MethodsFunctionsChecker {
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 
-		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
-		if(!an.isEmpty())
-			f.setState(an, rtc.context.getGhosts(), method);
-		
+		AuxStateHandler.handleMethodState(method, rtc.context, f);
 		if(klass != null)
 			AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
 	}
@@ -139,9 +114,7 @@ public class MethodsFunctionsChecker {
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 
-		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
-		if(!an.isEmpty())
-			f.setState(an, rtc.context.getGhosts(), method);
+		AuxStateHandler.handleMethodState(method, rtc.context, f);
 	}
 
 	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {
@@ -256,85 +229,6 @@ public class MethodsFunctionsChecker {
 
 
 
-	private void checkTargetChanges(RefinedFunction f, CtInvocation<?> invocation) {		
-		CtElement target = searchFistTarget(invocation);
-		if(target instanceof CtVariableRead<?>) {
-			CtVariableRead<?> v = (CtVariableRead<?>)target;
-			String name = v.getVariable().getSimpleName();
-			Optional<VariableInstance> ovi = rtc.context.getLastVariableInstance(name);
-			Constraint ref = new Predicate();
-			if(ovi.isPresent() && f.hasStateChange() && f.getFromStates().size()>0)
-				ref = changeState(ovi.get(), f, name, invocation);
-			if(ovi.isPresent() && !f.hasStateChange()) 
-				ref = sameState(ovi.get(), name, invocation);
-
-			invocation.putMetadata(rtc.STATE_KEY, ref);
-
-		}
-
-	}
-
-	private CtExpression searchFistTarget(CtInvocation<?> invocation) {
-		if(invocation.getTarget() instanceof CtVariableRead<?>)
-			return invocation.getTarget();
-		else if(invocation.getTarget() instanceof CtInvocation)
-			return searchFistTarget((CtInvocation)invocation.getTarget());
-		return null;
-	}
-
-	private Constraint sameState(VariableInstance variableInstance, String name, CtInvocation<?> invocation) {
-		String newInstanceName = String.format(rtc.instanceFormat, name, rtc.context.getCounter()); 
-		Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(), newInstanceName);
-		addInstanceWithState(name, newInstanceName, variableInstance, c);
-		return c;
-	}
-
-	private Constraint changeState(VariableInstance vi, RefinedFunction f, String name, CtInvocation<?> invocation) {
-		String instanceName = vi.getName();
-		Constraint prevState = vi.getState().substituteVariable(name, instanceName);
-		List<ObjectState> los = f.getAllStates();
-		boolean found = false;
-		for (int i = 0; i < los.size() && !found; i++) {
-			ObjectState os = los.get(i);
-			if(os.hasFrom()) {
-				Constraint expectState = os.getFrom().substituteVariable(rtc.THIS, instanceName); 
-				found = rtc.checkStateSMT(prevState, expectState, invocation);
-				if(found && os.hasTo()) {
-						String newInstanceName = String.format(rtc.instanceFormat, name, rtc.context.getCounter()); 
-						Constraint transitionedState = os.getTo().substituteVariable(rtc.THIS, newInstanceName);
-						addInstanceWithState(name, newInstanceName, vi, transitionedState);
-						return transitionedState;
-					
-				}
-			}
-		}
-		if(!found) {
-			System.out.println("Reached end of changeState with found false");
-			String states = los.stream().filter(p->p.hasFrom())
-										.map(p->p.getFrom().toString())
-										.collect(Collectors.joining(","));
-			ErrorPrinter.printStateMismatch(invocation, prevState, states);
-		}
-		return new Predicate();
-	}
-
-
-	private void addInstanceWithState(String superName, VariableInstance prevInstance, Constraint transitionedState) {
-		String name2 = String.format(rtc.instanceFormat, superName, rtc.context.getCounter()); 
-		VariableInstance vi2 = (VariableInstance)rtc.context.addInstanceToContext( 
-				name2, prevInstance.getType() , prevInstance.getRefinement());
-		vi2.setState(transitionedState);
-		rtc.context.addRefinementInstanceToVariable(superName, name2);
-
-	}
-	
-	private String addInstanceWithState(String superName, String name2, VariableInstance prevInstance, Constraint transitionedState) {
-		VariableInstance vi2 = (VariableInstance)rtc.context.addInstanceToContext( 
-				name2, prevInstance.getType() , prevInstance.getRefinement());
-		vi2.setState(transitionedState);
-		rtc.context.addRefinementInstanceToVariable(superName, name2);
-		return name2;
-	}
 
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
 		String ctype = m.getDeclaringClass().getCanonicalName();
@@ -358,7 +252,7 @@ public class MethodsFunctionsChecker {
 		int si = invocation.getArguments().size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
 		if(invocation.getTarget() != null) {
-			checkTargetChanges(f, invocation);
+			AuxStateHandler.checkTargetChanges(rtc, f, invocation);
 		}
 
 		if(f.allRefinementsTrue()) {
