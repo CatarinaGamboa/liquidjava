@@ -22,7 +22,8 @@ public abstract class RefinedVariable extends Refined{
 	
 	
 	public void addSuperType(CtTypeReference<?> t) {
-		supertypes.add(t);
+		if(!supertypes.contains(t))
+			supertypes.add(t);
 	}
 	
 	public List<CtTypeReference<?>> getSuperTypes(){

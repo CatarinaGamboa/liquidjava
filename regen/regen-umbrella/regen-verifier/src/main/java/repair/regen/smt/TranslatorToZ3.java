@@ -110,13 +110,13 @@ public class TranslatorToZ3 {
 			Expr param = params[i];
 			if(!s[i].equals(param.getSort())) {
 				//Look if the function type is a supertype of this
-				List<Expr> le = varSuperTypes.get(param.toString());
+				List<Expr> le = varSuperTypes.get(param.toString().replace("|", ""));
 				if(le != null)
 					for(Expr e: le) 
 						if(e.getSort().equals(s[i]))
 							params[i] = e;
 			}
-			System.out.println(params[i].toString() +":"+ params[i].getSort() );
+//			System.out.println("Expected sort"+s[i]+"; Final sort->" +params[i].toString() +":"+ params[i].getSort());
 		}
 		
 		return z3.mkApp(fd, params);

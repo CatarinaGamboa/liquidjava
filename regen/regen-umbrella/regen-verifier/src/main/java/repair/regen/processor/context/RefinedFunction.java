@@ -187,15 +187,15 @@ public class RefinedFunction extends Refined{
 	}
 
 	
-	public List<Optional<Constraint>> getFromStates() {
-		List<Optional<Constraint>> lc = new ArrayList<>();
+	public List<Constraint> getFromStates() {
+		List<Constraint> lc = new ArrayList<>();
 		for(ObjectState os : stateChange)
 			lc.add(os.getFrom());
 		return lc;
 	}
 	
-	public List<Optional<Constraint>> getToStates() {
-		List<Optional<Constraint>> lc = new ArrayList<>();
+	public List<Constraint> getToStates() {
+		List<Constraint> lc = new ArrayList<>();
 		for(ObjectState os : stateChange)
 			lc.add(os.getTo());
 		return lc;

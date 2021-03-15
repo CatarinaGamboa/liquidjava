@@ -9,6 +9,8 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
+import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.Utils;
 import repair.regen.processor.context.Variable;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
@@ -16,7 +18,7 @@ import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtTypeReference;
 
 public class AuxHierarchyRefinememtsPassage {
-	
+
 	static <R> void checkFunctionInSupertypes(CtClass<?> klass, CtMethod<R> method, RefinedFunction f ,TypeChecker tc) {
 		String name = method.getSimpleName();
 		int size = method.getParameters().size();
@@ -34,7 +36,7 @@ public class AuxHierarchyRefinememtsPassage {
 				transferRefinements(superFunction, f, method, tc);
 			}
 		}
-		
+
 	}
 
 	static void transferRefinements(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method, TypeChecker tc) {
@@ -65,7 +67,7 @@ public class AuxHierarchyRefinememtsPassage {
 			Variable superArg = superArgs.get(i);
 			Constraint argRef = arg.getRefinement();
 			Constraint superArgRef = superArg.getRefinement().substituteVariable(superArg.getName(), 
-															  super2function.get(superArg.getName()));
+					super2function.get(superArg.getName()));
 			if(argRef.isBooleanTrue())
 				arg.setRefinement(superArgRef);
 			else {
@@ -74,7 +76,7 @@ public class AuxHierarchyRefinememtsPassage {
 					ErrorPrinter.printError(method, argRef, superArgRef);
 			}
 		}
-		
+
 	}
 
 	static void transferReturnRefinement(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method, TypeChecker tc, HashMap<String, String> super2function) {
@@ -96,7 +98,7 @@ public class AuxHierarchyRefinememtsPassage {
 		}
 	}
 
-	
+
 
 	static Optional<RefinedFunction> functionInInterface(CtClass<?> klass, String simpleName, int size, TypeChecker tc) {
 		List<RefinedFunction> lrf = tc.context.getAllMethodsWithNameSize(simpleName, size);
@@ -107,19 +109,75 @@ public class AuxHierarchyRefinememtsPassage {
 		}
 		return Optional.empty();
 	}
-	
 
-	private static void transferStateRefinements(RefinedFunction superFunction, RefinedFunction function,
+
+	private static void transferStateRefinements(RefinedFunction superFunction, RefinedFunction subFunction,
 			CtMethod<?> method, TypeChecker tc) {
 		if(superFunction.hasStateChange()) {
-			if(!function.hasStateChange()) {
+			if(!subFunction.hasStateChange()) {
 				for(ObjectState o: superFunction.getAllStates())
-					function.addStates(o.clone());
+					subFunction.addStates(o.clone());
 			}else {
-				//TODO verify subtype
+				List<ObjectState> superStates = superFunction.getAllStates();
+				List<ObjectState> subStates = subFunction.getAllStates();
+				for (int i = 0; i < superStates.size(); i++) {
+					ObjectState superState = superStates.get(i);
+					ObjectState subState = subStates.get(i);
+
+					String thisName = String.format(tc.freshFormat, tc.context.getCounter());
+					createVariableInContext(thisName, tc, subFunction, superFunction);
+					
+					Constraint superConst = matchVariableNames(tc.THIS, thisName, superState.getFrom());
+					Constraint subConst = matchVariableNames(tc.THIS, thisName, superFunction, 
+							subFunction, subState.getFrom());
+
+					//fromSup <: fromSub   <==> fromSup is sub type and fromSub is expectedType
+					boolean correct = tc.checkStateSMT(superConst, subConst, method);
+					if(!correct) ErrorPrinter.printError(method, subState.getFrom(), superState.getFrom());
+					System.out.println("Came to checkStates hierarchy");
+
+					
+					superConst = matchVariableNames(tc.THIS, thisName, superState.getTo());
+					subConst = matchVariableNames(tc.THIS, thisName,superFunction, subFunction, subState.getTo());
+					//toSub <: toSup   <==> ToSub is sub type and toSup is expectedType
+					correct = tc.checkStateSMT(subConst, superConst, method);
+					if(!correct) ErrorPrinter.printError(method, subState.getTo(), superState.getTo());
+				}
 			}
 		}
+
+
+
+	}
+
+	private static void createVariableInContext(String thisName, TypeChecker tc, RefinedFunction subFunction, RefinedFunction superFunction) {
+		RefinedVariable rv  = tc.context.addVarToContext(thisName, Utils.getType(subFunction.getTargetClass(), tc.factory), 
+				new Predicate());
+		rv.addSuperType(Utils.getType(superFunction.getTargetClass(), tc.factory));//TODO: change: this only works for one superclass
 		
 	}
 
+	/**
+	 * Changes all variable names in c to match the names of superFunction
+	 * @param fromName
+	 * @param thisName
+	 * @param superFunction
+	 * @param subFunction
+	 * @param c
+	 * @return
+	 */
+	private static Constraint matchVariableNames(String fromName, String thisName, RefinedFunction superFunction,
+			RefinedFunction subFunction, Constraint c) {
+		Constraint nc = c.substituteVariable(fromName, thisName);
+		List<Variable> superArgs = superFunction.getArguments();
+		List<Variable> subArgs = subFunction.getArguments();
+		for (int i = 0; i < subArgs.size(); i++) {
+			nc.substituteVariable(subArgs.get(i).getName(), superArgs.get(i).getName());
+		}
+		return nc;
+	}
+
+	private static Constraint matchVariableNames(String fromName, String thisName, Constraint c) {
+		return c.substituteVariable(fromName, thisName);
+	}
 }

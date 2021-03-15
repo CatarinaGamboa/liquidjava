@@ -3,6 +3,7 @@ package repair.regen.processor.context;
 import java.util.Optional;
 
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 
 public class ObjectState {
 	
@@ -23,12 +24,18 @@ public class ObjectState {
 		this.to = to;
 	}
 	
-	
-	public Optional<Constraint> getFrom() {
-		return from != null? Optional.of(from):Optional.empty();
+	public boolean hasFrom() {
+		return from!=null;
 	}
-	public Optional<Constraint> getTo() {
-		return to != null? Optional.of(to):Optional.empty();
+	public boolean hasTo() {
+		return to!=null;
+	}
+	
+	public Constraint getFrom() {
+		return from != null? from:new Predicate();
+	}
+	public Constraint getTo() {
+		return to != null? to:new Predicate();
 	}
 	
 	public ObjectState clone() {

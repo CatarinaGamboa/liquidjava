@@ -1,3 +1,4 @@
+package repair.regen.classes.state_multiple_error;
 
 
 // https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
@@ -5,7 +6,7 @@
 @repair.regen.specification.StateSet({ "open", "close" })
 @repair.regen.specification.StateSet({ "alreadyRead", "nothingRead" })
 public interface InputStreamReaderRefinements {
-    @repair.regen.specification.StateRefinement(to = "open(this)")
+    @repair.regen.specification.StateRefinement(to = "open(this) && close(this)")
     public void InputStreamReader(java.io.InputStream in);
 
     @repair.regen.specification.StateRefinement(from = "open(this)", to = "open(this) && alreadyRead(this)")

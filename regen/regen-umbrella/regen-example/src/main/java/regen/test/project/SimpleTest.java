@@ -13,11 +13,16 @@ import repair.regen.specification.StateSet;
 public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
-		InputStreamReader isr = new InputStreamReader(System.in);
+//		InputStreamReader isr = new InputStreamReader(System.in);
+//		
+//		isr.close();
+//		isr.close();
+//		isr.read();
 		
-		isr.close();
-		isr.close();
-		isr.read();
+		MyBufferedInputReader b = new MyBufferedInputReader();
+		b.read();
+		b.close();
+		b.read();
 
 	}
 	

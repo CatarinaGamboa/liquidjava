@@ -79,9 +79,9 @@ public class MethodsFunctionsChecker {
 			RefinedFunction f = rtc.context.getFunction(exe.getSimpleName(), 
 					exe.getDeclaringType().getQualifiedName());
 			if(f != null) {
-				List<Optional<Constraint>> oc = f.getToStates();
-				if(oc.size() > 0 && oc.get(0).isPresent())
-					ctConstructorCall.putMetadata(rtc.STATE_KEY, oc.get(0).get());
+				List<Constraint> oc = f.getToStates();
+				if(oc.size() > 0 )//&& !oc.get(0).isBooleanTrue())
+					ctConstructorCall.putMetadata(rtc.STATE_KEY, oc.get(0));
 				else if(oc.size() > 1)
 					assertFalse("Constructor can only have one to state, not multiple", true);
 			}
@@ -109,12 +109,12 @@ public class MethodsFunctionsChecker {
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 
-		if(klass != null)
-			AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
-
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(!an.isEmpty())
 			f.setState(an, rtc.context.getGhosts(), method);
+		
+		if(klass != null)
+			AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
 	}
 
 
@@ -283,11 +283,11 @@ public class MethodsFunctionsChecker {
 		boolean found = false;
 		for (int i = 0; i < los.size() && !found; i++) {
 			ObjectState os = los.get(i);
-			if(os.getFrom().isPresent()) {
-				Constraint expectState = os.getFrom().get().substituteVariable(rtc.THIS, name); 
+			if(os.hasFrom()) {
+				Constraint expectState = os.getFrom().substituteVariable(rtc.THIS, name); 
 				found = rtc.checkStateSMT(prevState, expectState, invocation);
-				if(found && os.getTo().isPresent()) {
-						Constraint transitionedState = os.getTo().get().substituteVariable(rtc.THIS, name);
+				if(found && os.hasTo()) {
+						Constraint transitionedState = os.getTo().substituteVariable(rtc.THIS, name);
 						addInstanceWithState(name, vi, transitionedState);
 						return transitionedState;
 					
@@ -296,10 +296,9 @@ public class MethodsFunctionsChecker {
 		}
 		if(!found) {
 			System.out.println("Reached end of changeState with found false");
-			String states = los.stream().map(p->p.getFrom())
-											   .filter(p->p.isPresent())
-											   .map(p->p.get().toString())
-											   .collect(Collectors.joining(","));
+			String states = los.stream().filter(p->p.hasFrom())
+										.map(p->p.getFrom().toString())
+										.collect(Collectors.joining(","));
 			ErrorPrinter.printStateMismatch(invocation, prevState, states);
 		}
 		return new Predicate();
