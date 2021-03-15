@@ -63,8 +63,12 @@ public class MethodsFunctionsChecker {
 		if(exe != null) {
 			RefinedFunction f = rtc.context.getFunction(exe.getSimpleName(), 
 					exe.getDeclaringType().getQualifiedName());
-			if(f != null)
+			if(f != null) {
+				checkInvocationRefinements(ctConstructorCall, ctConstructorCall.getArguments(), ctConstructorCall.getTarget(), 
+						f.getName(), f.getTargetClass());
 				AuxStateHandler.constructorStateMetadata(rtc.STATE_KEY, rtc.REFINE_KEY, f, ctConstructorCall);
+				
+			}
 		}
 
 	}
@@ -210,7 +214,8 @@ public class MethodsFunctionsChecker {
 			String ctype = ((CtClass)method.getParent()).getQualifiedName();
 			RefinedFunction f = rtc.context.getFunction(method.getSimpleName(), ctype);
 			if(f != null) {//inside rtc.context
-				checkInvocationRefinements(invocation, method.getSimpleName(), ctype);
+				checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), 
+						method.getSimpleName(), ctype);
 
 			}else {
 				CtExecutable cet = invocation.getExecutable().getDeclaration();
@@ -233,35 +238,37 @@ public class MethodsFunctionsChecker {
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
 		String ctype = m.getDeclaringClass().getCanonicalName();
 		if(rtc.context.getFunction(m.getName(),ctype) != null) {//inside rtc.context
-			checkInvocationRefinements(invocation, m.getName(), ctype);
+			checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(),
+					m.getName(), ctype);
 			return;
 		}else {
 			String name = m.getName();
 			String prefix = m.getDeclaringClass().getCanonicalName();
 			String completeName = String.format("%s.%s", prefix, name);
 			if(rtc.context.getFunction(completeName, ctype) != null) {
-				checkInvocationRefinements(invocation, completeName, ctype);
+				checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(),
+						completeName, ctype);
 			}
 
 		}
 
 	}
 
-	private <R> void checkInvocationRefinements(CtInvocation<R> invocation, String methodName, String className) {
-		//		invocation.getTarget().getType().toString()
-		int si = invocation.getArguments().size();
+	private <R> void checkInvocationRefinements(CtElement element, List<CtExpression<?>> arguments, CtExpression<?> target,
+			String methodName, String className) {
+		int si = arguments.size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
-		if(invocation.getTarget() != null) {
-			AuxStateHandler.checkTargetChanges(rtc, f, invocation);
+		if(target!= null) {
+			AuxStateHandler.checkTargetChanges(rtc, f, element);
 		}
 
 		if(f.allRefinementsTrue()) {
-			invocation.putMetadata(rtc.REFINE_KEY, new Predicate());
+			element.putMetadata(rtc.REFINE_KEY, new Predicate());
 			return;
 		}
-		Map<String,String> map = mapInvocation(invocation, f);
+		Map<String,String> map = mapInvocation(arguments, f);
 
-		checkParameters(invocation, f, map);
+		checkParameters(element, arguments, f, map);
 
 		Constraint methodRef = f.getRefReturn(); 
 		if(methodRef != null) {
@@ -269,15 +276,15 @@ public class MethodsFunctionsChecker {
 			for(String s:vars) 
 				if(map.containsKey(s))
 					methodRef = methodRef.substituteVariable(s, map.get(s));
-			invocation.putMetadata(rtc.REFINE_KEY, methodRef);
+			element.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
 
 
 	}
 
-	private <R> Map<String, String> mapInvocation(CtInvocation<R> invocation, RefinedFunction f){
+	private <R> Map<String, String> mapInvocation(List<CtExpression<?>> arguments, RefinedFunction f){
 		Map<String, String> mapInvocation = new HashMap<>();
-		List<CtExpression<?>> invocationParams = invocation.getArguments();
+		List<CtExpression<?>> invocationParams = arguments;
 		List<Variable> functionParams = f.getArguments();
 		for (int i = 0; i < invocationParams.size(); i++) {
 			Variable fArg = functionParams.get(i);
@@ -315,8 +322,8 @@ public class MethodsFunctionsChecker {
 		return nVar;
 	}
 
-	private <R> void checkParameters(CtInvocation<R> invocation, RefinedFunction f, Map<String, String> map) {	
-		List<CtExpression<?>> invocationParams = invocation.getArguments();
+	private <R> void checkParameters(CtElement invocation, List<CtExpression<?>> arguments, RefinedFunction f, Map<String, String> map) {	
+		List<CtExpression<?>> invocationParams = arguments;
 		List<Variable> functionParams = f.getArguments();
 		for (int i = 0; i < invocationParams.size(); i++) {
 			Variable fArg = functionParams.get(i);

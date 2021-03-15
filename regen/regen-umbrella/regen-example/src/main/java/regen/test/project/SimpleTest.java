@@ -4,7 +4,9 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.spi.FileSystemProvider;
+import java.util.ArrayList;
 
+import bufferedreader.Order;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
@@ -14,11 +16,15 @@ public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
 
-		Order o = new Order();
-		o.addItem("shirt", 5)
-		 .addItem("shirt", 10)
-		 .addItem("h", 20)
-		 .hasThree();
+		@Refinement("size(al) < 4")
+		ArrayList al = new ArrayList<>();
+		
+		
+//		Order o = new Order();
+//		o.addItem("shirt", 5)
+//		 .addItem("shirt", 10)
+//		 .addItem("h", 20)
+//		 .hasThree();
 //		 .addItem("h", 6);
 
 	}

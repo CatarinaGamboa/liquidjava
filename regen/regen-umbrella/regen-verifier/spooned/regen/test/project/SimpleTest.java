@@ -26,8 +26,13 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        regen.test.project.Order o = new regen.test.project.Order();
-        o.addItem("shirt", 5).addItem("shirt", 10).addItem("h", 20).hasThree();
+        @repair.regen.specification.Refinement("size(al) < 4")
+        java.util.ArrayList al = new java.util.ArrayList<>();
+        // Order o = new Order();
+        // o.addItem("shirt", 5)
+        // .addItem("shirt", 10)
+        // .addItem("h", 20)
+        // .hasThree();
         // .addItem("h", 6);
     }
 }

@@ -1,4 +1,4 @@
-package regen.test.project;
+package bufferedreader;
 
 
 
@@ -8,7 +8,6 @@ import repair.regen.specification.StateSet;
 @StateSet({"empty","addingItems", "checkout", "closed"})
 public class Order {
 	@RefinementPredicate("int countItems(Order o)")
-	@RefinementPredicate("int total(Order o)")
 	@StateRefinement(to="(countItems(this) == 0) && empty(this)")
 	public Order() {}
 	

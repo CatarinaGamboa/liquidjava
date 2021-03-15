@@ -99,7 +99,8 @@ public class AuxStateHandler {
 	 * @param f
 	 * @param invocation
 	 */
-	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtInvocation<?> invocation) {		
+	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtElement invocation) {
+		CtConstructorCall<?> ctConstructorCall = null;
 		CtElement target = searchFistTarget(invocation);
 		if(target instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)target;
@@ -128,7 +129,7 @@ public class AuxStateHandler {
 	 * @param invocation
 	 * @return
 	 */
-	private static Constraint changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name, CtInvocation<?> invocation) {
+	private static Constraint changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name, CtElement invocation) {
 		if(vi.getState() == null)
 			return new Predicate();
 		String instanceName = vi.getName();
@@ -173,7 +174,7 @@ public class AuxStateHandler {
 	 * @param invocation
 	 * @return
 	 */
-	private static Constraint sameState(TypeChecker tc, VariableInstance variableInstance, String name, CtInvocation<?> invocation) {
+	private static Constraint sameState(TypeChecker tc, VariableInstance variableInstance, String name, CtElement invocation) {
 		if(variableInstance.getState() != null) {
 			String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
 			Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(), newInstanceName);
@@ -208,11 +209,11 @@ public class AuxStateHandler {
 	 * @param invocation
 	 * @return
 	 */
-	static CtExpression searchFistTarget(CtInvocation<?> invocation) {
-		if(invocation.getTarget() instanceof CtVariableRead<?>)
-			return invocation.getTarget();
-		else if(invocation.getTarget() instanceof CtInvocation)
-			return searchFistTarget((CtInvocation)invocation.getTarget());
+	static CtExpression<?> searchFistTarget(CtElement invocation) {
+		if(invocation instanceof CtInvocation<?>)
+			return searchFistTarget(((CtInvocation<?>)invocation).getTarget());
+		else if(invocation instanceof CtVariableRead<?>)
+			return (CtVariableRead<?>)invocation;
 		return null;
 	}
 
