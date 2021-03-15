@@ -1,3 +1,4 @@
+package regen.test.project;
 
 
 
@@ -12,7 +13,8 @@ public class Order {
 	
 //	@StateRefinement(from="addingItems(this) || empty(this)", 
 //			to="(priceNow(this) == (priceNow(old(this)) + price)) && addingItems(this)")
-	@StateRefinement(from="addingItems(this) || empty(this)", to="addingItems(this)")
+	@StateRefinement(from="empty(this)", to="addingItems(this)")
+	@StateRefinement(from="addingItems(this)", to="addingItems(this)")
 	public Order addItem(String itemName, int price) {		
 		return this;
 	}

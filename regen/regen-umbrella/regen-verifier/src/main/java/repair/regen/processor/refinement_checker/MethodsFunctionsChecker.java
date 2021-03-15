@@ -38,6 +38,8 @@ import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
+import spoon.reflect.visitor.filter.TypeFilter;
+import spoon.support.reflect.code.CtInvocationImpl;
 
 public class MethodsFunctionsChecker {
 
@@ -254,7 +256,8 @@ public class MethodsFunctionsChecker {
 
 
 
-	private void checkTargetChanges(CtExpression<?> target, RefinedFunction f, CtInvocation<?> invocation) {		
+	private void checkTargetChanges(RefinedFunction f, CtInvocation<?> invocation) {		
+		CtElement target = searchFistTarget(invocation);
 		if(target instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)target;
 			String name = v.getVariable().getSimpleName();
@@ -271,24 +274,35 @@ public class MethodsFunctionsChecker {
 
 	}
 
+	private CtExpression searchFistTarget(CtInvocation<?> invocation) {
+		if(invocation.getTarget() instanceof CtVariableRead<?>)
+			return invocation.getTarget();
+		else if(invocation.getTarget() instanceof CtInvocation)
+			return searchFistTarget((CtInvocation)invocation.getTarget());
+		return null;
+	}
+
 	private Constraint sameState(VariableInstance variableInstance, String name, CtInvocation<?> invocation) {
-		Constraint c = variableInstance.getState();
-		addInstanceWithState(name, variableInstance, c);
+		String newInstanceName = String.format(rtc.instanceFormat, name, rtc.context.getCounter()); 
+		Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(), newInstanceName);
+		addInstanceWithState(name, newInstanceName, variableInstance, c);
 		return c;
 	}
 
 	private Constraint changeState(VariableInstance vi, RefinedFunction f, String name, CtInvocation<?> invocation) {
-		Constraint prevState = vi.getState();
+		String instanceName = vi.getName();
+		Constraint prevState = vi.getState().substituteVariable(name, instanceName);
 		List<ObjectState> los = f.getAllStates();
 		boolean found = false;
 		for (int i = 0; i < los.size() && !found; i++) {
 			ObjectState os = los.get(i);
 			if(os.hasFrom()) {
-				Constraint expectState = os.getFrom().substituteVariable(rtc.THIS, name); 
+				Constraint expectState = os.getFrom().substituteVariable(rtc.THIS, instanceName); 
 				found = rtc.checkStateSMT(prevState, expectState, invocation);
 				if(found && os.hasTo()) {
-						Constraint transitionedState = os.getTo().substituteVariable(rtc.THIS, name);
-						addInstanceWithState(name, vi, transitionedState);
+						String newInstanceName = String.format(rtc.instanceFormat, name, rtc.context.getCounter()); 
+						Constraint transitionedState = os.getTo().substituteVariable(rtc.THIS, newInstanceName);
+						addInstanceWithState(name, newInstanceName, vi, transitionedState);
 						return transitionedState;
 					
 				}
@@ -304,12 +318,22 @@ public class MethodsFunctionsChecker {
 		return new Predicate();
 	}
 
+
 	private void addInstanceWithState(String superName, VariableInstance prevInstance, Constraint transitionedState) {
 		String name2 = String.format(rtc.instanceFormat, superName, rtc.context.getCounter()); 
 		VariableInstance vi2 = (VariableInstance)rtc.context.addInstanceToContext( 
 				name2, prevInstance.getType() , prevInstance.getRefinement());
 		vi2.setState(transitionedState);
 		rtc.context.addRefinementInstanceToVariable(superName, name2);
+
+	}
+	
+	private String addInstanceWithState(String superName, String name2, VariableInstance prevInstance, Constraint transitionedState) {
+		VariableInstance vi2 = (VariableInstance)rtc.context.addInstanceToContext( 
+				name2, prevInstance.getType() , prevInstance.getRefinement());
+		vi2.setState(transitionedState);
+		rtc.context.addRefinementInstanceToVariable(superName, name2);
+		return name2;
 	}
 
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
@@ -334,7 +358,7 @@ public class MethodsFunctionsChecker {
 		int si = invocation.getArguments().size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
 		if(invocation.getTarget() != null) {
-			checkTargetChanges(invocation.getTarget(), f, invocation);
+			checkTargetChanges(f, invocation);
 		}
 
 		if(f.allRefinementsTrue()) {

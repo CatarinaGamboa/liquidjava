@@ -26,15 +26,9 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        // InputStreamReader isr = new InputStreamReader(System.in);
-        // 
-        // isr.close();
-        // isr.close();
-        // isr.read();
-        regen.test.project.MyBufferedInputReader b = new regen.test.project.MyBufferedInputReader();
-        b.read();
-        b.close();
-        b.read();
+        regen.test.project.Order o = new regen.test.project.Order();
+        o.addItem("shirt", 5).addItem("shirt", 10).pay(55);
+        // .addItem("h", 6);
     }
 }
 
