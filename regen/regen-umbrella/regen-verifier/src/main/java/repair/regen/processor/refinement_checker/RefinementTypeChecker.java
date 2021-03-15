@@ -162,7 +162,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable);
 
-			addStateRefinements(varName, e);
+			AuxStateHandler.addStateRefinements(context, STATE_KEY, THIS, varName, e);
 		}
 	}
 
@@ -571,16 +571,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	}
 
-	private void addStateRefinements(String varName, CtExpression<?> e) {
-		Optional<VariableInstance> vi = context.getLastVariableInstance(varName);
-		if(vi.isPresent() && e.getMetadata(STATE_KEY) != null) {
-			Constraint c = (Constraint)e.getMetadata(STATE_KEY);
-			c = c.substituteVariable("this", varName);
-			vi.get().setState(c);
-		}
-	}
-
-
 	@Override
 	public <T> void visitCtNewClass(CtNewClass<T> newClass) {
 		super.visitCtNewClass(newClass);
@@ -595,7 +585,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	@Override
 	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		return vcChecker.smtChecks(prevState, expectedState, target);
+		return vcChecker.processSubtyping(prevState, expectedState, target);
 	}
 
 

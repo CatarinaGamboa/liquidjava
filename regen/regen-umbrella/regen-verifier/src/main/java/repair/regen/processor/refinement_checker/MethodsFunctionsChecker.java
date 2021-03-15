@@ -64,7 +64,7 @@ public class MethodsFunctionsChecker {
 			RefinedFunction f = rtc.context.getFunction(exe.getSimpleName(), 
 					exe.getDeclaringType().getQualifiedName());
 			if(f != null)
-				AuxStateHandler.constructorStateMetadata(rtc.STATE_KEY, f, ctConstructorCall);
+				AuxStateHandler.constructorStateMetadata(rtc.STATE_KEY, rtc.REFINE_KEY, f, ctConstructorCall);
 		}
 
 	}

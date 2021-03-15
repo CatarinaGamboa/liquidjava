@@ -28,6 +28,19 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
 
 public class AuxStateHandler {
+	
+
+	public static void addStateRefinements(Context context, String state_key, String this_key, String varName, CtExpression<?> e) {
+		Optional<VariableInstance> ovi = context.getLastVariableInstance(varName);
+		if(ovi.isPresent() && e.getMetadata(state_key) != null) {
+			VariableInstance vi = ovi.get(); 
+			Constraint c = (Constraint)e.getMetadata(state_key);
+			c = c.substituteVariable(this_key, vi.getName());
+			vi.setState(c);
+			vi.setRefinement(c);
+		}
+	}
+
 
 	/**
 	 * Handles the passage of the written state annotations to the context for Constructors
@@ -70,11 +83,12 @@ public class AuxStateHandler {
 	 * @param f
 	 * @param ctConstructorCall
 	 */
-	public static void constructorStateMetadata(String key, RefinedFunction f, CtConstructorCall<?> ctConstructorCall) {
+	public static void constructorStateMetadata(String stateKey, String refKey, RefinedFunction f, CtConstructorCall<?> ctConstructorCall) {
 		List<Constraint> oc = f.getToStates();
-		if(oc.size() > 0 )//&& !oc.get(0).isBooleanTrue())
-			ctConstructorCall.putMetadata(key, oc.get(0));
-		else if(oc.size() > 1)
+		if(oc.size() > 0 ){//&& !oc.get(0).isBooleanTrue())
+			ctConstructorCall.putMetadata(stateKey, oc.get(0));
+			ctConstructorCall.putMetadata(refKey, oc.get(0));
+		}else if(oc.size() > 1)
 			assertFalse("Constructor can only have one to state, not multiple", true);
 		
 	}
@@ -183,6 +197,7 @@ public class AuxStateHandler {
 		VariableInstance vi2 = (VariableInstance)tc.context.addInstanceToContext( 
 				name2, prevInstance.getType() , prevInstance.getRefinement());
 		vi2.setState(transitionedState);
+		vi2.setRefinement(transitionedState);
 		tc.context.addRefinementInstanceToVariable(superName, name2);
 		return name2;
 	}

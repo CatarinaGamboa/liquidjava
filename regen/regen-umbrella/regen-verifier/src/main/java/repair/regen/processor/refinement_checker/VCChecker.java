@@ -35,8 +35,16 @@ public class VCChecker {
 		smtChecking(premises, expectedType, element);
 	}
 
-	public void processSubtyping(Constraint type, Constraint expectedType, CtElement element) {
-		smtChecking(type, expectedType, element);
+	public boolean processSubtyping(Constraint type, Constraint expectedType, CtElement element) {
+		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
+		gatherVariables(expectedType, lrv, mainVars);
+		gatherVariables(type, lrv, mainVars);
+		if(expectedType.isBooleanTrue())
+			return true;
+
+		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
+//		premises = Conjunction.createConjunction(premises, joinConstraints(type, element, mainVars, lrv));
+		return smtChecks(premises, expectedType, element);
 	}
 
 	private Constraint joinConstraints(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 
@@ -73,7 +81,8 @@ public class VCChecker {
 		for(String s: expectedType.getVariableNames()) {
 			if(context.hasVariable(s)) {
 				RefinedVariable rv = context.getVariableByName(s);
-				mainVars.add(rv);
+				if(!mainVars.contains(rv))
+					mainVars.add(rv);
 				List<RefinedVariable> lm = getVariables(rv.getMainRefinement(), rv.getName());
 				addAllDiferent(lrv, lm);
 			}
