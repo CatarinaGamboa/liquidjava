@@ -27,7 +27,12 @@ package regen.test.project;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         @repair.regen.specification.Refinement("size(al) < 4")
-        java.util.ArrayList al = new java.util.ArrayList<>();
+        java.util.ArrayList<java.lang.Integer> al = new java.util.ArrayList<java.lang.Integer>();
+        al.add(1);
+        al.add(1);
+        al.add(1);
+        @repair.regen.specification.Refinement("size(t) == 3")
+        java.util.ArrayList<java.lang.Integer> t = ((java.util.ArrayList<java.lang.Integer>) (al.clone()));
         // Order o = new Order();
         // o.addItem("shirt", 5)
         // .addItem("shirt", 10)

@@ -101,7 +101,7 @@ public class AuxStateHandler {
 	 */
 	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtElement invocation) {
 		CtConstructorCall<?> ctConstructorCall = null;
-		CtElement target = searchFistTarget(invocation);
+		CtElement target = searchFistVariableTarget(invocation);
 		if(target instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)target;
 			String name = v.getVariable().getSimpleName();
@@ -209,9 +209,9 @@ public class AuxStateHandler {
 	 * @param invocation
 	 * @return
 	 */
-	static CtExpression<?> searchFistTarget(CtElement invocation) {
+	static CtExpression<?> searchFistVariableTarget(CtElement invocation) {
 		if(invocation instanceof CtInvocation<?>)
-			return searchFistTarget(((CtInvocation<?>)invocation).getTarget());
+			return searchFistVariableTarget(((CtInvocation<?>)invocation).getTarget());
 		else if(invocation instanceof CtVariableRead<?>)
 			return (CtVariableRead<?>)invocation;
 		return null;

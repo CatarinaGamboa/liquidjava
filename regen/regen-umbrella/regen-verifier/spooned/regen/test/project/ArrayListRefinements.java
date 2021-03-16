@@ -10,7 +10,7 @@ public interface ArrayListRefinements<E> {
     @repair.regen.specification.Refinement("size(this) == (size(old(this)) + 1)")
     public void add(E e);
 
-    @repair.regen.specification.Refinement("size(_) == size(this)")
+    @repair.regen.specification.Refinement("_ == size(this)")
     public java.lang.Object clone();
 }
 

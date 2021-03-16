@@ -17,7 +17,13 @@ public class SimpleTest {
 	public static void main(String[] args) throws IOException{
 
 		@Refinement("size(al) < 4")
-		ArrayList al = new ArrayList<>();
+		ArrayList<Integer> al = new ArrayList<Integer>();
+		al.add(1);
+		al.add(1);
+		al.add(1);
+		
+		@Refinement("size(t) == 3")
+		ArrayList<Integer> t = (ArrayList<Integer>) al.clone();
 		
 		
 //		Order o = new Order();

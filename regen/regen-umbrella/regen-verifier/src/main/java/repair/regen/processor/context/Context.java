@@ -312,10 +312,10 @@ public class Context {
 		return lvi;
 	}
 
-	public void addRefinementInstanceToVariable(String name, String name2) {
+	public void addRefinementInstanceToVariable(String name, String instanceName) {
 		RefinedVariable vi1 = getVariableByName(name);
-		RefinedVariable vi2 = getVariableByName(name2);
-		if(!hasVariable(name) || !hasVariable(name2) || 
+		RefinedVariable vi2 = getVariableByName(instanceName);
+		if(!hasVariable(name) || !hasVariable(instanceName) || 
 				!(vi1 instanceof Variable && vi2 instanceof VariableInstance)) return;
 		
 		((Variable)vi1).addInstance((VariableInstance) vi2);

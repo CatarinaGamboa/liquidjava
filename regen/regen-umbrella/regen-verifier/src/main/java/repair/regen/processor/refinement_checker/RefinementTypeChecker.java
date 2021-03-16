@@ -467,13 +467,20 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type, CtElement variable) {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
-		Constraint cEt = expectedType.isPresent()?expectedType.get():new Predicate();
-
+		Constraint cEt;
+		if(expectedType.isPresent())
+			cEt = expectedType.get();
+		else if(context.hasVariable(simpleName))
+			cEt = context.getVariableByName(simpleName).getMainRefinement();
+		else
+			cEt = new Predicate();
+		
 		cEt = cEt.substituteVariable(WILD_VAR, simpleName);
 		Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
 
 		String newName = String.format(instanceFormat, simpleName, context.getCounter());
 		Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
+		correctNewRefinement = refinementFound.substituteVariable(THIS, newName);
 		cEt = cEt.substituteVariable(simpleName, newName);
 
 		//Substitute variable in verification

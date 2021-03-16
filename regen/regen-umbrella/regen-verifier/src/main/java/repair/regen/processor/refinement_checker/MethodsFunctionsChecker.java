@@ -31,7 +31,9 @@ import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
+import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtExecutableReference;
+import spoon.reflect.reference.CtVariableReference;
 
 public class MethodsFunctionsChecker {
 
@@ -258,10 +260,6 @@ public class MethodsFunctionsChecker {
 			String methodName, String className) {
 		int si = arguments.size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
-		if(target!= null) {
-			AuxStateHandler.checkTargetChanges(rtc, f, element);
-		}
-
 		if(f.allRefinementsTrue()) {
 			element.putMetadata(rtc.REFINE_KEY, new Predicate());
 			return;
@@ -278,8 +276,32 @@ public class MethodsFunctionsChecker {
 					methodRef = methodRef.substituteVariable(s, map.get(s));
 			element.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
+		
+		if(target!= null) {
+			AuxStateHandler.checkTargetChanges(rtc, f, element);
+			checkTargetInstance(element, methodRef, target);
+			
+		}
 
 
+	}
+
+	private void checkTargetInstance(CtElement element, Constraint methodRef, CtExpression<?> target) {
+		CtElement t = AuxStateHandler.searchFistVariableTarget(target);
+		if(t instanceof CtVariableRead<?> && methodRef != null) {
+			CtVariableRead<?> cvr = (CtVariableRead<?>)t;
+			CtVariableReference<?> v = cvr.getVariable();
+//			String name = String.format(rtc.instanceFormat, v.getSimpleName(), rtc.context.getCounter());
+			Constraint c = methodRef;
+			Optional<VariableInstance> ovi = rtc.context.getLastVariableInstance(v.getSimpleName());
+			if(ovi.isPresent())
+				c = c.changeOldMentions(ovi.get().getName(), v.getSimpleName());
+//			rtc.context.addVarToContext(name, v.getType(), c);
+//			rtc.context.addRefinementInstanceToVariable(v.getSimpleName(), name);
+//			RefinedVariable rv = rtc.context.getVariableByName(v.getSimpleName());
+//			rtc.checkSMT(rv.getMainRefinement(), element);
+			rtc.checkVariableRefinements(c, v.getSimpleName(), v.getType(), element);
+		}
 	}
 
 	private <R> Map<String, String> mapInvocation(List<CtExpression<?>> arguments, RefinedFunction f){

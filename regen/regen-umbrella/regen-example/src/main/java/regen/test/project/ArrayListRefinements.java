@@ -13,8 +13,8 @@ public interface ArrayListRefinements <E>{
 	@Refinement("size(this) == (size(old(this)) + 1)")
 	public void add(E e);
 	
-	@Refinement("size(_) == size(this)")
-	public Object clone();
+//	@Refinement("size(_) == size(this)")
+//	public Object clone();
 	
 
 }
