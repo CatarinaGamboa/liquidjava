@@ -22,8 +22,10 @@ public class SimpleTest {
 		al.add(1);
 		al.add(1);
 		
+		
 		@Refinement("size(t) == 3")
-		ArrayList<Integer> t = (ArrayList<Integer>) al.clone();
+		ArrayList<Integer> t = al;
+		
 		
 		
 //		Order o = new Order();

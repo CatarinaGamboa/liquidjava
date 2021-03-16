@@ -260,6 +260,9 @@ public class MethodsFunctionsChecker {
 			String methodName, String className) {
 		int si = arguments.size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
+		if(target!= null) {
+			AuxStateHandler.checkTargetChanges(rtc, f, element);	
+		}
 		if(f.allRefinementsTrue()) {
 			element.putMetadata(rtc.REFINE_KEY, new Predicate());
 			return;
@@ -275,13 +278,13 @@ public class MethodsFunctionsChecker {
 				if(map.containsKey(s))
 					methodRef = methodRef.substituteVariable(s, map.get(s));
 			element.putMetadata(rtc.REFINE_KEY, methodRef);
+			
+			if(target!= null) {
+				checkTargetInstance(element, methodRef, target);
+			}
 		}
 		
-		if(target!= null) {
-			AuxStateHandler.checkTargetChanges(rtc, f, element);
-			checkTargetInstance(element, methodRef, target);
-			
-		}
+		
 
 
 	}
@@ -291,15 +294,10 @@ public class MethodsFunctionsChecker {
 		if(t instanceof CtVariableRead<?> && methodRef != null) {
 			CtVariableRead<?> cvr = (CtVariableRead<?>)t;
 			CtVariableReference<?> v = cvr.getVariable();
-//			String name = String.format(rtc.instanceFormat, v.getSimpleName(), rtc.context.getCounter());
 			Constraint c = methodRef;
 			Optional<VariableInstance> ovi = rtc.context.getLastVariableInstance(v.getSimpleName());
 			if(ovi.isPresent())
 				c = c.changeOldMentions(ovi.get().getName(), v.getSimpleName());
-//			rtc.context.addVarToContext(name, v.getType(), c);
-//			rtc.context.addRefinementInstanceToVariable(v.getSimpleName(), name);
-//			RefinedVariable rv = rtc.context.getVariableByName(v.getSimpleName());
-//			rtc.checkSMT(rv.getMainRefinement(), element);
 			rtc.checkVariableRefinements(c, v.getSimpleName(), v.getType(), element);
 		}
 	}

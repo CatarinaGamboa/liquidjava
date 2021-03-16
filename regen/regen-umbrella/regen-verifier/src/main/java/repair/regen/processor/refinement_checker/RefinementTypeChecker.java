@@ -480,7 +480,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 		String newName = String.format(instanceFormat, simpleName, context.getCounter());
 		Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
-		correctNewRefinement = refinementFound.substituteVariable(THIS, newName);
+		correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
 		cEt = cEt.substituteVariable(simpleName, newName);
 
 		//Substitute variable in verification

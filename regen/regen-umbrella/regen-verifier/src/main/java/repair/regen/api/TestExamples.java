@@ -221,6 +221,11 @@ public class TestExamples {
 		testCorrect(testPath+"/classes/state_multiple_cases");
 	}
 	
+	@Test
+	public void correctArrayListSize() {
+		testCorrect(testPath+"/classes/arraylist_correct");
+	}
+	
 //	@Test
 //	public void correctInputReaderCharArrayLongerNameEve() {
 //		testCorrect(testPath+"/classes/input_reader_correct");

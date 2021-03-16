@@ -32,7 +32,7 @@ public class SimpleTest {
         al.add(1);
         al.add(1);
         @repair.regen.specification.Refinement("size(t) == 3")
-        java.util.ArrayList<java.lang.Integer> t = ((java.util.ArrayList<java.lang.Integer>) (al.clone()));
+        java.util.ArrayList<java.lang.Integer> t = al;
         // Order o = new Order();
         // o.addItem("shirt", 5)
         // .addItem("shirt", 10)

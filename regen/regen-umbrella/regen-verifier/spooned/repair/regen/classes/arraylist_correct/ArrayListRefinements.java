@@ -1,4 +1,4 @@
-package regen.test.project;
+package repair.regen.classes.arraylist_correct;
 
 
 // @Refinement("size(_) == size(this)")
