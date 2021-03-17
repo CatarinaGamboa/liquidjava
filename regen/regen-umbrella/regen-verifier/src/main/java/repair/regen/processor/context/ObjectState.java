@@ -42,4 +42,10 @@ public class ObjectState {
 		return new ObjectState(from.clone(), to.clone());
 	}
 
+	@Override
+	public String toString() {
+		return "ObjectState [from=" + from + ", to=" + to + "]";
+	}
+
+	
 }
