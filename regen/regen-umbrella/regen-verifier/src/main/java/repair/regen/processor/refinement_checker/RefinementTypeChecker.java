@@ -468,10 +468,14 @@ public class RefinementTypeChecker extends TypeChecker {
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type, CtElement variable) {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
 		Constraint cEt;
+		RefinedVariable mainRV = null;
+		if(context.hasVariable(simpleName))
+			mainRV =  context.getVariableByName(simpleName);
+		
 		if(expectedType.isPresent())
 			cEt = expectedType.get();
 		else if(context.hasVariable(simpleName))
-			cEt = context.getVariableByName(simpleName).getMainRefinement();
+			cEt = mainRV.getMainRefinement();
 		else
 			cEt = new Predicate();
 		
@@ -485,6 +489,8 @@ public class RefinementTypeChecker extends TypeChecker {
 
 		//Substitute variable in verification
 		RefinedVariable rv= context.addInstanceToContext(newName, type, correctNewRefinement);
+		for(CtTypeReference t: mainRV.getSuperTypes())
+			rv.addSuperType(t);
 		context.addRefinementInstanceToVariable(simpleName, newName);
 		//smt check
 		checkSMT(cEt, variable);//TODO CHANGE

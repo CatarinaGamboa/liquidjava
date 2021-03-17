@@ -15,24 +15,27 @@ import repair.regen.specification.StateSet;
 public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
+		
+		TrafficLight tl = new TrafficLight();
+		tl.transitionToAmber();
+		tl.transitionToFlashingAmber();
 
-		@Refinement("size(al) < 4")
-		ArrayList<Integer> al = new ArrayList<Integer>();
-		al.add(1);
-		al.add(1);
-		al.add(1);
+//		@Refinement("size(al) < 4")
+//		ArrayList<Integer> al = new ArrayList<Integer>();
+//		al.add(1);
+//		al.add(1);
+//		al.get(2);
 		
 		
-		@Refinement("size(t) == 3")
-		ArrayList<Integer> t = al;
+//		@Refinement("size(t) == 3")
+//		ArrayList<Integer> t = al;
 		
 		
-		
+//		
 //		Order o = new Order();
 //		o.addItem("shirt", 5)
 //		 .addItem("shirt", 10)
 //		 .addItem("h", 20)
-//		 .hasThree();
 //		 .addItem("h", 6);
 
 	}

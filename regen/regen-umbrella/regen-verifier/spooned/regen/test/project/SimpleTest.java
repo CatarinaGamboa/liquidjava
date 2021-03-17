@@ -26,18 +26,21 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        @repair.regen.specification.Refinement("size(al) < 4")
-        java.util.ArrayList<java.lang.Integer> al = new java.util.ArrayList<java.lang.Integer>();
-        al.add(1);
-        al.add(1);
-        al.add(1);
-        @repair.regen.specification.Refinement("size(t) == 3")
-        java.util.ArrayList<java.lang.Integer> t = al;
+        regen.test.project.TrafficLight tl = new regen.test.project.TrafficLight();
+        tl.transitionToAmber();
+        tl.transitionToFlashingAmber();
+        // @Refinement("size(al) < 4")
+        // ArrayList<Integer> al = new ArrayList<Integer>();
+        // al.add(1);
+        // al.add(1);
+        // al.get(2);
+        // @Refinement("size(t) == 3")
+        // ArrayList<Integer> t = al;
+        // 
         // Order o = new Order();
         // o.addItem("shirt", 5)
         // .addItem("shirt", 10)
         // .addItem("h", 20)
-        // .hasThree();
         // .addItem("h", 6);
     }
 }

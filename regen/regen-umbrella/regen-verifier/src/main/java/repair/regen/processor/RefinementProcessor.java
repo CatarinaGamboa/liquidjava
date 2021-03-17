@@ -6,6 +6,7 @@ import java.util.Set;
 
 import repair.regen.processor.context.Context;
 import repair.regen.processor.refinement_checker.ExternalRefinementTypeChecker;
+import repair.regen.processor.refinement_checker.MethodsFirstChecker;
 import repair.regen.processor.refinement_checker.RefinementTypeChecker;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.declaration.CtPackage;
@@ -31,6 +32,7 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
 			Context c = Context.getInstance();
 			c.reinitializeAllContext();
 			pkg.accept(new ExternalRefinementTypeChecker(c, factory));
+			pkg.accept(new MethodsFirstChecker(c, factory));
 			pkg.accept(new RefinementTypeChecker(c, factory));
 		}
 

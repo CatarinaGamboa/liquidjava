@@ -26,10 +26,10 @@ package bufferedreader;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        bufferedreader.MyBufferedInputReader b = new bufferedreader.MyBufferedInputReader();
-        b.read();
-        b.close();
-        b.read();
+        // MyBufferedInputReader b = new MyBufferedInputReader();
+        // b.read();
+        // b.close();
+        // b.read();
     }
 }
 
