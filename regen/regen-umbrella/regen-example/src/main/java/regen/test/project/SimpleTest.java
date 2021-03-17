@@ -18,7 +18,7 @@ public class SimpleTest {
 		
 		TrafficLight tl = new TrafficLight();
 		tl.transitionToAmber();
-		tl.transitionToFlashingAmber();
+//		tl.transitionToFlashingAmber();
 
 //		@Refinement("size(al) < 4")
 //		ArrayList<Integer> al = new ArrayList<Integer>();

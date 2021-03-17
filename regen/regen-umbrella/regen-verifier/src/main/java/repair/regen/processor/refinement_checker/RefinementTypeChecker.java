@@ -82,34 +82,34 @@ public class RefinementTypeChecker extends TypeChecker {
 		System.out.println("CTCLASS:"+ctClass.getSimpleName());
 		context.reinitializeContext();
 		//visitInterfaces
-		if(!ctClass.getSuperInterfaces().isEmpty())
-			for(CtTypeReference<?> t :ctClass.getSuperInterfaces()) {
-				if(t.isInterface()) {
-					CtType ct = t.getDeclaration();
-					if(ct instanceof CtInterface)				
-						visitCtInterface((CtInterface<?>) ct);
-				}
-
-			}
-		//visitSubclasses
-		CtTypeReference<?> sup = ctClass.getSuperclass();
-		if(sup != null && sup.isClass()){
-			CtType ct = sup.getDeclaration();
-			if(ct instanceof CtClass)				
-				visitCtClass((CtClass<?>) ct);
-		}
-		getRefinementFromAnnotation(ctClass);
-		handleStateSetsFromAnnotation(ctClass);
+//		if(!ctClass.getSuperInterfaces().isEmpty())
+//			for(CtTypeReference<?> t :ctClass.getSuperInterfaces()) {
+//				if(t.isInterface()) {
+//					CtType ct = t.getDeclaration();
+//					if(ct instanceof CtInterface)				
+//						visitCtInterface((CtInterface<?>) ct);
+//				}
+//
+//			}
+//		//visitSubclasses
+//		CtTypeReference<?> sup = ctClass.getSuperclass();
+//		if(sup != null && sup.isClass()){
+//			CtType ct = sup.getDeclaration();
+//			if(ct instanceof CtClass)				
+//				visitCtClass((CtClass<?>) ct);
+//		}
+//		getRefinementFromAnnotation(ctClass);
+//		handleStateSetsFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
 	}
 
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
 		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
-		if(getExternalRefinement(intrface).isPresent())
-			return;
-		getRefinementFromAnnotation(intrface);
-		handleStateSetsFromAnnotation(intrface);
+//		if(getExternalRefinement(intrface).isPresent())
+//			return;
+//		getRefinementFromAnnotation(intrface);
+//		handleStateSetsFromAnnotation(intrface);
 		super.visitCtInterface(intrface);
 	}
 
@@ -127,8 +127,8 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtConstructor(CtConstructor<T> c) {
 		context.enterContext();
-		mfc.getConstructorRefinements(c);
-		getRefinementFromAnnotation(c); 
+//		mfc.getConstructorRefinements(c);
+//		getRefinementFromAnnotation(c); 
 		super.visitCtConstructor(c);
 		context.exitContext();
 	}
@@ -136,7 +136,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	public <R> void visitCtMethod(CtMethod<R> method) {
 		context.enterContext();
-		mfc.getMethodRefinements(method);
+//		mfc.getMethodRefinements(method);
 		super.visitCtMethod(method);
 		context.exitContext();
 

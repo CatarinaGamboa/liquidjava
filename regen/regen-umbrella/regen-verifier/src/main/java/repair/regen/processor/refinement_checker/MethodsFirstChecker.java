@@ -82,46 +82,4 @@ public class MethodsFirstChecker extends TypeChecker{
 	}
 
 
-	@Override
-	protected Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element) {
-	CtClass<?> klass = null; 
-		
-		if(element.getParent() instanceof CtClass<?>) {
-			klass =(CtClass<?>) element.getParent();
-		}else if(element instanceof CtClass<?>) {
-			klass = (CtClass<?>) element;
-		}
-		if(klass != null) {
-			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
-			List<String> params = Arrays.asList(klass.getSimpleName());
-			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
-												klass.getQualifiedName(), klass.getSimpleName(), set); 
-//			context.addGhostFunction(gh);
-			System.out.println(gh.toString());
-			return Optional.of(gh);
-		}
-		return Optional.empty();
-	}
-
-	@Override
-	protected void getGhostFunction(String value, CtElement element) {//Same as in Refinement Checker
-		try {
-			Optional<FunctionDeclaration> ofd = 
-					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
-				CtClass<?> klass =(CtClass<?>) element.getParent(); 
-				GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
-				context.addGhostFunction(gh);
-				System.out.println(gh.toString());
-			}
-
-		} catch (SyntaxException e) {
-			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
-			e.printStackTrace();
-		}
-		
-	}
-
-
-
 }
