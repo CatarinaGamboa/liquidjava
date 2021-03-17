@@ -6,6 +6,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.declaration.CtClass;
+import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.factory.Factory;
@@ -21,6 +22,16 @@ public class MethodsFirstChecker extends TypeChecker{
 	public <T> void visitCtClass(CtClass<T> ctClass) {
 		System.out.println("First check on methods of:"+ctClass.getSimpleName());
 		super.visitCtClass(ctClass);
+	}
+	
+	@Override
+	public <T> void visitCtConstructor(CtConstructor<T> c) {
+		context.enterContext();
+		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
+		mfc.getConstructorRefinements(c);
+		getRefinementFromAnnotation(c); 
+		super.visitCtConstructor(c);
+		context.exitContext();
 	}
 	
 	public <R> void visitCtMethod(CtMethod<R> method) {
