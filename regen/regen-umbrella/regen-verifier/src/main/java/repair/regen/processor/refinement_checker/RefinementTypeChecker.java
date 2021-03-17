@@ -434,6 +434,14 @@ public class RefinementTypeChecker extends TypeChecker {
 		super.visitCtConstructorCall(ctConstructorCall);
 		mfc.getConstructorInvocationRefinements(ctConstructorCall);
 	}
+	
+	
+	@Override
+	public <T> void visitCtNewClass(CtNewClass<T> newClass) {
+		super.visitCtNewClass(newClass);
+		System.out.println("new class");
+	}
+
 
 
 	//############################### Inner Visitors  ##########################################
@@ -462,45 +470,6 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 
-	//############################### SMT Evaluation ##########################################
-
-	@Override
-	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type, CtElement variable) {
-		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
-		Constraint cEt;
-		RefinedVariable mainRV = null;
-		if(context.hasVariable(simpleName))
-			mainRV =  context.getVariableByName(simpleName);
-		
-		if(expectedType.isPresent())
-			cEt = expectedType.get();
-		else if(context.hasVariable(simpleName))
-			cEt = mainRV.getMainRefinement();
-		else
-			cEt = new Predicate();
-		
-		cEt = cEt.substituteVariable(WILD_VAR, simpleName);
-		Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
-
-		String newName = String.format(instanceFormat, simpleName, context.getCounter());
-		Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
-		correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
-		cEt = cEt.substituteVariable(simpleName, newName);
-
-		//Substitute variable in verification
-		RefinedVariable rv= context.addInstanceToContext(newName, type, correctNewRefinement);
-		for(CtTypeReference t: mainRV.getSuperTypes())
-			rv.addSuperType(t);
-		context.addRefinementInstanceToVariable(simpleName, newName);
-		//smt check
-		checkSMT(cEt, variable);//TODO CHANGE
-		context.addRefinementToVariableInContext(simpleName,type , cet);
-	}
-
-
-
-
-
 	//############################### Get Metadata ##########################################
 
 	/**
@@ -517,89 +486,5 @@ public class RefinementTypeChecker extends TypeChecker {
 
 		elem.putMetadata(REFINE_KEY, cref);
 	}
-
-
-	protected void getGhostFunction(String value, CtElement element) {
-		try {
-			Optional<FunctionDeclaration> ofd = 
-					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
-				CtClass<?> klass =(CtClass<?>) element.getParent(); 
-				GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
-				context.addGhostFunction(gh);
-				System.out.println(gh.toString());
-			}
-
-		} catch (SyntaxException e) {
-			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
-			e.printStackTrace();
-		}
-	}
-
-
-	@Override
-	protected Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element) {
-		CtClass<?> klass = null; 
-		
-		if(element.getParent() instanceof CtClass<?>) {
-			klass =(CtClass<?>) element.getParent();
-		}else if(element instanceof CtClass<?>) {
-			klass = (CtClass<?>) element;
-		}
-		if(klass != null) {
-			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
-			List<String> params = Arrays.asList(klass.getSimpleName());
-			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
-												klass.getQualifiedName(), klass.getSimpleName(), set); 
-//			context.addGhostFunction(gh);
-			System.out.println(gh.toString());
-			return Optional.of(gh);
-		}
-		return Optional.empty();
-	}
-
-
-	protected void handleAlias(String value, CtElement element) {
-		try {
-			Optional<Alias> oa = RefinementParser.parseAlias(value);
-			if(oa.isPresent()) {
-				String klass = null;
-				String path = null;
-				if(element instanceof CtClass) {
-					klass = ((CtClass<?>) element).getSimpleName();
-					path = ((CtClass<?>) element).getQualifiedName();
-				}else if(element instanceof CtInterface<?>) {
-					klass = ((CtInterface<?>) element).getSimpleName();
-					path = ((CtInterface<?>) element).getQualifiedName();
-				}
-				if(klass != null && path != null) {
-					AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
-					context.addAlias(a);
-				}	
-			}
-		} catch (SyntaxException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-
-	}
-
-	@Override
-	public <T> void visitCtNewClass(CtNewClass<T> newClass) {
-		super.visitCtNewClass(newClass);
-		System.out.println("new class");
-	}
-
-	@Override
-	void checkSMT(Constraint expectedType, CtElement element) {
-		vcChecker.processSubtyping(expectedType, element);
-		element.putMetadata(REFINE_KEY, expectedType);	
-	}
-
-	@Override
-	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		return vcChecker.processSubtyping(prevState, expectedState, target);
-	}
-
 
 }

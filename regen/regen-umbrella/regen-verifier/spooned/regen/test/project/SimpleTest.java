@@ -28,7 +28,7 @@ public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         regen.test.project.TrafficLight tl = new regen.test.project.TrafficLight();
         tl.transitionToAmber();
-        // tl.transitionToFlashingAmber();
+        tl.transitionToFlashingAmber();
         // @Refinement("size(al) < 4")
         // ArrayList<Integer> al = new ArrayList<Integer>();
         // al.add(1);

@@ -2,17 +2,25 @@ package repair.regen.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.language.alias.Alias;
+import repair.regen.language.function.FunctionDeclaration;
+import repair.regen.language.parser.RefinementParser;
+import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
+import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtNewArray;
 import spoon.reflect.declaration.CtAnnotation;
+import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.factory.Factory;
@@ -31,7 +39,7 @@ public abstract class TypeChecker extends CtScanner{
 	
 	Context context;
 	Factory factory;
-	VCChecker vcChecker = new VCChecker();;
+	VCChecker vcChecker = new VCChecker();
 	
 	public TypeChecker(Context c, Factory fac) {
 		this.context = c;
@@ -39,13 +47,10 @@ public abstract class TypeChecker extends CtScanner{
 	}
 
 	
+	Constraint getRefinement(CtElement elem) {
+		return (Constraint)elem.getMetadata(REFINE_KEY);
+	}
 	
-	abstract void checkVariableRefinements(Constraint refinementFound, String simpleName, 
-			CtTypeReference type, CtElement variable);
-	abstract void checkSMT(Constraint expectedType, CtElement element);
-
-
-	protected abstract boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target);
 	
 	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
 		Optional<Constraint> constr = Optional.empty();
@@ -92,7 +97,6 @@ public abstract class TypeChecker extends CtScanner{
 		}
 	}
 		
-
 	Optional<String> getExternalRefinement(CtInterface<?> intrface) {
 		Optional<String> ref = Optional.empty();
 		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
@@ -104,17 +108,109 @@ public abstract class TypeChecker extends CtScanner{
 		return ref;
 	}
 	
-
 	
-	protected abstract Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element);
-
-	abstract protected void getGhostFunction(String value, CtElement element);
-
-	abstract protected void handleAlias(String value, CtElement element);
-	
-	Constraint getRefinement(CtElement elem) {
-		return (Constraint)elem.getMetadata(REFINE_KEY);
+	protected Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element){
+		CtClass<?> klass = null; 
+		
+		if(element.getParent() instanceof CtClass<?>) {
+			klass =(CtClass<?>) element.getParent();
+		}else if(element instanceof CtClass<?>) {
+			klass = (CtClass<?>) element;
+		}
+		if(klass != null) {
+			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
+			List<String> params = Arrays.asList(klass.getSimpleName());
+			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
+												klass.getQualifiedName(), klass.getSimpleName(), set); 
+//			context.addGhostFunction(gh);
+			System.out.println(gh.toString());
+			return Optional.of(gh);
+		}
+		return Optional.empty();
 	}
+
+	protected void getGhostFunction(String value, CtElement element) {
+		try {
+			Optional<FunctionDeclaration> ofd = 
+					RefinementParser.parseFunctionDecl(value);
+			if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
+				CtClass<?> klass =(CtClass<?>) element.getParent(); 
+				GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
+				context.addGhostFunction(gh);
+				System.out.println(gh.toString());
+			}
+
+		} catch (SyntaxException e) {
+			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
+			e.printStackTrace();
+		}
+	}
+
+	protected void handleAlias(String value, CtElement element) {
+		try {
+			Optional<Alias> oa = RefinementParser.parseAlias(value);
+			if(oa.isPresent()) {
+				String klass = null;
+				String path = null;
+				if(element instanceof CtClass) {
+					klass = ((CtClass<?>) element).getSimpleName();
+					path = ((CtClass<?>) element).getQualifiedName();
+				}else if(element instanceof CtInterface<?>) {
+					klass = ((CtInterface<?>) element).getSimpleName();
+					path = ((CtInterface<?>) element).getQualifiedName();
+				}
+				if(klass != null && path != null) {
+					AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
+					context.addAlias(a);
+				}	
+			}
+		} catch (SyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+
 	
-	
+	void checkSMT(Constraint expectedType, CtElement element) {
+		vcChecker.processSubtyping(expectedType, element);
+		element.putMetadata(REFINE_KEY, expectedType);	
+	}
+
+	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
+		return vcChecker.processSubtyping(prevState, expectedState, target);
+	}
+		
+	void checkVariableRefinements(Constraint refinementFound, String simpleName, 
+			CtTypeReference type, CtElement variable) {
+			Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
+			Constraint cEt;
+			RefinedVariable mainRV = null;
+			if(context.hasVariable(simpleName))
+				mainRV =  context.getVariableByName(simpleName);
+			
+			if(expectedType.isPresent())
+				cEt = expectedType.get();
+			else if(context.hasVariable(simpleName))
+				cEt = mainRV.getMainRefinement();
+			else
+				cEt = new Predicate();
+			
+			cEt = cEt.substituteVariable(WILD_VAR, simpleName);
+			Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
+
+			String newName = String.format(instanceFormat, simpleName, context.getCounter());
+			Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
+			correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
+			cEt = cEt.substituteVariable(simpleName, newName);
+
+			//Substitute variable in verification
+			RefinedVariable rv= context.addInstanceToContext(newName, type, correctNewRefinement);
+			for(CtTypeReference t: mainRV.getSuperTypes())
+				rv.addSuperType(t);
+			context.addRefinementInstanceToVariable(simpleName, newName);
+			//smt check
+			checkSMT(cEt, variable);//TODO CHANGE
+			context.addRefinementToVariableInContext(simpleName,type , cet);
+	}
 }

@@ -88,7 +88,8 @@ public class Predicate extends Constraint{
 		Predicate c = (Predicate) this.clone();
 		if(from.equals(to))
 			return c;
-		c.exp.substituteVariable(from, to);
+		AuxVisitTree.substituteVariable(c.getExpression(), from, to);
+//		c.exp.substituteVariable(from, to);
 		return c;
 	}
 
@@ -98,6 +99,19 @@ public class Predicate extends Constraint{
 		exp.getVariableNames(l);
 		return l;
 	}
+	
+	public List<GhostFunction> getGhostInvocations(List<GhostFunction> contextGhosts) {
+		List<GhostFunction> gh = new ArrayList<>();
+		AuxVisitTree.getGhostInvocations(exp, gh, contextGhosts);
+		return gh;
+	}
+
+	public Constraint changeOldMentions(String previousName, String newName) {
+		Constraint c = this.clone();
+		AuxVisitTree.changeOldMentions(c.getExpression(), previousName, newName);
+		return c;
+	}
+
 
 	public boolean isBooleanTrue() {//TODO rever
 		return exp instanceof BooleanLiteral; 
@@ -130,85 +144,7 @@ public class Predicate extends Constraint{
 		
 	}
 
-	public List<GhostFunction> getGhostInvocations(List<GhostFunction> contextGhosts) {
-		List<GhostFunction> gh = new ArrayList<>();
-		auxGetGhostInvocations(exp, gh, contextGhosts);
-		return gh;
-	}
 
-	private void auxGetGhostInvocations(Expression exp, List<GhostFunction> gh, List<GhostFunction> contextGhosts) {
-		if(exp instanceof UnaryExpression)
-			auxGetGhostInvocations(((UnaryExpression) exp).getExpression(), gh, contextGhosts);
-		else if(exp instanceof BinaryExpression) {
-			auxGetGhostInvocations(((BinaryExpression) exp).getFirstExpression(), gh, contextGhosts);
-			auxGetGhostInvocations(((BinaryExpression) exp).getSecondExpression(), gh, contextGhosts);
-		}else if(exp instanceof ExpressionGroup) {
-			auxGetGhostInvocations(((ExpressionGroup) exp).getExpression(), gh, contextGhosts);	
-		}else if(exp instanceof IfElseExpression) {
-			auxGetGhostInvocations(((IfElseExpression) exp).getCondition(), gh, contextGhosts);
-			auxGetGhostInvocations(((IfElseExpression) exp).getThenExpression(), gh, contextGhosts);
-			auxGetGhostInvocations(((IfElseExpression) exp).getElseExpression(), gh, contextGhosts);
-		}else if(exp instanceof AliasUsage) {
-			for(Expression e :((AliasUsage)exp).getExpressions())
-				auxGetGhostInvocations(e, gh, contextGhosts);
-		}else if(exp instanceof FunctionInvocationExpression) {
-			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
-			for(GhostFunction f: contextGhosts) {
-				if(f.getName().equals(fie.getFunctionName()))
-					gh.add(f);
-			}
-		}
-		
-	}
 	
-	public Constraint changeOldMentions(String previousName, String newName) {
-		Constraint c = this.clone();
-		auxChangeOldMentions(c.getExpression(), previousName, newName);
-		return c;
-	}
-
-	private Expression auxChangeOldMentions(Expression exp, String previousName, String newName) {
-		Expression e = null;
-		if(exp instanceof UnaryExpression) {
-			e = auxChangeOldMentions(((UnaryExpression) exp).getExpression(), previousName, newName);
-			if(e != null) ((UnaryExpression) exp).setExpression(e);
-		}else if(exp instanceof BinaryExpression) {
-			e = auxChangeOldMentions(((BinaryExpression) exp).getFirstExpression(), previousName, newName);
-			if(e!=null) ((BinaryExpression) exp).setFirstExpression(e);
-			e = auxChangeOldMentions(((BinaryExpression) exp).getSecondExpression(),previousName, newName);
-			if(e!=null) ((BinaryExpression) exp).setSecondExpression(e);
-		}else if(exp instanceof ExpressionGroup) {
-			e = auxChangeOldMentions(((ExpressionGroup) exp).getExpression(),previousName, newName);
-			if(e!=null) ((ExpressionGroup) exp).setExpression(e);
-		}else if(exp instanceof IfElseExpression) {
-			e = auxChangeOldMentions(((IfElseExpression) exp).getCondition(), previousName, newName);
-			if(e!=null) ((IfElseExpression) exp).setCondition(e);
-			e = auxChangeOldMentions(((IfElseExpression) exp).getThenExpression(), previousName, newName);
-			if(e!=null) ((IfElseExpression) exp).setThen(e);
-			e = auxChangeOldMentions(((IfElseExpression) exp).getElseExpression(), previousName, newName);
-			if(e!=null) ((IfElseExpression) exp).setElse(e);
-		}else if(exp instanceof AliasUsage) {
-			List<Expression> l = ((AliasUsage)exp).getExpressions();
-			for (int i = 0; i < l.size(); i++) {
-				e = auxChangeOldMentions(l.get(i), previousName, newName);
-				if (e!=null) ((AliasUsage)exp).setExpression(i, e);
-			}
-		}else if(exp instanceof FunctionInvocationExpression) {
-			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
-			if(fie.getFunctionName().equals("old")) {
-				System.out.println("FOUND AN OLD!!!!!");
-				return new Variable(previousName);
-			}
-			if(fie.getArgument() != null) {
-				List<Expression> le = new ArrayList();
-				fie.getArgument().getAllExpressions(le);
-				for (int i = 0; i < le.size(); i++) {
-					e = auxChangeOldMentions(le.get(i), previousName, newName);
-					if(e!=null) fie.setArgument(i, e);
-				}
-			}
-		}
-		return null;
-	}
 
 }

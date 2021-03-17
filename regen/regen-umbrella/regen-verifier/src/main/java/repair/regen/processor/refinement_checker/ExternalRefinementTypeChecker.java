@@ -103,33 +103,4 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		return Optional.empty();
 	}
 
-
-
-	@Override
-	protected void checkSMT(Constraint refPar, CtElement invocation) {
-		// TODO Auto-generated method stub
-	}
-	
-	@Override
-	protected void handleAlias(String value, CtElement element) {
-		// TODO Auto-generated method stub
-		
-	}
-	
-	@Override
-	void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type,
-			CtElement variable) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		return vcChecker.smtChecks(prevState, expectedState, target);
-	}
-
-
-
-	
-
 }
