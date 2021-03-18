@@ -121,9 +121,7 @@ public class AuxVisitTree {
 	}
 
 	public static boolean isTrue(Expression exp) {
-		if(exp instanceof UnaryExpression)
-			return isTrue(((UnaryExpression) exp).getExpression());
-		else if(exp instanceof BinaryExpression) {
+		if(exp instanceof BinaryExpression) {
 			return isTrue(((BinaryExpression) exp).getFirstExpression()) &&
 				   isTrue(((BinaryExpression) exp).getSecondExpression());
 		}else if(exp instanceof ExpressionGroup)

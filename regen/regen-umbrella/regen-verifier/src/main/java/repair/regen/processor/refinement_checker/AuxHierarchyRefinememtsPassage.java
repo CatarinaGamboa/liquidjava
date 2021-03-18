@@ -29,7 +29,6 @@ public class AuxHierarchyRefinememtsPassage {
 			Optional<RefinedFunction> superFunction = functionInInterface(klass, 
 					name, size, tc);
 			if(superFunction.isPresent()) {
-//				System.out.println("superFunction: "+superFunction+ "; class="+superFunction.get().getTargetClass());
 				transferRefinements(superFunction.get(), f, method, tc);
 			}
 		}
@@ -37,7 +36,6 @@ public class AuxHierarchyRefinememtsPassage {
 			CtTypeReference<?> t = klass.getSuperclass();
 			RefinedFunction superFunction = tc.context.getFunction(name, t.getQualifiedName(), size);
 			if(superFunction != null) {
-//				System.out.println("superFunction: "+superFunction+ "; class="+superFunction.getTargetClass());
 				transferRefinements(superFunction, f, method, tc);
 			}
 		}
@@ -60,7 +58,10 @@ public class AuxHierarchyRefinememtsPassage {
 			String newName = String.format(tc.instanceFormat, fArgs.get(i).getName(), tc.context.getCounter());
 			m.put(superArgs.get(i).getName(), newName); 
 			m.put(fArgs.get(i).getName(), newName);
-			tc.context.addVarToContext(newName, superArgs.get(i).getType(), new Predicate());
+			RefinedVariable rv = tc.context.addVarToContext(newName, superArgs.get(i).getType(), new Predicate());
+			for(CtTypeReference<?> t : fArgs.get(i).getSuperTypes()) {
+				rv.addSuperType(t);
+			}
 		}
 		return m;
 	}

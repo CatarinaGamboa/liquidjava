@@ -45,7 +45,7 @@ public class TranslatorToZ3 {
 
 	public TranslatorToZ3(repair.regen.processor.context.Context c) {
 		TranslatorContextToZ3.translateVariables(z3, c.getContext(), varTranslation);
-		TranslatorContextToZ3.storeVariablesSubtypes(z3, c.getAllVariables(), varSuperTypes);
+		TranslatorContextToZ3.storeVariablesSubtypes(z3, c.getAllVariablesWithSupertypes(), varSuperTypes);
 		TranslatorContextToZ3.addAlias(z3, c.getAlias(), aliasTranslation);
 		TranslatorContextToZ3.addGhostFunctions(z3, c.getGhosts(), funcTranslation);
 	}

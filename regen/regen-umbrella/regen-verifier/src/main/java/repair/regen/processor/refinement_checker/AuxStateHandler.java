@@ -16,6 +16,7 @@ import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
+import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
@@ -26,10 +27,19 @@ import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.reference.CtTypeReference;
 
 public class AuxStateHandler {
 	
-
+	/**
+	 * If an expression has a state in metadata, then its state is passed to the last instance
+	 * of the variable with varName
+	 * @param context
+	 * @param state_key
+	 * @param this_key
+	 * @param varName
+	 * @param e
+	 */
 	public static void addStateRefinements(Context context, String state_key, String this_key, String varName, CtExpression<?> e) {
 		Optional<VariableInstance> ovi = context.getLastVariableInstance(varName);
 		if(ovi.isPresent() && e.getMetadata(state_key) != null) {
@@ -40,7 +50,6 @@ public class AuxStateHandler {
 			vi.setRefinement(c);
 		}
 	}
-
 
 	/**
 	 * Handles the passage of the written state annotations to the context for Constructors
@@ -136,6 +145,8 @@ public class AuxStateHandler {
 		Constraint prevState = vi.getState().substituteVariable(name, instanceName);
 		List<ObjectState> los = f.getAllStates();
 		boolean found = false;
+		if(los.size() > 1)
+			assertFalse("Change state only working for one methods with one state",true);
 		for (int i = 0; i < los.size() && !found; i++) {//TODO: only working for 1 state annotation
 			ObjectState os = los.get(i);
 			if(os.hasFrom()) {
@@ -199,6 +210,9 @@ public class AuxStateHandler {
 				name2, prevInstance.getType() , prevInstance.getRefinement());
 		vi2.setState(transitionedState);
 		vi2.setRefinement(transitionedState);
+		RefinedVariable rv = tc.context.getVariableByName(superName);
+		for(CtTypeReference<?> t: rv.getSuperTypes())
+			vi2.addSuperType(t);
 		tc.context.addRefinementInstanceToVariable(superName, name2);
 		return name2;
 	}

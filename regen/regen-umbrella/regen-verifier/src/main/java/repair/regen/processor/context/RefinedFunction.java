@@ -135,10 +135,15 @@ public class RefinedFunction extends Refined{
 		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
 		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
 		ObjectState state = new ObjectState();
-		if(from != null)
+		if(from != null)				//has From
 			state.setFrom(createStateConstraint(from.getValue(), c, e));
-		if(to != null)
+		if(to != null)					//has To
 			state.setTo(createStateConstraint(to.getValue(), c, e));
+		
+		if(from != null && to == null)	//has From but not To -> the state remains the same 
+			state.setTo(createStateConstraint(from.getValue(), c, e));
+		if(from == null && to != null)	//has To but not From -> enters with true and exists with a specific state
+			state.setFrom(new Predicate());
 		return state;
 	}
 	

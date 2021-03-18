@@ -41,8 +41,7 @@ public class VCChecker {
 		gatherVariables(type, lrv, mainVars);
 		if(expectedType.isBooleanTrue() && type.isBooleanTrue())
 			return true;
-		else if(expectedType.isBooleanTrue() && !type.isBooleanTrue())
-			return false;
+
 
 //		Constraint premises = joinConstraints(type, element, mainVars, lrv);
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);

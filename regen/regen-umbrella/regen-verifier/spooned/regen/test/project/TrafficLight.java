@@ -18,6 +18,15 @@ public class TrafficLight {
     }
 
     @repair.regen.specification.StateRefinement(from = "green(this)", to = "solidAmber(this)")
+    public regen.test.project.TrafficLight transitionToAmber2() {
+        return this;
+    }
+
+    public regen.test.project.TrafficLight getStartingTrafficLight() {
+        return new regen.test.project.TrafficLight();
+    }
+
+    @repair.regen.specification.StateRefinement(from = "green(this)", to = "solidAmber(this)")
     public void transitionToAmber() {
     }
 
@@ -31,6 +40,15 @@ public class TrafficLight {
 
     @repair.regen.specification.StateRefinement(from = "flashingAmber(this)", to = "green(this)")
     public void transitionToGreen() {
+    }
+
+    @repair.regen.specification.StateRefinement(from = "red(this)")
+    public boolean passagersCanCross() {
+        return true;
+    }
+
+    @repair.regen.specification.StateRefinement(to = "flashingAmber(this)")
+    public void intermitentMalfunction() {
     }
 }
 

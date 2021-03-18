@@ -5,11 +5,7 @@ import java.io.IOException;
 public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
-
-//		MyBufferedInputReader b = new MyBufferedInputReader();
-//		b.read();
-//		b.close();
-//		b.read();
+//		Order
 
 	}
 	
