@@ -22,7 +22,11 @@ public class TestInsideClasses {
 		RefinedVariable vi2 = new Variable("a",factory.Type().INTEGER_PRIMITIVE, new Predicate("a > 0"));
 		Constraint c2 = vi2.getRenamedRefinements("_");
 		
+		Constraint c = new Predicate("(true) && (true) ");
 		
+		boolean b = c.isBooleanTrue();
+		
+		System.out.println(b);
 		FunctionPredicate fp = new FunctionPredicate("ola", "a", "b");
 
 		System.out.println(c2.toString());

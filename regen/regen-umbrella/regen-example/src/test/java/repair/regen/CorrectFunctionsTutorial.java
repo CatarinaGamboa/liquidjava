@@ -26,7 +26,8 @@ public class CorrectFunctionsTutorial {
 	@Refinement("length(_) == length(vec1)")
 	static int[] sumVectors(int[] vec1, @Refinement("length(vec1) == length(vec2)") int[] vec2) {
 		int[] add = new int[vec1.length];
-		auxSum(add, vec1, vec2, 0);
+		if(vec1.length > 0)
+			auxSum(add, vec1, vec2, 0);
 		return add;
 	}
 

@@ -114,8 +114,7 @@ public class Predicate extends Constraint{
 
 
 	public boolean isBooleanTrue() {//TODO rever
-		return exp instanceof BooleanLiteral; 
-//				toString().equals("true") || toString().equals("(true)") ;	
+		return exp instanceof BooleanLiteral || AuxVisitTree.isTrue(exp);
 	}
 	
 	@Override

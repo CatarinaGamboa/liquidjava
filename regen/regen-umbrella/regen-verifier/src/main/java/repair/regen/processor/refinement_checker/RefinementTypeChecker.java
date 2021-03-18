@@ -1,5 +1,7 @@
 package repair.regen.processor.refinement_checker;
 
+import static org.junit.Assert.assertFalse;
+
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +21,7 @@ import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
+import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
@@ -106,8 +109,8 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
 		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
-//		if(getExternalRefinement(intrface).isPresent())
-//			return;
+		if(getExternalRefinement(intrface).isPresent())
+			return;
 //		getRefinementFromAnnotation(intrface);
 //		handleStateSetsFromAnnotation(intrface);
 		super.visitCtInterface(intrface);
@@ -136,7 +139,8 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	public <R> void visitCtMethod(CtMethod<R> method) {
 		context.enterContext();
-//		mfc.getMethodRefinements(method);
+		if(!method.getSignature().equals("main(java.lang.String[])"))
+			mfc.loadFunctionInfo(method);
 		super.visitCtMethod(method);
 		context.exitContext();
 
@@ -347,9 +351,6 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public void visitCtIf(CtIf ifElement) {
 		CtExpression<Boolean> exp = ifElement.getCondition();
-		context.variablesNewIfCombination();
-		context.variablesSetBeforeIf();
-		context.enterContext();
 
 		Constraint expRefs = getExpressionRefinements(exp);
 		String freshVarName = String.format(freshFormat ,context.getCounter());
@@ -360,11 +361,14 @@ public class RefinementTypeChecker extends TypeChecker {
 		//TODO Change in future
 		if(expRefs.getVariableNames().contains("null"))
 			expRefs = new Predicate();
-
-
+		
 		RefinedVariable freshRV = context.addInstanceToContext(freshVarName, 
 				factory.Type().INTEGER_PRIMITIVE, expRefs);
 		vcChecker.addPathVariable(freshRV);
+		
+		context.variablesNewIfCombination();
+		context.variablesSetBeforeIf();
+		context.enterContext();
 
 		//VISIT THEN
 		context.enterContext();

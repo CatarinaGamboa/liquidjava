@@ -1,5 +1,6 @@
 package repair.regen.processor.refinement_checker;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -20,15 +21,22 @@ import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
 public class MethodsFirstChecker extends TypeChecker{
-
+	MethodsFunctionsChecker mfc;
+	List<String> visitedClasses;
 	public MethodsFirstChecker(Context c, Factory fac) {
 		super(c, fac);
+		mfc = new MethodsFunctionsChecker(this);
+		visitedClasses = new ArrayList<>();
 	}
 	
 	@Override
 	public <T> void visitCtClass(CtClass<T> ctClass) {
 		System.out.println("CTCLASS:"+ctClass.getSimpleName());
 		context.reinitializeContext();
+		if(visitedClasses.contains(ctClass.getQualifiedName()))
+			return;
+		else
+			visitedClasses.add(ctClass.getQualifiedName());
 		//visitInterfaces
 		if(!ctClass.getSuperInterfaces().isEmpty())
 			for(CtTypeReference<?> t :ctClass.getSuperInterfaces()) {
@@ -54,6 +62,10 @@ public class MethodsFirstChecker extends TypeChecker{
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
 		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
+		if(visitedClasses.contains(intrface.getQualifiedName()))
+			return;
+		else
+			visitedClasses.add(intrface.getQualifiedName());
 		if(getExternalRefinement(intrface).isPresent())
 			return;
 		getRefinementFromAnnotation(intrface);
@@ -65,7 +77,6 @@ public class MethodsFirstChecker extends TypeChecker{
 	@Override
 	public <T> void visitCtConstructor(CtConstructor<T> c) {
 		context.enterContext();
-		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
 		mfc.getConstructorRefinements(c);
 		getRefinementFromAnnotation(c); 
 		super.visitCtConstructor(c);
@@ -74,7 +85,6 @@ public class MethodsFirstChecker extends TypeChecker{
 	
 	public <R> void visitCtMethod(CtMethod<R> method) {
 		context.enterContext();
-		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
 		mfc.getMethodRefinements(method);
 		super.visitCtMethod(method);
 		context.exitContext();

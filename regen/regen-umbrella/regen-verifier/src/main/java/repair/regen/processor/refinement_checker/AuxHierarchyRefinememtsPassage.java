@@ -5,8 +5,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
@@ -26,6 +29,7 @@ public class AuxHierarchyRefinememtsPassage {
 			Optional<RefinedFunction> superFunction = functionInInterface(klass, 
 					name, size, tc);
 			if(superFunction.isPresent()) {
+//				System.out.println("superFunction: "+superFunction+ "; class="+superFunction.get().getTargetClass());
 				transferRefinements(superFunction.get(), f, method, tc);
 			}
 		}
@@ -33,6 +37,7 @@ public class AuxHierarchyRefinememtsPassage {
 			CtTypeReference<?> t = klass.getSuperclass();
 			RefinedFunction superFunction = tc.context.getFunction(name, t.getQualifiedName(), size);
 			if(superFunction != null) {
+//				System.out.println("superFunction: "+superFunction+ "; class="+superFunction.getTargetClass());
 				transferRefinements(superFunction, f, method, tc);
 			}
 		}
@@ -40,19 +45,22 @@ public class AuxHierarchyRefinememtsPassage {
 	}
 
 	static void transferRefinements(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method, TypeChecker tc) {
-		HashMap<String, String> super2function = getParametersMap(superFunction, function);
+		HashMap<String, String> super2function = getParametersMap(superFunction, function, tc);
 		transferReturnRefinement(superFunction,function, method, tc, super2function);
 		transferArgumentsRefinements(superFunction, function, method, tc, super2function);
 		transferStateRefinements(superFunction, function, method, tc);
 	}
 
 
-	private static HashMap<String, String> getParametersMap(RefinedFunction superFunction, RefinedFunction function) {
+	private static HashMap<String, String> getParametersMap(RefinedFunction superFunction, RefinedFunction function, TypeChecker tc) {
 		List<Variable> superArgs = superFunction.getArguments();
 		List<Variable> fArgs = function.getArguments();
 		HashMap<String, String> m = new HashMap<String, String>();
 		for (int i = 0; i < fArgs.size(); i++) {
-			m.put(superArgs.get(i).getName(), fArgs.get(i).getName());
+			String newName = String.format(tc.instanceFormat, fArgs.get(i).getName(), tc.context.getCounter());
+			m.put(superArgs.get(i).getName(), newName); 
+			m.put(fArgs.get(i).getName(), newName);
+			tc.context.addVarToContext(newName, superArgs.get(i).getType(), new Predicate());
 		}
 		return m;
 	}
@@ -65,12 +73,16 @@ public class AuxHierarchyRefinememtsPassage {
 		for (int i = 0; i < args.size(); i++) {
 			Variable arg = args.get(i);
 			Variable superArg = superArgs.get(i);
-			Constraint argRef = arg.getRefinement();
-			Constraint superArgRef = superArg.getRefinement().substituteVariable(superArg.getName(), 
-					super2function.get(superArg.getName()));
-			if(argRef.isBooleanTrue())
-				arg.setRefinement(superArgRef);
-			else {
+			String newName = super2function.get(arg.getName());
+			//create new name
+			Constraint argRef = arg.getRefinement().substituteVariable(arg.getName(), newName);
+			Constraint superArgRef =superArg.getRefinement().substituteVariable(superArg.getName(), newName);
+			
+			System.out.println(arg.getName()+" has ref "+argRef);
+			if(argRef.isBooleanTrue()) {
+				System.out.println(arg.getName()+" has ref boolean true");
+				arg.setRefinement(superArgRef.substituteVariable(newName, arg.getName()));
+			} else {
 				boolean f = tc.checkStateSMT(superArgRef, argRef, params.get(i));
 				if(!f)
 					ErrorPrinter.printError(method, argRef, superArgRef);
@@ -92,6 +104,9 @@ public class AuxHierarchyRefinememtsPassage {
 			superRef = superRef.substituteVariable(tc.WILD_VAR, name);
 			for(String m:super2function.keySet()) 
 				superRef  = superRef.substituteVariable(m, super2function.get(m));
+			for(String m:super2function.keySet()) 
+				functionRef  = functionRef.substituteVariable(m, super2function.get(m));
+		
 			boolean f = tc.checkStateSMT(functionRef, superRef, method);
 			if(!f)
 				ErrorPrinter.printError(method, superRef, functionRef);
@@ -105,7 +120,7 @@ public class AuxHierarchyRefinememtsPassage {
 		List<String> st = klass.getSuperInterfaces().stream().map(p->p.getQualifiedName()).collect(Collectors.toList());
 		for(RefinedFunction rf :lrf) {
 			if(st.contains(rf.getTargetClass()))
-				return Optional.of(rf);
+				return Optional.of(rf);//TODO only works for 1 interface
 		}
 		return Optional.empty();
 	}

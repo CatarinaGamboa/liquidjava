@@ -39,10 +39,14 @@ public class VCChecker {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		gatherVariables(type, lrv, mainVars);
-		if(expectedType.isBooleanTrue())
+		if(expectedType.isBooleanTrue() && type.isBooleanTrue())
 			return true;
+		else if(expectedType.isBooleanTrue() && !type.isBooleanTrue())
+			return false;
 
+//		Constraint premises = joinConstraints(type, element, mainVars, lrv);
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
+		premises = Conjunction.createConjunction(premises, type);//TODO add to print
 //		premises = Conjunction.createConjunction(premises, joinConstraints(type, element, mainVars, lrv));
 		return smtChecks(premises, expectedType, element);
 	}

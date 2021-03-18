@@ -1,5 +1,7 @@
 package repair.regen.processor.refinement_checker;
 
+import static org.junit.Assert.assertFalse;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -160,7 +162,7 @@ public class MethodsFunctionsChecker {
 		Optional<Constraint> oret = rtc.getRefinementFromAnnotation(method);
 		Constraint ret = oret.isPresent()?oret.get():new Predicate();
 		f.setRefReturn(ret);
-		rtc.context.addFunctionToContext(f);
+//		rtc.context.addFunctionToContext(f);
 		return Conjunction.createConjunction(joint, ret);
 	}
 
@@ -190,6 +192,11 @@ public class MethodsFunctionsChecker {
 			if (method.getParent() instanceof CtClass) {
 				RefinedFunction fi = rtc.context.getFunction(method.getSimpleName(), 
 						((CtClass)method.getParent()).getQualifiedName());
+				
+				List<Variable> lv = fi.getArguments();
+				for(Variable v: lv) {
+					rtc.context.addVarToContext(v);
+				}
 
 				//Both return and the method have metadata
 				String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
@@ -215,6 +222,7 @@ public class MethodsFunctionsChecker {
 		}else if(method.getParent() instanceof CtClass){
 			String ctype = ((CtClass)method.getParent()).getQualifiedName();
 			RefinedFunction f = rtc.context.getFunction(method.getSimpleName(), ctype);
+			System.out.println("function found:"+f);
 			if(f != null) {//inside rtc.context
 				checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), 
 						method.getSimpleName(), ctype);
@@ -233,8 +241,14 @@ public class MethodsFunctionsChecker {
 	}
 
 
+	RefinedFunction getRefinementFunction(String methodName, String className, int size) {
+		RefinedFunction f = rtc.context.getFunction(methodName, className, size);
+		if(f == null)
+			f = rtc.context.getFunction(String.format("%s.%s", className, methodName), methodName, size);
+		return f;
+	}
 
-
+	
 
 
 	private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
@@ -356,6 +370,27 @@ public class MethodsFunctionsChecker {
 			rtc.checkSMT(c, invocation);
 		}
 
+	}
+
+	void loadFunctionInfo(CtMethod<?> method) {
+		String className = null;
+		if(method.getParent() instanceof CtClass) {
+			className = ((CtClass) method.getParent()).getQualifiedName();
+		}else if(method.getParent() instanceof CtInterface<?>) {
+			className = ((CtInterface<?>) method.getParent()).getQualifiedName();
+		}
+		if(className != null) {
+			RefinedFunction fi = getRefinementFunction(method.getSimpleName(), className, method.getParameters().size());
+			if( fi != null ) {
+				List<Variable> lv = fi.getArguments();
+				for(Variable v: lv)
+					rtc.context.addVarToContext(v);
+			}else {
+				assertFalse("Method should already be in context. Should not arrive this point in refinement checker.", true);
+				getMethodRefinements(method); //should be irrelevant -should never need to get here
+			}
+		}
+		
 	}
 
 

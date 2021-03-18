@@ -26,7 +26,9 @@ public class CorrectFunctionsTutorial {
     static int[] sumVectors(int[] vec1, @repair.regen.specification.Refinement("length(vec1) == length(vec2)")
     int[] vec2) {
         int[] add = new int[vec1.length];
-        repair.regen.CorrectFunctionsTutorial.auxSum(add, vec1, vec2, 0);
+        if ((vec1.length) > 0)
+            repair.regen.CorrectFunctionsTutorial.auxSum(add, vec1, vec2, 0);
+
         return add;
     }
 

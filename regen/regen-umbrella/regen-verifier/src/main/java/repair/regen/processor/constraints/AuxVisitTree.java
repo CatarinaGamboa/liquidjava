@@ -6,6 +6,7 @@ import java.util.List;
 import org.apache.maven.shared.utils.cli.Commandline.Argument;
 
 import repair.regen.language.BinaryExpression;
+import repair.regen.language.BooleanLiteral;
 import repair.regen.language.Expression;
 import repair.regen.language.ExpressionGroup;
 import repair.regen.language.IfElseExpression;
@@ -117,5 +118,23 @@ public class AuxVisitTree {
 				v.changeName(to);
 		}
 		
+	}
+
+	public static boolean isTrue(Expression exp) {
+		if(exp instanceof UnaryExpression)
+			return isTrue(((UnaryExpression) exp).getExpression());
+		else if(exp instanceof BinaryExpression) {
+			return isTrue(((BinaryExpression) exp).getFirstExpression()) &&
+				   isTrue(((BinaryExpression) exp).getSecondExpression());
+		}else if(exp instanceof ExpressionGroup)
+			return isTrue(((ExpressionGroup) exp).getExpression());
+		else if(exp instanceof BooleanLiteral) {
+			if(((BooleanLiteral)exp).getValue())
+				return true;
+		}else if(exp instanceof Variable)
+			if(((Variable)exp).getName().equals("true"))
+				return true;
+		
+		return false;
 	}
 }
