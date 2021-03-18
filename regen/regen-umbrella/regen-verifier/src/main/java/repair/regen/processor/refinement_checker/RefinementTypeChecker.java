@@ -84,25 +84,6 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtClass(CtClass<T> ctClass) {
 		System.out.println("CTCLASS:"+ctClass.getSimpleName());
 		context.reinitializeContext();
-		//visitInterfaces
-//		if(!ctClass.getSuperInterfaces().isEmpty())
-//			for(CtTypeReference<?> t :ctClass.getSuperInterfaces()) {
-//				if(t.isInterface()) {
-//					CtType ct = t.getDeclaration();
-//					if(ct instanceof CtInterface)				
-//						visitCtInterface((CtInterface<?>) ct);
-//				}
-//
-//			}
-//		//visitSubclasses
-//		CtTypeReference<?> sup = ctClass.getSuperclass();
-//		if(sup != null && sup.isClass()){
-//			CtType ct = sup.getDeclaration();
-//			if(ct instanceof CtClass)				
-//				visitCtClass((CtClass<?>) ct);
-//		}
-//		getRefinementFromAnnotation(ctClass);
-//		handleStateSetsFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
 	}
 
@@ -111,16 +92,9 @@ public class RefinementTypeChecker extends TypeChecker {
 		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
 		if(getExternalRefinement(intrface).isPresent())
 			return;
-//		getRefinementFromAnnotation(intrface);
-//		handleStateSetsFromAnnotation(intrface);
 		super.visitCtInterface(intrface);
 	}
 
-
-	//	@Override
-	//	public <A extends Annotation> void visitCtAnnotation(CtAnnotation<A> annotation) {
-	//		super.visitCtAnnotation(annotation);
-	//	}
 
 	@Override
 	public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
@@ -130,8 +104,6 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtConstructor(CtConstructor<T> c) {
 		context.enterContext();
-//		mfc.getConstructorRefinements(c);
-//		getRefinementFromAnnotation(c); 
 		super.visitCtConstructor(c);
 		context.exitContext();
 	}
@@ -166,7 +138,8 @@ public class RefinementTypeChecker extends TypeChecker {
 
 			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable);
 
-			AuxStateHandler.addStateRefinements(context, STATE_KEY, THIS, varName, e);
+//			AuxStateHandler.addStateRefinements(context, STATE_KEY, THIS, varName, e);
+			AuxStateHandler.addStateRefinements(this, varName, e);
 		}
 	}
 

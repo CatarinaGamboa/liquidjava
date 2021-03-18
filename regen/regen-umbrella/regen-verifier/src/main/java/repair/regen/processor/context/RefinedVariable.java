@@ -39,4 +39,29 @@ public abstract class RefinedVariable extends Refined{
 		
 	}
 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((supertypes == null) ? 0 : supertypes.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RefinedVariable other = (RefinedVariable) obj;
+		if (supertypes == null) {
+			if (other.supertypes != null)
+				return false;
+		} else if (!supertypes.equals(other.supertypes))
+			return false;
+		return true;
+	}
+
 }

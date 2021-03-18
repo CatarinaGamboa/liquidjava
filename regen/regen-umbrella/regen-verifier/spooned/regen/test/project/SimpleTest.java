@@ -27,11 +27,12 @@ package regen.test.project;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         regen.test.project.TrafficLight tl = new regen.test.project.TrafficLight();
-        tl.transitionToAmber();
-        tl.transitionToRed();
-        regen.test.project.TrafficLight tl2 = tl.getStartingTrafficLight();
-        tl.passagersCanCross();
-        tl.intermitentMalfunction();
+        regen.test.project.TrafficLight tl2 = tl.getTrafficLightStartingRed();
+        tl2.transitionToFlashingAmber();
+        // tl.transitionToAmber();
+        // tl.transitionToAmber();
+        // tl.passagersCross();
+        // tl.intermitentMalfunction();
         // tl.transitionToFlashingAmber();
         // @Refinement("size(al) < 4")
         // ArrayList<Integer> al = new ArrayList<Integer>();

@@ -5,7 +5,7 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class VariableInstance extends RefinedVariable{
 	
-	private Constraint state;
+//	private Constraint state;
 	
 
 	public VariableInstance(String name, CtTypeReference<?> type, Constraint c) {
@@ -25,13 +25,13 @@ public class VariableInstance extends RefinedVariable{
 				super.getRefinement() +"]";
 	}
 	
-	public void setState(Constraint c) {
-		state = c;
-	}
-	public Constraint getState() {
-		return state;
-	}
-	
+//	public void setState(Constraint c) {
+//		state = c;
+//	}
+//	public Constraint getState() {
+//		return state;
+//	}
+//	
 	
 	
 

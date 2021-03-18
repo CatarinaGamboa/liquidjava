@@ -40,13 +40,13 @@ public class AuxStateHandler {
 	 * @param varName
 	 * @param e
 	 */
-	public static void addStateRefinements(Context context, String state_key, String this_key, String varName, CtExpression<?> e) {
-		Optional<VariableInstance> ovi = context.getLastVariableInstance(varName);
-		if(ovi.isPresent() && e.getMetadata(state_key) != null) {
+	public static void addStateRefinements(TypeChecker tc, String varName, CtExpression<?> e) {
+		Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(varName);
+		if(ovi.isPresent() && e.getMetadata(tc.REFINE_KEY) != null) {
 			VariableInstance vi = ovi.get(); 
-			Constraint c = (Constraint)e.getMetadata(state_key);
-			c = c.substituteVariable(this_key, vi.getName());
-			vi.setState(c);
+			Constraint c = (Constraint)e.getMetadata(tc.REFINE_KEY);
+			c = c.substituteVariable(tc.THIS, vi.getName()).substituteVariable(tc.WILD_VAR, vi.getName());
+//			vi.setState(c);
 			vi.setRefinement(c);
 		}
 	}
@@ -92,10 +92,10 @@ public class AuxStateHandler {
 	 * @param f
 	 * @param ctConstructorCall
 	 */
-	public static void constructorStateMetadata(String stateKey, String refKey, RefinedFunction f, CtConstructorCall<?> ctConstructorCall) {
+	public static void constructorStateMetadata(String refKey, RefinedFunction f, CtConstructorCall<?> ctConstructorCall) {
 		List<Constraint> oc = f.getToStates();
 		if(oc.size() > 0 ){//&& !oc.get(0).isBooleanTrue())
-			ctConstructorCall.putMetadata(stateKey, oc.get(0));
+//			ctConstructorCall.putMetadata(stateKey, oc.get(0));
 			ctConstructorCall.putMetadata(refKey, oc.get(0));
 		}else if(oc.size() > 1)
 			assertFalse("Constructor can only have one to state, not multiple", true);
@@ -121,7 +121,7 @@ public class AuxStateHandler {
 			if(ovi.isPresent() && !f.hasStateChange()) 
 				ref = sameState(tc, ovi.get(), name, invocation);
 
-			invocation.putMetadata(tc.STATE_KEY, ref);
+//			invocation.putMetadata(tc.REFINE_KEY, ref);
 
 		}
 
@@ -139,10 +139,14 @@ public class AuxStateHandler {
 	 * @return
 	 */
 	private static Constraint changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name, CtElement invocation) {
-		if(vi.getState() == null)
+//		if(vi.getState() == null)
+		if(vi.getRefinement() == null)
 			return new Predicate();
 		String instanceName = vi.getName();
-		Constraint prevState = vi.getState().substituteVariable(name, instanceName);
+//		Constraint prevState = vi.getState().substituteVariable(name, instanceName);
+		Constraint prevState = vi.getRefinement()
+					.substituteVariable(tc.WILD_VAR, instanceName)
+					.substituteVariable(name, instanceName);
 		List<ObjectState> los = f.getAllStates();
 		boolean found = false;
 		if(los.size() > 1)
@@ -153,11 +157,13 @@ public class AuxStateHandler {
 				Constraint expectState = os.getFrom().substituteVariable(tc.THIS, instanceName); 
 				found = tc.checkStateSMT(prevState, expectState, invocation);
 				if(found && os.hasTo()) {
-						String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
-						Constraint transitionedState = os.getTo().substituteVariable(tc.THIS, newInstanceName);
-						transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
-						addInstanceWithState(tc, name, newInstanceName, vi, transitionedState);
-						return transitionedState;
+					String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
+					Constraint transitionedState = os.getTo()
+							.substituteVariable(tc.WILD_VAR, newInstanceName)
+							.substituteVariable(tc.THIS, newInstanceName);
+					transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
+					addInstanceWithState(tc, name, newInstanceName, vi, transitionedState);
+					return transitionedState;
 					
 				}
 			}
@@ -186,9 +192,14 @@ public class AuxStateHandler {
 	 * @return
 	 */
 	private static Constraint sameState(TypeChecker tc, VariableInstance variableInstance, String name, CtElement invocation) {
-		if(variableInstance.getState() != null) {
+//		if(variableInstance.getState() != null) {
+		if(variableInstance.getRefinement() != null) {
 			String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
-			Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(), newInstanceName);
+//			Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(), newInstanceName);
+			Constraint c = variableInstance.getRefinement()
+					.substituteVariable(tc.WILD_VAR, newInstanceName)
+					.substituteVariable(variableInstance.getName(), newInstanceName);
+			
 			addInstanceWithState(tc, name, newInstanceName, variableInstance, c);
 			return c;
 		}
@@ -205,10 +216,11 @@ public class AuxStateHandler {
 	 * @param transitionedState
 	 * @return
 	 */
-	private static String addInstanceWithState(TypeChecker tc, String superName, String name2, VariableInstance prevInstance, Constraint transitionedState) {
+	private static String addInstanceWithState(TypeChecker tc, String superName, 
+			String name2, VariableInstance prevInstance, Constraint transitionedState) {
 		VariableInstance vi2 = (VariableInstance)tc.context.addInstanceToContext( 
 				name2, prevInstance.getType() , prevInstance.getRefinement());
-		vi2.setState(transitionedState);
+//		vi2.setState(transitionedState);
 		vi2.setRefinement(transitionedState);
 		RefinedVariable rv = tc.context.getVariableByName(superName);
 		for(CtTypeReference<?> t: rv.getSuperTypes())

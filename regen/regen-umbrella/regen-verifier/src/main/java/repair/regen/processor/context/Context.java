@@ -342,9 +342,11 @@ public class Context {
 	}
 
 	public void addSpecificVariable(RefinedVariable vi) {
-		ctxSpecificVars.add(vi);
-		CtTypeReference<?> type = vi.getType();
-		vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
+		if(!ctxSpecificVars.contains(vi)) {
+			ctxSpecificVars.add(vi);
+			CtTypeReference<?> type = vi.getType();
+			vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
+		}
 	}
 
 

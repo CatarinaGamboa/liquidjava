@@ -24,29 +24,38 @@ public class TrafficLight {
 	@StateRefinement(from="flashingAmber(this)", to="green(this)")
 	public void transitionToGreen() {}
 	
-	@StateRefinement(from="red(this)")
-	public void passagersCross() {}
-	
-	@StateRefinement(to = "flashingAmber(this)")
-	public void intermitentMalfunction() {}
-	
-	
-	
-	
-	@StateRefinement(from="green(this)", to="solidAmber(this)")
-	public TrafficLight transitionToAmber2() {
-		return this;
+	@Refinement("red(_)")
+	public TrafficLight getTrafficLightStartingRed() {
+		TrafficLight t = new TrafficLight();
+		t.transitionToAmber();
+		t.transitionToRed();
+		return t;
 	}
+
 	
-	public TrafficLight getStartingTrafficLight() {
-		return new TrafficLight();
-	}
+//	@StateRefinement(from="green(this)", to="solidAmber(this)")
+//	@Refinement("this == _")
+//	public TrafficLight transitionToAmber2() {
+//		//...
+//		return this;
+//	}
+	
+	
+	
+
 	
 	@StateRefinement(to="green(this)")
+	@Refinement("_ >= 0")
 	public int getTotalChangesReset() {
 		return 0;//count
 	}
 	
+	
+//	@StateRefinement(from="red(this)")
+//	public void passagersCross() {}
+//	
+//	@StateRefinement(to = "flashingAmber(this)")
+//	public void intermitentMalfunction() {}
 	
 	
 //	@StateRefinement(from="green(this)", to="solidAmber(this)")

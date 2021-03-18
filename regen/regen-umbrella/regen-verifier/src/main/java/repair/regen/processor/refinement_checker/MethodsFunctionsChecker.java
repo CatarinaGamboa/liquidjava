@@ -70,7 +70,7 @@ public class MethodsFunctionsChecker {
 			if(f != null) {
 				checkInvocationRefinements(ctConstructorCall, ctConstructorCall.getArguments(), ctConstructorCall.getTarget(), 
 						f.getName(), f.getTargetClass());
-				AuxStateHandler.constructorStateMetadata(rtc.STATE_KEY, rtc.REFINE_KEY, f, ctConstructorCall);
+				AuxStateHandler.constructorStateMetadata(rtc.REFINE_KEY, f, ctConstructorCall);
 				
 			}
 		}
@@ -291,15 +291,13 @@ public class MethodsFunctionsChecker {
 			for(String s:vars) 
 				if(map.containsKey(s))
 					methodRef = methodRef.substituteVariable(s, map.get(s));
-			element.putMetadata(rtc.REFINE_KEY, methodRef);
+//			element.putMetadata(rtc.REFINE_KEY, methodRef);
 			
 			if(target!= null) {
 				checkTargetInstance(element, methodRef, target);
 			}
+			element.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
-		
-		
-
 
 	}
 
