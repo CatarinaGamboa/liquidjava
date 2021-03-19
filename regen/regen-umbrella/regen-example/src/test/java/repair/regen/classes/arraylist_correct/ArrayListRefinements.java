@@ -2,15 +2,16 @@ package repair.regen.classes.arraylist_correct;
 import repair.regen.specification.ExternalRefinementsFor;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementPredicate;
+import repair.regen.specification.StateRefinement;
 
 @ExternalRefinementsFor("java.util.ArrayList")
 public interface ArrayListRefinements <E>{
 	
 	@RefinementPredicate("int size(ArrayList l)")
-	@Refinement("size(this) == 0")
+	@StateRefinement(to = "size(this) == 0")
 	public void ArrayList();
 	
-	@Refinement("size(this) == (size(old(this)) + 1)")
+	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
 	public void add(E e);
 	
 //	@Refinement("size(_) == size(this)")

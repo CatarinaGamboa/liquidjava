@@ -58,7 +58,7 @@ public class MethodsFunctionsChecker {
 			f.setClass(klass.getQualifiedName());
 		}
 		rtc.context.addFunctionToContext(f);
-		AuxStateHandler.handleConstructorState(c, f, rtc.context);
+		AuxStateHandler.handleConstructorState(c, f, rtc);
 	}
 
 
@@ -97,7 +97,7 @@ public class MethodsFunctionsChecker {
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 
-		AuxStateHandler.handleMethodState(method, rtc.context, f);
+		AuxStateHandler.handleMethodState(method, f, rtc);
 		if(klass != null)
 			AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
 	}
@@ -122,7 +122,7 @@ public class MethodsFunctionsChecker {
 		rtc.context.addFunctionToContext(f);
 		auxGetMethodRefinements(method, f);
 
-		AuxStateHandler.handleMethodState(method, rtc.context, f);
+		AuxStateHandler.handleMethodState(method, f, rtc);
 	}
 
 	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {
@@ -293,26 +293,11 @@ public class MethodsFunctionsChecker {
 					methodRef = methodRef.substituteVariable(s, map.get(s));
 //			element.putMetadata(rtc.REFINE_KEY, methodRef);
 			
-			if(target!= null) {
-				checkTargetInstance(element, methodRef, target);
-			}
 			element.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
 
 	}
 
-	private void checkTargetInstance(CtElement element, Constraint methodRef, CtExpression<?> target) {
-		CtElement t = AuxStateHandler.searchFistVariableTarget(target);
-		if(t instanceof CtVariableRead<?> && methodRef != null) {
-			CtVariableRead<?> cvr = (CtVariableRead<?>)t;
-			CtVariableReference<?> v = cvr.getVariable();
-			Constraint c = methodRef;
-			Optional<VariableInstance> ovi = rtc.context.getLastVariableInstance(v.getSimpleName());
-			if(ovi.isPresent())
-				c = c.changeOldMentions(ovi.get().getName(), v.getSimpleName());
-			rtc.checkVariableRefinements(c, v.getSimpleName(), v.getType(), element);
-		}
-	}
 
 	private <R> Map<String, String> mapInvocation(List<CtExpression<?>> arguments, RefinedFunction f){
 		Map<String, String> mapInvocation = new HashMap<>();

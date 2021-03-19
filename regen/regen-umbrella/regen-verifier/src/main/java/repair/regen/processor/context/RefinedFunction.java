@@ -115,13 +115,6 @@ public class RefinedFunction extends Refined{
 	}
 	
 	
-	public void setState(List<CtAnnotation<? extends Annotation>> ctAnnotations, 
-			List<GhostFunction> c, CtElement e) {
-		for(CtAnnotation<? extends Annotation> an: ctAnnotations) {
-			stateChange.add(getState(an, c, e));
-		}
-	}
-	
 	public List<ObjectState> getAllStates(){
 		return stateChange;
 	}
@@ -129,64 +122,11 @@ public class RefinedFunction extends Refined{
 	public void setAllStates(List<ObjectState> l){
 		stateChange = l;
 	}
-	
-	private ObjectState getState(CtAnnotation<? extends Annotation> ctAnnotation, List<GhostFunction> c, CtElement e) {
-		Map<String, CtExpression> m = ctAnnotation.getAllValues();
-		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
-		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
-		ObjectState state = new ObjectState();
-		if(from != null)				//has From
-			state.setFrom(createStateConstraint(from.getValue(), c, e));
-		if(to != null)					//has To
-			state.setTo(createStateConstraint(to.getValue(), c, e));
-		
-		if(from != null && to == null)	//has From but not To -> the state remains the same 
-			state.setTo(createStateConstraint(from.getValue(), c, e));
-		if(from == null && to != null)	//has To but not From -> enters with true and exists with a specific state
-			state.setFrom(new Predicate());
-		return state;
-	}
-	
-	private Constraint createStateConstraint(String value, List<GhostFunction> c, CtElement e) {
-		Predicate p = new Predicate(value);
-		List<GhostFunction> lgf = p.getGhostInvocations(c);
-		Map<String,List<Integer>> differentSets = new HashMap<>();
-		for(GhostFunction gf: lgf) {
-			if(gf.belongsToGroupSet()) {//belongs to a set state
-				String name = gf.getParentClassName();
-				if(!differentSets.containsKey(name))
-					differentSets.put(name, new ArrayList());
-				List<Integer> dfl = differentSets.get(name);
-				if(!dfl.contains(gf.getGroupSet()))
-					dfl.add(gf.getGroupSet());
-				else
-					ErrorPrinter.printSameStateSetError(e, p, name, dfl);
-				
-			}
-		}
-		
-		return p;
-	}
-
 
 	public void addStates(ObjectState e){
 		stateChange.add(e);
 	}
-	
-	
-//	public void setChangeTo(Constraint to) {
-//		if(stateChange == null)
-//			stateChange = new ObjectState();
-//		stateChange.setTo(to);
-//	}
-//	
-//	public void setChangeFrom(Constraint to, Constraint from) {
-//		if(stateChange == null)
-//			stateChange = new ObjectState();
-//		stateChange.setFrom(from);
-//	}
-
-	
+		
 	public boolean hasStateChange() {
 		return stateChange.size()>0;
 	}

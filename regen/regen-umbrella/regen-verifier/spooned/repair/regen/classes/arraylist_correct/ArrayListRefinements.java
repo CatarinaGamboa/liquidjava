@@ -6,10 +6,10 @@ package repair.regen.classes.arraylist_correct;
 @repair.regen.specification.ExternalRefinementsFor("java.util.ArrayList")
 public interface ArrayListRefinements<E> {
     @repair.regen.specification.RefinementPredicate("int size(ArrayList l)")
-    @repair.regen.specification.Refinement("size(this) == 0")
+    @repair.regen.specification.StateRefinement(to = "size(this) == 0")
     public void ArrayList();
 
-    @repair.regen.specification.Refinement("size(this) == (size(old(this)) + 1)")
+    @repair.regen.specification.StateRefinement(to = "size(this) == (size(old(this)) + 1)")
     public void add(E e);
 }
 

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertFalse;
 
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,6 +15,7 @@ import org.omg.PortableInterceptor.INACTIVE;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
+import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
@@ -31,25 +33,8 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class AuxStateHandler {
 	
-	/**
-	 * If an expression has a state in metadata, then its state is passed to the last instance
-	 * of the variable with varName
-	 * @param context
-	 * @param state_key
-	 * @param this_key
-	 * @param varName
-	 * @param e
-	 */
-	public static void addStateRefinements(TypeChecker tc, String varName, CtExpression<?> e) {
-		Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(varName);
-		if(ovi.isPresent() && e.getMetadata(tc.REFINE_KEY) != null) {
-			VariableInstance vi = ovi.get(); 
-			Constraint c = (Constraint)e.getMetadata(tc.REFINE_KEY);
-			c = c.substituteVariable(tc.THIS, vi.getName()).substituteVariable(tc.WILD_VAR, vi.getName());
-//			vi.setState(c);
-			vi.setRefinement(c);
-		}
-	}
+	
+	//########### Get State from StateRefinement declaration #############
 
 	/**
 	 * Handles the passage of the written state annotations to the context for Constructors
@@ -57,7 +42,7 @@ public class AuxStateHandler {
 	 * @param f
 	 * @param context
 	 */
-	public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, Context context) {
+	public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, TypeChecker tc) {
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
 		if(!an.isEmpty()) {
 			for(CtAnnotation<? extends Annotation> a: an) {
@@ -66,7 +51,7 @@ public class AuxStateHandler {
 				if(from != null)
 					ErrorPrinter.printErrorConstructorFromState(c, from);
 			}
-			f.setState(an, context.getGhosts(), c);
+			setFunctionStates(f, an, tc, c);//f.setState(an, context.getGhosts(), c);
 		}
 		
 	}
@@ -77,15 +62,75 @@ public class AuxStateHandler {
 	 * @param context
 	 * @param f
 	 */
-	public static void handleMethodState(CtMethod<?> method, Context context, RefinedFunction f) {
+	public static void handleMethodState(CtMethod<?> method, RefinedFunction f, TypeChecker tc) {
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(!an.isEmpty())
-			f.setState(an, context.getGhosts(), method);
+			setFunctionStates(f, an, tc, method);
+//			f.setState(an, context.getGhosts(), method);
 		
 	}
-	
+
+	/**
+	 * Creates the list of states and adds them to the function
+	 * @param f
+	 * @param anns
+	 * @param tc
+	 * @param element
+	 */
+	private static void setFunctionStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
+			TypeChecker tc, CtElement element) {
+		List<ObjectState> l = new ArrayList<>();
+		for(CtAnnotation<? extends Annotation> an: anns) {
+			l.add(getStates(an, tc, element));
+		}
+		f.setAllStates(l);
+	}
+
+	private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, 
+										TypeChecker tc, CtElement e) {
+		Map<String, CtExpression> m = ctAnnotation.getAllValues();
+		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
+		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
+		ObjectState state = new ObjectState();
+		if(from != null)				//has From
+			state.setFrom(createStateConstraint(from.getValue(), tc, e));
+		if(to != null)					//has To
+			state.setTo(createStateConstraint(to.getValue(), tc, e));
+		
+		if(from != null && to == null)	//has From but not To -> the state remains the same 
+			state.setTo(createStateConstraint(from.getValue(), tc, e));
+		if(from == null && to != null)	//has To but not From -> enters with true and exists with a specific state
+			state.setFrom(new Predicate());
+		return state;
+	}
+
+
+	private static Constraint createStateConstraint(String value, TypeChecker tc, CtElement e) {
+		Predicate p = new Predicate(value);
+		List<GhostFunction> lgf = p.getGhostInvocations(tc.context.getGhosts());
+		Map<String,List<Integer>> differentSets = new HashMap<>();
+		for(GhostFunction gf: lgf) {
+			//join all sets of the klass 
+			if(gf.belongsToGroupSet()) {//belongs to a set state
+				String name = gf.getParentClassName();
+				if(!differentSets.containsKey(name))
+					differentSets.put(name, new ArrayList());
+				List<Integer> dfl = differentSets.get(name);
+				if(!dfl.contains(gf.getGroupSet()))
+					dfl.add(gf.getGroupSet());
+				else
+					ErrorPrinter.printSameStateSetError(e, p, name, dfl);
+				
+			}
+		}
+		
+		return p;
+	}
+
 
 	
+	//################ Handling State Change effects ################
+
 	/**
 	 * Sets the new state acquired from the constructor call
 	 * @param key
@@ -101,6 +146,24 @@ public class AuxStateHandler {
 			assertFalse("Constructor can only have one to state, not multiple", true);
 		
 	}
+	/**
+	 * If an expression has a state in metadata, then its state is passed to the last instance
+	 * of the variable with varName
+	 * @param context
+	 * @param state_key
+	 * @param this_key
+	 * @param varName
+	 * @param e
+	 */
+	public static void addStateRefinements(TypeChecker tc, String varName, CtExpression<?> e) {
+		Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(varName);
+		if(ovi.isPresent() && e.getMetadata(tc.REFINE_KEY) != null) {
+			VariableInstance vi = ovi.get(); 
+			Constraint c = (Constraint)e.getMetadata(tc.REFINE_KEY);
+			c = c.substituteVariable(tc.THIS, vi.getName()).substituteVariable(tc.WILD_VAR, vi.getName());
+			vi.setRefinement(c);
+		}
+	}
 
 	/**
 	 * Checks the changes in the state of the target
@@ -109,7 +172,7 @@ public class AuxStateHandler {
 	 * @param invocation
 	 */
 	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtElement invocation) {
-		CtConstructorCall<?> ctConstructorCall = null;
+		
 		CtElement target = searchFistVariableTarget(invocation);
 		if(target instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)target;
@@ -139,18 +202,17 @@ public class AuxStateHandler {
 	 * @return
 	 */
 	private static Constraint changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name, CtElement invocation) {
-//		if(vi.getState() == null)
 		if(vi.getRefinement() == null)
 			return new Predicate();
 		String instanceName = vi.getName();
-//		Constraint prevState = vi.getState().substituteVariable(name, instanceName);
 		Constraint prevState = vi.getRefinement()
 					.substituteVariable(tc.WILD_VAR, instanceName)
 					.substituteVariable(name, instanceName);
 		List<ObjectState> los = f.getAllStates();
+		
 		boolean found = false;
-		if(los.size() > 1)
-			assertFalse("Change state only working for one methods with one state",true);
+//		if(los.size() > 1)
+//			assertFalse("Change state only working for one methods with one state",true);
 		for (int i = 0; i < los.size() && !found; i++) {//TODO: only working for 1 state annotation
 			ObjectState os = los.get(i);
 			if(os.hasFrom()) {
