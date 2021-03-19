@@ -15,7 +15,7 @@ public class CommandLineLauncher {
 		process(file);
 	}
 
-	static void process(String file) {
+	public static void process(String file) {
 		Launcher launcher = new Launcher();
         launcher.addInputResource(file);
         launcher.getEnvironment().setNoClasspath(true);

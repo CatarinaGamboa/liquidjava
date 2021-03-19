@@ -1,4 +1,4 @@
-package repair.regen.api;
+package repair.regen.api.tests;
 
 import static org.junit.Assert.fail;
 
@@ -8,31 +8,8 @@ import org.junit.Test;
 
 import repair.regen.language.parser.SyntaxException;
 
-public class TestExamples {
+public class TestExamples extends TestAbstract{
 
-	String testPath = "../regen-example/src/test/java/repair/regen/";
-
-	private void testCorrect(String filename) {   
-		MySecurityManager secManager = new MySecurityManager();
-	    System.setSecurityManager(secManager);
-	    try {
-	    	CommandLineLauncher.process(filename);    
-	    } catch (SecurityException e) {
-	      fail();
-	    }
-	}
-	
-	private void testWrong(String filename) {    
-		MySecurityManager secManager = new MySecurityManager();
-	    System.setSecurityManager(secManager);
-	    try {
-	    	CommandLineLauncher.process(filename);    
-	    } catch (SecurityException e) {
-	      return;
-	    }
-	    fail();
-	}
-	
 	@Test
 	public void correctSimpleAssignment() {
 		testCorrect(testPath+"CorrectSimpleAssignment.java");
@@ -200,11 +177,7 @@ public class TestExamples {
 	public void correctSimpleCarTest() {
 		testCorrect(testPath+"/classes/car1");
 	}
-	
-	@Test
-	public void correctEmail1() {
-		testCorrect(testPath+"/classes/email1");
-	}
+
 	
 	@Test
 	public void correctCheckRefinementsSupertype() {
@@ -212,26 +185,10 @@ public class TestExamples {
 	}
 	
 	@Test
-	public void correctStateFromSuperclass() {
-		testCorrect(testPath+"/classes/state_from_superclass_correct");
-	}
-	
-	@Test
-	public void correctStateCases() {
-		testCorrect(testPath+"/classes/state_multiple_cases");
-	}
-	
-	@Test
 	public void correctArrayListSize() {
 		testCorrect(testPath+"/classes/arraylist_correct");
 	}
-	
-//	@Test
-//	public void correctInputReaderCharArrayLongerNameEve() {
-//		testCorrect(testPath+"/classes/input_reader_correct");
-//	}
-//	
-	
+
 	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
@@ -459,21 +416,7 @@ public class TestExamples {
 	public void errorAliasArgumentSize() {
 		testWrong(testPath+"ErrorAliasArgumentSize.java");
 	}
-	
-	@Test
-	public void errorEmail2() {
-		testWrong(testPath+"/classes/email2");
-	}
-	
-	@Test
-	public void errorInputReader() {
-		testWrong(testPath+"/classes/input_reader_error");
-	}
-	
-	@Test
-	public void errorInputReader2() {
-		testWrong(testPath+"/classes/input_reader_error2");
-	}
+
 
 	@Test
 	public void errorRefsFromInterface() {
@@ -484,29 +427,6 @@ public class TestExamples {
 	@Test
 	public void errorRefsFromSuperclass() {
 		testWrong(testPath+"/classes/refs_from_superclass_error");
-	}
-	
-	@Test
-	public void errorStatesSameSet() {
-		testWrong(testPath+"/classes/state_multiple_error");
-	}
-	
-	@Test
-	public void errorConstructorWithFromCase() {
-		testWrong(testPath+"/classes/MyStreamReader.java");
-	}
-
-	
-	class MySecurityManager extends SecurityManager {
-		//Handles exit(1) when the refinements are not respected
-		  @Override public void checkExit(int status) {
-			  if(status == 1 || status == 2)
-				  throw new SecurityException("subtyping");
-		  }
-
-		  @Override public void checkPermission(Permission perm) {
-		      // Allow other activities by default
-		  }
 	}
 
 }
