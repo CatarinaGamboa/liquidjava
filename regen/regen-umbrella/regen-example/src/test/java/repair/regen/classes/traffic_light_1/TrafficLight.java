@@ -1,4 +1,4 @@
-package regen.test.project;
+package repair.regen.classes.traffic_light_1;
 
 import repair.regen.specification.Refinement;
 import repair.regen.specification.StateRefinement;

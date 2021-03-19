@@ -1,4 +1,4 @@
-package regen.test.project;
+package repair.regen.classes.traffic_light_1;
 
 
 // @StateRefinement(from="red(this)")
@@ -41,8 +41,8 @@ public class TrafficLight {
     }
 
     @repair.regen.specification.Refinement("red(_)")
-    public regen.test.project.TrafficLight getTrafficLightStartingRed() {
-        regen.test.project.TrafficLight t = new regen.test.project.TrafficLight();
+    public repair.regen.classes.traffic_light_1.TrafficLight getTrafficLightStartingRed() {
+        repair.regen.classes.traffic_light_1.TrafficLight t = new repair.regen.classes.traffic_light_1.TrafficLight();
         t.transitionToAmber();
         t.transitionToRed();
         return t;

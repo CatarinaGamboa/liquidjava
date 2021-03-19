@@ -9,7 +9,7 @@ import repair.regen.specification.StateSet;
 //https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
 @ExternalRefinementsFor("java.io.InputStreamReader")
 @StateSet({"open",  "close"})
-@StateSet({"alreadyRead", "nothingRead"})
+@StateSet({"nothingRead", "alreadyRead"})
 public interface InputStreamReaderRefinements {
 	
 	@StateRefinement(to="open(this) && nothingRead(this)")

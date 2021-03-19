@@ -52,8 +52,30 @@ public class AuxStateHandler {
 					ErrorPrinter.printErrorConstructorFromState(c, from);
 			}
 			setFunctionStates(f, an, tc, c);//f.setState(an, context.getGhosts(), c);
+		}else {
+			setDefaultState(f, tc);
 		}
 		
+	}
+
+	private static void setDefaultState(RefinedFunction f, TypeChecker tc) {
+		String[] path = f.getTargetClass().split("\\.");
+		String klass = path[path.length-1];
+		List<GhostFunction> l = tc.context.getGhosts();
+		String[] s = {tc.THIS};
+		Constraint c = new Predicate();
+		for(GhostFunction g:l) {
+			if(g.belongsToGroupSet() && g.hasOrder() && 
+					g.getParentClassName().equals(klass) && g.getOrder() == 1) {
+				c = Conjunction.createConjunction(c, new Predicate(g.getInvocation(s)));
+			}
+		}
+		ObjectState os = new ObjectState();
+		os.setTo(c);
+		List<ObjectState> los = new ArrayList<>();
+		los.add(os);
+		f.setAllStates(los);
+		System.out.println();
 	}
 
 	/**

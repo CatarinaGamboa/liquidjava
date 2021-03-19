@@ -86,13 +86,16 @@ public abstract class TypeChecker extends CtScanner{
 				CtNewArray<String> e = (CtNewArray<String>)ann.getAllValues().get("value");
 				List<CtExpression<?>> ls = e.getElements();
 				set++;
-				for(CtExpression<?> ce : ls)
+				int order = 1;
+				for(CtExpression<?> ce : ls) {
 					if(ce instanceof CtLiteral<?>) {
 						CtLiteral<String> s = (CtLiteral<String>)ce;
-						Optional<GhostFunction> gh = createGhostFunction(s.getValue(), set, element);
+						Optional<GhostFunction> gh = createGhostFunction(s.getValue(), set, order, element);
 						if(gh.isPresent() && !context.hasGhost(gh.get().getName()))
 							context.addGhostFunction(gh.get());
 					}
+					order++;
+				}
 			}	
 		}
 	}
@@ -109,7 +112,7 @@ public abstract class TypeChecker extends CtScanner{
 	}
 
 
-	protected Optional<GhostFunction> createGhostFunction(String value, int set, CtElement element){
+	protected Optional<GhostFunction> createGhostFunction(String value, int set, int order, CtElement element){
 		CtClass<?> klass = null; 
 
 		if(element.getParent() instanceof CtClass<?>) {
@@ -121,7 +124,7 @@ public abstract class TypeChecker extends CtScanner{
 			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
 			List<String> params = Arrays.asList(klass.getSimpleName());
 			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
-					klass.getQualifiedName(), klass.getSimpleName(), set); 
+					klass.getQualifiedName(), klass.getSimpleName(), set, order); 
 			//			context.addGhostFunction(gh);
 			System.out.println(gh.toString());
 			return Optional.of(gh);

@@ -19,6 +19,7 @@ public class GhostFunction {
 	
 	private String klassName;
 	private int setGroup;
+	private int order;
 	
 	public GhostFunction(FunctionDeclaration fdExp, Factory factory, String path, String klass) {
 		name = fdExp.getName().toString();
@@ -35,7 +36,7 @@ public class GhostFunction {
 	}
 	
 	public GhostFunction(String name,List<String> param_types, CtTypeReference<?> return_type, 
-			Factory factory, String path, String klass, int group) {
+			Factory factory, String path, String klass, int group, int order) {
 		this.name = name;
 		this.return_type = Utils.getType(return_type.toString().equals(klass)? path: return_type.toString(), factory);
 		this.param_types = new ArrayList<>();
@@ -45,6 +46,7 @@ public class GhostFunction {
 		}
 		this.klassName = klass;
 		this.setGroup = group;
+		this.order = order;
 	}
 
 	
@@ -95,6 +97,14 @@ public class GhostFunction {
 	
 	public boolean belongsToGroupSet() {
 		return setGroup > 0;
+	}
+	
+	public int getOrder() {
+		return order;
+	}
+	
+	public boolean hasOrder() {
+		return order > 0;
 	}
 
 }

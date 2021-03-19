@@ -37,6 +37,11 @@ public class TestClasses extends TestAbstract{
 		testCorrect(testPath+"/classes/arraylist_correct");
 	}
 
+	@Test
+	public void correctTrafficLights1() {
+		testCorrect(testPath+"/classes/traffic_light_1");
+	}
+
 	
 //	@Test
 //	public void correctInputReaderCharArrayLongerNameEve() {
