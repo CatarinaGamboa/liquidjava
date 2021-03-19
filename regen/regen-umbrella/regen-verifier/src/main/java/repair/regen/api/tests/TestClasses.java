@@ -2,7 +2,7 @@ package repair.regen.api.tests;
 
 import org.junit.Test;
 
-public class TestState extends TestAbstract{
+public class TestClasses extends TestAbstract{
 		
 	@Test
 	public void correctEmail1() {
@@ -18,6 +18,23 @@ public class TestState extends TestAbstract{
 	@Test
 	public void correctStateCases() {
 		testCorrect(testPath+"/classes/state_multiple_cases");
+	}
+
+	
+	@Test
+	public void correctSimpleCarTest() {
+		testCorrect(testPath+"/classes/car1");
+	}
+
+	
+	@Test
+	public void correctCheckRefinementsSupertype() {
+		testCorrect(testPath+"/classes/refs_from_superclasses_correct");
+	}
+	
+	@Test
+	public void correctArrayListSize() {
+		testCorrect(testPath+"/classes/arraylist_correct");
 	}
 
 	
@@ -58,6 +75,18 @@ public class TestState extends TestAbstract{
 	public void correctEmail3() {
 		testWrong(testPath+"/classes/email3");
 	}
+	
+	@Test
+	public void errorRefsFromInterface() {
+		testWrong(testPath+"/classes/refs_from_interface_error");
+	}
+	
+	
+	@Test
+	public void errorRefsFromSuperclass() {
+		testWrong(testPath+"/classes/refs_from_superclass_error");
+	}
+
 
 
 }

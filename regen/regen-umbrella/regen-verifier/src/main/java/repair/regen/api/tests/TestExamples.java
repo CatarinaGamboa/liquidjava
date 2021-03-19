@@ -1,22 +1,12 @@
 package repair.regen.api.tests;
 
-import static org.junit.Assert.fail;
-
-import java.security.Permission;
-
 import org.junit.Test;
-
-import repair.regen.language.parser.SyntaxException;
 
 public class TestExamples extends TestAbstract{
 
 	@Test
 	public void correctSimpleAssignment() {
 		testCorrect(testPath+"CorrectSimpleAssignment.java");
-	}
-	@Test
-	public void correctArithmeticBinaryOperation() {
-		testCorrect(testPath+"CorrectArithmeticBinaryOperations.java");
 	}
 
 	@Test
@@ -35,22 +25,6 @@ public class TestExamples extends TestAbstract{
 	public void correctImplies() {
 		testCorrect(testPath+"CorrectImplies.java");
 	}
-	
-	@Test
-	public void correctLongUsage() {
-		testCorrect(testPath+"CorrectLongUsage.java");
-	}
-	
-	@Test
-	public void correctPrimitiveNumbersTypes() {
-		testCorrect(testPath+"CorrectPrimitiveNumbersTypes.java");
-	} //Takes a long time
-	
-	@Test
-	public void correctFPArithmetic() {
-		testCorrect(testPath+"CorrectFPArithmetic.java");
-	}
-	
 	
 	@Test
 	public void correctNoRefinements() {
@@ -135,11 +109,6 @@ public class TestExamples extends TestAbstract{
 	}
 	
 	@Test
-	public void correctInvocationFromMathLibrary() {
-		testCorrect(testPath+"/math/correctInvocation");
-	}
-	
-	@Test
 	public void correctUsingAfterIf() {
 		testCorrect(testPath+"CorrectUsingAfterIf.java");
 	}
@@ -172,77 +141,21 @@ public class TestExamples extends TestAbstract{
 	public void correctAliasExpressions() {
 		testCorrect(testPath+"CorrectAliasExpressions.java");
 	}
-	
-	@Test
-	public void correctSimpleCarTest() {
-		testCorrect(testPath+"/classes/car1");
-	}
-
-	
-	@Test
-	public void correctCheckRefinementsSupertype() {
-		testCorrect(testPath+"/classes/refs_from_superclasses_correct");
-	}
-	
-	@Test
-	public void correctArrayListSize() {
-		testCorrect(testPath+"/classes/arraylist_correct");
-	}
 
 	@Test
 	public void errorSimpleAssignment() {
 		testWrong(testPath+"ErrorSimpleAssignment.java");
 	}
-	
-	@Test
-	public void errorArithmeticBinaryOperation() {
-		testWrong(testPath+"ErrorArithmeticBinaryOperations.java");
-	}
-	
-	
+
 	@Test
 	public void errorAssignementAfterDeclaration() {
 		testWrong(testPath+"ErrorAssignementAfterDeclaration.java");
 	}
-
 	
 	@Test
 	public void errorUnaryOperators() {
 		testWrong(testPath+"ErrorUnaryOperators.java");
 	}
-	
-	@Test
-	public void errorUnaryOpMinus() {
-		testWrong(testPath+"ErrorUnaryOpMinus.java");
-	}
-	
-	@Test
-	public void errorLongUsage1() {
-		testWrong(testPath+"ErrorLongUsage1.java");
-	}
-	
-	@Test
-	public void errorLongUsage2() {
-		testWrong(testPath+"ErrorLongUsage2.java");
-	}
-	
-	@Test
-	public void errorArithmeticFP1() {
-		testWrong(testPath+"ErrorArithmeticFP1.java");
-	}
-	@Test
-	public void errorArithmeticFP2() {
-		testWrong(testPath+"ErrorArithmeticFP2.java");
-	}
-	@Test
-	public void errorArithmeticFP3() {
-		testWrong(testPath+"ErrorArithmeticFP3.java");
-	}
-	@Test
-	public void errorArithmeticFP4() {
-		testWrong(testPath+"ErrorArithmeticFP4.java");
-	}
-	
 	
 	@Test
 	public void errorNoRefinementsVar() {
@@ -323,11 +236,6 @@ public class TestExamples extends TestAbstract{
 	}
 	
 	@Test
-	public void errorSpecificArithmetic() {
-		testWrong(testPath+"ErrorSpecificArithmetic.java");
-	}
-
-	@Test
 	public void errorSpecificVarInRefinement() {
 		testWrong(testPath+"ErrorSpecificVarInRefinement.java");
 	}
@@ -335,22 +243,6 @@ public class TestExamples extends TestAbstract{
 	public void errorSpecificVarInRefinementIf() {
 		testWrong(testPath+"ErrorSpecificVarInRefinementIf.java");
 	}
-	
-	@Test
-	public void errorMathMax() {
-		testWrong(testPath+"/math/errorMax");
-	}
-
-	@Test
-	public void errorMathAbs() {
-		testWrong(testPath+"/math/errorAbs");
-	}
-
-	@Test
-	public void errorMathMultiplyExact() {
-		testWrong(testPath+"/math/errorMultiplyExact");
-	}
-	
 	
 	@Test
 	public void errorRecursion1() {
@@ -418,15 +310,5 @@ public class TestExamples extends TestAbstract{
 	}
 
 
-	@Test
-	public void errorRefsFromInterface() {
-		testWrong(testPath+"/classes/refs_from_interface_error");
-	}
-	
-	
-	@Test
-	public void errorRefsFromSuperclass() {
-		testWrong(testPath+"/classes/refs_from_superclass_error");
-	}
 
 }
