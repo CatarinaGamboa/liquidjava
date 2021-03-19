@@ -5,20 +5,20 @@ import static org.junit.Assert.assertFalse;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.omg.PortableInterceptor.INACTIVE;
-
+import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.Utils;
 import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
@@ -107,28 +107,62 @@ public class AuxStateHandler {
 
 	private static Constraint createStateConstraint(String value, TypeChecker tc, CtElement e) {
 		Predicate p = new Predicate(value);
-		List<GhostFunction> lgf = p.getGhostInvocations(tc.context.getGhosts());
-		Map<String,List<Integer>> differentSets = new HashMap<>();
-		for(GhostFunction gf: lgf) {
-			//join all sets of the klass 
-			if(gf.belongsToGroupSet()) {//belongs to a set state
-				String name = gf.getParentClassName();
-				if(!differentSets.containsKey(name))
-					differentSets.put(name, new ArrayList());
-				List<Integer> dfl = differentSets.get(name);
-				if(!dfl.contains(gf.getGroupSet()))
-					dfl.add(gf.getGroupSet());
-				else
-					ErrorPrinter.printSameStateSetError(e, p, name, dfl);
-				
+		List<GhostFunction> allGhosts = tc.context.getGhosts();
+		List<GhostFunction> ghostsInAnnotation = p.getGhostInvocations(tc.context.getGhosts());
+		Map<String,List<Integer>> referedSets = getReferedSets(ghostsInAnnotation);
+		for(String k: referedSets.keySet()) {
+			for(int i : referedSets.get(k)) {
+				List<GhostFunction> allFromSet = getAllFromSet(allGhosts, k, i);
+				String name = String.format(tc.instanceFormat, k, tc.context.getCounter());
+				//should only have 1 param
+				tc.context.addVarToContext(name, allFromSet.get(0).getParametersTypes().get(0), new Predicate());
+				String[] ls = {name};
+				Constraint disjoint = getAllPermutations(allFromSet, ls);
+				Constraint c = p.substituteVariable(tc.THIS, name);
+				boolean b = tc.checkStateSMT(disjoint, c.negate(), e);
+				//If it is impossible then the check will return true, so in this case
+				//we want to send an error because the states must be disjoint
+				if(b) ErrorPrinter.printSameStateSetError(e, p, k);
 			}
 		}
-		
+
 		return p;
 	}
 
 
 	
+	private static Constraint getAllPermutations(List<GhostFunction> allFromSet, String[] ls) {
+		List<Constraint> l = allFromSet.stream().map(p->p.getInvocation(ls)).map(p -> new Predicate(p)).collect(Collectors.toList());
+		Constraint c = new Predicate();
+		for (int i = 0; i < l.size(); i++) {
+			for (int j = i+1; j < l.size(); j++) {
+				c = Conjunction.createConjunction(c, Conjunction.createConjunction(l.get(i), l.get(j)).negate());
+			}
+		}
+		return c;
+	}
+
+	private static List<GhostFunction> getAllFromSet(List<GhostFunction> allGhosts, String k, int i) {
+		List<GhostFunction> l = new ArrayList<>();
+		for(GhostFunction g: allGhosts)
+			if(g.getParentClassName().equals(k) && g.belongsToGroupSet() && g.getGroupSet() == i)
+				l.add(g);
+		return l;
+	}
+
+	private static Map<String, List<Integer>> getReferedSets(List<GhostFunction> ghostsInAnnotation) {
+		Map<String,List<Integer>> differentSets = new HashMap<>();
+		for(GhostFunction gf: ghostsInAnnotation) {
+			if(gf.belongsToGroupSet()) {//belongs to a set state
+				String name = gf.getParentClassName();
+				if(!differentSets.containsKey(name))
+					differentSets.put(name, new ArrayList());
+				differentSets.get(name).add(gf.getGroupSet());
+			}
+		}
+		return differentSets;
+	}
+
 	//################ Handling State Change effects ################
 
 	/**

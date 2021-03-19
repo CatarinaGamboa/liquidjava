@@ -20,6 +20,12 @@ public class Argument implements IModel{
 	@Optional
 	FollowUpArgument fua;
 	
+	public Argument() {}
+	
+	public Argument(Expression v) {
+		this.v = v;
+	}
+	
 	public void eval(TranslatorToZ3 ctx, List<Expr> l) throws Exception{
 		l.add(v.eval(ctx));
 		if(hasFollowUpArgument())

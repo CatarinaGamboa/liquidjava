@@ -17,10 +17,11 @@ package regen.test.project;
 // return true;
 // }
 @repair.regen.specification.StateSet({ "green", "solidAmber", "red", "flashingAmber" })
+@repair.regen.specification.StateSet({ "a", "b" })
 public class TrafficLight {
     // StateRefinement -> refines the state of the present object
     // independently of the arguments or the return of the method
-    @repair.regen.specification.StateRefinement(to = "green(this)")
+    @repair.regen.specification.StateRefinement(to = "green(this) && (a(this) || b(this))")
     public TrafficLight() {
     }
 

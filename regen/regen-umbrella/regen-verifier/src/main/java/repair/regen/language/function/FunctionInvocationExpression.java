@@ -23,6 +23,14 @@ public class FunctionInvocationExpression extends Expression implements IModel{
 	Argument mv;
 
 	ParenthesisRight pr;
+	
+	public FunctionInvocationExpression() {}
+	public FunctionInvocationExpression(String n, Argument m) {
+		name = new FunctionName(n);
+		pl = new ParenthesisLeft();
+		mv = m;
+		pr = new ParenthesisRight();
+	}
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception{

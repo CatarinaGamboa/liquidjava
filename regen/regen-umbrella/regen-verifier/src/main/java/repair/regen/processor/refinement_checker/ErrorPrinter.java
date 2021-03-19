@@ -75,9 +75,9 @@ public class ErrorPrinter {
 
 	}
 
-	public static void printSameStateSetError(CtElement element, Predicate p, String name, List<Integer> dfl) {
+	public static void printSameStateSetError(CtElement element, Constraint p,String name) {
 		System.out.println("______________________________________________________");
-		System.err.println(" Error found multiple states from a State Set in a refinement");
+		System.err.println(" Error found multiple disjoint states from a State Set in a refinement");
 		System.out.println();
 		System.out.println(element);
 		System.out.println();

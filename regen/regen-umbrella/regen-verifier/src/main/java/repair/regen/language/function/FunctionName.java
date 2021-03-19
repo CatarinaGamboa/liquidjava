@@ -8,6 +8,11 @@ import org.modelcc.Value;
 public class FunctionName implements IModel{
 	@Value
 	String name;
+	
+	public FunctionName() {}
+	public FunctionName(String name) {
+		this.name = name;
+	}
 
 	public String toString() {
 		return name;

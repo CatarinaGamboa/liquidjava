@@ -1,5 +1,7 @@
 package repair.regen.processor.context;
 
+import static org.junit.Assert.assertFalse;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,6 +70,18 @@ public class GhostFunction {
 		}
 		sb.delete(sb.length()-2, sb.length());
 		sb.append(")");
+		return sb.toString();
+	}
+	
+	public String getInvocation(String[] paramNames) {
+		if(paramNames.length != param_types.size())
+			assertFalse("Error in code - GhostFunction.getInvocation",true);
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append(name).append("(");
+		for(String s :paramNames)
+			sb.append(s).append(",");
+		sb.deleteCharAt(sb.length()-1).append(")");
 		return sb.toString();
 	}
 	
