@@ -58,7 +58,7 @@ public class AuxStateHandler {
 		
 	}
 
-	private static void setDefaultState(RefinedFunction f, TypeChecker tc) {
+	public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
 		String[] path = f.getTargetClass().split("\\.");
 		String klass = path[path.length-1];
 		List<GhostFunction> l = tc.context.getGhosts();
@@ -75,7 +75,7 @@ public class AuxStateHandler {
 		List<ObjectState> los = new ArrayList<>();
 		los.add(os);
 		f.setAllStates(los);
-		System.out.println();
+//		System.out.println();
 	}
 
 	/**

@@ -12,6 +12,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
+import repair.regen.processor.context.RefinedFunction;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
@@ -64,7 +65,9 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
 		mfc.getMethodRefinements(method, prefix);
 		super.visitCtMethod(method);
-		System.out.println("visited method external");
+	
+//		
+//		System.out.println("visited method external");
 	}
 
 

@@ -106,12 +106,13 @@ public class MethodsFunctionsChecker {
 
 
 	<R> void getMethodRefinements(CtMethod<R> method, String prefix) {
+		String constructorName = "<init>";
 		String[] pac = prefix.split("\\.");
 		String k = pac[pac.length-1]; 
 
 		String functionName = String.format("%s.%s", prefix, method.getSimpleName());
 		if(k.equals(method.getSimpleName())) {//is a constructor
-			functionName = String.format("<init>");
+			functionName = String.format(constructorName);
 		}
 
 		RefinedFunction f = new RefinedFunction();
@@ -123,6 +124,9 @@ public class MethodsFunctionsChecker {
 		auxGetMethodRefinements(method, f);
 
 		AuxStateHandler.handleMethodState(method, f, rtc);
+		if(functionName.equals(constructorName) && !f.hasStateChange()) {
+			AuxStateHandler.setDefaultState(f, rtc);
+		}
 	}
 
 	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {

@@ -125,7 +125,6 @@ public abstract class TypeChecker extends CtScanner{
 			List<String> params = Arrays.asList(klass.getSimpleName());
 			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
 					klass.getQualifiedName(), klass.getSimpleName(), set, order); 
-			//			context.addGhostFunction(gh);
 			System.out.println(gh.toString());
 			return Optional.of(gh);
 		}
@@ -168,7 +167,6 @@ public abstract class TypeChecker extends CtScanner{
 				}	
 			}
 		} catch (SyntaxException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
