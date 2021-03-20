@@ -16,7 +16,7 @@ package regen.test.project;
 // public boolean carsPass() {
 // return true;
 // }
-@repair.regen.specification.StateSet({ "green", "solidAmber", "red", "flashingAmber" })
+@repair.regen.specification.StateSet({ "solidAmber", "green", "red", "flashingAmber" })
 @repair.regen.specification.StateSet({ "buttonTouched", "buttonNotTouched" })
 public class TrafficLight {
     // StateRefinement -> refines the state of the present object

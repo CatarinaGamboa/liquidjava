@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.ObjectState;
@@ -67,7 +68,8 @@ public class AuxStateHandler {
 		for(GhostFunction g:l) {
 			if(g.belongsToGroupSet() && g.hasOrder() && 
 					g.getParentClassName().equals(klass) && g.getOrder() == 1) {
-				c = Conjunction.createConjunction(c, new Predicate(g.getInvocation(s)));
+				Predicate p = new InvocationPredicate(g.getName(), s);
+				c = Conjunction.createConjunction(c, p);
 			}
 		}
 		ObjectState os = new ObjectState();
@@ -141,6 +143,7 @@ public class AuxStateHandler {
 				String[] ls = {name};
 				Constraint disjoint = getAllPermutations(allFromSet, ls);
 				Constraint c = p.substituteVariable(tc.THIS, name);
+				
 				boolean b = tc.checkStateSMT(disjoint, c.negate(), e);
 				//If it is impossible then the check will return true, so in this case
 				//we want to send an error because the states must be disjoint
@@ -154,7 +157,9 @@ public class AuxStateHandler {
 
 	
 	private static Constraint getAllPermutations(List<GhostFunction> allFromSet, String[] ls) {
-		List<Constraint> l = allFromSet.stream().map(p->p.getInvocation(ls)).map(p -> new Predicate(p)).collect(Collectors.toList());
+		List<Constraint> l = allFromSet.stream()
+									   .map(p->new InvocationPredicate(p.getName(), ls))
+									   .collect(Collectors.toList());
 		Constraint c = new Predicate();
 		for (int i = 0; i < l.size(); i++) {
 			for (int j = i+1; j < l.size(); j++) {

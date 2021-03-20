@@ -4,7 +4,7 @@ import repair.regen.specification.Refinement;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 
-@StateSet({"green", "solidAmber", "red", "flashingAmber"})
+@StateSet({"solidAmber", "green", "red", "flashingAmber"})
 @StateSet({"buttonTouched", "buttonNotTouched"})
 public class TrafficLight {
 	//StateRefinement -> refines the state of the present object
