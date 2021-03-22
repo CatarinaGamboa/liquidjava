@@ -6,7 +6,6 @@ import java.io.InputStreamReader;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 
-import bufferedreader.Order;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
@@ -15,12 +14,19 @@ import repair.regen.specification.StateSet;
 public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
-
-		TrafficLight tl = new TrafficLight();
-		tl.transitionToAmber();
 		
-		TrafficLight tl2 = tl.getTrafficLightStartingRed();
-		tl2.transitionToFlashingAmber();
+		Order o = new Order();
+		o.addItem("shirt", 3);
+		o.addItem("shirt2", 5);
+		o.hasThree();
+
+//		TrafficLight tl = new TrafficLight();
+//		tl.transitionToAmber();
+//		
+		
+//		TrafficLight tl2 = tl.getTrafficLightStartingRed();
+//		tl2.transitionToFlashingAmber();
+		
 		
 //		tl.transitionToAmber();
 //		tl.transitionToAmber();

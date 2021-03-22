@@ -95,11 +95,21 @@ public class MethodsFunctionsChecker {
 			f.setClass(inter.getQualifiedName());
 		}
 		rtc.context.addFunctionToContext(f);
+		
+		long d1 = System.currentTimeMillis();
 		auxGetMethodRefinements(method, f);
-
+		long d2 = System.currentTimeMillis();
+		System.out.println("auxGetMethod refinements:" + (d2-d1));
+		
+		d1 = System.currentTimeMillis();
 		AuxStateHandler.handleMethodState(method, f, rtc);
+		d2 = System.currentTimeMillis();
+		System.out.println("handleState refinements:" + (d2-d1));
+		
 		if(klass != null)
 			AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
+
+		
 	}
 
 

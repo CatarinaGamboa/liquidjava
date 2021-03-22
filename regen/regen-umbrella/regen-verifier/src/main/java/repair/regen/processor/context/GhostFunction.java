@@ -74,19 +74,7 @@ public class GhostFunction {
 		sb.append(")");
 		return sb.toString();
 	}
-	
-	public String getInvocation(String[] paramNames) {
-		if(paramNames.length != param_types.size())
-			assertFalse("Error in code - GhostFunction.getInvocation",true);
 		
-		StringBuilder sb = new StringBuilder();
-		sb.append(name).append("(");
-		for(String s :paramNames)
-			sb.append(s).append(",");
-		sb.deleteCharAt(sb.length()-1).append(")");
-		return sb.toString();
-	}
-	
 	public String getParentClassName() {
 		return klassName;
 	}

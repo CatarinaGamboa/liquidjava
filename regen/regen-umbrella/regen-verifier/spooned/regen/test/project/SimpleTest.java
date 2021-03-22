@@ -26,10 +26,15 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        regen.test.project.TrafficLight tl = new regen.test.project.TrafficLight();
-        tl.transitionToAmber();
-        regen.test.project.TrafficLight tl2 = tl.getTrafficLightStartingRed();
-        tl2.transitionToFlashingAmber();
+        regen.test.project.Order o = new regen.test.project.Order();
+        o.addItem("shirt", 3);
+        o.addItem("shirt2", 5);
+        o.hasThree();
+        // TrafficLight tl = new TrafficLight();
+        // tl.transitionToAmber();
+        // 
+        // TrafficLight tl2 = tl.getTrafficLightStartingRed();
+        // tl2.transitionToFlashingAmber();
         // tl.transitionToAmber();
         // tl.transitionToAmber();
         // tl.passagersCross();

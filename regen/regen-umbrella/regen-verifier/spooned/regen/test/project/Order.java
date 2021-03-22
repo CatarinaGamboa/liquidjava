@@ -21,15 +21,15 @@ public class Order {
     public Order() {
     }
 
-    @repair.regen.specification.StateRefinement(from = "addingItems(this)", to = "((countItems(this) == (countItems(old(this)) + 1)) && (addingItems(this)))")
-    @repair.regen.specification.StateRefinement(from = "empty(this)", to = "((countItems(this) == (countItems(old(this)) + 1)) && addingItems(this))")
+    // @Refinement("_ == this")
+    @repair.regen.specification.StateRefinement(from = "empty(this) || addingItems(this)", to = "((countItems(this) == (countItems(old(this)) + 1)) && addingItems(this))")
     public regen.test.project.Order addItem(java.lang.String itemName, int price) {
         return this;
     }
 
     @repair.regen.specification.StateRefinement(from = "((addingItems(this)) && (countItems(this) == 3))")
     public boolean hasThree() {
-        return false;
+        return true;
     }
 }
 

@@ -6,7 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 
-import bufferedreader.Order;
+import regen.test.project.Order;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
