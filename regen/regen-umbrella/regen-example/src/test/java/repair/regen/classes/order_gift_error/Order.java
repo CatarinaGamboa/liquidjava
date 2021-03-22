@@ -1,4 +1,4 @@
-package regen.test.project;
+package repair.regen.classes.order_gift_error;
 
 
 
@@ -7,20 +7,20 @@ import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 @StateSet({"empty","addingItems", "checkout", "closed"})
-public class OrderSimple {
+public class Order {
 	
-	@RefinementPredicate("int countItems(OrderSimple o)")
-	@StateRefinement(to="(countItems(this) == 0) && empty(this)")
-	public OrderSimple() {}
+	@RefinementPredicate("int totalPrice(Order o)")
+	@StateRefinement(to="(totalPrice(this) == 0) && empty(this)")
+	public Order() {}
 	
 	@StateRefinement(from="(empty(this) || addingItems(this))", 
-					 to="((countItems(this) == (countItems(old(this)) + 1)) && addingItems(this))")
+					 to="((totalPrice(this) == (totalPrice(old(this)) + price)) && addingItems(this))")
 //	@Refinement("_ == this")
-	public OrderSimple addItem(String itemName, int price) {		
+	public Order addItem(String itemName, int price) {		
 		return this;
 	}
 	
-	@StateRefinement(from="((addingItems(this)) && (countItems(this) > 20))")
+	@StateRefinement(from="((addingItems(this)) && (totalPrice(this) > 20))")
 	public boolean hasGift() {return true;}
 	
 //	@StateRefinement(from="addingItems(this)", to = "checkout(this)")

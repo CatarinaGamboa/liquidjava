@@ -145,7 +145,7 @@ public class AuxStateHandler {
 				String[] ls = {name};
 				Constraint disjoint = getAllPermutations(allFromSet, ls);
 				Constraint c = p.substituteVariable(tc.THIS, name);
-				c = c.changeOldMentions("", nameOld);
+				c = c.changeOldMentions(nameOld, "");
 				boolean b = tc.checkStateSMT(disjoint, c.negate(), e);
 				//If it is impossible then the check will return true, so in this case
 				//we want to send an error because the states must be disjoint

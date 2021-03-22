@@ -1,19 +1,6 @@
 package regen.test.project;
 
 
-// @StateRefinement(from="addingItems(this)", to = "checkout(this)")
-// public Order pay(int cardNumber) {
-// return this;
-// }
-// @StateRefinement(from="checkout(this) && priceNow(this) > 20", to = "checkout(this)")
-// public Order addGift() {
-// return this;
-// }
-// 
-// @StateRefinement(from="checkout(this)", to = "closed(this)")
-// public Order sendToAddress(String a) {
-// return this;
-// }
 @repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "closed" })
 public class Order {
     @repair.regen.specification.RefinementPredicate("int totalPrice(Order o)")
@@ -27,9 +14,19 @@ public class Order {
         return this;
     }
 
-    @repair.regen.specification.StateRefinement(from = "((addingItems(this)) && (totalPrice(this) > 20))")
-    public boolean hasGift() {
-        return true;
+    @repair.regen.specification.StateRefinement(from = "addingItems(this)", to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+    public regen.test.project.Order pay(int cardNumber) {
+        return this;
+    }
+
+    @repair.regen.specification.StateRefinement(from = "checkout(this) && totalPrice(this) > 20", to = "checkout(this)")
+    public regen.test.project.Order addGift() {
+        return this;
+    }
+
+    @repair.regen.specification.StateRefinement(from = "checkout(this)", to = "closed(this)")
+    public regen.test.project.Order sendToAddress(java.lang.String a) {
+        return this;
     }
 }
 
