@@ -15,19 +15,19 @@ package regen.test.project;
 // return this;
 // }
 @repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "closed" })
-public class Order {
-    @repair.regen.specification.RefinementPredicate("int totalPrice(Order o)")
-    @repair.regen.specification.StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
-    public Order() {
+public class OrderSimple {
+    @repair.regen.specification.RefinementPredicate("int countItems(OrderSimple o)")
+    @repair.regen.specification.StateRefinement(to = "(countItems(this) == 0) && empty(this)")
+    public OrderSimple() {
     }
 
     // @Refinement("_ == this")
-    @repair.regen.specification.StateRefinement(from = "(empty(this) || addingItems(this))", to = "((totalPrice(this) == (totalPrice(old(this)) + price)) && addingItems(this))")
-    public regen.test.project.Order addItem(java.lang.String itemName, int price) {
+    @repair.regen.specification.StateRefinement(from = "(empty(this) || addingItems(this))", to = "((countItems(this) == (countItems(old(this)) + 1)) && addingItems(this))")
+    public regen.test.project.OrderSimple addItem(java.lang.String itemName, int price) {
         return this;
     }
 
-    @repair.regen.specification.StateRefinement(from = "((addingItems(this)) && (totalPrice(this) > 20))")
+    @repair.regen.specification.StateRefinement(from = "((addingItems(this)) && (countItems(this) > 20))")
     public boolean hasGift() {
         return true;
     }

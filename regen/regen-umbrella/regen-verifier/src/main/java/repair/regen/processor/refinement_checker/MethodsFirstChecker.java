@@ -77,8 +77,8 @@ public class MethodsFirstChecker extends TypeChecker{
 	@Override
 	public <T> void visitCtConstructor(CtConstructor<T> c) {
 		context.enterContext();
+		getRefinementFromAnnotation(c);
 		mfc.getConstructorRefinements(c);
-		getRefinementFromAnnotation(c); 
 		super.visitCtConstructor(c);
 		context.exitContext();
 	}

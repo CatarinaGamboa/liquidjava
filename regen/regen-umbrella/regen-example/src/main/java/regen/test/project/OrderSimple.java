@@ -7,21 +7,21 @@ import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 @StateSet({"empty","addingItems", "checkout", "closed"})
-public class Order {
+public class OrderSimple {
 	
-	@RefinementPredicate("int countItems(Order o)")
+	@RefinementPredicate("int countItems(OrderSimple o)")
 	@StateRefinement(to="(countItems(this) == 0) && empty(this)")
-	public Order() {}
+	public OrderSimple() {}
 	
-	@StateRefinement(from="empty(this) || addingItems(this)", 
+	@StateRefinement(from="(empty(this) || addingItems(this))", 
 					 to="((countItems(this) == (countItems(old(this)) + 1)) && addingItems(this))")
 //	@Refinement("_ == this")
-	public Order addItem(String itemName, int price) {		
+	public OrderSimple addItem(String itemName, int price) {		
 		return this;
 	}
 	
-	@StateRefinement(from="((addingItems(this)) && (countItems(this) == 3))")
-	public boolean hasThree() {return true;}
+	@StateRefinement(from="((addingItems(this)) && (countItems(this) > 20))")
+	public boolean hasGift() {return true;}
 	
 //	@StateRefinement(from="addingItems(this)", to = "checkout(this)")
 //	public Order pay(int cardNumber) {

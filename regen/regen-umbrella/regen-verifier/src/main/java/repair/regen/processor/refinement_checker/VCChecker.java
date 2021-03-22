@@ -146,8 +146,12 @@ public class VCChecker {
 	public boolean smtChecks(Constraint cSMT, Constraint expectedType, CtElement element) {
 		try {
 			new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
-		}catch (Exception e) { 
+		}catch (TypeCheckError e) { 
 			return false;
+		}catch(Exception e) {
+			System.err.println("Unknown error:"+e.getMessage());
+			e.printStackTrace();
+			System.exit(7);
 		}
 		return true;
 	}

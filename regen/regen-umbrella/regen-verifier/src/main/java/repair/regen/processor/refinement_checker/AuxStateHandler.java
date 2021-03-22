@@ -138,12 +138,14 @@ public class AuxStateHandler {
 			for(int i : referedSets.get(k)) {
 				List<GhostFunction> allFromSet = getAllFromSet(allGhosts, k, i);
 				String name = String.format(tc.instanceFormat, k, tc.context.getCounter());
+				String nameOld = String.format(tc.instanceFormat, k, tc.context.getCounter());
 				//should only have 1 param
 				tc.context.addVarToContext(name, allFromSet.get(0).getParametersTypes().get(0), new Predicate());
+				tc.context.addVarToContext(nameOld, allFromSet.get(0).getParametersTypes().get(0), new Predicate());
 				String[] ls = {name};
 				Constraint disjoint = getAllPermutations(allFromSet, ls);
 				Constraint c = p.substituteVariable(tc.THIS, name);
-				
+				c = c.changeOldMentions("", nameOld);
 				boolean b = tc.checkStateSMT(disjoint, c.negate(), e);
 				//If it is impossible then the check will return true, so in this case
 				//we want to send an error because the states must be disjoint
@@ -230,10 +232,10 @@ public class AuxStateHandler {
 	 * Checks the changes in the state of the target
 	 * @param tc
 	 * @param f
+	 * @param map 
 	 * @param invocation
 	 */
-	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtElement invocation) {
-		
+	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, Map<String, String> map, CtElement invocation) {
 		CtElement target = searchFistVariableTarget(invocation);
 		if(target instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)target;
@@ -241,7 +243,7 @@ public class AuxStateHandler {
 			Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(name);
 			Constraint ref = new Predicate();
 			if(ovi.isPresent() && f.hasStateChange() && f.getFromStates().size()>0)
-				ref = changeState(tc, ovi.get(), f, name, invocation);
+				ref = changeState(tc, ovi.get(), f, name, map, invocation);
 			if(ovi.isPresent() && !f.hasStateChange()) 
 				ref = sameState(tc, ovi.get(), name, invocation);
 
@@ -259,10 +261,12 @@ public class AuxStateHandler {
 	 * @param vi
 	 * @param f
 	 * @param name
+	 * @param map 
 	 * @param invocation
 	 * @return
 	 */
-	private static Constraint changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name, CtElement invocation) {
+	private static Constraint changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name,
+			Map<String, String> map, CtElement invocation) {
 		if(vi.getRefinement() == null)
 			return new Predicate();
 		String instanceName = vi.getName();
@@ -284,6 +288,9 @@ public class AuxStateHandler {
 					Constraint transitionedState = os.getTo()
 							.substituteVariable(tc.WILD_VAR, newInstanceName)
 							.substituteVariable(tc.THIS, newInstanceName);
+					for(String s : map.keySet()) {
+						transitionedState = transitionedState.substituteVariable(s, map.get(s));
+					}
 					transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
 					addInstanceWithState(tc, name, newInstanceName, vi, transitionedState);
 					return transitionedState;

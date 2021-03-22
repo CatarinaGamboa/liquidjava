@@ -288,15 +288,14 @@ public class MethodsFunctionsChecker {
 			String methodName, String className) {
 		int si = arguments.size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
+		Map<String,String> map = mapInvocation(arguments, f);
 		if(target!= null) {
-			AuxStateHandler.checkTargetChanges(rtc, f, element);	
+			AuxStateHandler.checkTargetChanges(rtc, f, map, element);	
 		}
 		if(f.allRefinementsTrue()) {
 			element.putMetadata(rtc.REFINE_KEY, new Predicate());
 			return;
 		}
-		Map<String,String> map = mapInvocation(arguments, f);
-
 		checkParameters(element, arguments, f, map);
 
 		Constraint methodRef = f.getRefReturn(); 
@@ -344,6 +343,8 @@ public class MethodsFunctionsChecker {
 
 	private String createVariableRepresentingArgument(CtExpression<?> iArg, Variable fArg) {
 		Constraint met = (Constraint) iArg.getMetadata(rtc.REFINE_KEY);
+		if(met == null)
+			met = new Predicate();
 		if(!met.getVariableNames().contains(rtc.WILD_VAR))
 			met = new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), met);
 		String nVar = String.format(rtc.instanceFormat, fArg.getName(),

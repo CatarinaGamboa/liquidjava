@@ -73,7 +73,7 @@ public class AuxVisitTree {
 			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
 			if(fie.getFunctionName().equals("old")) {
 				System.out.println("FOUND AN OLD!!!!!");
-				return new Variable(previousName);
+				return new Variable(newName);
 			}
 			if(fie.getArgument() != null) {
 				List<Expression> le = new ArrayList();

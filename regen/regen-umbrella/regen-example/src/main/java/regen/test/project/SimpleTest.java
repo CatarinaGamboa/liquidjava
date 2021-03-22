@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 
+import bufferedreader.Order;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
@@ -15,11 +16,10 @@ public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
 		
-		Order o = new Order();
-		o.addItem("shirt", 3);
-		o.addItem("shirt2", 5);
-		o.hasThree();
-
+		OrderSimple o = new OrderSimple();
+		o.addItem("shirt", 6);
+		o.addItem("shirt2", 15);
+		o.hasGift();
 //		TrafficLight tl = new TrafficLight();
 //		tl.transitionToAmber();
 //		
