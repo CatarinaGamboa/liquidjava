@@ -26,12 +26,15 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
+        // Order o = new Order();
+        // o.addItem("shirt", 10);
+        // o.addItem("shirt2", 15);
+        // o.pay(00000000);
+        // o.addGift();
+        // o.sendToAddress("my home");
         regen.test.project.Order o = new regen.test.project.Order();
-        o.addItem("shirt", 10);
-        o.addItem("shirt2", 15);
-        o.pay(0);
-        o.addGift();
-        o.sendToAddress("my home");
+        o.addItem("shirt", 10);// .pay(00000).getNewOrder().addItem("shirt", 5);
+
         // TrafficLight tl = new TrafficLight();
         // tl.transitionToAmber();
         // 

@@ -20,7 +20,7 @@ public class VariableInstance extends RefinedVariable{
 
 	@Override
 	public String toString() {
-		return "RefinedInstance [name=" + super.getName() + 
+		return "VariableInstance [name=" + super.getName() + 
 				", type=" + super.getType() + ", refinement=" +
 				super.getRefinement() +"]";
 	}

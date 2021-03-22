@@ -197,7 +197,7 @@ public class Variable extends RefinedVariable{
 
 	@Override
 	public String toString() {
-		return "VariableInfo [name=" + super.getName() + ", type=" + super.getType() + ", refinement=" +
+		return "Variable [name=" + super.getName() + ", type=" + super.getType() + ", refinement=" +
 				super.getRefinement() +"]";
 	}
 

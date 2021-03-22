@@ -195,6 +195,8 @@ public class MethodsFunctionsChecker {
 
 
 	<R> void getReturnRefinements(CtReturn<R> ret) {
+		CtClass c = ret.getParent(CtClass.class);
+		String className = c.getSimpleName();
 		if(ret.getReturnedExpression() != null) {
 			//check if there are refinements
 			if(rtc.getRefinement(ret.getReturnedExpression())== null)
@@ -213,9 +215,15 @@ public class MethodsFunctionsChecker {
 				}
 
 				//Both return and the method have metadata
+				String thisName = String.format(rtc.thisFormat, className);
+				rtc.context.addInstanceToContext(thisName, c.getReference(), new Predicate());
 				String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
-				Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression()).substituteVariable(rtc.WILD_VAR, returnVarName);
-				Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName);
+				Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression())
+										.substituteVariable(rtc.WILD_VAR, returnVarName)
+										.substituteVariable(rtc.THIS, thisName);
+				Constraint cexpectedType = fi.getRefReturn()
+										.substituteVariable(rtc.WILD_VAR, returnVarName)
+										.substituteVariable(rtc.THIS, thisName);
 
 				RefinedVariable rv = rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
 				rtc.checkSMT(cexpectedType, ret);
@@ -300,10 +308,12 @@ public class MethodsFunctionsChecker {
 
 		Constraint methodRef = f.getRefReturn(); 
 		if(methodRef != null) {
+			String thisName = String.format(rtc.instanceFormat, methodName, rtc.context.getCounter());
 			List<String> vars = methodRef.getVariableNames(); 
 			for(String s:vars) 
 				if(map.containsKey(s))
-					methodRef = methodRef.substituteVariable(s, map.get(s));
+					methodRef = methodRef.substituteVariable(s, map.get(s))
+										 .substituteVariable(rtc.THIS, thisName);
 //			element.putMetadata(rtc.REFINE_KEY, methodRef);
 			
 			element.putMetadata(rtc.REFINE_KEY, methodRef);
@@ -349,7 +359,7 @@ public class MethodsFunctionsChecker {
 			met = new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), met);
 		String nVar = String.format(rtc.instanceFormat, fArg.getName(),
 				rtc.context.getCounter());
-		rtc.context.addVarToContext(nVar, fArg.getType(), 
+		rtc.context.addInstanceToContext(nVar, fArg.getType(), 
 				met.substituteVariable(rtc.WILD_VAR, nVar));
 		return nVar;
 	}

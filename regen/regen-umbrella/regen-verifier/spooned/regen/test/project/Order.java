@@ -8,8 +8,8 @@ public class Order {
     public Order() {
     }
 
-    // @Refinement("_ == this")
     @repair.regen.specification.StateRefinement(from = "(empty(this) || addingItems(this))", to = "((totalPrice(this) == (totalPrice(old(this)) + price)) && addingItems(this))")
+    @repair.regen.specification.Refinement("_ == this")
     public regen.test.project.Order addItem(java.lang.String itemName, int price) {
         return this;
     }
@@ -27,6 +27,10 @@ public class Order {
     @repair.regen.specification.StateRefinement(from = "checkout(this)", to = "closed(this)")
     public regen.test.project.Order sendToAddress(java.lang.String a) {
         return this;
+    }
+
+    public regen.test.project.Order getNewOrder() {
+        return new regen.test.project.Order();
     }
 }
 

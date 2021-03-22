@@ -41,6 +41,7 @@ import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtNewArray;
 import spoon.reflect.code.CtNewClass;
 import spoon.reflect.code.CtReturn;
+import spoon.reflect.code.CtThisAccess;
 import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableAccess;
 import spoon.reflect.code.CtVariableRead;
@@ -161,7 +162,18 @@ public class RefinementTypeChecker extends TypeChecker {
 		}
 	}
 
-
+	@Override
+	public <T> void visitCtThisAccess(CtThisAccess<T> thisAccess) {
+		super.visitCtThisAccess(thisAccess);
+		CtClass c = thisAccess.getParent(CtClass.class);
+		String s = c.getSimpleName();
+		if(thisAccess.getParent() instanceof CtReturn) {
+			String thisName = String.format(thisFormat, s);
+			thisAccess.putMetadata(REFINE_KEY, new EqualsPredicate(new VariablePredicate(WILD_VAR), 
+											   new VariablePredicate(thisName)));
+		}
+			
+	}
 
 	@Override
 	public <T,A extends T> void visitCtAssignment(CtAssignment<T,A> assignement) {

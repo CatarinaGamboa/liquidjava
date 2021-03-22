@@ -15,11 +15,12 @@ public class Order {
 	
 	@StateRefinement(from="(empty(this) || addingItems(this))", 
 					 to="((totalPrice(this) == (totalPrice(old(this)) + price)) && addingItems(this))")
-//	@Refinement("_ == this")
+	@Refinement("_ == this")
 	public Order addItem(String itemName, int price) {		
 		return this;
 	}
-	@StateRefinement(from="addingItems(this)", to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+	@StateRefinement(from="addingItems(this)", 
+					 to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
 	public Order pay(int cardNumber) {
 		return this;
 	}
@@ -34,4 +35,8 @@ public class Order {
 		return this;
 	}
 
+	public Order getNewOrder() {
+		return new Order();
+	}
+	
 }
