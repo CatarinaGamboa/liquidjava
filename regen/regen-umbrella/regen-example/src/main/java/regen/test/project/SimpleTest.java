@@ -25,7 +25,7 @@ public class SimpleTest {
 		
 		
 		Order o = new Order();
-		o.addItem("shirt", 10);//.pay(00000).getNewOrder().addItem("shirt", 5);
+		o.addItem("shirt", 10);//.pay(00000).getNewOrder();//.addItem("shirt", 5);
 		
 		
 //		TrafficLight tl = new TrafficLight();

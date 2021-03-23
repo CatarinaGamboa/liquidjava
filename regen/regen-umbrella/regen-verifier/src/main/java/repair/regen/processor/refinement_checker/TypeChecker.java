@@ -29,6 +29,7 @@ import spoon.reflect.visitor.CtScanner;
 
 public abstract class TypeChecker extends CtScanner{
 	public final String REFINE_KEY = "refinement";
+	public final String TARGET_KEY = "target";
 	//	public final String STATE_KEY = "state";
 	public final String THIS = "this";
 	public final String WILD_VAR = "_";

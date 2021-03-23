@@ -232,23 +232,24 @@ public class AuxStateHandler {
 	 * Checks the changes in the state of the target
 	 * @param tc
 	 * @param f
+	 * @param target2 
+	 * @param target2 
 	 * @param map 
 	 * @param invocation
 	 */
-	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, Map<String, String> map, CtElement invocation) {
-		CtElement target = searchFistVariableTarget(invocation);
-		if(target instanceof CtVariableRead<?>) {
-			CtVariableRead<?> v = (CtVariableRead<?>)target;
-			String name = v.getVariable().getSimpleName();
-			Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(name);
+	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtExpression<?> target2, Map<String, String> map, CtElement invocation) {
+		String variableName = searchFistVariableTarget(tc, target2, invocation);
+		VariableInstance target = getTarget(tc, invocation);
+		if(target != null) {
 			Constraint ref = new Predicate();
-			if(ovi.isPresent() && f.hasStateChange() && f.getFromStates().size()>0)
-				ref = changeState(tc, ovi.get(), f, name, map, invocation);
-			if(ovi.isPresent() && !f.hasStateChange()) 
-				ref = sameState(tc, ovi.get(), name, invocation);
+			if(f.hasStateChange() && f.getFromStates().size()>0)
+				ref = changeState(tc, target, f,variableName, map, invocation);
+			if(!f.hasStateChange()) 
+				ref = sameState(tc, target, variableName, invocation);
 
-//			invocation.putMetadata(tc.REFINE_KEY, ref);
-
+			System.out.println();
+			VariableInstance vi = tc.context.getLastVariableInstance(variableName).get();//has at least one if target!=null
+			invocation.putMetadata(tc.TARGET_KEY, vi);
 		}
 
 	}
@@ -365,11 +366,27 @@ public class AuxStateHandler {
 	 * @param invocation
 	 * @return
 	 */
-	static CtExpression<?> searchFistVariableTarget(CtElement invocation) {
-		if(invocation instanceof CtInvocation<?>)
-			return searchFistVariableTarget(((CtInvocation<?>)invocation).getTarget());
-		else if(invocation instanceof CtVariableRead<?>)
-			return (CtVariableRead<?>)invocation;
+	static String searchFistVariableTarget(TypeChecker tc, CtElement elem, CtElement invocation) {
+		if(elem instanceof CtVariableRead<?>) {
+			CtVariableRead<?> v = (CtVariableRead<?>)elem;
+			String name = v.getVariable().getSimpleName();
+			Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(name);
+			if(ovi.isPresent())
+				invocation.putMetadata(tc.TARGET_KEY, ovi.get());
+			return name;
+		}
+		return null;
+		
+//		if(invocation instanceof CtInvocation<?>)
+//			return searchFistVariableTarget(((CtInvocation<?>)invocation).getTarget());
+//		else if(invocation instanceof CtVariableRead<?>)
+//			return (CtVariableRead<?>)invocation;
+//		return null;
+	}
+	
+	static VariableInstance getTarget(TypeChecker tc, CtElement invocation) {
+		if(invocation.getMetadata(tc.TARGET_KEY)!=null)
+			return (VariableInstance)invocation.getMetadata(tc.TARGET_KEY);
 		return null;
 	}
 

@@ -220,10 +220,10 @@ public class MethodsFunctionsChecker {
 				String returnVarName = String.format(retNameFormat,rtc.context.getCounter());
 				Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression())
 										.substituteVariable(rtc.WILD_VAR, returnVarName)
-										.substituteVariable(rtc.THIS, thisName);
+										.substituteVariable(rtc.THIS, returnVarName);
 				Constraint cexpectedType = fi.getRefReturn()
 										.substituteVariable(rtc.WILD_VAR, returnVarName)
-										.substituteVariable(rtc.THIS, thisName);
+										.substituteVariable(rtc.THIS, returnVarName);
 
 				RefinedVariable rv = rtc.context.addVarToContext(returnVarName, method.getType(), cretRef);
 				rtc.checkSMT(cexpectedType, ret);
@@ -298,7 +298,7 @@ public class MethodsFunctionsChecker {
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
 		Map<String,String> map = mapInvocation(arguments, f);
 		if(target!= null) {
-			AuxStateHandler.checkTargetChanges(rtc, f, map, element);	
+			AuxStateHandler.checkTargetChanges(rtc, f, target, map, element);	
 		}
 		if(f.allRefinementsTrue()) {
 			element.putMetadata(rtc.REFINE_KEY, new Predicate());
@@ -308,13 +308,15 @@ public class MethodsFunctionsChecker {
 
 		Constraint methodRef = f.getRefReturn(); 
 		if(methodRef != null) {
-			String thisName = String.format(rtc.instanceFormat, methodName, rtc.context.getCounter());
 			List<String> vars = methodRef.getVariableNames(); 
 			for(String s:vars) 
 				if(map.containsKey(s))
-					methodRef = methodRef.substituteVariable(s, map.get(s))
-										 .substituteVariable(rtc.THIS, thisName);
-//			element.putMetadata(rtc.REFINE_KEY, methodRef);
+					methodRef = methodRef.substituteVariable(s, map.get(s));
+
+			if(element.getMetadata(rtc.TARGET_KEY) != null) {
+				VariableInstance vi = (VariableInstance)element.getMetadata(rtc.TARGET_KEY);
+				methodRef= methodRef.substituteVariable(rtc.THIS, vi.getName());
+			}
 			
 			element.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
