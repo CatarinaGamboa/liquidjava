@@ -248,8 +248,6 @@ public class AuxStateHandler {
 				ref = sameState(tc, target, variableName, invocation);
 
 			System.out.println();
-			VariableInstance vi = tc.context.getLastVariableInstance(variableName).get();//has at least one if target!=null
-			invocation.putMetadata(tc.TARGET_KEY, vi);
 		}
 
 	}
@@ -293,7 +291,7 @@ public class AuxStateHandler {
 						transitionedState = transitionedState.substituteVariable(s, map.get(s));
 					}
 					transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
-					addInstanceWithState(tc, name, newInstanceName, vi, transitionedState);
+					addInstanceWithState(tc, name, newInstanceName, vi, transitionedState, invocation);
 					return transitionedState;
 					
 				}
@@ -331,7 +329,7 @@ public class AuxStateHandler {
 					.substituteVariable(tc.WILD_VAR, newInstanceName)
 					.substituteVariable(variableInstance.getName(), newInstanceName);
 			
-			addInstanceWithState(tc, name, newInstanceName, variableInstance, c);
+			addInstanceWithState(tc, name, newInstanceName, variableInstance, c, invocation);
 			return c;
 		}
 		return new Predicate();
@@ -345,10 +343,11 @@ public class AuxStateHandler {
 	 * @param name2
 	 * @param prevInstance
 	 * @param transitionedState
+	 * @param invocation 
 	 * @return
 	 */
 	private static String addInstanceWithState(TypeChecker tc, String superName, 
-			String name2, VariableInstance prevInstance, Constraint transitionedState) {
+			String name2, VariableInstance prevInstance, Constraint transitionedState, CtElement invocation) {
 		VariableInstance vi2 = (VariableInstance)tc.context.addInstanceToContext( 
 				name2, prevInstance.getType() , prevInstance.getRefinement());
 //		vi2.setState(transitionedState);
@@ -357,6 +356,7 @@ public class AuxStateHandler {
 		for(CtTypeReference<?> t: rv.getSuperTypes())
 			vi2.addSuperType(t);
 		tc.context.addRefinementInstanceToVariable(superName, name2);
+		invocation.putMetadata(tc.TARGET_KEY, vi2);
 		return name2;
 	}
 
@@ -374,6 +374,10 @@ public class AuxStateHandler {
 			if(ovi.isPresent())
 				invocation.putMetadata(tc.TARGET_KEY, ovi.get());
 			return name;
+		}else if(elem.getMetadata(tc.TARGET_KEY) != null) {
+			VariableInstance vi = (VariableInstance)elem.getMetadata(tc.TARGET_KEY);
+			invocation.putMetadata(tc.TARGET_KEY, vi);
+			return vi.getName();
 		}
 		return null;
 		

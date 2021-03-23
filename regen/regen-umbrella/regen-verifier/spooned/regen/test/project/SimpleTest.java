@@ -33,7 +33,7 @@ public class SimpleTest {
         // o.addGift();
         // o.sendToAddress("my home");
         regen.test.project.Order o = new regen.test.project.Order();
-        o.addItem("shirt", 10);// .pay(00000).getNewOrder();//.addItem("shirt", 5);
+        o.addItem("shirt", 10).pay(0).getNewOrder();// .addItem("shirt", 5);
 
         // TrafficLight tl = new TrafficLight();
         // tl.transitionToAmber();

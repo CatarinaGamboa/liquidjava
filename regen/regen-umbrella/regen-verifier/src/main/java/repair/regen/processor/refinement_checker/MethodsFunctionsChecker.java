@@ -317,7 +317,11 @@ public class MethodsFunctionsChecker {
 				VariableInstance vi = (VariableInstance)element.getMetadata(rtc.TARGET_KEY);
 				methodRef= methodRef.substituteVariable(rtc.THIS, vi.getName());
 			}
-			
+
+			String viName = String.format(rtc.instanceFormat, f.getName(), rtc.context.getCounter());
+			VariableInstance vi = (VariableInstance) rtc.context.addInstanceToContext(viName					, 
+							f.getType(), methodRef.substituteVariable(rtc.WILD_VAR, viName));
+			element.putMetadata(rtc.TARGET_KEY, vi);
 			element.putMetadata(rtc.REFINE_KEY, methodRef);
 		}
 
