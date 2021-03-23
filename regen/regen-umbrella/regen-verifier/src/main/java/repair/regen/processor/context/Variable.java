@@ -111,6 +111,15 @@ public class Variable extends RefinedVariable{
 	}
 	
 	
+	public boolean hasInstance(VariableInstance vi) {
+		for(List<VariableInstance> lv: instances)
+			for(VariableInstance v: lv)
+				if(v.equals(vi))
+					return true;
+		return false;
+	}
+
+	
 	//IFS
 	public void newIfCombination() {
 		ifCombiner.push(new Object[ifelseIndex+1]);
@@ -200,6 +209,7 @@ public class Variable extends RefinedVariable{
 		return "Variable [name=" + super.getName() + ", type=" + super.getType() + ", refinement=" +
 				super.getRefinement() +"]";
 	}
+
 
 
 

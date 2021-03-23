@@ -313,14 +313,20 @@ public class MethodsFunctionsChecker {
 				if(map.containsKey(s))
 					methodRef = methodRef.substituteVariable(s, map.get(s));
 
+			String varName = null;
 			if(element.getMetadata(rtc.TARGET_KEY) != null) {
 				VariableInstance vi = (VariableInstance)element.getMetadata(rtc.TARGET_KEY);
 				methodRef= methodRef.substituteVariable(rtc.THIS, vi.getName());
+//				Variable v = rtc.context.getVariableFromInstance(vi);
+//				if(v != null)
+//					varName = v.getName();
 			}
 
 			String viName = String.format(rtc.instanceFormat, f.getName(), rtc.context.getCounter());
 			VariableInstance vi = (VariableInstance) rtc.context.addInstanceToContext(viName					, 
 							f.getType(), methodRef.substituteVariable(rtc.WILD_VAR, viName));
+//			if(varName != null)
+//				rtc.context.addRefinementInstanceToVariable(varName, viName);
 			element.putMetadata(rtc.TARGET_KEY, vi);
 			element.putMetadata(rtc.REFINE_KEY, methodRef);
 		}

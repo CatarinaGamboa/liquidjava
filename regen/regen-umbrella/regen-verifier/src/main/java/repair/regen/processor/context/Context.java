@@ -404,6 +404,14 @@ public class Context {
 		return sb.toString();
 	}
 
+	public Variable getVariableFromInstance(VariableInstance vi) {
+		for(List<RefinedVariable> lv: ctxVars) 
+			for(RefinedVariable v: lv)
+				if(v instanceof Variable && ((Variable)v).hasInstance(vi))
+					return (Variable)v;
+		return null;
+	}
 
 
+	
 }

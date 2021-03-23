@@ -20,6 +20,7 @@ import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Utils;
+import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
@@ -376,8 +377,10 @@ public class AuxStateHandler {
 			return name;
 		}else if(elem.getMetadata(tc.TARGET_KEY) != null) {
 			VariableInstance vi = (VariableInstance)elem.getMetadata(tc.TARGET_KEY);
+			
 			invocation.putMetadata(tc.TARGET_KEY, vi);
-			return vi.getName();
+			Variable parentVar = tc.context.getVariableFromInstance(vi);
+			return parentVar!=null?parentVar.getName():vi.getName();
 		}
 		return null;
 		
