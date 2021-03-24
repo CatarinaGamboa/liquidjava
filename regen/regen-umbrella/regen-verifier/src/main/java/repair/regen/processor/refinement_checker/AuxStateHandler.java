@@ -239,14 +239,14 @@ public class AuxStateHandler {
 	 * @param invocation
 	 */
 	public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtExpression<?> target2, Map<String, String> map, CtElement invocation) {
-		String variableName = searchFistVariableTarget(tc, target2, invocation);
+		String parentTargetName = searchFistVariableTarget(tc, target2, invocation);
 		VariableInstance target = getTarget(tc, invocation);
 		if(target != null) {
 			Constraint ref = new Predicate();
 			if(f.hasStateChange() && f.getFromStates().size()>0)
-				ref = changeState(tc, target, f,variableName, map, invocation);
+				ref = changeState(tc, target, f, parentTargetName, map, invocation);
 			if(!f.hasStateChange()) 
-				ref = sameState(tc, target, variableName, invocation);
+				ref = sameState(tc, target, parentTargetName, invocation);
 
 			System.out.println();
 		}
@@ -363,7 +363,8 @@ public class AuxStateHandler {
 
 
 	/**
-	 * Gets the first target that is a CtVariable that appears in the invocation
+	 * Gets the name of the parent target and adds the 
+	 * closest target to the elem TARGET metadata
 	 * @param invocation
 	 * @return
 	 */
@@ -377,18 +378,12 @@ public class AuxStateHandler {
 			return name;
 		}else if(elem.getMetadata(tc.TARGET_KEY) != null) {
 			VariableInstance vi = (VariableInstance)elem.getMetadata(tc.TARGET_KEY);
-			
+			Optional<Variable> v = vi.getParent();
 			invocation.putMetadata(tc.TARGET_KEY, vi);
-			Variable parentVar = tc.context.getVariableFromInstance(vi);
-			return parentVar!=null?parentVar.getName():vi.getName();
+			return v.isPresent()? v.get().getName() : vi.getName();
+			
 		}
 		return null;
-		
-//		if(invocation instanceof CtInvocation<?>)
-//			return searchFistVariableTarget(((CtInvocation<?>)invocation).getTarget());
-//		else if(invocation instanceof CtVariableRead<?>)
-//			return (CtVariableRead<?>)invocation;
-//		return null;
 	}
 	
 	static VariableInstance getTarget(TypeChecker tc, CtElement invocation) {

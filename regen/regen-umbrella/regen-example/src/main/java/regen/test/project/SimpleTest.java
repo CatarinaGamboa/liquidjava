@@ -25,9 +25,10 @@ public class SimpleTest {
 		
 		
 		Order o = new Order();
-		o.addItem("shirt", 50).pay(00000).getNewOrder().addItem("shirt", 5);
+		Order f = o.addItem("shirt", 60).getNewOrderPayThis().addItem("t", 6).addItem("t", 15);
 		o.addGift();
-		
+		f.addItem("l", 1);
+
 		
 //		TrafficLight tl = new TrafficLight();
 //		tl.transitionToAmber();

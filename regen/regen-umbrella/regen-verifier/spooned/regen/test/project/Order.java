@@ -10,7 +10,8 @@ public class Order {
 
     @repair.regen.specification.StateRefinement(from = "(empty(this) || addingItems(this))", to = "((totalPrice(this) == (totalPrice(old(this)) + price)) && addingItems(this))")
     @repair.regen.specification.Refinement("_ == this")
-    public regen.test.project.Order addItem(java.lang.String itemName, int price) {
+    public regen.test.project.Order addItem(java.lang.String itemName, @repair.regen.specification.Refinement("_ > 0")
+    int price) {
         return this;
     }
 
@@ -32,8 +33,9 @@ public class Order {
         return this;
     }
 
+    @repair.regen.specification.StateRefinement(to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
     @repair.regen.specification.Refinement("(totalPrice(_) == 0) && empty(_)")
-    public regen.test.project.Order getNewOrder() {
+    public regen.test.project.Order getNewOrderPayThis() {
         return new regen.test.project.Order();
     }
 }

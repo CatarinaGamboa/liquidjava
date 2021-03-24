@@ -33,8 +33,9 @@ public class SimpleTest {
         // o.addGift();
         // o.sendToAddress("my home");
         regen.test.project.Order o = new regen.test.project.Order();
-        o.addItem("shirt", 50).pay(0).getNewOrder().addItem("shirt", 5);
+        regen.test.project.Order f = o.addItem("shirt", 60).getNewOrderPayThis().addItem("t", 6).addItem("t", 15);
         o.addGift();
+        f.addItem("l", 1);
         // TrafficLight tl = new TrafficLight();
         // tl.transitionToAmber();
         // 

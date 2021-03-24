@@ -20,6 +20,7 @@ public class Context {
 	private List<RefinedVariable> ctxGlobalVars;
 
 	private List<GhostFunction> ghosts;
+	private Map<String, List<GhostFunction>> classStates;
 	private List<AliasWrapper> alias;
 
 
@@ -38,6 +39,7 @@ public class Context {
 
 		alias = new ArrayList<>();
 		ghosts = new ArrayList<>();
+		classStates = new HashMap<>();
 		counter = 0;
 
 	}
@@ -65,6 +67,7 @@ public class Context {
 		ctxFunctions = new ArrayList<>();
 		alias = new ArrayList<>();
 		ghosts = new ArrayList<>();
+		classStates = new HashMap<>();
 		counter = 0;
 
 	}
@@ -332,6 +335,7 @@ public class Context {
 				!(vi1 instanceof Variable && vi2 instanceof VariableInstance)) return;
 
 		((Variable)vi1).addInstance((VariableInstance) vi2);
+		((VariableInstance) vi2).setParent((Variable)vi1);
 		addSpecificVariable(vi2);
 	}
 
@@ -405,11 +409,14 @@ public class Context {
 	}
 
 	public Variable getVariableFromInstance(VariableInstance vi) {
-		for(List<RefinedVariable> lv: ctxVars) 
-			for(RefinedVariable v: lv)
-				if(v instanceof Variable && ((Variable)v).hasInstance(vi))
-					return (Variable)v;
+		if(vi.getParent().isPresent())
+			return vi.getParent().get();
 		return null;
+//		for(List<RefinedVariable> lv: ctxVars) 
+//			for(RefinedVariable v: lv)
+//				if(v instanceof Variable && ((Variable)v).hasInstance(vi))
+//					return (Variable)v;
+//		return null;
 	}
 
 
