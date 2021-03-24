@@ -15,6 +15,13 @@ import repair.regen.smt.TranslatorToZ3;
 public class IntegerLiteral extends LiteralExpression implements IModel {
 	@Value
 	int value;
+	
+	public IntegerLiteral() {}
+	
+	public IntegerLiteral(int i) {
+		value = i;
+	}
+	
 
 	public void setValue(int val) {
 		value = val;

@@ -18,8 +18,6 @@ public class GhostFunction {
 	private CtTypeReference<?> return_type;
 	
 	private String klassName;
-	private int setGroup;
-	private int order;
 	
 	public GhostFunction(FunctionDeclaration fdExp, Factory factory, String path, String klass) {
 		name = fdExp.getName().toString();
@@ -31,12 +29,10 @@ public class GhostFunction {
 			String mType = mt.getType().toString();
 			param_types.add(Utils.getType(mType.equals(klass)? path : mType, factory));
 		}
-		this.klassName = klass;
-		this.setGroup = 0;//does not have a group
 	}
 	
 	public GhostFunction(String name,List<String> param_types, CtTypeReference<?> return_type, 
-			Factory factory, String path, String klass, int group, int order) {
+			Factory factory, String path, String klass) {
 		this.name = name;
 		this.return_type = Utils.getType(return_type.toString().equals(klass)? path: return_type.toString(), factory);
 		this.param_types = new ArrayList<>();
@@ -45,11 +41,17 @@ public class GhostFunction {
 			this.param_types.add(Utils.getType(mType.equals(klass)? path : mType, factory));
 		}
 		this.klassName = klass;
-		this.setGroup = group;
-		this.order = order;
 	}
 
 	
+	protected GhostFunction(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String klass) {
+		this.name = name;
+		this.return_type = return_type;
+		this.param_types = new ArrayList<>();
+		this.param_types = list;
+		this.klassName = klass;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -77,22 +79,6 @@ public class GhostFunction {
 		
 	public String getParentClassName() {
 		return klassName;
-	}
-	
-	public int getGroupSet() {
-		return setGroup;
-	}
-	
-	public boolean belongsToGroupSet() {
-		return setGroup > 0;
-	}
-	
-	public int getOrder() {
-		return order;
-	}
-	
-	public boolean hasOrder() {
-		return order > 0;
 	}
 
 }

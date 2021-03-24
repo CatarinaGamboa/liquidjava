@@ -48,6 +48,8 @@ public class TranslatorToZ3 {
 		TranslatorContextToZ3.storeVariablesSubtypes(z3, c.getAllVariablesWithSupertypes(), varSuperTypes);
 		TranslatorContextToZ3.addAlias(z3, c.getAlias(), aliasTranslation);
 		TranslatorContextToZ3.addGhostFunctions(z3, c.getGhosts(), funcTranslation);
+		TranslatorContextToZ3.addGhostStates(z3, c.getGhostState(), premisesToAdd, funcTranslation);
+		System.out.println();
 	}
 
 

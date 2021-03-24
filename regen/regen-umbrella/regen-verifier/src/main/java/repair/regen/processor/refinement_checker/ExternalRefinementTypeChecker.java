@@ -90,20 +90,20 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		}
 	}
 	
-
-	@Override
-	protected Optional<GhostFunction> createGhostFunction(String value, int set, int order, CtElement element)  {
-		if(element instanceof CtInterface<?>) {
-			String[] a = prefix.split("\\.");
-			String klass =  a[a.length-1];
-			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
-			List<String> params = Arrays.asList(klass);
-			GhostFunction gh = new GhostFunction(value, params, ret ,factory, prefix, klass, set, order); 
-//			context.addGhostFunction(gh);
-			System.out.println(gh.toString());
-			return Optional.of(gh);
-		}		
-		return Optional.empty();
-	}
+//TODO CHANGE
+//	@Override
+//	protected Optional<GhostFunction> createGhostFunction(String value, int set, int order, CtElement element)  {
+//		if(element instanceof CtInterface<?>) {
+//			String[] a = prefix.split("\\.");
+//			String klass =  a[a.length-1];
+//			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
+//			List<String> params = Arrays.asList(klass);
+//			GhostFunction gh = new GhostFunction(value, params, ret ,factory, prefix, klass); 
+////			context.addGhostFunction(gh);
+//			System.out.println(gh.toString());
+//			return Optional.of(gh);
+//		}		
+//		return Optional.empty();
+//	}
 
 }

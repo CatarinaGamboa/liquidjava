@@ -20,7 +20,7 @@ public class Context {
 	private List<RefinedVariable> ctxGlobalVars;
 
 	private List<GhostFunction> ghosts;
-	private Map<String, List<GhostFunction>> classStates;
+	private Map<String, List<GhostState>> classStates;
 	private List<AliasWrapper> alias;
 
 
@@ -368,6 +368,29 @@ public class Context {
 
 	public List<GhostFunction> getGhosts() {
 		return ghosts;
+	}
+	
+	public void addGhostClass(String klass) {
+		if(!classStates.containsKey(klass))
+			classStates.put(klass, new ArrayList<GhostState>());
+	}
+	
+	public void addToGhostClass(String klass, GhostState gs) {
+		List<GhostState> l = classStates.get(klass);
+		if(!l.contains(gs))
+			l.add(gs);
+	}
+	
+	public List<GhostState> getGhostState(String s) {
+		return classStates.get(s);
+	}
+	
+	public List<GhostState> getGhostState() {
+		List<GhostState> lgs = new ArrayList();
+		for(List<GhostState> l: classStates.values())
+			for(GhostState g: l)
+				lgs.add(g);
+		return lgs;
 	}
 
 	public void addAlias(AliasWrapper aw) {

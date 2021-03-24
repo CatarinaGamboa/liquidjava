@@ -12,9 +12,8 @@ public class GhostState extends GhostFunction{
 	private GhostFunction parent;
 	private Constraint refinement;
 
-	public GhostState(String name, List<String> param_types, CtTypeReference<?> return_type, Factory factory,
-			String path, String klass, int group, int order) {
-		super(name, param_types, return_type, factory, path, klass, group, order);
+	public GhostState(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String klass) {
+		super(name, list, return_type, klass);
 		// TODO Auto-generated constructor stub
 	}
 	

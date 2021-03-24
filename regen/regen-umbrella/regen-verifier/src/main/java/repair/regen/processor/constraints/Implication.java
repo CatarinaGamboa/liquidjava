@@ -50,8 +50,10 @@ public class Implication extends Constraint{
 
 	@Override
 	public Expression getExpression() {
-		BinaryExpression be = new BinaryExpression(c1.getExpression(), 
-				new ImpliesOperator(), c2.getExpression());
+		BinaryExpression be = new BinaryExpression(
+				new ExpressionGroup(c1.getExpression()), 
+				new ImpliesOperator(), 
+				new ExpressionGroup(c2.getExpression()));
 		return new ExpressionGroup(be);
 	}
 

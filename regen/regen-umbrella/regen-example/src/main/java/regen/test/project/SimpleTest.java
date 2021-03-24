@@ -15,15 +15,7 @@ import repair.regen.specification.StateSet;
 public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
-		
-//		Order o = new Order();
-//		o.addItem("shirt", 10);
-//		o.addItem("shirt2", 15);
-//		o.pay(00000000);
-//		o.addGift();
-//		o.sendToAddress("my home");
-		
-		
+				
 		Order o = new Order();
 //		Order f = o.addItem("shirt", 60).getNewOrderPayThis().addItem("t", 6).addItem("t", 1);
 //		o.addGift();

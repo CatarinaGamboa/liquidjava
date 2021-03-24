@@ -15,7 +15,7 @@ public class Order {
 	@StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
 	public Order() {}
 	
-	@StateRefinement(from = "(empty(this) || addingItems(this))", 
+	@StateRefinement(from = "(empty(this) && addingItems(this))", 
 					 to   = "((totalPrice(this) == (totalPrice(old(this)) + price)) && addingItems(this))")
 	@Refinement("_ == this")
 	public Order addItem(String itemName, @Refinement("_ > 0")int price) {		

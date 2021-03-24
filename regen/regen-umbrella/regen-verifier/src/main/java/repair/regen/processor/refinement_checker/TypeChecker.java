@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import repair.regen.language.alias.Alias;
@@ -11,10 +12,15 @@ import repair.regen.language.function.FunctionDeclaration;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.EqualsPredicate;
+import repair.regen.processor.constraints.Implication;
+import repair.regen.processor.constraints.InvocationPredicate;
+import repair.regen.processor.constraints.LiteralPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
+import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
@@ -83,23 +89,43 @@ public abstract class TypeChecker extends CtScanner{
 		int set = 0;
 		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
 			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
+			set++;
 			if(an.contentEquals("repair.regen.specification.StateSet")) {
-				CtNewArray<String> e = (CtNewArray<String>)ann.getAllValues().get("value");
-				List<CtExpression<?>> ls = e.getElements();
-				set++;
-				int order = 1;
-				for(CtExpression<?> ce : ls) {
-					if(ce instanceof CtLiteral<?>) {
-						CtLiteral<String> s = (CtLiteral<String>)ce;
-						Optional<GhostFunction> gh = createGhostFunction(s.getValue(), set, order, element);
-						if(gh.isPresent() && !context.hasGhost(gh.get().getName()))
-							context.addGhostFunction(gh.get());
-					}
-					order++;
-				}
+				createStateSet((CtNewArray<String>)ann.getAllValues().get("value"), an, set, element);
 			}	
 		}
 	}
+
+	private void createStateSet(CtNewArray<String> e, String an, int set, CtElement element) {
+		Optional<GhostFunction> og = createStateGhost(set, element);
+		if(!og.isPresent()) {
+			System.out.println("Error in creation of GhostFunction");
+			System.exit(8);
+		}
+		GhostFunction g = og.get();
+		context.addGhostFunction(g);
+		context.addGhostClass(g.getParentClassName());
+		
+		
+		List<CtExpression<?>> ls = e.getElements();
+		InvocationPredicate ip = new InvocationPredicate(g.getName(), THIS);
+		int order = 1;
+		for(CtExpression<?> ce : ls) {
+			if(ce instanceof CtLiteral<?>) {
+				CtLiteral<String> s = (CtLiteral<String>)ce;
+				String f = s.getValue();
+				GhostState gs = new GhostState(f, g.getParametersTypes(), 
+						factory.Type().BOOLEAN_PRIMITIVE, g.getParentClassName());
+				gs.setGhostParent(g);
+				gs.setRefinement(new Implication(new InvocationPredicate(f, THIS), 
+						new EqualsPredicate(ip, LiteralPredicate.getIntPredicate(order)))); // open(THIS) -> state1(THIS) == 1
+				context.addToGhostClass(g.getParentClassName(), gs);
+			}
+			order++;
+		}
+		
+	}
+
 
 	Optional<String> getExternalRefinement(CtInterface<?> intrface) {
 		Optional<String> ref = Optional.empty();
@@ -112,8 +138,27 @@ public abstract class TypeChecker extends CtScanner{
 		return ref;
 	}
 
-
-	protected Optional<GhostFunction> createGhostFunction(String value, int set, int order, CtElement element){
+//
+//	protected Optional<GhostFunction> createGhostFunction(String value, int set, int order, CtElement element){
+//		CtClass<?> klass = null; 
+//
+//		if(element.getParent() instanceof CtClass<?>) {
+//			klass =(CtClass<?>) element.getParent();
+//		}else if(element instanceof CtClass<?>) {
+//			klass = (CtClass<?>) element;
+//		}
+//		if(klass != null) {
+//			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
+//			List<String> params = Arrays.asList(klass.getSimpleName());
+//			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
+//					klass.getQualifiedName(), klass.getSimpleName(), set, order); 
+//			System.out.println(gh.toString());
+//			return Optional.of(gh);
+//		}
+//		return Optional.empty();
+//	}
+	
+	protected Optional<GhostFunction> createStateGhost(int order, CtElement element){
 		CtClass<?> klass = null; 
 
 		if(element.getParent() instanceof CtClass<?>) {
@@ -122,10 +167,11 @@ public abstract class TypeChecker extends CtScanner{
 			klass = (CtClass<?>) element;
 		}
 		if(klass != null) {
-			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
+			CtTypeReference<?> ret = factory.Type().INTEGER_PRIMITIVE;
 			List<String> params = Arrays.asList(klass.getSimpleName());
-			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
-					klass.getQualifiedName(), klass.getSimpleName(), set, order); 
+			GhostFunction gh = new GhostFunction(String.format("%s_state%d", klass.getSimpleName().toLowerCase(), order), 
+					params, ret , factory, 
+					klass.getQualifiedName(), klass.getSimpleName()); 
 			System.out.println(gh.toString());
 			return Optional.of(gh);
 		}

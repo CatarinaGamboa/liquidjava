@@ -11,8 +11,10 @@ import com.microsoft.z3.FPExpr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
 
+import repair.regen.language.Expression;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.GhostFunction;
+import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -80,13 +82,7 @@ public class TranslatorContextToZ3 {
 		addBuiltinFunctions(z3, funcTranslation);
 		if(!ghosts.isEmpty()) {
 			for(GhostFunction gh: ghosts) {
-				List<CtTypeReference<?>> paramTypes = gh.getParametersTypes();
-				Sort ret = getSort(z3, gh.getReturnType().toString());
-				Sort[] d = paramTypes.stream()
-						.map(t->t.toString())
-						.map(t->getSort(z3,t))
-						.toArray(Sort[]::new);
-				funcTranslation.put(gh.getName(), z3.mkFuncDecl(gh.getName(), d, ret));
+				addGhostFunction(z3, gh, funcTranslation);
 			}
 		}
 	}
@@ -121,6 +117,30 @@ public class TranslatorContextToZ3 {
 			return z3.mkUninterpretedSort(sort);
 		}	
 	}
+
+
+	public static void addGhostStates(Context z3, List<GhostState> ghostState, List<Expression> premisesToAdd,
+			Map<String, FuncDecl> funcTranslation) {
+		for(GhostState g: ghostState) {
+			addGhostFunction(z3, g,  funcTranslation);
+//			if(g.getRefinement() != null)
+//				premisesToAdd.add(g.getRefinement().getExpression());
+		}
+		
+	}
+	
+
+
+	private static void addGhostFunction(Context z3, GhostFunction gh, Map<String, FuncDecl> funcTranslation) {
+		List<CtTypeReference<?>> paramTypes = gh.getParametersTypes();
+		Sort ret = getSort(z3, gh.getReturnType().toString());
+		Sort[] d = paramTypes.stream()
+				.map(t->t.toString())
+				.map(t->getSort(z3,t))
+				.toArray(Sort[]::new);
+		funcTranslation.put(gh.getName(), z3.mkFuncDecl(gh.getName(), d, ret));	
+	}
+
 
 
 
