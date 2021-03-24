@@ -41,7 +41,11 @@ public class TestClasses extends TestAbstract{
 	public void correctTrafficLights1() {
 		testCorrect(testPath+"/classes/traffic_light_1");
 	}
-
+	
+	@Test
+	public void correctOrderGift() {
+		testCorrect(testPath+"/classes/order_gift_correct");
+	}
 	
 //	@Test
 //	public void correctInputReaderCharArrayLongerNameEve() {
@@ -90,6 +94,11 @@ public class TestClasses extends TestAbstract{
 	@Test
 	public void errorRefsFromSuperclass() {
 		testWrong(testPath+"/classes/refs_from_superclass_error");
+	}
+
+	@Test
+	public void errorOrderGiftError() {
+		testWrong(testPath+"/classes/order_gift_error");
 	}
 
 
