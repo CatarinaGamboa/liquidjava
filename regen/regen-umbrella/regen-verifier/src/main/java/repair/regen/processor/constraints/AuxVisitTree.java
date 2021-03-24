@@ -1,5 +1,7 @@
 package repair.regen.processor.constraints;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,27 +17,28 @@ import repair.regen.language.Variable;
 import repair.regen.language.alias.AliasUsage;
 import repair.regen.language.function.FunctionInvocationExpression;
 import repair.regen.processor.context.GhostFunction;
+import repair.regen.processor.context.GhostState;
 
 public class AuxVisitTree {
 
-	static void getGhostInvocations(Expression exp, List<GhostFunction> gh, List<GhostFunction> contextGhosts) {
+	static void getGhostInvocations(Expression exp, List<GhostState> gh, List<GhostState> lgs) {
 		if(exp instanceof UnaryExpression)
-			getGhostInvocations(((UnaryExpression) exp).getExpression(), gh, contextGhosts);
+			getGhostInvocations(((UnaryExpression) exp).getExpression(), gh, lgs);
 		else if(exp instanceof BinaryExpression) {
-			getGhostInvocations(((BinaryExpression) exp).getFirstExpression(), gh, contextGhosts);
-			getGhostInvocations(((BinaryExpression) exp).getSecondExpression(), gh, contextGhosts);
+			getGhostInvocations(((BinaryExpression) exp).getFirstExpression(), gh, lgs);
+			getGhostInvocations(((BinaryExpression) exp).getSecondExpression(), gh, lgs);
 		}else if(exp instanceof ExpressionGroup) {
-			getGhostInvocations(((ExpressionGroup) exp).getExpression(), gh, contextGhosts);	
+			getGhostInvocations(((ExpressionGroup) exp).getExpression(), gh, lgs);	
 		}else if(exp instanceof IfElseExpression) {
-			getGhostInvocations(((IfElseExpression) exp).getCondition(), gh, contextGhosts);
-			getGhostInvocations(((IfElseExpression) exp).getThenExpression(), gh, contextGhosts);
-			getGhostInvocations(((IfElseExpression) exp).getElseExpression(), gh, contextGhosts);
+			getGhostInvocations(((IfElseExpression) exp).getCondition(), gh, lgs);
+			getGhostInvocations(((IfElseExpression) exp).getThenExpression(), gh, lgs);
+			getGhostInvocations(((IfElseExpression) exp).getElseExpression(), gh, lgs);
 		}else if(exp instanceof AliasUsage) {
 			for(Expression e :((AliasUsage)exp).getExpressions())
-				getGhostInvocations(e, gh, contextGhosts);
+				getGhostInvocations(e, gh, lgs);
 		}else if(exp instanceof FunctionInvocationExpression) {
 			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
-			for(GhostFunction f: contextGhosts) {
+			for(GhostState f: lgs) {
 				if(f.getName().equals(fie.getFunctionName()))
 					gh.add(f);
 			}
@@ -134,5 +137,58 @@ public class AuxVisitTree {
 				return true;
 		
 		return false;
+	}
+
+	public static Expression changeStateRefinements(Expression exp, List<GhostState> ghostState) {
+		Expression e = null;
+		if(exp instanceof UnaryExpression) {
+			e = changeStateRefinements(((UnaryExpression) exp).getExpression(), ghostState);
+			if(e != null) ((UnaryExpression) exp).setExpression(e);
+		}else if(exp instanceof BinaryExpression) {
+			e = changeStateRefinements(((BinaryExpression) exp).getFirstExpression(), ghostState);
+			if(e!=null) ((BinaryExpression) exp).setFirstExpression(e);
+			e = changeStateRefinements(((BinaryExpression) exp).getSecondExpression(),ghostState);
+			if(e!=null) ((BinaryExpression) exp).setSecondExpression(e);
+		}else if(exp instanceof ExpressionGroup) {
+			e = changeStateRefinements(((ExpressionGroup) exp).getExpression(),ghostState);
+			if(e!=null) ((ExpressionGroup) exp).setExpression(e);
+		}else if(exp instanceof IfElseExpression) {
+			e = changeStateRefinements(((IfElseExpression) exp).getCondition(), ghostState);
+			if(e!=null) ((IfElseExpression) exp).setCondition(e);
+			e = changeStateRefinements(((IfElseExpression) exp).getThenExpression(), ghostState);
+			if(e!=null) ((IfElseExpression) exp).setThen(e);
+			e = changeStateRefinements(((IfElseExpression) exp).getElseExpression(), ghostState);
+			if(e!=null) ((IfElseExpression) exp).setElse(e);
+		}else if(exp instanceof AliasUsage) {
+			List<Expression> l = ((AliasUsage)exp).getExpressions();
+			for (int i = 0; i < l.size(); i++) {
+				e = changeStateRefinements(l.get(i), ghostState);
+				if (e!=null) ((AliasUsage)exp).setExpression(i, e);
+			}
+		}else if(exp instanceof FunctionInvocationExpression) {
+			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
+			for(GhostState g: ghostState) {
+				if(fie.getFunctionName().equals(g.getName())) {
+					System.out.println("Changed state call for refinement");
+					//States -> only one argument "this"
+					if(fie.getArgument() == null || !(fie.getArgument().getExpression() instanceof Variable))
+						fail("Error in changing state function for state");
+					Variable a = (Variable)fie.getArgument().getExpression();
+					Constraint c = g.getRefinement().substituteVariable("this", a.getName())
+													.substituteVariable("_", a.getName());
+					return c.getExpression();
+				}
+			}
+			if(fie.getArgument() != null) {
+				List<Expression> le = new ArrayList();
+				fie.getArgument().getAllExpressions(le);
+				for (int i = 0; i < le.size(); i++) {
+					e = changeStateRefinements(le.get(i), ghostState);
+					if(e!=null) fie.setArgument(i, e);
+				}
+			}
+		}
+		return null;
+		
 	}
 }

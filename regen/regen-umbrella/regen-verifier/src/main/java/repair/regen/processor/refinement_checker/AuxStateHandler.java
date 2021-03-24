@@ -3,6 +3,7 @@ package repair.regen.processor.refinement_checker;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
+import java.awt.Container;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,9 @@ import java.util.stream.Collectors;
 
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.InvocationPredicate;
+import repair.regen.processor.constraints.LiteralPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
@@ -68,15 +71,21 @@ public class AuxStateHandler {
 	public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
 		String[] path = f.getTargetClass().split("\\.");
 		String klass = path[path.length-1];
-		List<GhostFunction> l = tc.context.getGhosts();
+		List<GhostState> l = tc.context.getGhostState(klass);
 		String[] s = {tc.THIS};
 		Constraint c = new Predicate();
-		for(GhostFunction g:l) {
-			if(//g.belongsToGroupSet() && g.hasOrder() && 
-					g.getParentClassName().equals(klass) /*&& g.getOrder() == 1*/) {
-				Predicate p = new InvocationPredicate(g.getName(), s);
-				c = Conjunction.createConjunction(c, p);
+		List<GhostFunction> sets = new ArrayList<>();
+		if(l != null)
+			for(GhostState g: l) {
+				if(!sets.contains(g.getParent()))
+					sets.add(g.getParent());
 			}
+		for(GhostFunction sg: sets) {
+				Predicate p = new EqualsPredicate(
+						new InvocationPredicate(sg.getName(), s),
+						LiteralPredicate.getIntPredicate(0));
+				c = Conjunction.createConjunction(c, p);
+				
 		}
 		ObjectState os = new ObjectState();
 		os.setTo(c);
@@ -123,20 +132,20 @@ public class AuxStateHandler {
 		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
 		ObjectState state = new ObjectState();
 		if(from != null)				//has From
-			state.setFrom(createStateConstraint(from.getValue(), tc, e));
+			state.setFrom(createStateConstraint(from.getValue(), tc, e, false));
 		if(to != null)					//has To
-			state.setTo(createStateConstraint(to.getValue(), tc, e));
+			state.setTo(createStateConstraint(to.getValue(), tc, e, true));
 		
 		if(from != null && to == null)	//has From but not To -> the state remains the same 
-			state.setTo(createStateConstraint(from.getValue(), tc, e));
+			state.setTo(createStateConstraint(from.getValue(), tc, e, true));
 		if(from == null && to != null)	//has To but not From -> enters with true and exists with a specific state
 			state.setFrom(new Predicate());
 		return state;
 	}
 
 
-	private static Constraint createStateConstraint(String value, TypeChecker tc, CtElement e) {
-		Predicate p = new Predicate(value);
+	private static Constraint createStateConstraint(String value, TypeChecker tc, CtElement e, boolean isTo) {
+		Constraint p = new Predicate(value);
 		CtClass cl = e.getParent(CtClass.class);
 		CtTypeReference r = null;
 		if(cl != null) r = tc.factory.Type().createReference(cl);
@@ -150,80 +159,16 @@ public class AuxStateHandler {
 		tc.context.addVarToContext(name, r, new Predicate());
 		tc.context.addVarToContext(nameOld, r, new Predicate());
 		
-		Constraint premisses = new Predicate();
-		List<GhostState> lgs = tc.context.getGhostState(cl.getSimpleName());
-		for(GhostState s: lgs) {
-			premisses = Conjunction.createConjunction(premisses, s.getRefinement());
-		}
-		premisses = premisses.substituteVariable(tc.THIS, name);
 		Constraint c = p.substituteVariable(tc.THIS, name);
-		premisses = premisses.changeOldMentions(nameOld, "");
 		c = c.changeOldMentions(nameOld, "");
-		boolean b = tc.checkStateSMT(premisses, c.negate(), e);
-		if(b) ErrorPrinter.printSameStateSetError(e, p, cl.getSimpleName());
+		boolean b = tc.checkStateSMT(new Predicate(), c.negate(), e);
+		if(b) ErrorPrinter.printSameStateSetError(e, p, cl.getSimpleName());	
+				
+		return p;
+
 		
-		return c;
-//		Predicate p = new Predicate(value);
-//		List<GhostFunction> allGhosts = tc.context.getGhosts();
-//		List<GhostFunction> ghostsInAnnotation = p.getGhostInvocations(tc.context.getGhosts());
-//		Map<String,List<Integer>> referedSets = getReferedSets(ghostsInAnnotation);
-//		for(String k: referedSets.keySet()) {
-//			for(int i : referedSets.get(k)) {
-//				List<GhostFunction> allFromSet = getAllFromSet(allGhosts, k, i);
-//				String name = String.format(tc.instanceFormat, k, tc.context.getCounter());
-//				String nameOld = String.format(tc.instanceFormat, k, tc.context.getCounter());
-//				//should only have 1 param
-//				tc.context.addVarToContext(name, allFromSet.get(0).getParametersTypes().get(0), new Predicate());
-//				tc.context.addVarToContext(nameOld, allFromSet.get(0).getParametersTypes().get(0), new Predicate());
-//				String[] ls = {name};
-//				Constraint disjoint = getAllPermutations(allFromSet, ls);
-//				Constraint c = p.substituteVariable(tc.THIS, name);
-//				c = c.changeOldMentions(nameOld, "");
-//				boolean b = tc.checkStateSMT(disjoint, c.negate(), e);
-//				//If it is impossible then the check will return true, so in this case
-//				//we want to send an error because the states must be disjoint
-//				if(b) ErrorPrinter.printSameStateSetError(e, p, k);
-//			}
-//		}
-//
-//		return p;
+
 	}
-
-
-//	
-//	private static Constraint getAllPermutations(List<GhostFunction> allFromSet, String[] ls) {
-//		List<Constraint> l = allFromSet.stream()
-//									   .map(p->new InvocationPredicate(p.getName(), ls))
-//									   .collect(Collectors.toList());
-//		Constraint c = new Predicate();
-//		for (int i = 0; i < l.size(); i++) {
-//			for (int j = i+1; j < l.size(); j++) {
-//				c = Conjunction.createConjunction(c, Conjunction.createConjunction(l.get(i), l.get(j)).negate());
-//			}
-//		}
-//		return c;
-//	}
-//
-//	private static List<GhostFunction> getAllFromSet(List<GhostFunction> allGhosts, String k, int i) {
-//		List<GhostFunction> l = new ArrayList<>();
-//		for(GhostFunction g: allGhosts)
-//			if(g.getParentClassName().equals(k) && g.belongsToGroupSet() && g.getGroupSet() == i)
-//				l.add(g);
-//		return l;
-//	}
-//
-//	private static Map<String, List<Integer>> getReferedSets(List<GhostFunction> ghostsInAnnotation) {
-//		Map<String,List<Integer>> differentSets = new HashMap<>();
-//		for(GhostFunction gf: ghostsInAnnotation) {
-//			if(gf.belongsToGroupSet()) {//belongs to a set state
-//				String name = gf.getParentClassName();
-//				if(!differentSets.containsKey(name))
-//					differentSets.put(name, new ArrayList());
-//				differentSets.get(name).add(gf.getGroupSet());
-//			}
-//		}
-//		return differentSets;
-//	}
 
 	//################ Handling State Change effects ################
 

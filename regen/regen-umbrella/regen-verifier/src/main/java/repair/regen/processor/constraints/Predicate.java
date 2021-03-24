@@ -23,6 +23,7 @@ import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
+import repair.regen.processor.context.GhostState;
 
 public class Predicate extends Constraint{
 	private Expression exp;
@@ -100,15 +101,22 @@ public class Predicate extends Constraint{
 		return l;
 	}
 	
-	public List<GhostFunction> getGhostInvocations(List<GhostFunction> contextGhosts) {
-		List<GhostFunction> gh = new ArrayList<>();
-		AuxVisitTree.getGhostInvocations(exp, gh, contextGhosts);
+	public List<GhostState> getGhostInvocations(List<GhostState> lgs) {
+		List<GhostState> gh = new ArrayList<>();
+		AuxVisitTree.getGhostInvocations(exp, gh, lgs);
 		return gh;
 	}
 
 	public Constraint changeOldMentions(String previousName, String newName) {
 		Constraint c = this.clone();
 		AuxVisitTree.changeOldMentions(c.getExpression(), previousName, newName);
+		return c;
+	}
+	
+	@Override
+	public Constraint changeStateRefinements(List<GhostState> ghostState) {
+		Constraint c = this.clone();
+		AuxVisitTree.changeStateRefinements(c.getExpression(), ghostState);
 		return c;
 	}
 

@@ -9,6 +9,7 @@ import repair.regen.language.UnaryExpression;
 import repair.regen.language.operators.AndOperator;
 import repair.regen.language.operators.NotOperator;
 import repair.regen.language.operators.OrOperator;
+import repair.regen.processor.context.GhostState;
 
 public class Disjunction extends Constraint{
 	
@@ -76,6 +77,11 @@ public class Disjunction extends Constraint{
 		Constraint c1_ = c1.changeOldMentions(previousName, newName);
 		Constraint c2_ = c2.changeOldMentions(previousName, newName);
 		return new Disjunction(c1_, c2_);
+	}
+	
+	@Override
+	public Constraint changeStateRefinements(List<GhostState> ghostState) {
+		return new Disjunction(c1.changeStateRefinements(ghostState), c2.changeStateRefinements(ghostState));
 	}
 
 

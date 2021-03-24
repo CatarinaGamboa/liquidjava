@@ -4,11 +4,13 @@ import repair.regen.language.BinaryExpression;
 import repair.regen.language.ExpressionGroup;
 import repair.regen.language.operators.AdditionOperator;
 import repair.regen.language.operators.AndOperator;
+import repair.regen.language.operators.BiconditionalOperator;
 import repair.regen.language.operators.BinaryOperator;
 import repair.regen.language.operators.DivisionOperator;
 import repair.regen.language.operators.EqualsOperator;
 import repair.regen.language.operators.GreaterOrEqualOperator;
 import repair.regen.language.operators.GreaterThanOperator;
+import repair.regen.language.operators.ImpliesOperator;
 import repair.regen.language.operators.LessOrEqualOperator;
 import repair.regen.language.operators.LessThanOperator;
 import repair.regen.language.operators.ModOperator;
@@ -22,8 +24,10 @@ public class OperationPredicate extends Predicate{
 	public OperationPredicate(Constraint c1, String op, Constraint c2) {
 		super();
 		if(c1 != null && c2 != null && op != null)
-			setExpression(new ExpressionGroup(new BinaryExpression(c1.getExpression(), 
-					operationFromString(op), c2.getExpression())));
+			setExpression(new ExpressionGroup(new BinaryExpression(
+					c1.getExpression(), 
+					operationFromString(op), 
+					c2.getExpression())));
 		else
 			System.out.println("Something to implement later on Operation Predicate!");
 	}
@@ -45,6 +49,9 @@ public class OperationPredicate extends Predicate{
 		case ">":  return new GreaterThanOperator();
 		case "<=": return new LessOrEqualOperator();
 		case "<":  return new LessThanOperator();	
+		
+		case "<-->":  return new BiconditionalOperator();
+		case "-->":  return new ImpliesOperator();
 		default:
 			System.out.println("ERROR in creation of OperationPredicate");
 			return null;

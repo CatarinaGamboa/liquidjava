@@ -8,6 +8,7 @@ import repair.regen.language.ExpressionGroup;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.operators.AndOperator;
 import repair.regen.language.operators.NotOperator;
+import repair.regen.processor.context.GhostState;
 
 public class Conjunction extends Constraint{
 	private Constraint c1;
@@ -75,6 +76,11 @@ public class Conjunction extends Constraint{
 		Constraint c1_ = c1.changeOldMentions(previousName, newName);
 		Constraint c2_ = c2.changeOldMentions(previousName, newName);
 		return new Conjunction(c1_, c2_);
+	}
+
+	@Override
+	public Constraint changeStateRefinements(List<GhostState> ghostState) {
+		return new Conjunction(c1.changeStateRefinements(ghostState), c2.changeStateRefinements(ghostState));
 	}
 
 }

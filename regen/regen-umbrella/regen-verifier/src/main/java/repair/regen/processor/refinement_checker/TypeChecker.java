@@ -16,6 +16,7 @@ import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Implication;
 import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.LiteralPredicate;
+import repair.regen.processor.constraints.OperationPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
@@ -109,7 +110,7 @@ public abstract class TypeChecker extends CtScanner{
 		
 		List<CtExpression<?>> ls = e.getElements();
 		InvocationPredicate ip = new InvocationPredicate(g.getName(), THIS);
-		int order = 1;
+		int order = 0;
 		for(CtExpression<?> ce : ls) {
 			if(ce instanceof CtLiteral<?>) {
 				CtLiteral<String> s = (CtLiteral<String>)ce;
@@ -117,8 +118,8 @@ public abstract class TypeChecker extends CtScanner{
 				GhostState gs = new GhostState(f, g.getParametersTypes(), 
 						factory.Type().BOOLEAN_PRIMITIVE, g.getParentClassName());
 				gs.setGhostParent(g);
-				gs.setRefinement(new Implication(new InvocationPredicate(f, THIS), 
-						new EqualsPredicate(ip, LiteralPredicate.getIntPredicate(order)))); // open(THIS) -> state1(THIS) == 1
+				gs.setRefinement(/*new OperationPredicate(new InvocationPredicate(f, THIS), "<-->", */
+						new EqualsPredicate(ip, LiteralPredicate.getIntPredicate(order))); // open(THIS) -> state1(THIS) == 1
 				context.addToGhostClass(g.getParentClassName(), gs);
 			}
 			order++;
@@ -221,12 +222,12 @@ public abstract class TypeChecker extends CtScanner{
 
 
 	void checkSMT(Constraint expectedType, CtElement element) {
-		vcChecker.processSubtyping(expectedType, element);
+		vcChecker.processSubtyping(expectedType, context.getGhostState(), element);
 		element.putMetadata(REFINE_KEY, expectedType);	
 	}
 
 	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		return vcChecker.processSubtyping(prevState, expectedState, target);
+		return vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), target);
 	}
 
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, 

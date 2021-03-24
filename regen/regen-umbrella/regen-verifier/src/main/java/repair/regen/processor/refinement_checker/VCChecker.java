@@ -9,6 +9,7 @@ import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
+import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.smt.GhostFunctionError;
 import repair.regen.smt.SMTEvaluator;
@@ -25,17 +26,19 @@ public class VCChecker {
 		pathVariables = new Stack<>();
 	}
 
-	public void processSubtyping(Constraint expectedType, CtElement element) {
+	public void processSubtyping(Constraint expectedType, List<GhostState> list, CtElement element) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		if(expectedType.isBooleanTrue())
 			return;
 
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
-		smtChecking(premises, expectedType, element);
+		premises = premises.changeStateRefinements(list);
+		Constraint et = expectedType.changeStateRefinements(list);
+		smtChecking(premises, et, element);
 	}
 
-	public boolean processSubtyping(Constraint type, Constraint expectedType, CtElement element) {
+	public boolean processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, CtElement element) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		gatherVariables(type, lrv, mainVars);
@@ -46,8 +49,9 @@ public class VCChecker {
 //		Constraint premises = joinConstraints(type, element, mainVars, lrv);
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
 		premises = Conjunction.createConjunction(premises, type);//TODO add to print
-//		premises = Conjunction.createConjunction(premises, joinConstraints(type, element, mainVars, lrv));
-		return smtChecks(premises, expectedType, element);
+		premises = premises.changeStateRefinements(list);
+		Constraint et = expectedType.changeStateRefinements(list);
+		return smtChecks(premises, et, element);
 	}
 
 	private Constraint joinConstraints(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 

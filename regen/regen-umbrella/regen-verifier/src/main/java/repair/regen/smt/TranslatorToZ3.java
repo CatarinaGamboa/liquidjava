@@ -179,6 +179,9 @@ public class TranslatorToZ3 {
 		return z3.mkImplies((BoolExpr) e1,(BoolExpr) e2);
 	}
 
+	public Expr makeBiconditional(Expr eval, Expr eval2) {
+		return z3.mkIff((BoolExpr) eval,(BoolExpr) eval2);
+	}
 
 	public Expr makeAnd(Expr eval, Expr eval2) {
 		return z3.mkAnd((BoolExpr) eval, (BoolExpr) eval2);

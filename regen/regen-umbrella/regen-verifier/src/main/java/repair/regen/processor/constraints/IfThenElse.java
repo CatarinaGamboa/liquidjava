@@ -8,6 +8,7 @@ import repair.regen.language.ExpressionGroup;
 import repair.regen.language.IfElseExpression;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.operators.NotOperator;
+import repair.regen.processor.context.GhostState;
 
 public class IfThenElse extends Constraint{
 	private Constraint ite;
@@ -61,6 +62,11 @@ public class IfThenElse extends Constraint{
 	@Override
 	public Constraint changeOldMentions(String previousName, String newName) {
 		return ite.changeOldMentions(previousName, newName);
+	}
+	
+	@Override
+	public Constraint changeStateRefinements(List<GhostState> ghostState) {
+		return ite.changeStateRefinements(ghostState);
 	}
 
 }

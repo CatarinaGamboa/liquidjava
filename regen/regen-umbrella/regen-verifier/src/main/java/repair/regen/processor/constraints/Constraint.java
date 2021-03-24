@@ -3,6 +3,7 @@ package repair.regen.processor.constraints;
 import java.util.List;
 
 import repair.regen.language.Expression;
+import repair.regen.processor.context.GhostState;
 
 public abstract class Constraint {
 	
@@ -14,6 +15,7 @@ public abstract class Constraint {
 	public abstract Expression getExpression();
 	public abstract boolean isBooleanTrue();
 	public abstract Constraint changeOldMentions(String previousName, String newName);
+	public abstract Constraint changeStateRefinements(List<GhostState> ghostState);
 	
 
 }

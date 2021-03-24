@@ -9,6 +9,7 @@ import repair.regen.language.ExpressionGroup;
 import repair.regen.language.UnaryExpression;
 import repair.regen.language.operators.ImpliesOperator;
 import repair.regen.language.operators.NotOperator;
+import repair.regen.processor.context.GhostState;
 
 public class Implication extends Constraint{
 	
@@ -69,4 +70,8 @@ public class Implication extends Constraint{
 		return new Implication(c1_, c2_);
 	}
 
+	@Override
+	public Constraint changeStateRefinements(List<GhostState> ghostState) {
+		return new Implication(c1.changeStateRefinements(ghostState), c2.changeStateRefinements(ghostState));
+	}
 }
