@@ -7,7 +7,7 @@ public class Account {
     private int balance;
 
     public Account() {
-        balance = 0;
+        balance = -1;
     }
 
     @repair.regen.specification.StateRefinement(to = "sum(this) == v")

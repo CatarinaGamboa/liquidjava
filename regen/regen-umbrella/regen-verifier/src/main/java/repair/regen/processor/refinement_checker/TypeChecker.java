@@ -248,17 +248,17 @@ public abstract class TypeChecker extends CtScanner{
 	}
 
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, 
-			CtTypeReference type, CtElement variable) {
+			CtTypeReference type, CtElement usage, CtElement variable) {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
 		Constraint cEt;
 		RefinedVariable mainRV = null;
 		if(context.hasVariable(simpleName))
 			mainRV =  context.getVariableByName(simpleName);
 
-		if(expectedType.isPresent())
-			cEt = expectedType.get();
-		else if(context.hasVariable(simpleName))
+		if(context.hasVariable(simpleName))
 			cEt = mainRV.getMainRefinement();
+		else if(expectedType.isPresent())
+			cEt = expectedType.get();
 		else
 			cEt = new Predicate();
 
@@ -276,7 +276,7 @@ public abstract class TypeChecker extends CtScanner{
 			rv.addSuperType(t);
 		context.addRefinementInstanceToVariable(simpleName, newName);
 		//smt check
-		checkSMT(cEt, variable);//TODO CHANGE
+		checkSMT(cEt, usage);//TODO CHANGE
 		context.addRefinementToVariableInContext(simpleName,type , cet);
 	}
 }

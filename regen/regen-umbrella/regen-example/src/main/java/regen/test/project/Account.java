@@ -11,7 +11,7 @@ public class Account {
 	private int balance;
 	
 	public Account() {
-		balance = 0;
+		balance = -1;
 	}
 	
 	@StateRefinement(to = "sum(this) == v")

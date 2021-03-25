@@ -137,7 +137,7 @@ public class RefinementTypeChecker extends TypeChecker {
 				refinementFound = new Predicate();
 			context.addVarToContext(varName, localVariable.getType(), new Predicate());
 
-			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable);
+			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable, localVariable);
 
 //			AuxStateHandler.addStateRefinements(context, STATE_KEY, THIS, varName, e);
 			AuxStateHandler.addStateRefinements(this, varName, e);
@@ -184,7 +184,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			CtVariableReference<?> var = ((CtVariableAccess<?>) ex).getVariable();
 			CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
 			String name = var.getSimpleName();
-			checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), varDecl);
+			checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), assignement, varDecl);
 
 			//			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
 			//				checkArray(varDecl);
@@ -193,7 +193,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			CtFieldReference<?> cr = ((CtFieldWrite<?>) ex).getVariable();
 			CtField<?> f= ((CtFieldWrite<?>) ex).getVariable().getDeclaration();
 			String name = String.format(thisFormat, cr.getSimpleName());
-			checkAssignment(name, cr.getType(), ex, assignement.getAssignment(), f);
+			checkAssignment(name, cr.getType(), ex, assignement.getAssignment(), assignement, f);
 
 		}
 		if(ex instanceof CtArrayWrite) {
@@ -213,7 +213,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 	private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, 
-			CtExpression<?> assignment, CtElement elem) {
+			CtExpression<?> assignment, CtElement parentElem, CtElement varDecl) {
 		getPutVariableMetadada(ex, name);
 
 		Constraint refinementFound = getRefinement(assignment);
@@ -229,7 +229,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			vcChecker.removePathVariableThatIncludes(r.get().getName());//AQUI!!
 
 		vcChecker.removePathVariableThatIncludes(name);//AQUI!!
-		checkVariableRefinements(refinementFound, name, type, elem);
+		checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
 
 	}
 
