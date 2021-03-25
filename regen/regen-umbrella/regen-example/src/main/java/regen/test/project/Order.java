@@ -24,7 +24,7 @@ public class Order {
 	}
 	
 	@StateRefinement(from = "addingItems(this)", 
-					 to   = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+					 to   = "checkout(this)")
 	@Refinement("_ == this")
 	public Order pay(int cardNumber) {
 		return this;
@@ -36,13 +36,19 @@ public class Order {
 		return this;
 	}
 	
+	@StateRefinement(from = "checkout(this)", to = "totalPrice(this) == (totalPrice(old(this)) + 3)")
+	@Refinement("_ == this")
+	public Order addTransportCosts() {
+		return this;
+	}
+	
 	@StateRefinement(from="checkout(this)", to = "closed(this)")
 	@Refinement("_ == this")
 	public Order sendToAddress(String a) {
 		return this;
 	}
 
-	@StateRefinement(to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+	@StateRefinement(to = "checkout(this)")
 	@Refinement("(totalPrice(_) == 0) && empty(_)")
 	public Order getNewOrderPayThis() {
 		return new Order();

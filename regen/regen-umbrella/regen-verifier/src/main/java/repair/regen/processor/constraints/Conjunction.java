@@ -79,8 +79,8 @@ public class Conjunction extends Constraint{
 	}
 
 	@Override
-	public Constraint changeStateRefinements(List<GhostState> ghostState) {
-		return new Conjunction(c1.changeStateRefinements(ghostState), c2.changeStateRefinements(ghostState));
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
+		return new Conjunction(c1.changeStatesToRefinements(ghostState), c2.changeStatesToRefinements(ghostState));
 	}
 
 }

@@ -29,7 +29,7 @@ public class SimpleTest {
         regen.test.project.Order o = new regen.test.project.Order();
         regen.test.project.Order f = o.addItem("shirt", 60).getNewOrderPayThis().addItem("t", 6).addItem("t", 100);
         o.addGift();
-        f.addItem("l", 1).pay(0).addGift();
+        f.addItem("l", 1).pay(0).addGift().addTransportCosts().sendToAddress("home");
         // TrafficLight tl = new TrafficLight();
         // tl.transitionToAmber();
         // 

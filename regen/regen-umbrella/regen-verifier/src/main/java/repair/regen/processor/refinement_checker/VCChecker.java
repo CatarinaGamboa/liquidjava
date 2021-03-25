@@ -33,8 +33,8 @@ public class VCChecker {
 			return;
 
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
-		premises = premises.changeStateRefinements(list);
-		Constraint et = expectedType.changeStateRefinements(list);
+		premises = premises.changeStatesToRefinements(list);
+		Constraint et = expectedType.changeStatesToRefinements(list);
 		smtChecking(premises, et, element);
 	}
 
@@ -49,8 +49,8 @@ public class VCChecker {
 //		Constraint premises = joinConstraints(type, element, mainVars, lrv);
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
 		premises = Conjunction.createConjunction(premises, type);//TODO add to print
-		premises = premises.changeStateRefinements(list);
-		Constraint et = expectedType.changeStateRefinements(list);
+		premises = premises.changeStatesToRefinements(list);
+		Constraint et = expectedType.changeStatesToRefinements(list);
 		return smtChecks(premises, et, element);
 	}
 

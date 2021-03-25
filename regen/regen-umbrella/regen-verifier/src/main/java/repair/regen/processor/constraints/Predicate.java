@@ -103,7 +103,8 @@ public class Predicate extends Constraint{
 	
 	public List<GhostState> getGhostInvocations(List<GhostState> lgs) {
 		List<GhostState> gh = new ArrayList<>();
-		AuxVisitTree.getGhostInvocations(exp, gh, lgs);
+		if(lgs != null)
+			AuxVisitTree.getGhostInvocations(exp, gh, lgs);
 		return gh;
 	}
 
@@ -114,7 +115,7 @@ public class Predicate extends Constraint{
 	}
 	
 	@Override
-	public Constraint changeStateRefinements(List<GhostState> ghostState) {
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
 		Constraint c = this.clone();
 		AuxVisitTree.changeStateRefinements(c.getExpression(), ghostState);
 		return c;

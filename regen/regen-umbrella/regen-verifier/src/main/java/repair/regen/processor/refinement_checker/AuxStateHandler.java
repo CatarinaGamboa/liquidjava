@@ -19,6 +19,7 @@ import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.LiteralPredicate;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.ObjectState;
@@ -41,8 +42,8 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.reference.CtTypeReference;
 
 public class AuxStateHandler {
-	
-	
+
+
 	//########### Get State from StateRefinement declaration #############
 
 	/**
@@ -64,27 +65,17 @@ public class AuxStateHandler {
 		}else {
 			setDefaultState(f, tc);
 		}
-		
+
 	}
 
 
 	public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
 		String[] path = f.getTargetClass().split("\\.");
 		String klass = path[path.length-1];
-		List<GhostState> l = tc.context.getGhostState(klass);
-		if(l == null)
-			return;
+
 		String[] s = {tc.THIS};
 		Constraint c = new Predicate();
-		List<GhostFunction> sets = new ArrayList<>();
-		if(l != null)
-			for(GhostState g: l) {
-				if(g.getParent() == null) {
-					sets.add(g);
-				}else if(!sets.contains(g.getParent()))
-					sets.add(g.getParent());
-				
-			}
+		List<GhostFunction> sets = getDifferentSets(tc, klass);
 		for(GhostFunction sg: sets) {
 			if(sg.getReturnType().toString().equals("int")) {
 				Predicate p = new EqualsPredicate(
@@ -93,16 +84,30 @@ public class AuxStateHandler {
 				c = Conjunction.createConjunction(c, p);
 			}else {
 				fail("Ghost Functions not implemented for other types than int -> implement in AuxStateHandler defaultState");
-			}
-				
+			}	
 		}
 		ObjectState os = new ObjectState();
 		os.setTo(c);
 		List<ObjectState> los = new ArrayList<>();
 		los.add(os);
 		f.setAllStates(los);
-//		System.out.println();
+		//		System.out.println();
 	}
+
+	private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klass) {
+		List<GhostFunction> sets = new ArrayList<>();
+		List<GhostState> l = tc.context.getGhostState(klass);
+		if(l != null)
+			for(GhostState g: l) {
+				if(g.getParent() == null) {
+					sets.add(g);
+				} else if(!sets.contains(g.getParent()))
+					sets.add(g.getParent());
+
+			}
+		return sets;
+	}
+
 
 	/**
 	 * Handles the passage of the written state annotations to the context for regular Methods
@@ -114,8 +119,8 @@ public class AuxStateHandler {
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(!an.isEmpty())
 			setFunctionStates(f, an, tc, method);
-//			f.setState(an, context.getGhosts(), method);
-		
+		//			f.setState(an, context.getGhosts(), method);
+
 	}
 
 	/**
@@ -135,51 +140,73 @@ public class AuxStateHandler {
 	}
 
 	private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, 
-										RefinedFunction f, TypeChecker tc, CtElement e) {
+			RefinedFunction f, TypeChecker tc, CtElement e) {
 		Map<String, CtExpression> m = ctAnnotation.getAllValues();
 		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
 		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
 		ObjectState state = new ObjectState();
 		if(from != null)				//has From
-			state.setFrom(createStateConstraint(from.getValue(), f, tc, e));
+			state.setFrom(createStateConstraint(from.getValue(), f, tc, e, false));
 		if(to != null)					//has To
-			state.setTo(createStateConstraint(to.getValue(), f, tc, e));
-		
+			state.setTo(createStateConstraint(to.getValue(), f, tc, e, true));
+
 		if(from != null && to == null)	//has From but not To -> the state remains the same 
-			state.setTo(createStateConstraint(from.getValue(), f, tc, e));
+			state.setTo(createStateConstraint(from.getValue(), f, tc, e, true));
 		if(from == null && to != null)	//has To but not From -> enters with true and exists with a specific state
 			state.setFrom(new Predicate());
 		return state;
 	}
 
 
-	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e) {
-		Constraint p = new Predicate(value);
-//		CtClass cl = e.getParent(CtClass.class);
-//		CtTypeReference r = null;
-//		if(cl != null) r = tc.factory.Type().createReference(cl);
-//		else 
-//			fail("Add createStateConstraint for others than Class only");
-//		if(r == null)
-//			return new Predicate();
+	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e, boolean isTo) {
+		Predicate p = new Predicate(value);
 		String t = f.getTargetClass();
-		CtTypeReference r = tc.factory.Type().createReference(t);
-		
+		CtTypeReference<?> r = tc.factory.Type().createReference(t);
+
 		String nameOld = String.format(tc.instanceFormat, tc.THIS, tc.context.getCounter());
 		String name = String.format(tc.instanceFormat, tc.THIS, tc.context.getCounter());
 		tc.context.addVarToContext(name, r, new Predicate());
 		tc.context.addVarToContext(nameOld, r, new Predicate());
-		
-		Constraint c = p.substituteVariable(tc.THIS, name);
+
+		Constraint c1 = isTo? getMissingStates(t, tc, p): p;
+		Constraint c = c1.substituteVariable(tc.THIS, name);
 		c = c.changeOldMentions(nameOld, "");
 		boolean b = tc.checkStateSMT(new Predicate(), c.negate(), e);
 		if(b) ErrorPrinter.printSameStateSetError(e, p, t);	
-				
-		return p;
 
-		
+		return c1;
+
+
 
 	}
+
+	private static Constraint getMissingStates(String t, TypeChecker tc, Predicate p) {
+		String[] temp= t.split("\\.");
+		String simpleT = temp[temp.length-1];
+		List<GhostState> gs = p.getGhostInvocations(tc.context.getGhostState(simpleT));
+		List<GhostFunction> sets = getDifferentSets(tc, simpleT);
+		for(GhostState g: gs) {
+			if(g.getParent() == null && sets.contains(g))
+				sets.remove(g);
+			else if(g.getParent() != null && sets.contains(g.getParent()))
+				sets.remove(g.getParent());
+		}
+		return addOldStates(p, tc.THIS, sets);
+	}
+
+
+	private static Constraint addOldStates(Predicate p, String th, List<GhostFunction> sets) {
+		Constraint c = p;
+		for(GhostFunction gf: sets) {
+			Constraint eq = new EqualsPredicate(
+					new InvocationPredicate(gf.getName(), th),
+					new InvocationPredicate(gf.getName(), 
+							new InvocationPredicate("old", th).getExpression()));
+			c = Conjunction.createConjunction(c, eq);
+		}
+		return c;
+	}
+
 
 	//################ Handling State Change effects ################
 
@@ -192,11 +219,11 @@ public class AuxStateHandler {
 	public static void constructorStateMetadata(String refKey, RefinedFunction f, CtConstructorCall<?> ctConstructorCall) {
 		List<Constraint> oc = f.getToStates();
 		if(oc.size() > 0 ){//&& !oc.get(0).isBooleanTrue())
-//			ctConstructorCall.putMetadata(stateKey, oc.get(0));
+			//			ctConstructorCall.putMetadata(stateKey, oc.get(0));
 			ctConstructorCall.putMetadata(refKey, oc.get(0));
 		}else if(oc.size() > 1)
 			assertFalse("Constructor can only have one to state, not multiple", true);
-		
+
 	}
 	/**
 	 * If an expression has a state in metadata, then its state is passed to the last instance
@@ -242,7 +269,7 @@ public class AuxStateHandler {
 	}
 
 
-	
+
 	/**
 	 * Changes the state
 	 * @param tc
@@ -259,13 +286,14 @@ public class AuxStateHandler {
 			return new Predicate();
 		String instanceName = vi.getName();
 		Constraint prevState = vi.getRefinement()
-					.substituteVariable(tc.WILD_VAR, instanceName)
-					.substituteVariable(name, instanceName);
-		List<ObjectState> los = f.getAllStates();
+				.substituteVariable(tc.WILD_VAR, instanceName)
+				.substituteVariable(name, instanceName);
 		
+		List<ObjectState> los = f.getAllStates();
+
 		boolean found = false;
-//		if(los.size() > 1)
-//			assertFalse("Change state only working for one methods with one state",true);
+		//		if(los.size() > 1)
+		//			assertFalse("Change state only working for one methods with one state",true);
 		for (int i = 0; i < los.size() && !found; i++) {//TODO: only working for 1 state annotation
 			ObjectState os = los.get(i);
 			if(os.hasFrom()) {
@@ -282,19 +310,19 @@ public class AuxStateHandler {
 					transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
 					addInstanceWithState(tc, name, newInstanceName, vi, transitionedState, invocation);
 					return transitionedState;
-					
+
 				}
 			}
 		}
 		if(!found) {//Reaches the end of stateChange no matching states
 			String states = los.stream().filter(p->p.hasFrom())
-										.map(p->p.getFrom().toString())
-										.collect(Collectors.joining(","));
+					.map(p->p.getFrom().toString())
+					.collect(Collectors.joining(","));
 			ErrorPrinter.printStateMismatch(invocation, prevState, states);
 		}
 		return new Predicate();
 	}
-	
+
 
 	private static Constraint checkOldMentions(Constraint transitionedState, String instanceName,
 			String newInstanceName) {
@@ -310,14 +338,14 @@ public class AuxStateHandler {
 	 * @return
 	 */
 	private static Constraint sameState(TypeChecker tc, VariableInstance variableInstance, String name, CtElement invocation) {
-//		if(variableInstance.getState() != null) {
+		//		if(variableInstance.getState() != null) {
 		if(variableInstance.getRefinement() != null) {
 			String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
-//			Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(), newInstanceName);
+			//			Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(), newInstanceName);
 			Constraint c = variableInstance.getRefinement()
 					.substituteVariable(tc.WILD_VAR, newInstanceName)
 					.substituteVariable(variableInstance.getName(), newInstanceName);
-			
+
 			addInstanceWithState(tc, name, newInstanceName, variableInstance, c, invocation);
 			return c;
 		}
@@ -339,7 +367,7 @@ public class AuxStateHandler {
 			String name2, VariableInstance prevInstance, Constraint transitionedState, CtElement invocation) {
 		VariableInstance vi2 = (VariableInstance)tc.context.addInstanceToContext( 
 				name2, prevInstance.getType() , prevInstance.getRefinement());
-//		vi2.setState(transitionedState);
+		//		vi2.setState(transitionedState);
 		vi2.setRefinement(transitionedState);
 		RefinedVariable rv = tc.context.getVariableByName(superName);
 		for(CtTypeReference<?> t: rv.getSuperTypes())
@@ -369,11 +397,11 @@ public class AuxStateHandler {
 			Optional<Variable> v = vi.getParent();
 			invocation.putMetadata(tc.TARGET_KEY, vi);
 			return v.isPresent()? v.get().getName() : vi.getName();
-			
+
 		}
 		return null;
 	}
-	
+
 	static VariableInstance getTarget(TypeChecker tc, CtElement invocation) {
 		if(invocation.getMetadata(tc.TARGET_KEY)!=null)
 			return (VariableInstance)invocation.getMetadata(tc.TARGET_KEY);

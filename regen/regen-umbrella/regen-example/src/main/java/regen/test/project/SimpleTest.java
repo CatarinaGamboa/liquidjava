@@ -20,7 +20,7 @@ public class SimpleTest {
 		
 		Order f = o.addItem("shirt", 60).getNewOrderPayThis().addItem("t", 6).addItem("t", 100);
 		o.addGift();
-		f.addItem("l", 1).pay(000).addGift();
+		f.addItem("l", 1).pay(000).addGift().addTransportCosts().sendToAddress("home");
 
 		
 //		TrafficLight tl = new TrafficLight();

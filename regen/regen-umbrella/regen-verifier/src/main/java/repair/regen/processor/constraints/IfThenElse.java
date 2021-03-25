@@ -65,8 +65,8 @@ public class IfThenElse extends Constraint{
 	}
 	
 	@Override
-	public Constraint changeStateRefinements(List<GhostState> ghostState) {
-		return ite.changeStateRefinements(ghostState);
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
+		return ite.changeStatesToRefinements(ghostState);
 	}
 
 }

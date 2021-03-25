@@ -75,7 +75,7 @@ public class AuxVisitTree {
 		}else if(exp instanceof FunctionInvocationExpression) {
 			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
 			if(fie.getFunctionName().equals("old")) {
-				System.out.println("FOUND AN OLD!!!!!");
+//				System.out.println("FOUND AN OLD!!!!!");
 				return new Variable(previousName);
 			}
 			if(fie.getArgument() != null) {
@@ -169,7 +169,7 @@ public class AuxVisitTree {
 			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
 			for(GhostState g: ghostState) {
 				if(fie.getFunctionName().equals(g.getName()) && g.getRefinement()!=null) {
-					System.out.println("Changed state call for refinement");
+//					System.out.println("Changed state call for refinement");
 					//States -> only one argument "this"
 					if(fie.getArgument() == null || !(fie.getArgument().getExpression() instanceof Variable))
 						fail("Error in changing state function for state");

@@ -71,7 +71,7 @@ public class Implication extends Constraint{
 	}
 
 	@Override
-	public Constraint changeStateRefinements(List<GhostState> ghostState) {
-		return new Implication(c1.changeStateRefinements(ghostState), c2.changeStateRefinements(ghostState));
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
+		return new Implication(c1.changeStatesToRefinements(ghostState), c2.changeStatesToRefinements(ghostState));
 	}
 }
