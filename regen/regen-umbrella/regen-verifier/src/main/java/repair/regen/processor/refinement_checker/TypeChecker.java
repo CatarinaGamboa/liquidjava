@@ -138,6 +138,7 @@ public abstract class TypeChecker extends CtScanner{
 		String[] s = string.split(" ");
 		String qn = getQualifiedClassName(element);
 		String sn = getSimpleClassName(element);
+		context.addGhostClass(sn);
 		if(s.length < 2)
 			ErrorPrinter.printCostumeError(element, "Syntax error in defining ghost "+string);
 		List<CtTypeReference<?>> param = Arrays.asList(factory.Type().createReference(qn));

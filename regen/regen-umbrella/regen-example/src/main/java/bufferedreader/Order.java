@@ -1,4 +1,4 @@
-package regen.test.project;
+package bufferedreader;
 
 
 

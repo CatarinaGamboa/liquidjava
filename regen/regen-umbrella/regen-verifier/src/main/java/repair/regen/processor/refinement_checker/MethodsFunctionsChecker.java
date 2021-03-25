@@ -52,6 +52,7 @@ public class MethodsFunctionsChecker {
 		RefinedFunction f = new RefinedFunction();
 		f.setName(c.getSimpleName());
 		f.setType(c.getType());
+		handleFunctionRefinements(f, c, c.getParameters());
 		f.setRefReturn(new Predicate());
 		if(c.getParent() instanceof CtClass) {
 			CtClass klass = (CtClass)c.getParent();
@@ -156,7 +157,7 @@ public class MethodsFunctionsChecker {
 	 * @param params
 	 * @return Conjunction of all 
 	 */
-	private Constraint handleFunctionRefinements(RefinedFunction f, CtMethod<?> method, 
+	private Constraint handleFunctionRefinements(RefinedFunction f, CtElement method, 
 			List<CtParameter<?>> params) {
 		Constraint joint = new Predicate();
 

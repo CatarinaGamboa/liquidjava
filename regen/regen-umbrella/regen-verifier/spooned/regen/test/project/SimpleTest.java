@@ -26,8 +26,11 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        regen.test.project.Order o = new regen.test.project.Order();
-        regen.test.project.Order f = o.addItem("shirt", 60).addGift();
+        @repair.regen.specification.Refinement("sum(_) > 30")
+        regen.test.project.Account a = new regen.test.project.Account(50);
+        // Order o = new Order();
+        // 
+        // Order f = o.addItem("shirt", 60).addGift();
         // .getNewOrderPayThis().addItem("t", 6).addItem("t", 1);
         // o.addGift();
         // f.addItem("l", 1).pay(000).addGift().pay(000);//.addTransportCosts().sendToAddress("home");
