@@ -2,9 +2,8 @@ package regen.test.project;
 
 
 @repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "closed" })
+@repair.regen.specification.Ghost("int totalPrice")
 public class Order {
-    @repair.regen.specification.RefinementPredicate("int totalPrice(Order o)")
-    @repair.regen.specification.StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
     public Order() {
     }
 

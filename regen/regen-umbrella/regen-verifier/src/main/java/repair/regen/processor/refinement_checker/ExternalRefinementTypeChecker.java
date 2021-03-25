@@ -105,5 +105,31 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 //		}		
 //		return Optional.empty();
 //	}
+	@Override
+	protected Optional<GhostFunction> createStateGhost(int order, CtElement element){
+		String[] a = prefix.split("\\.");
+		String klass =  a[a.length-1];
+		if(klass != null) {
+			CtTypeReference<?> ret = factory.Type().INTEGER_PRIMITIVE;
+			List<String> params = Arrays.asList(klass);
+			GhostFunction gh = new GhostFunction(String.format("%s_state%d", klass.toLowerCase(), order), 
+					params, ret , factory, 
+					prefix, klass); 
+			System.out.println(gh.toString());
+			return Optional.of(gh);
+		}
+		return Optional.empty();
+	}
 
+	
+	@Override
+	protected String getQualifiedClassName(CtElement elem) {
+		return prefix;
+	}
+	
+	@Override
+	protected String getSimpleClassName(CtElement elem) {
+		String[] a = prefix.split("\\.");
+		return a[a.length-1];
+	}
 }

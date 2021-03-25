@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.lang.model.element.Element;
+
 import repair.regen.language.alias.Alias;
 import repair.regen.language.function.FunctionDeclaration;
 import repair.regen.language.parser.RefinementParser;
@@ -90,14 +92,19 @@ public abstract class TypeChecker extends CtScanner{
 		int set = 0;
 		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
 			String an = ann.getActualAnnotation().annotationType().getCanonicalName();
-			set++;
 			if(an.contentEquals("repair.regen.specification.StateSet")) {
-				createStateSet((CtNewArray<String>)ann.getAllValues().get("value"), an, set, element);
+				set++;
+				createStateSet((CtNewArray<String>)ann.getAllValues().get("value"), set, element);
+			}
+			if(an.contentEquals("repair.regen.specification.Ghost")) {
+				CtLiteral<String> s = (CtLiteral<String>)ann.getAllValues().get("value"); 
+				createStateGhost(s.getValue(), an, element);
 			}	
 		}
 	}
 
-	private void createStateSet(CtNewArray<String> e, String an, int set, CtElement element) {
+
+	private void createStateSet(CtNewArray<String> e,  int set, CtElement element) {
 		Optional<GhostFunction> og = createStateGhost(set, element);
 		if(!og.isPresent()) {
 			System.out.println("Error in creation of GhostFunction");
@@ -127,41 +134,40 @@ public abstract class TypeChecker extends CtScanner{
 		
 	}
 
+	private void createStateGhost(String string, String an, CtElement element) {
+		String[] s = string.split(" ");
+		String qn = getQualifiedClassName(element);
+		String sn = getSimpleClassName(element);
+		if(s.length < 2)
+			ErrorPrinter.printCostumeError(element, "Syntax error in defining ghost "+string);
+		List<CtTypeReference<?>> param = Arrays.asList(factory.Type().createReference(qn));
+		CtTypeReference r = factory.Type().createReference(s[0]);
+		GhostState gs = new GhostState(s[1], param, r, qn);
+		context.addToGhostClass(sn, gs);
+	}
+	
+	protected String getQualifiedClassName(CtElement element) {
+		if(element.getParent() instanceof CtClass<?>) {
+			return ((CtClass<?>) element.getParent()).getQualifiedName();
+		}else if(element instanceof CtClass<?>) {
+			return ((CtClass<?>) element).getQualifiedName();
+		}
+		return null;
+	}
+	
+	protected String getSimpleClassName(CtElement element) {
+		if(element.getParent() instanceof CtClass<?>) {
+			return ((CtClass<?>) element.getParent()).getSimpleName();
+		}else if(element instanceof CtClass<?>) {
+			return ((CtClass<?>) element).getSimpleName();
+		}
+		return null;
 
-	Optional<String> getExternalRefinement(CtInterface<?> intrface) {
-		Optional<String> ref = Optional.empty();
-		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
-			if( ann.getActualAnnotation().annotationType().getCanonicalName()
-					.contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
-				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-				ref = Optional.of(s.getValue());
-			}		
-		return ref;
 	}
 
-//
-//	protected Optional<GhostFunction> createGhostFunction(String value, int set, int order, CtElement element){
-//		CtClass<?> klass = null; 
-//
-//		if(element.getParent() instanceof CtClass<?>) {
-//			klass =(CtClass<?>) element.getParent();
-//		}else if(element instanceof CtClass<?>) {
-//			klass = (CtClass<?>) element;
-//		}
-//		if(klass != null) {
-//			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
-//			List<String> params = Arrays.asList(klass.getSimpleName());
-//			GhostFunction gh = new GhostFunction(value, params, ret , factory, 
-//					klass.getQualifiedName(), klass.getSimpleName(), set, order); 
-//			System.out.println(gh.toString());
-//			return Optional.of(gh);
-//		}
-//		return Optional.empty();
-//	}
 	
 	protected Optional<GhostFunction> createStateGhost(int order, CtElement element){
 		CtClass<?> klass = null; 
-
 		if(element.getParent() instanceof CtClass<?>) {
 			klass =(CtClass<?>) element.getParent();
 		}else if(element instanceof CtClass<?>) {
@@ -189,7 +195,6 @@ public abstract class TypeChecker extends CtScanner{
 				context.addGhostFunction(gh);
 				System.out.println(gh.toString());
 			}
-
 		} catch (SyntaxException e) {
 			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
 			e.printStackTrace();
@@ -217,6 +222,17 @@ public abstract class TypeChecker extends CtScanner{
 		} catch (SyntaxException e) {
 			e.printStackTrace();
 		}
+	}
+
+	Optional<String> getExternalRefinement(CtInterface<?> intrface) {
+		Optional<String> ref = Optional.empty();
+		for(CtAnnotation<? extends Annotation> ann :intrface.getAnnotations()) 
+			if( ann.getActualAnnotation().annotationType().getCanonicalName()
+					.contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
+				CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+				ref = Optional.of(s.getValue());
+			}		
+		return ref;
 	}
 
 

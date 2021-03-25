@@ -101,5 +101,17 @@ public class ErrorPrinter {
 		System.exit(1);
 		
 	}
+	
+	public static void printCostumeError(CtElement element, String msg) {
+		System.out.println("______________________________________________________");
+		System.err.println(" Found Error: "+msg);
+		System.out.println();
+		System.out.println(element);
+		System.out.println();
+		System.out.println("Location: " + element.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(1);
+		
+	}
 
 }

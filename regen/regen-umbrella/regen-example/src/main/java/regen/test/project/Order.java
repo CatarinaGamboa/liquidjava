@@ -2,6 +2,7 @@ package regen.test.project;
 
 
 
+import repair.regen.specification.Ghost;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
@@ -9,10 +10,10 @@ import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 
 @StateSet({"empty","addingItems", "checkout", "closed"})
+@Ghost   ("int totalPrice")
 public class Order {
 	
-	@RefinementPredicate("int totalPrice(Order o)")
-	@StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
+
 	public Order() {}
 	
 	@StateRefinement(from = "(empty(this) || addingItems(this))", 

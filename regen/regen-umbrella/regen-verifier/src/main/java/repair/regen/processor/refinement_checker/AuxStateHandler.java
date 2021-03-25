@@ -67,24 +67,33 @@ public class AuxStateHandler {
 		
 	}
 
-	//TODO CHANGE!!!!!!!!!!!!!!!!!!!!!!!!!
+
 	public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
 		String[] path = f.getTargetClass().split("\\.");
 		String klass = path[path.length-1];
 		List<GhostState> l = tc.context.getGhostState(klass);
+		if(l == null)
+			return;
 		String[] s = {tc.THIS};
 		Constraint c = new Predicate();
 		List<GhostFunction> sets = new ArrayList<>();
 		if(l != null)
 			for(GhostState g: l) {
-				if(!sets.contains(g.getParent()))
+				if(g.getParent() == null) {
+					sets.add(g);
+				}else if(!sets.contains(g.getParent()))
 					sets.add(g.getParent());
+				
 			}
 		for(GhostFunction sg: sets) {
+			if(sg.getReturnType().toString().equals("int")) {
 				Predicate p = new EqualsPredicate(
 						new InvocationPredicate(sg.getName(), s),
 						LiteralPredicate.getIntPredicate(0));
 				c = Conjunction.createConjunction(c, p);
+			}else {
+				fail("Ghost Functions not implemented for other types than int -> implement in AuxStateHandler defaultState");
+			}
 				
 		}
 		ObjectState os = new ObjectState();
@@ -120,39 +129,41 @@ public class AuxStateHandler {
 			TypeChecker tc, CtElement element) {
 		List<ObjectState> l = new ArrayList<>();
 		for(CtAnnotation<? extends Annotation> an: anns) {
-			l.add(getStates(an, tc, element));
+			l.add(getStates(an, f, tc, element));
 		}
 		f.setAllStates(l);
 	}
 
 	private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, 
-										TypeChecker tc, CtElement e) {
+										RefinedFunction f, TypeChecker tc, CtElement e) {
 		Map<String, CtExpression> m = ctAnnotation.getAllValues();
 		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
 		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
 		ObjectState state = new ObjectState();
 		if(from != null)				//has From
-			state.setFrom(createStateConstraint(from.getValue(), tc, e, false));
+			state.setFrom(createStateConstraint(from.getValue(), f, tc, e));
 		if(to != null)					//has To
-			state.setTo(createStateConstraint(to.getValue(), tc, e, true));
+			state.setTo(createStateConstraint(to.getValue(), f, tc, e));
 		
 		if(from != null && to == null)	//has From but not To -> the state remains the same 
-			state.setTo(createStateConstraint(from.getValue(), tc, e, true));
+			state.setTo(createStateConstraint(from.getValue(), f, tc, e));
 		if(from == null && to != null)	//has To but not From -> enters with true and exists with a specific state
 			state.setFrom(new Predicate());
 		return state;
 	}
 
 
-	private static Constraint createStateConstraint(String value, TypeChecker tc, CtElement e, boolean isTo) {
+	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e) {
 		Constraint p = new Predicate(value);
-		CtClass cl = e.getParent(CtClass.class);
-		CtTypeReference r = null;
-		if(cl != null) r = tc.factory.Type().createReference(cl);
-		else 
-			fail("Add createStateConstraint for others than Class only");
-		if(r == null)
-			return new Predicate();
+//		CtClass cl = e.getParent(CtClass.class);
+//		CtTypeReference r = null;
+//		if(cl != null) r = tc.factory.Type().createReference(cl);
+//		else 
+//			fail("Add createStateConstraint for others than Class only");
+//		if(r == null)
+//			return new Predicate();
+		String t = f.getTargetClass();
+		CtTypeReference r = tc.factory.Type().createReference(t);
 		
 		String nameOld = String.format(tc.instanceFormat, tc.THIS, tc.context.getCounter());
 		String name = String.format(tc.instanceFormat, tc.THIS, tc.context.getCounter());
@@ -162,7 +173,7 @@ public class AuxStateHandler {
 		Constraint c = p.substituteVariable(tc.THIS, name);
 		c = c.changeOldMentions(nameOld, "");
 		boolean b = tc.checkStateSMT(new Predicate(), c.negate(), e);
-		if(b) ErrorPrinter.printSameStateSetError(e, p, cl.getSimpleName());	
+		if(b) ErrorPrinter.printSameStateSetError(e, p, t);	
 				
 		return p;
 
