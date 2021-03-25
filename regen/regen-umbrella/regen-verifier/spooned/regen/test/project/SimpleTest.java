@@ -27,9 +27,10 @@ package regen.test.project;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         regen.test.project.Order o = new regen.test.project.Order();
-        regen.test.project.Order f = o.addItem("shirt", 60).getNewOrderPayThis().addItem("t", 6).addItem("t", 100);
-        o.addGift();
-        f.addItem("l", 1).pay(0).addGift().addTransportCosts().sendToAddress("home");
+        regen.test.project.Order f = o.addItem("shirt", 60).addGift();
+        // .getNewOrderPayThis().addItem("t", 6).addItem("t", 1);
+        // o.addGift();
+        // f.addItem("l", 1).pay(000).addGift().pay(000);//.addTransportCosts().sendToAddress("home");
         // TrafficLight tl = new TrafficLight();
         // tl.transitionToAmber();
         // 

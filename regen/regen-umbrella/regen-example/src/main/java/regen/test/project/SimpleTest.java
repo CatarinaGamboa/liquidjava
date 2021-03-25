@@ -18,9 +18,10 @@ public class SimpleTest {
 				
 		Order o = new Order();
 		
-		Order f = o.addItem("shirt", 60).getNewOrderPayThis().addItem("t", 6).addItem("t", 100);
-		o.addGift();
-		f.addItem("l", 1).pay(000).addGift().addTransportCosts().sendToAddress("home");
+		Order f = o.addItem("shirt", 60).addGift();
+//				.getNewOrderPayThis().addItem("t", 6).addItem("t", 1);
+//		o.addGift();
+//		f.addItem("l", 1).pay(000).addGift().pay(000);//.addTransportCosts().sendToAddress("home");
 
 		
 //		TrafficLight tl = new TrafficLight();

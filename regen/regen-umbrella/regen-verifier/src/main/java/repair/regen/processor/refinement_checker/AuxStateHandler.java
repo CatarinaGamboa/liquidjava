@@ -37,9 +37,13 @@ import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtTypeReference;
+import spoon.support.reflect.reference.CtExecutableReferenceImpl;
+import spoon.support.sniper.internal.ElementSourceFragment;
 
 public class AuxStateHandler {
 
@@ -318,7 +322,16 @@ public class AuxStateHandler {
 			String states = los.stream().filter(p->p.hasFrom())
 					.map(p->p.getFrom().toString())
 					.collect(Collectors.joining(","));
-			ErrorPrinter.printStateMismatch(invocation, prevState, states);
+//			CtExecutableReference e =invocation.getParent(CtExecutableReference.class);
+			ElementSourceFragment  e = invocation.getOriginalSourceFragment();
+			String simpleInvocation = f.getName();
+			if(invocation instanceof CtInvocation) {
+				CtInvocation i = (CtInvocation) invocation;
+				simpleInvocation = i.getExecutable().toString();
+				System.out.println();
+			}
+				
+			ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState, states);
 		}
 		return new Predicate();
 	}

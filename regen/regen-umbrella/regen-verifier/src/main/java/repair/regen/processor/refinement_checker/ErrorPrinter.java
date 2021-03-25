@@ -30,9 +30,9 @@ public class ErrorPrinter {
 		System.exit(1);
 	}
 	
-	public static void printStateMismatch(CtElement element, Constraint c, String states) {
+	public static void printStateMismatch(CtElement element, String method, Constraint c, String states) {
 		System.out.println("______________________________________________________");
-		System.err.println(" Failed to check all state transitions ");
+		System.err.println(" Failed to check state transitions when calling "+ method+" in:");
 		System.out.println();
 		System.out.println(element);
 		System.out.println();
