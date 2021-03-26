@@ -324,6 +324,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <R> void visitCtInvocation(CtInvocation<R> invocation) {
 		super.visitCtInvocation(invocation);
 		mfc.getInvocationRefinements(invocation);
+		System.out.println();
 	}
 
 	@Override

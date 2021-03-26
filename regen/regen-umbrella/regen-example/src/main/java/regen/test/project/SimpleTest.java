@@ -22,7 +22,7 @@ public class SimpleTest {
 		a.deposit(60);
 
 		Account b = new Account(138);
-		a.transferTo(b, 10);
+		b = a.transferTo(b, 10);
 		
 		@Refinement("sum(_) == 148")
 		Account c = b;

@@ -3,7 +3,7 @@ package repair.regen.language.alias;
 import org.modelcc.IModel;
 import org.modelcc.Pattern;
 import org.modelcc.Value;
-@Pattern(regExp = "[A-Z][a-zA-z0-9]*")
+@Pattern(regExp = "[A-Z][a-zA-Z0-9_]*")
 public class AliasName implements IModel{
 
 	@Value

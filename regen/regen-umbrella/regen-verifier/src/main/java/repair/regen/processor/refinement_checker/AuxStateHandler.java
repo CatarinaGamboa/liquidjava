@@ -313,6 +313,7 @@ public class AuxStateHandler {
 					prevCheck = prevCheck.substituteVariable(s, map.get(s));
 					expectState = expectState.substituteVariable(s, map.get(s));
 				}
+				expectState = expectState.changeOldMentions(vi.getName(), instanceName);
 				
 				found = tc.checkStateSMT(prevCheck, expectState, invocation);
 				if(found && os.hasTo()) {
@@ -418,6 +419,15 @@ public class AuxStateHandler {
 			Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(name);
 			if(ovi.isPresent())
 				invocation.putMetadata(tc.TARGET_KEY, ovi.get());
+			else if( elem.getMetadata(tc.TARGET_KEY) == null) {
+				RefinedVariable var = tc.context.getVariableByName(name);
+				String nName = String.format(tc.instanceFormat, name, tc.context.getCounter());
+				RefinedVariable rv = tc.context.addInstanceToContext(nName, var.getType(), 
+						var.getRefinement().substituteVariable(name, nName));
+				tc.context.addRefinementInstanceToVariable(name, nName);
+				invocation.putMetadata(tc.TARGET_KEY, rv);
+			}
+				
 			return name;
 		}else if(elem.getMetadata(tc.TARGET_KEY) != null) {
 			VariableInstance vi = (VariableInstance)elem.getMetadata(tc.TARGET_KEY);

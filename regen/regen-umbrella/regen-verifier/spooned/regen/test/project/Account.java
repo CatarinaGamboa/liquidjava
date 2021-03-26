@@ -31,9 +31,11 @@ public class Account {
     }
 
     @repair.regen.specification.StateRefinement(from = "(amount <= sum(this)) && (sum(this) == sum(old(this)))")
-    public void transferTo(regen.test.project.Account other, int amount) {
+    @repair.regen.specification.Refinement("sum(_) == (sum(old(_)) + amount)")
+    public regen.test.project.Account transferTo(regen.test.project.Account other, int amount) {
         this.withdraw(amount);
         other.deposit(amount);
+        return other;
     }
 }
 
