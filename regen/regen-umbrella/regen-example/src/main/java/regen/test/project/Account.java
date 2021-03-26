@@ -11,7 +11,7 @@ public class Account {
 	private int balance;
 	
 	public Account() {
-		balance = -1;
+		balance = 0;
 	}
 	
 	@StateRefinement(to = "sum(this) == v")
@@ -31,4 +31,14 @@ public class Account {
 	public void deposit(int v) {
 		balance += v;
 	}
+
+	
+	@StateRefinement(from="(amount <= sum(this)) && (sum(this) == sum(old(this)))")
+	public void transferTo(Account other, int amount) {
+		this.withdraw(amount);
+		other.deposit(amount);
+	}
+
+
+
 }

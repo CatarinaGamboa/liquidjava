@@ -174,7 +174,6 @@ public class VCChecker {
 			System.out.println("End smt checking");
 		} catch (TypeCheckError e) {
 			ErrorPrinter.printError(element, expectedType, cSMT);
-
 		}catch (GhostFunctionError e) {
 			ErrorPrinter.printErrorArgs(element, expectedType, e.getMessage());
 		}catch(TypeMismatchError e) {

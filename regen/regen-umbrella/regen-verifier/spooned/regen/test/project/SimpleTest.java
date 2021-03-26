@@ -28,6 +28,11 @@ public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         @repair.regen.specification.Refinement("sum(_) > 30")
         regen.test.project.Account a = new regen.test.project.Account(50);
+        a.deposit(60);
+        regen.test.project.Account b = new regen.test.project.Account(138);
+        a.transferTo(b, 10);
+        @repair.regen.specification.Refinement("sum(_) == 148")
+        regen.test.project.Account c = b;
         // Order o = new Order();
         // 
         // Order f = o.addItem("shirt", 60).addGift();

@@ -255,7 +255,8 @@ public abstract class TypeChecker extends CtScanner{
 		if(context.hasVariable(simpleName))
 			mainRV =  context.getVariableByName(simpleName);
 
-		if(context.hasVariable(simpleName))
+		if(context.hasVariable(simpleName)  && 
+				!context.getVariableByName(simpleName).getRefinement().isBooleanTrue())
 			cEt = mainRV.getMainRefinement();
 		else if(expectedType.isPresent())
 			cEt = expectedType.get();

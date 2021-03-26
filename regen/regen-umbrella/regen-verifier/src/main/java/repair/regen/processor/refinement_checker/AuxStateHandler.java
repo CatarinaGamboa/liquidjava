@@ -218,13 +218,19 @@ public class AuxStateHandler {
 	 * Sets the new state acquired from the constructor call
 	 * @param key
 	 * @param f
+	 * @param map 
 	 * @param ctConstructorCall
 	 */
-	public static void constructorStateMetadata(String refKey, RefinedFunction f, CtConstructorCall<?> ctConstructorCall) {
+	public static void constructorStateMetadata(String refKey, RefinedFunction f, Map<String, String> map, CtConstructorCall<?> ctConstructorCall) {
 		List<Constraint> oc = f.getToStates();
 		if(oc.size() > 0 ){//&& !oc.get(0).isBooleanTrue())
 			//			ctConstructorCall.putMetadata(stateKey, oc.get(0));
-			ctConstructorCall.putMetadata(refKey, oc.get(0));
+			Constraint c = oc.get(0);
+			for(String k:map.keySet()) {
+				c = c.substituteVariable(k, map.get(k));
+			}
+			ctConstructorCall.putMetadata(refKey, c);
+			//add maping to oc.get(0)-HERE
 		}else if(oc.size() > 1)
 			assertFalse("Constructor can only have one to state, not multiple", true);
 
@@ -302,7 +308,13 @@ public class AuxStateHandler {
 			ObjectState os = los.get(i);
 			if(os.hasFrom()) {
 				Constraint expectState = os.getFrom().substituteVariable(tc.THIS, instanceName); 
-				found = tc.checkStateSMT(prevState, expectState, invocation);
+				Constraint prevCheck = prevState;
+				for(String s : map.keySet()) {
+					prevCheck = prevCheck.substituteVariable(s, map.get(s));
+					expectState = expectState.substituteVariable(s, map.get(s));
+				}
+				
+				found = tc.checkStateSMT(prevCheck, expectState, invocation);
 				if(found && os.hasTo()) {
 					String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
 					Constraint transitionedState = os.getTo()
@@ -322,8 +334,6 @@ public class AuxStateHandler {
 			String states = los.stream().filter(p->p.hasFrom())
 					.map(p->p.getFrom().toString())
 					.collect(Collectors.joining(","));
-//			CtExecutableReference e =invocation.getParent(CtExecutableReference.class);
-			ElementSourceFragment  e = invocation.getOriginalSourceFragment();
 			String simpleInvocation = f.getName();
 			if(invocation instanceof CtInvocation) {
 				CtInvocation i = (CtInvocation) invocation;
@@ -385,6 +395,10 @@ public class AuxStateHandler {
 		RefinedVariable rv = tc.context.getVariableByName(superName);
 		for(CtTypeReference<?> t: rv.getSuperTypes())
 			vi2.addSuperType(t);
+		
+		Constraint superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
+		tc.checkSMT(superC, invocation);
+		//verify super main refinement 
 		tc.context.addRefinementInstanceToVariable(superName, name2);
 		invocation.putMetadata(tc.TARGET_KEY, vi2);
 		return name2;

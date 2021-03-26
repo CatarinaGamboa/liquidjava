@@ -21,31 +21,6 @@ public class SimpleTest {
 		TrafficLight tl2 = tl.getTrafficLightStartingRed();
 		tl2.transitionToFlashingAmber();
 		
-//		tl.transitionToAmber();
-//		tl.transitionToAmber();
-		
-//		tl.passagersCross();
-//		tl.intermitentMalfunction();
-		
-//		tl.transitionToFlashingAmber();
-
-//		@Refinement("size(al) < 4")
-//		ArrayList<Integer> al = new ArrayList<Integer>();
-//		al.add(1);
-//		al.add(1);
-//		al.get(2);
-		
-		
-//		@Refinement("size(t) == 3")
-//		ArrayList<Integer> t = al;
-		
-		
-//		
-//		Order o = new Order();
-//		o.addItem("shirt", 5)
-//		 .addItem("shirt", 10)
-//		 .addItem("h", 20)
-//		 .addItem("h", 6);
 
 	}
 	

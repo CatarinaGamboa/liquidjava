@@ -105,6 +105,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	@Override
 	public <T> void visitCtConstructor(CtConstructor<T> c) {
 		context.enterContext();
+		mfc.loadFunctionInfo(c);
 		super.visitCtConstructor(c);
 		context.exitContext();
 	}

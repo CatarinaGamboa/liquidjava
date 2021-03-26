@@ -19,6 +19,13 @@ public class SimpleTest {
 		
 		@Refinement("sum(_) > 30")
 		Account a = new Account(50);
+		a.deposit(60);
+
+		Account b = new Account(138);
+		a.transferTo(b, 10);
+		
+		@Refinement("sum(_) == 148")
+		Account c = b;
 		
 		
 //		Order o = new Order();

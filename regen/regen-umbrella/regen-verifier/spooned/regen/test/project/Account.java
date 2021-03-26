@@ -7,7 +7,7 @@ public class Account {
     private int balance;
 
     public Account() {
-        balance = -1;
+        balance = 0;
     }
 
     @repair.regen.specification.StateRefinement(to = "sum(this) == v")
@@ -28,6 +28,12 @@ public class Account {
     @repair.regen.specification.StateRefinement(to = "sum(this) == (sum(old(this)) + v)")
     public void deposit(int v) {
         balance += v;
+    }
+
+    @repair.regen.specification.StateRefinement(from = "(amount <= sum(this)) && (sum(this) == sum(old(this)))")
+    public void transferTo(regen.test.project.Account other, int amount) {
+        this.withdraw(amount);
+        other.deposit(amount);
     }
 }
 

@@ -67,12 +67,11 @@ public class MethodsFunctionsChecker {
 		CtExecutableReference<?> exe = ctConstructorCall.getExecutable();
 		if(exe != null) {
 			RefinedFunction f = rtc.context.getFunction(exe.getSimpleName(), 
-					exe.getDeclaringType().getQualifiedName());
+					exe.getDeclaringType().getQualifiedName(), ctConstructorCall.getArguments().size());
 			if(f != null) {
-				checkInvocationRefinements(ctConstructorCall, ctConstructorCall.getArguments(), ctConstructorCall.getTarget(), 
+				Map<String, String> map = checkInvocationRefinements(ctConstructorCall, ctConstructorCall.getArguments(), ctConstructorCall.getTarget(), 
 						f.getName(), f.getTargetClass());
-				AuxStateHandler.constructorStateMetadata(rtc.REFINE_KEY, f, ctConstructorCall);
-				
+				AuxStateHandler.constructorStateMetadata(rtc.REFINE_KEY, f, map, ctConstructorCall);
 			}
 		}
 
@@ -293,18 +292,20 @@ public class MethodsFunctionsChecker {
 
 	}
 
-	private <R> void checkInvocationRefinements(CtElement element, List<CtExpression<?>> arguments, CtExpression<?> target,
+	private Map<String,String>  checkInvocationRefinements(CtElement element, List<CtExpression<?>> arguments, CtExpression<?> target,
 			String methodName, String className) {
 		int si = arguments.size();
 		RefinedFunction f = rtc.context.getFunction(methodName, className, si);
 		Map<String,String> map = mapInvocation(arguments, f);
+		
 		if(target!= null) {
 			AuxStateHandler.checkTargetChanges(rtc, f, target, map, element);	
 		}
 		if(f.allRefinementsTrue()) {
 			element.putMetadata(rtc.REFINE_KEY, new Predicate());
-			return;
+			return map;
 		}
+		
 		checkParameters(element, arguments, f, map);
 
 		Constraint methodRef = f.getRefReturn(); 
@@ -332,7 +333,9 @@ public class MethodsFunctionsChecker {
 				rtc.context.addRefinementInstanceToVariable(varName, viName);
 			element.putMetadata(rtc.TARGET_KEY, vi);
 			element.putMetadata(rtc.REFINE_KEY, methodRef);
+
 		}
+		return map;
 
 	}
 
@@ -395,7 +398,7 @@ public class MethodsFunctionsChecker {
 
 	}
 
-	void loadFunctionInfo(CtMethod<?> method) {
+	void loadFunctionInfo(CtExecutable<?> method) {
 		String className = null;
 		if(method.getParent() instanceof CtClass) {
 			className = ((CtClass) method.getParent()).getQualifiedName();
@@ -410,7 +413,7 @@ public class MethodsFunctionsChecker {
 					rtc.context.addVarToContext(v);
 			}else {
 				assertFalse("Method should already be in context. Should not arrive this point in refinement checker.", true);
-				getMethodRefinements(method); //should be irrelevant -should never need to get here
+//				getMethodRefinements(method); //should be irrelevant -should never need to get here
 			}
 		}
 		
