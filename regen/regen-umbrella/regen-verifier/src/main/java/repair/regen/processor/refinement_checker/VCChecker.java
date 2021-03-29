@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.SimpleImplication;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
@@ -56,30 +57,35 @@ public class VCChecker {
 
 	private Constraint joinConstraints(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 
 			List<RefinedVariable> vars) {
-		StringBuilder sb = new StringBuilder();
-		StringBuilder sbSMT = new StringBuilder();
 
+		SimpleImplication firstSi = null;
+		SimpleImplication lastSi = null;
 		//Check
-		Constraint cSMT = new Predicate();
 		for(RefinedVariable var:mainVars) {//join main refinements of mainVars
-			cSMT = Conjunction.createConjunction(cSMT, var.getMainRefinement());
-			String ref = var.getMainRefinement().toString();
-
-			//imprimir
-			sb.append("forall "+var.getName()+":"+ref+" -> \n");
-			sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
+			SimpleImplication si = new SimpleImplication(var.getName(), var.getType(), var.getMainRefinement());
+			if(lastSi != null) {
+				lastSi.setNext(si); lastSi = si;
+			}
+			if(firstSi == null) {
+				firstSi = si; lastSi = si;
+			}
+			
 		}
 
 		for(RefinedVariable var:vars) {//join refinements of vars
-			cSMT = Conjunction.createConjunction(cSMT, var.getRefinement());
-			String ref = var.getRefinement().toString();
-
-			//imprimir
-			sb.append("forall "+var.getName()+":"+ref+" -> \n");
-			sbSMT.append(sbSMT.length()>0?" && "+ref : ref);
+			SimpleImplication si = new SimpleImplication(var.getName(), var.getType(), var.getRefinement());
+			if(lastSi != null) {
+				lastSi.setNext(si);	lastSi = si;
+			}
+			if(firstSi == null) {
+				firstSi = si; lastSi = si;
+			}
 		}
-		sb.append(expectedType);
-		printVCs(sb.toString(), sbSMT.toString(), expectedType);
+		
+		Constraint cSMT = firstSi.toConjunctions();
+		lastSi.setNext(new SimpleImplication(expectedType));
+
+		printVCs(firstSi.toString(), cSMT.toString(), expectedType);
 		return cSMT;
 	}
 

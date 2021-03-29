@@ -33,13 +33,13 @@ public class Account {
 	}
 
 	
-	@StateRefinement(from="(amount <= sum(this)) && (sum(this) == sum(old(this)))")
-	@Refinement("sum(_) == (sum(old(_)) + amount)")
-	public Account transferTo(Account other, int amount) {
-		this.withdraw(amount);
-		other.deposit(amount);
-		return other;
-	}
+//	@StateRefinement(from="(amount <= sum(this)) && (sum(this) == sum(old(this)))")
+//	@Refinement("sum(_) == (sum(old(_)) + amount)")
+//	public Account transferTo(Account other, int amount) {
+//		this.withdraw(amount);
+//		other.deposit(amount);
+//		return other;
+//	}
 
 
 

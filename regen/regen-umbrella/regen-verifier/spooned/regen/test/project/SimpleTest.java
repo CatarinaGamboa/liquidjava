@@ -29,10 +29,11 @@ public class SimpleTest {
         @repair.regen.specification.Refinement("sum(_) > 30")
         regen.test.project.Account a = new regen.test.project.Account(50);
         a.deposit(60);
-        regen.test.project.Account b = new regen.test.project.Account(138);
-        b = a.transferTo(b, 10);
-        @repair.regen.specification.Refinement("sum(_) == 148")
-        regen.test.project.Account c = b;
+        // Account b = new Account(138);
+        // b = a.transferTo(b, 10);
+        // 
+        // @Refinement("sum(_) == 148")
+        // Account c = b;
         // Order o = new Order();
         // 
         // Order f = o.addItem("shirt", 60).addGift();

@@ -1,6 +1,13 @@
 package regen.test.project;
 
 
+// @StateRefinement(from="(amount <= sum(this)) && (sum(this) == sum(old(this)))")
+// @Refinement("sum(_) == (sum(old(_)) + amount)")
+// public Account transferTo(Account other, int amount) {
+// this.withdraw(amount);
+// other.deposit(amount);
+// return other;
+// }
 @repair.regen.specification.Ghost("int sum")
 public class Account {
     @repair.regen.specification.Refinement("balance >= 0")
@@ -28,14 +35,6 @@ public class Account {
     @repair.regen.specification.StateRefinement(to = "sum(this) == (sum(old(this)) + v)")
     public void deposit(int v) {
         balance += v;
-    }
-
-    @repair.regen.specification.StateRefinement(from = "(amount <= sum(this)) && (sum(this) == sum(old(this)))")
-    @repair.regen.specification.Refinement("sum(_) == (sum(old(_)) + amount)")
-    public regen.test.project.Account transferTo(regen.test.project.Account other, int amount) {
-        this.withdraw(amount);
-        other.deposit(amount);
-        return other;
     }
 }
 
