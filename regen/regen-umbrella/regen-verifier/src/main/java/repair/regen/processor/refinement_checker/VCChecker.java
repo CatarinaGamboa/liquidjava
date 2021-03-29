@@ -1,17 +1,20 @@
 package repair.regen.processor.refinement_checker;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 import java.util.stream.Collectors;
 
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.SimpleImplication;
+import repair.regen.processor.constraints.VCImplication;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.VariableInstance;
 import repair.regen.smt.GhostFunctionError;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
@@ -33,10 +36,11 @@ public class VCChecker {
 		if(expectedType.isBooleanTrue())
 			return;
 
-		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
+		HashMap<String, String> map = new HashMap<String, String>();
+		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
 		premises = premises.changeStatesToRefinements(list);
 		Constraint et = expectedType.changeStatesToRefinements(list);
-		smtChecking(premises, et, element);
+		smtChecking(premises, et, element, map);
 	}
 
 	public boolean processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, CtElement element) {
@@ -48,7 +52,8 @@ public class VCChecker {
 
 
 //		Constraint premises = joinConstraints(type, element, mainVars, lrv);
-		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv);
+		HashMap<String, String> map = new HashMap<String, String>();
+		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
 		premises = Conjunction.createConjunction(premises, type);//TODO add to print
 		premises = premises.changeStatesToRefinements(list);
 		Constraint et = expectedType.changeStatesToRefinements(list);
@@ -56,13 +61,14 @@ public class VCChecker {
 	}
 
 	private Constraint joinConstraints(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 
-			List<RefinedVariable> vars) {
+			List<RefinedVariable> vars, Map<String, String> map) {
 
-		SimpleImplication firstSi = null;
-		SimpleImplication lastSi = null;
+		VCImplication firstSi = null;
+		VCImplication lastSi = null;
 		//Check
 		for(RefinedVariable var:mainVars) {//join main refinements of mainVars
-			SimpleImplication si = new SimpleImplication(var.getName(), var.getType(), var.getMainRefinement());
+			addMap(var, map);			
+			VCImplication si = new VCImplication(var.getName(), var.getType(), var.getMainRefinement());
 			if(lastSi != null) {
 				lastSi.setNext(si); lastSi = si;
 			}
@@ -73,7 +79,8 @@ public class VCChecker {
 		}
 
 		for(RefinedVariable var:vars) {//join refinements of vars
-			SimpleImplication si = new SimpleImplication(var.getName(), var.getType(), var.getRefinement());
+			addMap(var, map);
+			VCImplication si = new VCImplication(var.getName(), var.getType(), var.getRefinement());
 			if(lastSi != null) {
 				lastSi.setNext(si);	lastSi = si;
 			}
@@ -83,12 +90,21 @@ public class VCChecker {
 		}
 		
 		Constraint cSMT = firstSi.toConjunctions();
-		lastSi.setNext(new SimpleImplication(expectedType));
+		lastSi.setNext(new VCImplication(expectedType));
 
 		printVCs(firstSi.toString(), cSMT.toString(), expectedType);
 		return cSMT;
 	}
 
+
+	private void addMap(RefinedVariable var, Map<String, String> map) {
+		if(var instanceof VariableInstance) {
+			VariableInstance vi = (VariableInstance) var;
+			if(vi.getParent().isPresent())
+				map.put(vi.getName(), vi.getParent().get().getName());
+				
+		}
+	}
 
 	private void gatherVariables(Constraint expectedType, List<RefinedVariable> lrv, List<RefinedVariable> mainVars) {
 		for(String s: expectedType.getVariableNames()) {
@@ -172,18 +188,19 @@ public class VCChecker {
 	 * @param cSMT
 	 * @param expectedType
 	 * @param element
+	 * @param map 
 	 */
-	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element) {
+	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element, HashMap<String, String> map) {
 		//		printVCs("", cSMT.toString(), expectedType);
 		try {
 			new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
 			System.out.println("End smt checking");
 		} catch (TypeCheckError e) {
-			ErrorPrinter.printError(element, expectedType, cSMT);
+			ErrorPrinter.printError(element, substituteByMap(expectedType, map), substituteByMap(cSMT, map));
 		}catch (GhostFunctionError e) {
-			ErrorPrinter.printErrorArgs(element, expectedType, e.getMessage());
+			ErrorPrinter.printErrorArgs(element, substituteByMap(expectedType, map), e.getMessage());
 		}catch(TypeMismatchError e) {
-			ErrorPrinter.printErrorTypeMismatch(element, expectedType, e.getMessage());
+			ErrorPrinter.printErrorTypeMismatch(element, substituteByMap(expectedType, map), e.getMessage());
 		}catch (Exception e) {
 			System.err.println("Unknown error:"+e.getMessage());
 			e.printStackTrace();
@@ -197,6 +214,18 @@ public class VCChecker {
 	}
 
 
+	/**
+	 * Change variables in constraint by their value expression in the map
+	 * @param c
+	 * @param map
+	 * @return
+	 */
+	private Constraint substituteByMap(Constraint c, HashMap<String, String> map) {
+		Constraint c1 = c;
+		for(String s: map.keySet())
+			c1 = c.substituteVariable(s, map.get(s));
+		return c1;
+	}
 
 	public void addPathVariable(RefinedVariable rv) {
 		pathVariables.add(rv);

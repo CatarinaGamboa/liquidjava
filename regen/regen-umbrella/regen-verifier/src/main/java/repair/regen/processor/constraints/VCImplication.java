@@ -2,23 +2,23 @@ package repair.regen.processor.constraints;
 
 import spoon.reflect.reference.CtTypeReference;
 
-public class SimpleImplication{
+public class VCImplication{
 	String name;
 	CtTypeReference<?> type;
 	Constraint refinement;
-	SimpleImplication next;
+	VCImplication next;
 	
-	public SimpleImplication(String name, CtTypeReference type, Constraint ref) {
+	public VCImplication(String name, CtTypeReference type, Constraint ref) {
 		this.name = name;
 		this.type = type;
 		this.refinement = ref;
 	}
 	
-	public SimpleImplication(Constraint ref) {
+	public VCImplication(Constraint ref) {
 		this.refinement = ref;
 	}
 	
-	public void setNext(SimpleImplication c) {
+	public void setNext(VCImplication c) {
 		next = c;
 	}
 	
