@@ -88,11 +88,13 @@ public class VCChecker {
 				firstSi = si; lastSi = si;
 			}
 		}
-		
-		Constraint cSMT = firstSi.toConjunctions();
-		lastSi.setNext(new VCImplication(expectedType));
+		Constraint cSMT = new Predicate();
+		if(firstSi != null && lastSi != null) {
+			cSMT = firstSi.toConjunctions();
+			lastSi.setNext(new VCImplication(expectedType));
+			printVCs(firstSi.toString(), cSMT.toString(), expectedType);
+		}
 
-		printVCs(firstSi.toString(), cSMT.toString(), expectedType);
 		return cSMT;
 	}
 
