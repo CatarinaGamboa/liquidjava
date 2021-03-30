@@ -44,10 +44,11 @@
 					<testClassesDirectory>${project.build.directory}/classes/</testClassesDirectory>
 				</configuration>
 			</plugin>
+
 			<plugin>
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr4-maven-plugin</artifactId>
-				<version>4.3</version>
+				<version>4.7.1</version>
 				<executions>
 					<execution>
 						<goals>
@@ -56,10 +57,6 @@
 					</execution>
 				</executions>
 			</plugin>
-
-
-
-
 		</plugins>
 	</build>
 
@@ -127,6 +124,12 @@
 			<groupId>regen-api</groupId>
 			<artifactId>regen-api</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.antlr</groupId>
+			<artifactId>antlr4-runtime</artifactId>
+			<version>4.7.1</version>
 		</dependency>
 	</dependencies>
 </project>

@@ -1,21 +1,22 @@
-grammar Refinements;
+grammar RJ;
 @header{
-	package regen-verifier;
+	package rj.grammar;
 }
 
 prog: start;
 start:
 		predicate
-	|	'type' alias
-	|	'ghost' ghost;
+	|	'type'? alias
+	|	'ghost'? ghost;
 
-
-predicate :
+predicate:
 		expression (CONJ_OP predicate)?
-	|	predicate '?' predicate ':' predicate (CONJ_OP predicate)? ;
+	|	predicate '?' predicate ':' predicate (CONJ_OP predicate)? 
+	|	'(' predicate ')';
 	
 expression:
-		operand BOOL_OP	operand;
+		'(' expression ')'
+	|	operand BOOL_OP	operand;
 	
 operand:
 		literal
@@ -23,18 +24,21 @@ operand:
 	|	operand ARITH_OP operand
 	|	UNARY_OP operand
 	|	functionCall
-	|	VAR '.' functionCall;
+	|	VAR '.' functionCall
+	|	'(' operand ')';
 	
-functionCall:
-		VAR '(' args? ')';
+
 	
-args:	operand multipleArgs;
+functionCall: 
+		VAR '(' args? ')' ;
+	
+args:	operand multipleArgs; 
 
 multipleArgs:
 		',' args 
 	|	;
-
-literal:
+ 
+literal: 
 		BOOL
 	|	STRING
 	|	INT
@@ -72,4 +76,4 @@ ALIAS_ID: ([A-Z][a-zA-Z0-9]+) ;
 OBJECT_TYPE
 		: ([A-Z][a-zA-Z0-9]*) 
 		| (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9])+); 
-
+WS		: [' ''\t''\n''\r']+ -> channel(HIDDEN);
