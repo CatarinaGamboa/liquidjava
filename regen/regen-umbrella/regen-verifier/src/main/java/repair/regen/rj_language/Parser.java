@@ -8,12 +8,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 
 import rj.grammar.RJLexer;
 import rj.grammar.RJParser;
-import repair.regen.language.parser.RefinementParser;
 
 public class Parser {
 	public static void main(String[] args) {
 		CodePointCharStream input;
-		String s = "(a == 2) && (b === 3)";
+		String s = "_ == 30 ||| _ == 90";
 		input = CharStreams.fromString(s);
 		RJLexer lexer = new RJLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);

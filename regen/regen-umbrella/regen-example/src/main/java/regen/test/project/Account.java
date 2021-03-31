@@ -33,9 +33,9 @@ public class Account {
 	}
 
 	
-//	@StateRefinement(from="(amount <= sum(this)) && (sum(this) == sum(old(this)))")
+//	@StateRefinement(from="(amount <= sum(this)) && (sum(this) == sum(old(this)))", to="...")
 //	@Refinement("sum(_) == (sum(old(_)) + amount)")
-//	public Account transferTo(Account other, int amount) {
+//	public Account transferTo(Account other, @Refinement("_ < sum(this)")int amount) {
 //		this.withdraw(amount);
 //		other.deposit(amount);
 //		return other;

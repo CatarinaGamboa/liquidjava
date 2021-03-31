@@ -1,27 +1,25 @@
 grammar RJ;
-@header{
-	package rj.grammar;
-}
+
 
 prog: start;
 start:
 		predicate
-	|	'type'? alias
+	|	'type'? alias_1
 	|	'ghost'? ghost;
 
 predicate:
 		expression (CONJ_OP predicate)?
 	|	predicate '?' predicate ':' predicate (CONJ_OP predicate)? 
 	|	'(' predicate ')';
-	
-expression:
-		'(' expression ')'
+	 
+expression: 
+		'(' expression ')' 
 	|	operand BOOL_OP	operand;
-	
+	 
 operand:
 		literal
 	| 	VAR
-	|	operand ARITH_OP operand
+	|	operand ARITH_OP operand 
 	|	UNARY_OP operand
 	|	functionCall
 	|	VAR '.' functionCall
@@ -29,7 +27,7 @@ operand:
 	
 
 	
-functionCall: 
+functionCall:  
 		VAR '(' args? ')' ;
 	
 args:	operand multipleArgs; 
@@ -44,7 +42,7 @@ literal:
 	|	INT
 	|	REAL;
 	
-alias:
+alias_1:
 	ALIAS_ID '(' argDecl ')' '{' predicate '}';
 
 
@@ -61,7 +59,7 @@ type:
 		'int'
 	|	'double'
 	|	'float'
-	|	OBJECT_TYPE;
+	|	OBJECT_TYPE;  
 
 CONJ_OP: '&&' | '||' | '-->';
 UNARY_OP: '!' | '-' | '+';
@@ -76,4 +74,4 @@ ALIAS_ID: ([A-Z][a-zA-Z0-9]+) ;
 OBJECT_TYPE
 		: ([A-Z][a-zA-Z0-9]*) 
 		| (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9])+); 
-WS		: [' ''\t''\n''\r']+ -> channel(HIDDEN);
+WS		: [ \n\r]+ -> channel(HIDDEN);
