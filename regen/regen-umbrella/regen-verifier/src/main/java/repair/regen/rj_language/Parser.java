@@ -12,13 +12,17 @@ import rj.grammar.RJParser;
 public class Parser {
 	public static void main(String[] args) {
 		CodePointCharStream input;
-		String s = "_ == 30 ||| _ == 90";
+		String s = "b == 4";
 		input = CharStreams.fromString(s);
 		RJLexer lexer = new RJLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		RJParser parser = new RJParser(tokens);
 		parser.setBuildParseTree(true);
+		parser.addParseListener(new RJListener());
 		parser.start();
+		
+		System.out.println(parser.expression());
+		
 		//			CasualLexer lexer = new CasualLexer(input);
 		//			CasualErrorsListener errlis = new CasualErrorsListener();
 		//

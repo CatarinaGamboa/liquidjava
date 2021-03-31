@@ -4,33 +4,35 @@ grammar RJ;
 prog: start;
 start:
 		predicate
-	|	'type'? alias_1
+	|	'type' alias
 	|	'ghost'? ghost;
 
-predicate:
-		expression (CONJ_OP predicate)?
-	|	predicate '?' predicate ':' predicate (CONJ_OP predicate)? 
-	|	'(' predicate ')';
+predicate: expression;
+
+expression:
+		'(' predicate ')' 
+	|	expression BIN_OP expression
+	|	literalExpression;
+//	|	UNARY_OP expression
+//	|	expression '?' expression ':' expression;
+
+afterExpression:
+		BIN_OP expression
+	|	;
 	 
-expression: 
-		'(' expression ')' 
-	|	operand BOOL_OP	operand;
-	 
-operand:
+literalExpression:
 		literal
-	| 	VAR
-	|	operand ARITH_OP operand 
-	|	UNARY_OP operand
-	|	functionCall
-	|	VAR '.' functionCall
-	|	'(' operand ')';
+	| 	VAR;
+// VAR Second
+//	|	functionCall
+//	|	VAR '.' functionCall;
 	
 
 	
 functionCall:  
 		VAR '(' args? ')' ;
 	
-args:	operand multipleArgs; 
+args:	expression multipleArgs; 
 
 multipleArgs:
 		',' args 
@@ -42,8 +44,8 @@ literal:
 	|	INT
 	|	REAL;
 	
-alias_1:
-	ALIAS_ID '(' argDecl ')' '{' predicate '}';
+alias:
+	ALIAS_ID '(' argDecl ')' '{' expression '}';
 
 
 ghost: 
@@ -57,21 +59,25 @@ argDecl2:
 	
 type:
 		'int'
-	|	'double'
+	|	'double' 
 	|	'float'
 	|	OBJECT_TYPE;  
 
-CONJ_OP: '&&' | '||' | '-->';
-UNARY_OP: '!' | '-' | '+';
-BOOL_OP	: '=='|'!='|'>='|'>'|'<='|'<';
-ARITH_OP: '+'|'-'|'*'|'/'|'%';
+
+//UNARY_OP: '!' | '-' | '+';
+//CONJ_OP   : '&&'|'||'| '-->';
+//BOOL_OP	 : '=='|'!='|'>='|'>'|'<='|'<';
+//ARITH_OP : '+'|'*'|'/'|'%';//|'-';
+BIN_OP   : '&&'|'||'|'=='|'!='|'>='|'>'|'<='|
+          '<'|'+'|'*'|'/'|'%';//|'-';
+
+//BIN_OP	: '&&' | '||' | '-->'|'=='|'!='|'>='|'>'|'<='|'<'|'+'|'-'|'*'|'/'|'%';
 BOOL    : 'true' | 'false';
 VAR     : '#'*[a-zA-Z_][a-zA-Z0-9_]*;
 STRING  : '"'(~["])*'"';
-INT     : (([0-9]+) |([0-9]+('_'[0-9]+)*));
+INT     : 	(([0-9]+) |	([0-9]+('_'[0-9]+)*));
 REAL   	: (([0-9]+('.'[0-9]+)?) | '.'[0-9]+);
-ALIAS_ID: ([A-Z][a-zA-Z0-9]+) ;
-OBJECT_TYPE
-		: ([A-Z][a-zA-Z0-9]*) 
-		| (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9])+); 
-WS		: [ \n\r]+ -> channel(HIDDEN);
+OBJECT_TYPE 
+		: ([A-Z][a-zA-Z0-9]*) | (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9])+); 
+ALIAS_ID: ([A-Z][a-zA-Z0-9]+) ; 
+WS		:  (' '|'\t'|'\n'|'\r')+ -> channel(HIDDEN);
