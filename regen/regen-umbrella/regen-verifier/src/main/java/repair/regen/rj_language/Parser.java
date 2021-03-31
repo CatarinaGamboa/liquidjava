@@ -12,7 +12,8 @@ import rj.grammar.RJParser;
 public class Parser {
 	public static void main(String[] args) {
 		CodePointCharStream input;
-		String s = "((((( sum (#a_21) == (point.sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
+		String s = "type Positive(double x) { x > 0}";
+//		String s = "((((( sum (#a_21) == (sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
 		
 		input = CharStreams.fromString(s);
 		RJLexer lexer = new RJLexer(input);

@@ -3,8 +3,9 @@ grammar RJ;
 
 prog: start;
 start:
-		pred;
-//	|	'type' alias
+		pred
+	|	alias;
+
 //	|	'ghost'? ghost;
 
 //predicate: | expression ;
@@ -30,7 +31,7 @@ exp:
 //	|	ite
 	
 operand:
-	|	literalExpression
+		literalExpression
 	|	operand ARITHOP	operand
 	|	operand '-'	operand
 	|	'-' operand;
@@ -39,13 +40,14 @@ operand:
 literalExpression:
 		'(' literalExpression ')'
 	|	literal
-	| 	ID followVar
+	| 	ID 
+	|	ID '.' functionCall
 	|	functionCall;
 	
- followVar:
- 	|	'.' functionCall
- 	|	; 
- 	
+// followVar:
+// 	|	'.' functionCall
+// 	|	; 
+// 	
  functionCall:
  	ID '(' args ')';	
 
@@ -60,25 +62,27 @@ literal:
 	|	STRING
 	|	INT
 	|	REAL;
-//	
-//alias:
-//	ALIAS_ID '(' argDecl ')' '{' expression '}';
+	
+//----------------------- Alias -----------------------	
+
+alias:
+	'type'? ID '(' argDecl ')' '{' pred '}'|;
 //
 //
 //ghost: 
 //	type VAR '(' argDecl ')';
 //	
-//argDecl:
-//	type VAR argDecl2;
-//	
-//argDecl2:
-//	',' argDecl | ;
-//	
-//type:
-//		'int'
-//	|	'double' 
-//	|	'float'
-//	|	OBJECT_TYPE;  
+argDecl:
+	type ID argDecl2;
+	
+argDecl2:
+	',' argDecl | ;
+	
+type:
+		'int'
+	|	'double' 
+	|	'float'
+	|	OBJECT_TYPE;  
 
 
 ////UNARY_OP: '!' | '-' | '+';
@@ -90,11 +94,10 @@ ARITHOP : '+'|'*'|'/'|'%';//|'-';
 
 //BIN_OP	: '&&' | '||' | '-->'|'=='|'!='|'>='|'>'|'<='|'<'|'+'|'-'|'*'|'/'|'%';
 BOOL    : 'true' | 'false';
-ID     : '#'*[a-zA-Z_][a-zA-Z0-9_]*;
+ID     	: '#'*[a-zA-Z_][a-zA-Z0-9_]*;
 STRING  : '"'(~["])*'"';
 INT     : 	(([0-9]+) |	([0-9]+('_'[0-9]+)*));
 REAL   	: (([0-9]+('.'[0-9]+)?) | '.'[0-9]+);
 OBJECT_TYPE 
-		: ([A-Z][a-zA-Z0-9]*) | (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9])+); 
-ALIAS_ID: ([A-Z][a-zA-Z0-9]+) ; 
+		: ([A-Z][a-zA-Z0-9]*) | (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9])+);  
 WS		:  (' '|'\t'|'\n'|'\r')+ -> channel(HIDDEN);
