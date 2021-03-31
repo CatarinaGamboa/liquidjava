@@ -4,9 +4,8 @@ grammar RJ;
 prog: start;
 start:
 		pred
-	|	alias;
-
-//	|	'ghost'? ghost;
+	|	alias
+	|	ghost;
 
 //predicate: | expression ;
 //
@@ -66,13 +65,16 @@ literal:
 //----------------------- Alias -----------------------	
 
 alias:
-	'type'? ID '(' argDecl ')' '{' pred '}'|;
-//
-//
-//ghost: 
-//	type VAR '(' argDecl ')';
-//	
+	'type'? ID_UPPER '(' argDeclID ')' '{' pred '}'|;
+
+
+ghost: 
+	'ghost'? type ID '(' argDecl ')' | ;
+
 argDecl:
+	type ID? argDecl2;	
+	
+argDeclID:
 	type ID argDecl2;
 	
 argDecl2:
@@ -82,6 +84,8 @@ type:
 		'int'
 	|	'double' 
 	|	'float'
+	|	'boolean'
+	|	ID_UPPER
 	|	OBJECT_TYPE;  
 
 
@@ -89,15 +93,14 @@ type:
 LOGOP   : '&&'|'||'| '-->';
 BOOLOP	 : '=='|'!='|'>='|'>'|'<='|'<';
 ARITHOP : '+'|'*'|'/'|'%';//|'-';
-//BIN_OP   : '&&'|'||'|'=='|'!='|'>='|'>'|'<='|
-//          '<'|'+'|'*'|'/'|'%';//|'-';
 
-//BIN_OP	: '&&' | '||' | '-->'|'=='|'!='|'>='|'>'|'<='|'<'|'+'|'-'|'*'|'/'|'%';
 BOOL    : 'true' | 'false';
+ID_UPPER: ([A-Z][a-zA-Z0-9]*);
+OBJECT_TYPE: 
+		  (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9]*)+);
 ID     	: '#'*[a-zA-Z_][a-zA-Z0-9_]*;
 STRING  : '"'(~["])*'"';
 INT     : 	(([0-9]+) |	([0-9]+('_'[0-9]+)*));
 REAL   	: (([0-9]+('.'[0-9]+)?) | '.'[0-9]+);
-OBJECT_TYPE 
-		: ([A-Z][a-zA-Z0-9]*) | (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9])+);  
+  
 WS		:  (' '|'\t'|'\n'|'\r')+ -> channel(HIDDEN);
