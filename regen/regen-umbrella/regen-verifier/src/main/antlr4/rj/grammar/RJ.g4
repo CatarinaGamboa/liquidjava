@@ -3,73 +3,87 @@ grammar RJ;
 
 prog: start;
 start:
-		predicate
-	|	'type' alias
-	|	'ghost'? ghost;
+		pred;
+//	|	'type' alias
+//	|	'ghost'? ghost;
 
-predicate: expression;
-
-expression:
-		'(' predicate ')' 
-	|	expression BIN_OP expression
-	|	literalExpression;
+//predicate: | expression ;
+//
+//expression:
+//		'(' expression ')' 
+//	|	expression BIN_OP expression predicate
+//	|	literalExpression;
 //	|	UNARY_OP expression
 //	|	expression '?' expression ':' expression;
 
-afterExpression:
-		BIN_OP expression
-	|	;
+pred:
+		exp LOGOP exp pred
+	|	exp
+	|;
+	
+exp:
+		operand BOOLOP operand
+	|	operand;
+//	|	ite
+	
+operand:
+		literalExpression
+	|	operand ARITHOP	operand;
+
+//afterExpression:
+//		BIN_OP expression
+//	|	;
 	 
 literalExpression:
 		literal
-	| 	VAR;
+	| 	VAR; 
 // VAR Second
 //	|	functionCall
 //	|	VAR '.' functionCall;
 	
 
-	
-functionCall:  
-		VAR '(' args? ')' ;
-	
-args:	expression multipleArgs; 
-
-multipleArgs:
-		',' args 
-	|	;
- 
+//	
+//functionCall:  
+//		VAR '(' args? ')' ;
+//	
+//args:	expression multipleArgs; 
+//
+//multipleArgs:
+//		',' args 
+//	|	;
+// 
 literal: 
 		BOOL
 	|	STRING
 	|	INT
 	|	REAL;
-	
-alias:
-	ALIAS_ID '(' argDecl ')' '{' expression '}';
+//	
+//alias:
+//	ALIAS_ID '(' argDecl ')' '{' expression '}';
+//
+//
+//ghost: 
+//	type VAR '(' argDecl ')';
+//	
+//argDecl:
+//	type VAR argDecl2;
+//	
+//argDecl2:
+//	',' argDecl | ;
+//	
+//type:
+//		'int'
+//	|	'double' 
+//	|	'float'
+//	|	OBJECT_TYPE;  
 
 
-ghost: 
-	type VAR '(' argDecl ')';
-	
-argDecl:
-	type VAR argDecl2;
-	
-argDecl2:
-	',' argDecl | ;
-	
-type:
-		'int'
-	|	'double' 
-	|	'float'
-	|	OBJECT_TYPE;  
-
-
-//UNARY_OP: '!' | '-' | '+';
-//CONJ_OP   : '&&'|'||'| '-->';
-//BOOL_OP	 : '=='|'!='|'>='|'>'|'<='|'<';
-//ARITH_OP : '+'|'*'|'/'|'%';//|'-';
-BIN_OP   : '&&'|'||'|'=='|'!='|'>='|'>'|'<='|
-          '<'|'+'|'*'|'/'|'%';//|'-';
+////UNARY_OP: '!' | '-' | '+';
+LOGOP   : '&&'|'||'| '-->';
+BOOLOP	 : '=='|'!='|'>='|'>'|'<='|'<';
+ARITHOP : '+'|'*'|'/'|'%';//|'-';
+//BIN_OP   : '&&'|'||'|'=='|'!='|'>='|'>'|'<='|
+//          '<'|'+'|'*'|'/'|'%';//|'-';
 
 //BIN_OP	: '&&' | '||' | '-->'|'=='|'!='|'>='|'>'|'<='|'<'|'+'|'-'|'*'|'/'|'%';
 BOOL    : 'true' | 'false';

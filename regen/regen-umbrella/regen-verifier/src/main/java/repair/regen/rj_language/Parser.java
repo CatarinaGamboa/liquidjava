@@ -21,7 +21,7 @@ public class Parser {
 		parser.addParseListener(new RJListener());
 		parser.start();
 		
-		System.out.println(parser.expression());
+		System.out.println(parser.pred());
 		
 		//			CasualLexer lexer = new CasualLexer(input);
 		//			CasualErrorsListener errlis = new CasualErrorsListener();
