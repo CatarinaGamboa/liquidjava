@@ -12,9 +12,9 @@ import rj.grammar.RJParser;
 public class Parser {
 	public static void main(String[] args) {
 		CodePointCharStream input;
-		String s = "size(this) == (size(old(this)) + 1)";
-//		String s = "((((( sum (#a_21) == (sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
-		
+//		String s = "((v >= 0.0) && !(!(sum (#this_1) == v)))";
+//		String s = "((((( Sum (#a_21) == (sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
+		String s = "_ < 100 === 7";
 		input = CharStreams.fromString(s);
 		RJLexer lexer = new RJLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -25,7 +25,6 @@ public class Parser {
 		parser.addErrorListener(err);
 		parser.start();
 		
-		System.out.println(parser.ghost());
 	
 		System.out.println("Finished with "+ err.getErrors()+" errors");
 		//			CasualLexer lexer = new CasualLexer(input);

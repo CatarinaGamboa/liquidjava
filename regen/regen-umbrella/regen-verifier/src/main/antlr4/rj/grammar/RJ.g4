@@ -18,10 +18,9 @@ start:
 
 pred:
 		'(' pred ')'
-	|	'!' exp pred
+	|	'!' pred
 	|	pred LOGOP pred
-	|	exp
-	|;
+	|	exp;
 	
 exp: 
 		'(' exp ')'
@@ -33,7 +32,8 @@ operand:
 		literalExpression
 	|	operand ARITHOP	operand
 	|	operand '-'	operand
-	|	'-' operand;
+	|	'-' operand
+	|	'!' operand;
 
 	 
 literalExpression:
@@ -43,12 +43,15 @@ literalExpression:
 	|	ID '.' functionCall
 	|	functionCall;
 	
-// followVar:
-// 	|	'.' functionCall
-// 	|	; 
-// 	
  functionCall:
- 	ID '(' args ')';	
+ 		ghostCall
+ 	|	aliasCall;
+ 	
+ghostCall:
+ 	ID '(' args ')';
+ 
+aliasCall:
+	ID_UPPER '(' args ')';
 
 args:	pred multipleArgs; 
 
@@ -65,11 +68,11 @@ literal:
 //----------------------- Alias -----------------------	
 
 alias:
-	'type'? ID_UPPER '(' argDeclID ')' '{' pred '}'|;
+	'type'? ID_UPPER '(' argDeclID ')' '{' pred '}';
 
 
 ghost: 
-	'ghost'? type ID '(' argDecl ')' | ;
+	'ghost'? type ID '(' argDecl ')';
 
 argDecl:
 	type ID? argDecl2;	

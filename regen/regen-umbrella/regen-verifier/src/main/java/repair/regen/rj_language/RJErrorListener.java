@@ -11,7 +11,13 @@ import org.antlr.v4.runtime.dfa.DFA;
 
 public class RJErrorListener implements ANTLRErrorListener {
 
-	int errors = 0;
+	private int errors;
+	
+	public RJErrorListener() {
+		super();
+		errors = 0;
+	}
+	
 	@Override
 	public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
 			String msg, RecognitionException e) {
@@ -24,6 +30,7 @@ public class RJErrorListener implements ANTLRErrorListener {
 	public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact,
 			BitSet ambigAlts, ATNConfigSet configs) {
 		// TODO Auto-generated method stub
+		errors++;
 
 	}
 
@@ -31,6 +38,7 @@ public class RJErrorListener implements ANTLRErrorListener {
 	public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
 			BitSet conflictingAlts, ATNConfigSet configs) {
 		// TODO Auto-generated method stub
+		errors++;
 
 	}
 
@@ -38,6 +46,7 @@ public class RJErrorListener implements ANTLRErrorListener {
 	public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction,
 			ATNConfigSet configs) {
 		// TODO Auto-generated method stub
+		errors++;
 
 	}
 	
