@@ -17,12 +17,14 @@ start:
 //	|	expression '?' expression ':' expression;
 
 pred:
-		exp LOGOP exp pred
+		'(' pred ')'
+	|	exp LOGOP exp pred
 	|	exp
 	|;
 	
 exp:
-		operand BOOLOP operand
+		'(' exp ')'
+	|	operand BOOLOP operand
 	|	operand;
 //	|	ite
 	
@@ -30,28 +32,29 @@ operand:
 		literalExpression
 	|	operand ARITHOP	operand;
 
-//afterExpression:
-//		BIN_OP expression
-//	|	;
 	 
 literalExpression:
 		literal
-	| 	VAR; 
+	| 	VAR followVar
+	|	functionCall;
+	
+ followVar:
+ 	|	'.'
+ 	|	; 
+ 	
+ functionCall:
+ 	VAR '(' args? ')';
 // VAR Second
 //	|	functionCall
 //	|	VAR '.' functionCall;
 	
 
-//	
-//functionCall:  
-//		VAR '(' args? ')' ;
-//	
-//args:	expression multipleArgs; 
-//
-//multipleArgs:
-//		',' args 
-//	|	;
-// 
+args:	exp multipleArgs; 
+
+multipleArgs:
+		',' args 
+	|	;
+ 
 literal: 
 		BOOL
 	|	STRING

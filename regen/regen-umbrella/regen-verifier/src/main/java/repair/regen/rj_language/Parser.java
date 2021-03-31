@@ -12,7 +12,7 @@ import rj.grammar.RJParser;
 public class Parser {
 	public static void main(String[] args) {
 		CodePointCharStream input;
-		String s = "b == 4";
+		String s = "i >= 0 && i <= length(l)";
 		input = CharStreams.fromString(s);
 		RJLexer lexer = new RJLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
