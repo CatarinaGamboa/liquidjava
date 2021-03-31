@@ -18,38 +18,38 @@ start:
 
 pred:
 		'(' pred ')'
-	|	exp LOGOP exp pred
+	|	'!' exp pred
+	|	pred LOGOP pred
 	|	exp
 	|;
 	
-exp:
+exp: 
 		'(' exp ')'
-	|	operand BOOLOP operand
+	|	exp BOOLOP exp
 	|	operand;
 //	|	ite
 	
 operand:
-		literalExpression
-	|	operand ARITHOP	operand;
+	|	literalExpression
+	|	operand ARITHOP	operand
+	|	operand '-'	operand
+	|	'-' operand;
 
 	 
 literalExpression:
-		literal
-	| 	VAR followVar
+		'(' literalExpression ')'
+	|	literal
+	| 	ID followVar
 	|	functionCall;
 	
  followVar:
- 	|	'.'
+ 	|	'.' functionCall
  	|	; 
  	
  functionCall:
- 	VAR '(' args? ')';
-// VAR Second
-//	|	functionCall
-//	|	VAR '.' functionCall;
-	
+ 	ID '(' args ')';	
 
-args:	exp multipleArgs; 
+args:	pred multipleArgs; 
 
 multipleArgs:
 		',' args 
@@ -90,7 +90,7 @@ ARITHOP : '+'|'*'|'/'|'%';//|'-';
 
 //BIN_OP	: '&&' | '||' | '-->'|'=='|'!='|'>='|'>'|'<='|'<'|'+'|'-'|'*'|'/'|'%';
 BOOL    : 'true' | 'false';
-VAR     : '#'*[a-zA-Z_][a-zA-Z0-9_]*;
+ID     : '#'*[a-zA-Z_][a-zA-Z0-9_]*;
 STRING  : '"'(~["])*'"';
 INT     : 	(([0-9]+) |	([0-9]+('_'[0-9]+)*));
 REAL   	: (([0-9]+('.'[0-9]+)?) | '.'[0-9]+);

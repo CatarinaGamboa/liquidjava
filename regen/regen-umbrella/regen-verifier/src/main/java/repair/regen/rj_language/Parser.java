@@ -12,17 +12,21 @@ import rj.grammar.RJParser;
 public class Parser {
 	public static void main(String[] args) {
 		CodePointCharStream input;
-		String s = "i >= 0 && i <= length(l)";
+		String s = "((((( sum (#a_21) == (point.sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
+		
 		input = CharStreams.fromString(s);
 		RJLexer lexer = new RJLexer(input);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		RJParser parser = new RJParser(tokens);
 		parser.setBuildParseTree(true);
 		parser.addParseListener(new RJListener());
+		RJErrorListener err = new RJErrorListener();
+		parser.addErrorListener(err);
 		parser.start();
 		
 		System.out.println(parser.pred());
-		
+	
+		System.out.println("Finished with "+ err.getErrors()+" errors");
 		//			CasualLexer lexer = new CasualLexer(input);
 		//			CasualErrorsListener errlis = new CasualErrorsListener();
 		//
