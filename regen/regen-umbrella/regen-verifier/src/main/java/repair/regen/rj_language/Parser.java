@@ -10,23 +10,29 @@ import rj.grammar.RJLexer;
 import rj.grammar.RJParser;
 
 public class Parser {
-	public static void main(String[] args) {
+	public static void main(String[] args) throws ParsingException {
 		CodePointCharStream input;
 //		String s = "((v >= 0.0) && !(!(sum (#this_1) == v)))";
 //		String s = "((((( Sum (#a_21) == (sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
-		String s = "_ < 100 === 7";
+		String s = "_ < 100 == $7";
 		input = CharStreams.fromString(s);
+		RJErrorListener err = new RJErrorListener();
 		RJLexer lexer = new RJLexer(input);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(err);
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		RJParser parser = new RJParser(tokens);
 		parser.setBuildParseTree(true);
+		parser.removeErrorListeners();
 		parser.addParseListener(new RJListener());
-		RJErrorListener err = new RJErrorListener();
+		
 		parser.addErrorListener(err);
 		parser.start();
 		
-	
-		System.out.println("Finished with "+ err.getErrors()+" errors");
+		if(err.getErrors() > 0) {
+			throw new ParsingException(err.getMessages());
+		}
+			
 		//			CasualLexer lexer = new CasualLexer(input);
 		//			CasualErrorsListener errlis = new CasualErrorsListener();
 		//
