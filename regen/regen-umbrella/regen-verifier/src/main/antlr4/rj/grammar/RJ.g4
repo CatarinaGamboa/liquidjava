@@ -1,50 +1,42 @@
 grammar RJ;
 
 
-prog: start;
+prog: start | ;
 start:
-		pred	#start_pred
-	|	alias	#start_alias
-	|	ghost	#start_ghost
+		pred	#startPred
+	|	alias	#startAlias
+	|	ghost	#startGhost
 	;
 
-//predicate: | expression ;
-//
-//expression:
-//		'(' expression ')' 
-//	|	expression BIN_OP expression predicate
-//	|	literalExpression;
-//	|	UNARY_OP expression
-//	|	expression '?' expression ':' expression;
 
 pred:
-		'(' pred ')'				#pred_group
-	|	'!' pred					#pred_negate
-	|	pred LOGOP pred 			#pred_logic
+		'(' pred ')'				#predGroup
+	|	'!' pred					#predNegate
+	|	pred LOGOP pred 			#predLogic
 	|	pred '?' pred ':' pred		#ite
-	|	exp							#pred_exp
+	|	exp							#predExp
 	;
 	
 exp: 
-		'(' exp ')'
-	|	exp BOOLOP exp
-	|	operand;
-
+		'(' exp ')'					#expGroup
+	|	exp BOOLOP exp				#expBool
+	|	operand						#expOperand
+	;
 	
 operand:
-		literalExpression			#op_literal
-	|	operand ARITHOP	operand		#op_arith
-	|	operand '-'	operand			#op_sub
-	|	'-' operand					#op_minus
-	|	'!' operand					#op_not
+		literalExpression			#opLiteral
+	|	operand ARITHOP	operand		#opArith
+	|	operand '-'	operand			#opSub
+	|	'-' operand					#opMinus
+	|	'!' operand					#opNot
 	;
 
 	 
 literalExpression:
-		'(' literalExpression ')'	#lit_group
+		'(' literalExpression ')'	#litGroup
 	|	literal						#lit
 	| 	ID 							#var
-	|	ID '.' functionCall			#taget_invocation
+	|	ID '.' functionCall			#targetInvocation
 	|	functionCall				#invocation
 	;
 	
@@ -53,16 +45,13 @@ literalExpression:
  	|	aliasCall;
  	
 ghostCall:
- 	ID '(' args ')';
+ 	ID '(' args? ')';
  
 aliasCall:
-	ID_UPPER '(' args ')';
+	ID_UPPER '(' args? ')';
 
-args:	pred multipleArgs; 
+args:	pred (',' pred)* ; 
 
-multipleArgs:
-		',' args 
-	|	;
  
 literal: 
 		BOOL
@@ -70,7 +59,7 @@ literal:
 	|	INT
 	|	REAL;
 	
-//----------------------- Alias -----------------------	
+//----------------------- Declarations -----------------------	
 
 alias:
 	'type'? ID_UPPER '(' argDeclID ')' '{' pred '}';

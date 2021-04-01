@@ -79,6 +79,10 @@ public class TranslatorToZ3 {
 	public Expr makeDoubleLiteral(double value) {
 		return z3.mkFP(value, z3.mkFPSort64());
 	}
+	
+	public Expr makeString(String s) {
+		return z3.mkString(s);
+	}
 
 
 	public Expr makeBooleanLiteral(boolean value) {
@@ -273,6 +277,7 @@ public class TranslatorToZ3 {
 
 
 
+	//REMAKE
 	public Expression makeAlias(AliasName name, List<Expression> list) throws TypeMismatchError, Exception {
 		AliasWrapper al = aliasTranslation.get(name.toString());
 		if(al.getVarNames().size() != list.size())
@@ -291,6 +296,7 @@ public class TranslatorToZ3 {
 		return e;
 	}
 
+	//REMAKE
 	private void checkTypes(List<Expression> list, List<CtTypeReference<?>> types) throws Exception {
 		for (int i = 0; i < list.size(); i++) {
 			Sort se = (list.get(i).eval(this)).getSort();
