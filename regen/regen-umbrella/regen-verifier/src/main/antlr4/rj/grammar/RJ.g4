@@ -3,9 +3,10 @@ grammar RJ;
 
 prog: start;
 start:
-		pred
-	|	alias
-	|	ghost;
+		pred	#start_pred
+	|	alias	#start_alias
+	|	ghost	#start_ghost
+	;
 
 //predicate: | expression ;
 //
@@ -17,31 +18,35 @@ start:
 //	|	expression '?' expression ':' expression;
 
 pred:
-		'(' pred ')'
-	|	'!' pred
-	|	pred LOGOP pred
-	|	exp;
+		'(' pred ')'				#pred_group
+	|	'!' pred					#pred_negate
+	|	pred LOGOP pred 			#pred_logic
+	|	pred '?' pred ':' pred		#ite
+	|	exp							#pred_exp
+	;
 	
 exp: 
 		'(' exp ')'
 	|	exp BOOLOP exp
 	|	operand;
-//	|	ite
+
 	
 operand:
-		literalExpression
-	|	operand ARITHOP	operand
-	|	operand '-'	operand
-	|	'-' operand
-	|	'!' operand;
+		literalExpression			#op_literal
+	|	operand ARITHOP	operand		#op_arith
+	|	operand '-'	operand			#op_sub
+	|	'-' operand					#op_minus
+	|	'!' operand					#op_not
+	;
 
 	 
 literalExpression:
-		'(' literalExpression ')'
-	|	literal
-	| 	ID 
-	|	ID '.' functionCall
-	|	functionCall;
+		'(' literalExpression ')'	#lit_group
+	|	literal						#lit
+	| 	ID 							#var
+	|	ID '.' functionCall			#taget_invocation
+	|	functionCall				#invocation
+	;
 	
  functionCall:
  		ghostCall

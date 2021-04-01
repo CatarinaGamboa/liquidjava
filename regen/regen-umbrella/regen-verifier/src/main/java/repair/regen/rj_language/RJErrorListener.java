@@ -34,23 +34,18 @@ public class RJErrorListener implements ANTLRErrorListener {
 	public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact,
 			BitSet ambigAlts, ATNConfigSet configs) {
 		// TODO Auto-generated method stub
-		errors++;
 	}
 
 	@Override
 	public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
 			BitSet conflictingAlts, ATNConfigSet configs) {
 		// TODO Auto-generated method stub
-		errors++;
-
 	}
 
 	@Override
 	public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction,
 			ATNConfigSet configs) {
 		// TODO Auto-generated method stub
-		errors++;
-
 	}
 	
 	
