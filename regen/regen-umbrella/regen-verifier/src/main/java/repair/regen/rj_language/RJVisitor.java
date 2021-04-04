@@ -151,9 +151,10 @@ public class RJVisitor {
 			return eval(((LitGroupContext)rc).literalExpression());
 		else if(rc instanceof LitContext)
 			return eval(((LitContext)rc).literal());
-		else if(rc instanceof VarContext)
+		else if(rc instanceof VarContext) {
+//			((VarContext)rc)
 			return varEvaluate(((VarContext)rc).ID());
-		else if(rc instanceof TargetInvocationContext) {
+		}else if(rc instanceof TargetInvocationContext) {
 			//TODO Finish Invocation with Target (a.len())
 			return null;
 		}else {
