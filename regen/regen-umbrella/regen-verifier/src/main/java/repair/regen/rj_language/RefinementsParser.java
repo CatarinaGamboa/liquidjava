@@ -47,7 +47,7 @@ public class RefinementsParser {
 		parser.removeErrorListeners();
 		parser.addParseListener(new RJListener());
 		parser.addErrorListener(err);
-//		parser.start();
+//		parser.start(); //all consumed
 
 		if(err.getErrors() > 0) {
 			throw new ParsingException(err.getMessages());
@@ -58,9 +58,6 @@ public class RefinementsParser {
 	}
 	
 	public static String substitute(String s, String from, String to) throws Exception {
-//		RuleContext rc = compile(s);
-//		RJSubstituteVisitor.subtitute(rc, from, to);
-//		return rc;
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();
@@ -71,11 +68,10 @@ public class RefinementsParser {
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
 		
-		RJListener listener = new RJListener();
 		RJParser parser = new RJParser(tokens);
 		parser.setBuildParseTree(true);
 		parser.removeErrorListeners();
-		parser.addParseListener(listener);
+//		parser.addParseListener(new RJListener());
 		parser.addErrorListener(err);
 		
 		RuleContext rc = parser.prog();
