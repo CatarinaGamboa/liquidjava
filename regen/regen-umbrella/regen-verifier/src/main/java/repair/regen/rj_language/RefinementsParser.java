@@ -1,4 +1,7 @@
 package repair.regen.rj_language;
+import java.util.Arrays;
+import java.util.List;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -9,6 +12,7 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.rj_language.visitors.BooleanTrueVisitor;
 import repair.regen.rj_language.visitors.EvalVisitor;
+import repair.regen.rj_language.visitors.GhostInvocationsVisitor;
 import repair.regen.rj_language.visitors.SubstituteVisitor;
 import repair.regen.smt.TranslatorToZ3;
 import rj.grammar.RJLexer;
@@ -17,9 +21,13 @@ import rj.grammar.RJParser;
 public class RefinementsParser {
 	
 	public static void main(String[] args) throws Exception {
-		String toParse = "((true && true && (true)))";
+		String toParse = "f(x) && g(x) == 6";
 //		String s = substitute(toParse, "#i_0", "i_5");
-		System.out.println(isTrue(toParse));
+//		System.out.println(isTrue(toParse));
+		List<String> ls = Arrays.asList("f", "g", "h");
+		System.out.println(getGhostInvocations(toParse, ls));
+		
+		
 	}
 
 	
@@ -33,6 +41,11 @@ public class RefinementsParser {
 	public static boolean isTrue(String s) throws ParsingException {
 		RuleContext rc = compile(s);
 		return BooleanTrueVisitor.isTrue(rc);
+	}
+	
+	public static List<String> getGhostInvocations(String s, List<String> all) throws ParsingException {
+		RuleContext rc = compile(s);
+		return GhostInvocationsVisitor.getGhostInvocations(rc, all);
 	}
 	
 	

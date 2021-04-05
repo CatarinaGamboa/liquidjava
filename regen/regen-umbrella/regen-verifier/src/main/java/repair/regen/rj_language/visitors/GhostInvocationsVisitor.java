@@ -8,13 +8,13 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import rj.grammar.RJParser.GhostCallContext;
 
 public class GhostInvocationsVisitor {
-	public List<String> getGhostInvocations(ParseTree rc,  List<String> all) {
+	public static List<String> getGhostInvocations(ParseTree rc,  List<String> all) {
 		List<String> ls = new ArrayList<>();
 		getGhosts(rc, ls, all);
 		return ls;
 	}
 
-	private void getGhosts(ParseTree rc,List<String> toAdd, List<String> all) {
+	private static void getGhosts(ParseTree rc,List<String> toAdd, List<String> all) {
 		if(rc instanceof GhostCallContext) {
 			GhostCallContext gc = (GhostCallContext)rc;
 			String ghostName = gc.ID().getText();
