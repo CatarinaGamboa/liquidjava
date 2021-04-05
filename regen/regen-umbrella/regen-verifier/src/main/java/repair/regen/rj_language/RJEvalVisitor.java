@@ -44,11 +44,11 @@ import rj.grammar.RJParser.StartPredContext;
 import rj.grammar.RJParser.TargetInvocationContext;
 import rj.grammar.RJParser.VarContext;
 
-public class RJVisitor {
+public class RJEvalVisitor {
 
 	TranslatorToZ3 ctx;
 
-	public RJVisitor(TranslatorToZ3 ctx) {
+	public RJEvalVisitor(TranslatorToZ3 ctx) {
 		this.ctx = ctx;
 	}
 

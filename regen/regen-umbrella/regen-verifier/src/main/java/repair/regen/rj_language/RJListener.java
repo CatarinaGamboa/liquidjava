@@ -13,14 +13,14 @@ public class RJListener implements ParseTreeListener {
 	@Override
 	public void visitTerminal(TerminalNode node) {
 		int ti = node.getSymbol().getType();	
-//		if(ti < 0)
-//			System.out.println(node.getSymbol());
-//		else {
-//			String i = RJLexer.ruleNames[ti-1];
-//			System.out.println("Found literal:" + node.getText());
-//			System.out.println("Type:" + i);
-//			System.out.println("....");
-//		}
+		if(ti < 0)
+			System.out.println(node.getSymbol());
+		else {
+			String i = RJLexer.ruleNames[ti-1];
+			System.out.println("Found literal:" + node.getText());
+			System.out.println("Type:" + i);
+			System.out.println("....");
+		}
 	}
 
 	@Override
@@ -35,9 +35,9 @@ public class RJListener implements ParseTreeListener {
 		String ruleName = RJParser.ruleNames[ruleIndex];
 
 
-//		System.out.println("Non-Terminal: " + ctx.getText());
-//		System.out.println("Type of Token:" + ruleName);
-//		System.out.println("....");
+		System.out.println("Non-Terminal: " + ctx.getText());
+		System.out.println("Type of Token:" + ruleName);
+		System.out.println("....");
 
 
 

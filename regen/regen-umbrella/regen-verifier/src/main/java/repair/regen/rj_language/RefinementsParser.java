@@ -1,11 +1,9 @@
 package repair.regen.rj_language;
-import java.io.FileReader;
-import java.io.IOException;
-
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.TokenStreamRewriter;
 
 import com.microsoft.z3.Expr;
 
@@ -14,14 +12,21 @@ import rj.grammar.RJLexer;
 import rj.grammar.RJParser;
 
 public class RefinementsParser {
+	
+	public static void main(String[] args) throws Exception {
+		String toParse = "((#i_0 == 10) && !(#i_0 > 10))";
+		String s = substitute(toParse, "#i_0", "i_5");
+		System.out.println(s);
+	}
 
 	
 	public static Expr eval(String s, TranslatorToZ3 ctx) throws Exception {
 		RuleContext rc = compile(s);
-		RJVisitor visitor = new RJVisitor(ctx);
+		RJEvalVisitor visitor = new RJEvalVisitor(ctx);
 		Expr e =  visitor.eval(rc);
 		return e;
 	}
+	
 	
 	public static RuleContext compile(String toParse) throws ParsingException {
 		CodePointCharStream input;
@@ -43,11 +48,42 @@ public class RefinementsParser {
 		parser.addParseListener(new RJListener());
 		parser.addErrorListener(err);
 //		parser.start();
-		
+
 		if(err.getErrors() > 0) {
 			throw new ParsingException(err.getMessages());
 		}
 					
+		
 		return parser.prog();
 	}
+	
+	public static String substitute(String s, String from, String to) throws Exception {
+//		RuleContext rc = compile(s);
+//		RJSubstituteVisitor.subtitute(rc, from, to);
+//		return rc;
+		CodePointCharStream input;
+		input = CharStreams.fromString(s);
+		RJErrorListener err = new RJErrorListener();
+		RJLexer lexer = new RJLexer(input);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(err);
+		
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+		
+		RJListener listener = new RJListener();
+		RJParser parser = new RJParser(tokens);
+		parser.setBuildParseTree(true);
+		parser.removeErrorListeners();
+		parser.addParseListener(listener);
+		parser.addErrorListener(err);
+		
+		RuleContext rc = parser.prog();
+		RJSubstituteVisitor sv = new RJSubstituteVisitor(rewriter);
+		sv.subtitute(rc, from, to);
+		
+		return rewriter.getText();
+		
+	}
+	
 }
