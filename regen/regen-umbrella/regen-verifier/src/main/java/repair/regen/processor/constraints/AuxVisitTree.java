@@ -124,7 +124,7 @@ public class AuxVisitTree {
 		
 	}
 
-	//NOW
+	//DONE IN ANTLR
 	public static boolean isTrue(Expression exp) {
 		if(exp instanceof BinaryExpression) {
 			return isTrue(((BinaryExpression) exp).getFirstExpression()) &&

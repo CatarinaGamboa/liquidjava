@@ -7,6 +7,7 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 
 import com.microsoft.z3.Expr;
 
+import repair.regen.rj_language.visitors.BooleanTrueVisitor;
 import repair.regen.rj_language.visitors.EvalVisitor;
 import repair.regen.rj_language.visitors.SubstituteVisitor;
 import repair.regen.smt.TranslatorToZ3;
@@ -16,9 +17,9 @@ import rj.grammar.RJParser;
 public class RefinementsParser {
 	
 	public static void main(String[] args) throws Exception {
-		String toParse = "((#i_0 == 10) && !(#i_0 > 10))";
-		String s = substitute(toParse, "#i_0", "i_5");
-		System.out.println(s);
+		String toParse = "((true && true && (true)))";
+//		String s = substitute(toParse, "#i_0", "i_5");
+		System.out.println(isTrue(toParse));
 	}
 
 	
@@ -28,6 +29,12 @@ public class RefinementsParser {
 		Expr e =  visitor.eval(rc);
 		return e;
 	}
+	
+	public static boolean isTrue(String s) throws ParsingException {
+		RuleContext rc = compile(s);
+		return BooleanTrueVisitor.isTrue(rc);
+	}
+	
 	
 	
 	public static RuleContext compile(String toParse) throws ParsingException {
@@ -83,5 +90,7 @@ public class RefinementsParser {
 		return rewriter.getText();
 		
 	}
+	
+	
 	
 }
