@@ -1,4 +1,4 @@
-package repair.regen.rj_language;
+package repair.regen.rj_language.visitors;
 
 import org.antlr.v4.runtime.Token;
 
@@ -44,11 +44,11 @@ import rj.grammar.RJParser.StartPredContext;
 import rj.grammar.RJParser.TargetInvocationContext;
 import rj.grammar.RJParser.VarContext;
 
-public class RJEvalVisitor {
+public class EvalVisitor {
 
 	TranslatorToZ3 ctx;
 
-	public RJEvalVisitor(TranslatorToZ3 ctx) {
+	public EvalVisitor(TranslatorToZ3 ctx) {
 		this.ctx = ctx;
 	}
 

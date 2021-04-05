@@ -90,6 +90,7 @@ public class AuxVisitTree {
 		return null;
 	}
 
+	//DONE IN ANTLR
 	public static void substituteVariable(Expression exp, String from, String to) {
 		if(exp instanceof UnaryExpression)
 			substituteVariable(((UnaryExpression) exp).getExpression(), from, to);
@@ -123,6 +124,7 @@ public class AuxVisitTree {
 		
 	}
 
+	//NOW
 	public static boolean isTrue(Expression exp) {
 		if(exp instanceof BinaryExpression) {
 			return isTrue(((BinaryExpression) exp).getFirstExpression()) &&

@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 
 import com.microsoft.z3.Expr;
 
+import repair.regen.rj_language.visitors.EvalVisitor;
+import repair.regen.rj_language.visitors.SubstituteVisitor;
 import repair.regen.smt.TranslatorToZ3;
 import rj.grammar.RJLexer;
 import rj.grammar.RJParser;
@@ -22,7 +24,7 @@ public class RefinementsParser {
 	
 	public static Expr eval(String s, TranslatorToZ3 ctx) throws Exception {
 		RuleContext rc = compile(s);
-		RJEvalVisitor visitor = new RJEvalVisitor(ctx);
+		EvalVisitor visitor = new EvalVisitor(ctx);
 		Expr e =  visitor.eval(rc);
 		return e;
 	}
@@ -75,7 +77,7 @@ public class RefinementsParser {
 		parser.addErrorListener(err);
 		
 		RuleContext rc = parser.prog();
-		RJSubstituteVisitor sv = new RJSubstituteVisitor(rewriter);
+		SubstituteVisitor sv = new SubstituteVisitor(rewriter);
 		sv.subtitute(rc, from, to);
 		
 		return rewriter.getText();

@@ -1,4 +1,4 @@
-package repair.regen.rj_language;
+package repair.regen.rj_language.visitors;
 
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStreamRewriter;
@@ -7,14 +7,14 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import rj.grammar.RJParser.VarContext;
 
-public class RJSubstituteVisitor {
+public class SubstituteVisitor {
 	TokenStreamRewriter rewriter;
 	
-	public RJSubstituteVisitor(TokenStreamRewriter rewriter) {
+	public SubstituteVisitor(TokenStreamRewriter rewriter) {
 		this.rewriter = rewriter;
 	}
 
-	void subtitute(ParseTree rc, String from, String to) {
+	public void subtitute(ParseTree rc, String from, String to) {
 		if(rc instanceof VarContext) {
 			VarContext var = (VarContext) rc;
 			TerminalNode tn = var.ID();
