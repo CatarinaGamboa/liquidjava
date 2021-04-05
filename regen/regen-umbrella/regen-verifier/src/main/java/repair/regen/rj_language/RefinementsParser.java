@@ -11,6 +11,7 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 import com.microsoft.z3.Expr;
 
 import repair.regen.rj_language.visitors.BooleanTrueVisitor;
+import repair.regen.rj_language.visitors.ChangeOldVisitor;
 import repair.regen.rj_language.visitors.EvalVisitor;
 import repair.regen.rj_language.visitors.GhostInvocationsVisitor;
 import repair.regen.rj_language.visitors.SubstituteVisitor;
@@ -21,11 +22,12 @@ import rj.grammar.RJParser;
 public class RefinementsParser {
 	
 	public static void main(String[] args) throws Exception {
-		String toParse = "f(x) && g(x) == 6";
+		String toParse = "(f(a2) && (old(a2) == 6))";
 //		String s = substitute(toParse, "#i_0", "i_5");
 //		System.out.println(isTrue(toParse));
-		List<String> ls = Arrays.asList("f", "g", "h");
-		System.out.println(getGhostInvocations(toParse, ls));
+//		List<String> ls = Arrays.asList("f", "g", "h");
+//		System.out.println(getGhostInvocations(toParse, ls));
+		System.out.println(changeOldTo(toParse, "a1", "a2"));
 		
 		
 	}
@@ -47,7 +49,29 @@ public class RefinementsParser {
 		RuleContext rc = compile(s);
 		return GhostInvocationsVisitor.getGhostInvocations(rc, all);
 	}
-	
+
+	public static String changeOldTo(String s, String previous, String now) throws ParsingException {
+		CodePointCharStream input;
+		input = CharStreams.fromString(s);
+		RJErrorListener err = new RJErrorListener();
+		RJLexer lexer = new RJLexer(input);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(err);
+		
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+		
+		RJParser parser = new RJParser(tokens);
+		parser.setBuildParseTree(true);
+		parser.removeErrorListeners();
+//		parser.addParseListener(new RJListener());
+		parser.addErrorListener(err);
+		
+		RuleContext rc = parser.prog();
+		ChangeOldVisitor co = new ChangeOldVisitor(rewriter);
+		co.changeOldTo(rc, previous, now);
+		return rewriter.getText();
+	}
 	
 	
 	public static RuleContext compile(String toParse) throws ParsingException {
