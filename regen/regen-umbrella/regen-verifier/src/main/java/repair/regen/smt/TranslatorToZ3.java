@@ -66,6 +66,22 @@ public class TranslatorToZ3 {
 		}
 		return st;
 	}
+	
+	public Status verifyExpression(Expr e) throws Exception {
+		Solver s = z3.mkSolver();
+//		s.add((BoolExpr) e.eval(this));
+//		for(Expression ex: premisesToAdd)
+//			s.add((BoolExpr) ex.eval(this));
+		s.add((BoolExpr)e);
+		Status st = s.check();
+		if (st.equals(Status.SATISFIABLE)) {
+			// Example of values
+			// System.out.println(s.getModel());
+		}
+		return st;
+	}
+	
+	
 
 	//#####################Literals and Variables#####################
 	public Expr makeIntegerLiteral(int value) {

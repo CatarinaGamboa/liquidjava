@@ -77,9 +77,9 @@ public class RJVisitor {
 
 
 	private Expr progEvaluate(ProgContext rc) throws Exception {
-		if(rc.isEmpty())
-			return null;
-		return eval(rc.start());
+		if(rc.start() != null)
+			return eval(rc.start());
+		return null;
 	}
 
 	private Expr startEvaluate(RuleContext rc) throws Exception{
@@ -93,7 +93,7 @@ public class RJVisitor {
 		if(rc instanceof PredGroupContext)
 			return eval(((PredGroupContext)rc).pred());
 		else if(rc instanceof PredNegateContext)
-			return eval(((PredNegateContext)rc).pred());
+			return ctx.mkNot(eval(((PredNegateContext)rc).pred()));
 		else if(rc instanceof PredLogicContext) {
 			PredLogicContext plc = (PredLogicContext) rc;
 			Expr e1 = eval(plc.pred(0));

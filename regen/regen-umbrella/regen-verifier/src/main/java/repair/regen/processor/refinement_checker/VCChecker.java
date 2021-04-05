@@ -225,7 +225,7 @@ public class VCChecker {
 	private Constraint substituteByMap(Constraint c, HashMap<String, String> map) {
 		Constraint c1 = c;
 		for(String s: map.keySet())
-			c1 = c.substituteVariable(s, map.get(s));
+			c1 = c1.substituteVariable(s, map.get(s));
 		return c1;
 	}
 

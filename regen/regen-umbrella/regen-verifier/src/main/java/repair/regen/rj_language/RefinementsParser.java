@@ -13,20 +13,21 @@ import repair.regen.smt.TranslatorToZ3;
 import rj.grammar.RJLexer;
 import rj.grammar.RJParser;
 
-public class Parser {
+public class RefinementsParser {
 
 	
-	public static void eval(String s, TranslatorToZ3 ctx) throws Exception {
+	public static Expr eval(String s, TranslatorToZ3 ctx) throws Exception {
 		RuleContext rc = compile(s);
 		RJVisitor visitor = new RJVisitor(ctx);
-		Expr e = visitor.eval(rc);
+		Expr e =  visitor.eval(rc);
+		return e;
 	}
 	
 	public static RuleContext compile(String toParse) throws ParsingException {
 		CodePointCharStream input;
 //		toParse = "((v >= 0.0) && !(!(sum (#this_1) == v)))";
 //		toParse = "((((( Sum (#a_21) == (sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
-		toParse = "_ > 100";
+//		toParse = "((#i_0 == 10) && !(#i_0 > 10))";
 		input = CharStreams.fromString(toParse);
 		RJErrorListener err = new RJErrorListener();
 		

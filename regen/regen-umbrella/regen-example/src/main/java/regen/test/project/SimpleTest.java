@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 
+import bufferedreader.Account;
 import bufferedreader.Order;
 import bufferedreader.OrderSimple;
 import repair.regen.specification.Refinement;
@@ -15,11 +16,30 @@ import repair.regen.specification.StateSet;
 
 public class SimpleTest {
 	
+//	public static void addZ(@Refinement("a > 0")int a) {
+//		@Refinement("_ > 0")
+//		int d = a;
+//		if(d > 5) {
+//			@Refinement("b > 5")
+//			int b = d;
+//		}else {
+//			@Refinement("_ <= 5")
+//			int c = d;
+//			d = 10;
+//			@Refinement("b > 10")
+//			int b = d;
+//		}
+//	}
+	
 	public static void main(String[] args) throws IOException{
 		
-		@Refinement("sum(_) > 30")
-		Account a = new Account(50);
-		a.deposit(60);
+		@Refinement("_ > 10")
+		int i = 10;
+
+		
+//		@Refinement("sum(_) > 30")
+//		Account a = new Account(50);
+//		a.deposit(60);
 
 //		Account b = new Account(138);
 //		b = a.transferTo(b, 10);

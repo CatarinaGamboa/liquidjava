@@ -25,10 +25,26 @@ package regen.test.project;
 // @Refinement("_ > 5")
 // double c = b;
 public class SimpleTest {
+    // public static void addZ(@Refinement("a > 0")int a) {
+    // @Refinement("_ > 0")
+    // int d = a;
+    // if(d > 5) {
+    // @Refinement("b > 5")
+    // int b = d;
+    // }else {
+    // @Refinement("_ <= 5")
+    // int c = d;
+    // d = 10;
+    // @Refinement("b > 10")
+    // int b = d;
+    // }
+    // }
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        @repair.regen.specification.Refinement("sum(_) > 30")
-        regen.test.project.Account a = new regen.test.project.Account(50);
-        a.deposit(60);
+        @repair.regen.specification.Refinement("_ > 10")
+        int i = 10;
+        // @Refinement("sum(_) > 30")
+        // Account a = new Account(50);
+        // a.deposit(60);
         // Account b = new Account(138);
         // b = a.transferTo(b, 10);
         // 
