@@ -21,6 +21,7 @@ import repair.regen.processor.context.GhostState;
 
 public class AuxVisitTree {
 
+	//DONE IN ANTLR
 	static void getGhostInvocations(Expression exp, List<GhostState> gh, List<GhostState> lgs) {
 		if(exp instanceof UnaryExpression)
 			getGhostInvocations(((UnaryExpression) exp).getExpression(), gh, lgs);
