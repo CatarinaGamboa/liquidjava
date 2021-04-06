@@ -23,6 +23,12 @@ public class AliasVisitor {
 		this.rewriter = rewriter;
 	}
 
+	/**
+	 * Changes present Alias by their refinement expression
+	 * @param rc
+	 * @param map
+	 * @throws Exception
+	 */
 	public void changeAlias(ParseTree rc,  HashMap<String, Pair<String, List<String>>> map) throws Exception {
 		if(rc instanceof AliasCallContext) {
 			AliasCallContext acc = (AliasCallContext) rc;
@@ -48,21 +54,12 @@ public class AliasVisitor {
 		}		
 	}
 
-	private List<String> getArgsText(ArgsContext args) {
-		List<String> ls = new ArrayList<>();
-		for(PredContext p: args.pred())
-			ls.add(p.getText());
-		return ls;
-	}
 	
-
-	private String substituteInRefinement(String refinement, List<String> args, List<String> calledArgs) throws Exception {
-		String r = refinement;
-		for (int i = 0; i < args.size(); i++)
-			r = RefinementsParser.substitute(r, args.get(i), "("+calledArgs.get(i)+")");
-		return r;
-	}
-
+	/**
+	 * Gets information about the alias
+	 * @param rc
+	 * @return
+	 */
 	public static Triple<String, String,List<Pair<String,String>>> getAlias(ParseTree rc) {
 		if(rc instanceof AliasContext) {
 			AliasContext ac = (AliasContext) rc;
@@ -95,5 +92,19 @@ public class AliasVisitor {
 			auxGetArgsDecl(argDeclID.argDeclID(), l);
 	}
 
+	private List<String> getArgsText(ArgsContext args) {
+		List<String> ls = new ArrayList<>();
+		for(PredContext p: args.pred())
+			ls.add(p.getText());
+		return ls;
+	}
+	
+
+	private String substituteInRefinement(String refinement, List<String> args, List<String> calledArgs) throws Exception {
+		String r = refinement;
+		for (int i = 0; i < args.size(); i++)
+			r = RefinementsParser.substitute(r, args.get(i), "("+calledArgs.get(i)+")");
+		return r;
+	}
 
 }

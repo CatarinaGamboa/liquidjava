@@ -17,7 +17,7 @@ import repair.regen.rj_language.visitors.AliasVisitor;
 import repair.regen.rj_language.visitors.BooleanTrueVisitor;
 import repair.regen.rj_language.visitors.ChangeOldVisitor;
 import repair.regen.rj_language.visitors.EvalVisitor;
-import repair.regen.rj_language.visitors.GhostInvocationsVisitor;
+import repair.regen.rj_language.visitors.GhostVisitor;
 import repair.regen.rj_language.visitors.StateVisitor;
 import repair.regen.rj_language.visitors.SubstituteVisitor;
 import repair.regen.smt.TranslatorToZ3;
@@ -29,7 +29,7 @@ import rj.grammar.RJParser;
 
 public class RefinementsParser {
 	public static void main(String[] args) throws Exception {
-		String toParse = "type Between(double x, int low, java.lang.String high) {x > low && x < high}";
+		String toParse = "int between(double x, int low, java.lang.String)";
 //		String rr = "Between(5, 10 + 4, yy) && yy > 10 && foo(x)";
 		
 //		List<String> vars = new ArrayList<>();
@@ -41,7 +41,7 @@ public class RefinementsParser {
 //		String r = changeAlias(rr, m);
 //		System.out.println(r);
 		
-		System.out.println(getAliasDeclaration(toParse));
+		System.out.println(getGhostDeclaration(toParse));
 		
 	}
 
@@ -61,12 +61,17 @@ public class RefinementsParser {
 	
 	public static List<String> getGhostInvocations(String s, List<String> all) throws ParsingException {
 		RuleContext rc = compile(s);
-		return GhostInvocationsVisitor.getGhostInvocations(rc, all);
+		return GhostVisitor.getGhostInvocations(rc, all);
 	}
 
 	private static Triple<String, String, List<Pair<String,String>>> getAliasDeclaration(String s) throws ParsingException{
 		ParseTree rc = compile(s);
 		return AliasVisitor.getAlias(rc);
+	}
+	
+	private static Triple<String, String, List<Pair<String,String>>> getGhostDeclaration(String s) throws ParsingException{
+		ParseTree rc = compile(s);
+		return GhostVisitor.getGhostDecl(rc);
 	}
 
 	
