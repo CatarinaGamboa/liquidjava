@@ -24,7 +24,19 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
+@repair.regen.specification.RefinementAlias("type Percentage(int x) { 0 <= x && x >= 100}")
 public class SimpleTest {
+    @repair.regen.specification.Refinement("Percentage(_)")
+    public static int addBonus(@repair.regen.specification.Refinement("Percentage(gruade)")
+    int grade, @repair.regen.specification.Refinement("Percentage(bonus) && (bonus < grade)")
+    int bonus) {
+        if ((grade + bonus) > 100)
+            return 100;
+        else
+            return grade + bonus;
+
+    }
+
     // public static void addZ(@Refinement("a > 0")int a) {
     // @Refinement("_ > 0")
     // int d = a;
@@ -40,8 +52,8 @@ public class SimpleTest {
     // }
     // }
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        @repair.regen.specification.Refinement("_ > 10")
-        int i = 10;
+        // @Refinement("_ > 10")
+        // int i = 10;
         // @Refinement("sum(_) > 30")
         // Account a = new Account(50);
         // a.deposit(60);

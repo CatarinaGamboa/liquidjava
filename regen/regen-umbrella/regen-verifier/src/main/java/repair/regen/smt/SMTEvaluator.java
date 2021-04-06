@@ -27,7 +27,7 @@ public class SMTEvaluator {
 		Constraint toVerify = Conjunction.createConjunction(subRef, supRef.negate());
 		System.out.println(toVerify.toString()); //TODO remover
 		
-		testAntlr(toVerify.toString(), c);
+//		testAntlr(toVerify.toString(), c);
 		
 		try {
 			Expression e = toVerify.getExpression();

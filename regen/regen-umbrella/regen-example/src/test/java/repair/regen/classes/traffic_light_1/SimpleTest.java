@@ -16,7 +16,10 @@ public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
 
-		TrafficLight tl = new TrafficLight();	
+		TrafficLight tl = new TrafficLight();
+		tl.transitionToAmber(); //correct
+		tl.transitionToRed();   //correct
+		tl.transitionToGreen(); //error
 		
 		TrafficLight tl2 = tl.getTrafficLightStartingRed();
 		tl2.transitionToFlashingAmber();

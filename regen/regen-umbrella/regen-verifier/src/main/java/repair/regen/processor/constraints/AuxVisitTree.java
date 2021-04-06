@@ -47,6 +47,7 @@ public class AuxVisitTree {
 		
 	}
 	
+	//DONE IN ANTLR
 	static Expression changeOldMentions(Expression exp, String previousName, String newName) {
 		Expression e = null;
 		if(exp instanceof UnaryExpression) {
@@ -142,6 +143,7 @@ public class AuxVisitTree {
 		return false;
 	}
 
+	
 	public static Expression changeStateRefinements(Expression exp, List<GhostState> ghostState) {
 		Expression e = null;
 		if(exp instanceof UnaryExpression) {
@@ -171,7 +173,7 @@ public class AuxVisitTree {
 		}else if(exp instanceof FunctionInvocationExpression) {
 			FunctionInvocationExpression fie = (FunctionInvocationExpression)exp;
 			for(GhostState g: ghostState) {
-				if(fie.getFunctionName().equals(g.getName()) && g.getRefinement()!=null) {
+				if(fie.getFunctionName().equals(g.getName()) && g.getRefinement() != null) {
 //					System.out.println("Changed state call for refinement");
 					//States -> only one argument "this"
 					if(fie.getArgument() == null || !(fie.getArgument().getExpression() instanceof Variable))

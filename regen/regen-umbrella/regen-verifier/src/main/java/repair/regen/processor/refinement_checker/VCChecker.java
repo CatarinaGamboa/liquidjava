@@ -16,6 +16,7 @@ import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.smt.GhostFunctionError;
+import repair.regen.smt.NotFoundError;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import repair.regen.smt.TypeMismatchError;
@@ -203,6 +204,8 @@ public class VCChecker {
 			ErrorPrinter.printErrorArgs(element, substituteByMap(expectedType, map), e.getMessage());
 		}catch(TypeMismatchError e) {
 			ErrorPrinter.printErrorTypeMismatch(element, substituteByMap(expectedType, map), e.getMessage());
+		}catch(NotFoundError e) {
+			ErrorPrinter.printNotFound(element, substituteByMap(cSMT, map), substituteByMap(expectedType, map), e.getMessage());
 		}catch (Exception e) {
 			System.err.println("Unknown error:"+e.getMessage());
 			e.printStackTrace();

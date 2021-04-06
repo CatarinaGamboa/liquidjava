@@ -26,8 +26,6 @@ public class ChangeOldVisitor {
 			for (int j = 0; j < i; j++) {
 				changeOldTo(rc.getChild(j), previous, now);
 			}
-		}
-			
+		}		
 	}
-
 }

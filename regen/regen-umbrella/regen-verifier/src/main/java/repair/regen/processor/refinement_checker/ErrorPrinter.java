@@ -55,6 +55,22 @@ public class ErrorPrinter {
 		System.out.println("______________________________________________________");
 		System.exit(2);
 	}
+	
+	public static <T> void printNotFound(CtElement var, Constraint constraint, Constraint constraint2, String msg) {
+		System.out.println("______________________________________________________");
+		System.err.println(msg);
+		System.out.println(constraint);
+		System.out.println(constraint2);
+		System.out.println();
+		System.out.println("Error found while checking conditions in:");
+		System.out.println(var);
+		System.out.println();
+		System.out.println("Location: " + var.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(2);
+	}
+	
+	
 	public static <T> void printErrorArgs(CtElement var, Constraint expectedType, String msg) {
 		System.out.println("______________________________________________________");
 		System.err.println("Error in ghost invocation: "+ msg);

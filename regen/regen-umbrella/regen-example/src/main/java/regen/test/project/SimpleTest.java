@@ -14,7 +14,19 @@ import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateSet;
 
+@RefinementAlias("type Percentage(int x) { 0 <= x && x >= 100}")
 public class SimpleTest {
+	
+	@Refinement("Percentage(_)")
+	public static int addBonus	(@Refinement("Percentage(grade)") int grade, 
+								 @Refinement("Percentage(bonus) && (bonus < grade)") int bonus) {
+		if((grade + bonus) > 100)
+			return 100;
+		else
+			return grade+bonus;
+	}
+	
+	
 	
 //	public static void addZ(@Refinement("a > 0")int a) {
 //		@Refinement("_ > 0")
@@ -33,8 +45,9 @@ public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
 		
-		@Refinement("_ > 10")
-		int i = 10;
+		
+//		@Refinement("_ > 10")
+//		int i = 10;
 
 		
 //		@Refinement("sum(_) > 30")
