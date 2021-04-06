@@ -1,4 +1,5 @@
 package repair.regen.rj_language;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.antlr.v4.runtime.TokenStreamRewriter;
 
 import com.microsoft.z3.Expr;
 
+import repair.regen.rj_language.visitors.AliasVisitor;
 import repair.regen.rj_language.visitors.BooleanTrueVisitor;
 import repair.regen.rj_language.visitors.ChangeOldVisitor;
 import repair.regen.rj_language.visitors.EvalVisitor;
@@ -22,27 +24,28 @@ import repair.regen.smt.TranslatorToZ3;
 import rj.grammar.RJLexer;
 import rj.grammar.RJParser;
 
+
 public class RefinementsParser {
 	
 	public static void main(String[] args) throws Exception {
-		String toParse = "(f(a2) && (old(a2) == 6))";
-//		String s = substitute(toParse, "#i_0", "i_5");
-//		System.out.println(isTrue(toParse));
-//		List<String> ls = Arrays.asList("f", "g", "h");
-//		System.out.println(getGhostInvocations(toParse, ls));
+		String toParse = "type Between(int x, int low, int high) {x > low && x < high}";
+		String rr = "Between(5, 10 + 4, yy) && yy > 10 && foo(x)";
 		
-		HashMap<String, String> m = new HashMap<>();
-		m.put("green", "state_1(this) == 1");
-		m.put("amber", "state_1(_) == 2");
-		m.put("red", "state_1(this) == 3");
-		String[] s = {"this", "_"};
-		String r = changeStateRefinement("(y == 10) && (green(#s1) || amber(#s1)) && f(yy) == 5", m, s);
+		List<String> vars = new ArrayList<>();
+		vars.add("x");vars.add("low");vars.add("high");
+		Pair<String, List<String>> p = new Pair<>("x > low && x < high", vars);
+		
+		HashMap<String, Pair<String, List<String>>> m = new HashMap<>();
+		m.put("Between", p);
+		String r = changeAlias(rr, m);
 		System.out.println(r);
+		compile(r);
 		
 		
 	}
 
-	
+
+
 	public static Expr eval(String s, TranslatorToZ3 ctx) throws Exception {
 		RuleContext rc = compile(s);
 		EvalVisitor visitor = new EvalVisitor(ctx);
@@ -80,7 +83,7 @@ public class RefinementsParser {
 		RJParser parser = new RJParser(tokens);
 		parser.setBuildParseTree(true);
 		parser.removeErrorListeners();
-		parser.addParseListener(new RJListener());
+//		parser.addParseListener(new RJListener());
 		parser.addErrorListener(err);
 //		parser.start(); //all consumed
 
@@ -160,9 +163,57 @@ public class RefinementsParser {
 		sv.changeState(rc, nameRefinementMap, toChange);
 		
 		return rewriter.getText();
-		
 	}
 	
 	
+	public static String changeAlias(String s, Map<String,String> nameRefinementMap, String[] toChange) throws Exception {
+		CodePointCharStream input;
+		input = CharStreams.fromString(s);
+		RJErrorListener err = new RJErrorListener();
+		RJLexer lexer = new RJLexer(input);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(err);
+		
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+		
+		RJParser parser = new RJParser(tokens);
+		parser.setBuildParseTree(true);
+		parser.removeErrorListeners();
+//		parser.addParseListener(new RJListener());
+		parser.addErrorListener(err);
+		
+		RuleContext rc = parser.prog();
+		StateVisitor sv = new StateVisitor(rewriter);
+		sv.changeState(rc, nameRefinementMap, toChange);
+		
+		return rewriter.getText();
+	}
+	
+	
+	private static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
+		CodePointCharStream input;
+		input = CharStreams.fromString(s);
+		RJErrorListener err = new RJErrorListener();
+		RJLexer lexer = new RJLexer(input);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(err);
+		
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+		
+		RJParser parser = new RJParser(tokens);
+		parser.setBuildParseTree(true);
+		parser.removeErrorListeners();
+//		parser.addParseListener(new RJListener());
+		parser.addErrorListener(err);
+		
+		RuleContext rc = parser.prog();
+		AliasVisitor sv = new AliasVisitor(rewriter);
+		sv.changeAlias(rc, m);
+		
+		return rewriter.getText();
+	}
+
 	
 }
