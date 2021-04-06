@@ -1,6 +1,5 @@
 package repair.regen.rj_language;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +9,7 @@ import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.TokenStreamRewriter;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import com.microsoft.z3.Expr;
 
@@ -21,26 +21,27 @@ import repair.regen.rj_language.visitors.GhostInvocationsVisitor;
 import repair.regen.rj_language.visitors.StateVisitor;
 import repair.regen.rj_language.visitors.SubstituteVisitor;
 import repair.regen.smt.TranslatorToZ3;
+import repair.regen.utils.Pair;
+import repair.regen.utils.Triple;
 import rj.grammar.RJLexer;
 import rj.grammar.RJParser;
 
 
 public class RefinementsParser {
-	
 	public static void main(String[] args) throws Exception {
-		String toParse = "type Between(int x, int low, int high) {x > low && x < high}";
-		String rr = "Between(5, 10 + 4, yy) && yy > 10 && foo(x)";
+		String toParse = "type Between(double x, int low, java.lang.String high) {x > low && x < high}";
+//		String rr = "Between(5, 10 + 4, yy) && yy > 10 && foo(x)";
 		
-		List<String> vars = new ArrayList<>();
-		vars.add("x");vars.add("low");vars.add("high");
-		Pair<String, List<String>> p = new Pair<>("x > low && x < high", vars);
+//		List<String> vars = new ArrayList<>();
+//		vars.add("x");vars.add("low");vars.add("high");
+//		Pair<String, List<String>> p = new Pair<>("x > low && x < high", vars);
+//		
+//		HashMap<String, Pair<String, List<String>>> m = new HashMap<>();
+//		m.put("Between", p);
+//		String r = changeAlias(rr, m);
+//		System.out.println(r);
 		
-		HashMap<String, Pair<String, List<String>>> m = new HashMap<>();
-		m.put("Between", p);
-		String r = changeAlias(rr, m);
-		System.out.println(r);
-		compile(r);
-		
+		System.out.println(getAliasDeclaration(toParse));
 		
 	}
 
@@ -63,12 +64,16 @@ public class RefinementsParser {
 		return GhostInvocationsVisitor.getGhostInvocations(rc, all);
 	}
 
+	private static Triple<String, String, List<Pair<String,String>>> getAliasDeclaration(String s) throws ParsingException{
+		ParseTree rc = compile(s);
+		return AliasVisitor.getAlias(rc);
+	}
 
 	
 	
 	public static RuleContext compile(String toParse) throws ParsingException {
 		CodePointCharStream input;
-//		toParse = "((v >= 0.0) && !(!(sum (#this_1) == v)))";
+//		toParse = "x>low&&x<high";
 //		toParse = "((((( Sum (#a_21) == (sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
 //		toParse = "((#i_0 == 10) && !(#i_0 > 10))";
 		input = CharStreams.fromString(toParse);
@@ -92,6 +97,8 @@ public class RefinementsParser {
 		}
 		return parser.prog();
 	}
+	
+	
 	
 	public static String changeOldTo(String s, String previous, String now) throws ParsingException {
 		CodePointCharStream input;
@@ -166,7 +173,7 @@ public class RefinementsParser {
 	}
 	
 	
-	public static String changeAlias(String s, Map<String,String> nameRefinementMap, String[] toChange) throws Exception {
+	public static String changeState(String s, Map<String,String> nameRefinementMap, String[] toChange) throws Exception {
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();
@@ -190,6 +197,7 @@ public class RefinementsParser {
 		return rewriter.getText();
 	}
 	
+
 	
 	private static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
 		CodePointCharStream input;

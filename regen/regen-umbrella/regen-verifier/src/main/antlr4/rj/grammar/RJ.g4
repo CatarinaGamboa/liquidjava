@@ -30,7 +30,7 @@ operand:
 	|	'-' operand					#opMinus
 	|	'!' operand					#opNot
 	;
- 
+
 	 
 literalExpression:
 		'(' literalExpression ')'	#litGroup
@@ -69,13 +69,11 @@ ghost:
 	'ghost'? type ID '(' argDecl ')';
 
 argDecl:
-	type ID? argDecl2;	
+	type ID? (',' argDecl)?;	
 	
 argDeclID:
-	type ID argDecl2;
-	
-argDecl2:
-	',' argDecl | ;
+	type ID (',' argDeclID)?;
+
 	
 type:
 		'int'

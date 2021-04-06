@@ -1,4 +1,4 @@
-package repair.regen.rj_language;
+package repair.regen.utils;
 
 public class Pair <K, V>{
 	private K k;
@@ -15,6 +15,10 @@ public class Pair <K, V>{
 	
 	public V getSecond() {
 		return v;
+	}
+	
+	public String toString() {
+		return "Pair ["+k.toString()+", "+v.toString()+"]";
 	}
 
 }
