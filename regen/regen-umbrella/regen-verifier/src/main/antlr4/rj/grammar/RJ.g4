@@ -30,7 +30,7 @@ operand:
 	|	'-' operand					#opMinus
 	|	'!' operand					#opNot
 	;
-
+ 
 	 
 literalExpression:
 		'(' literalExpression ')'	#litGroup

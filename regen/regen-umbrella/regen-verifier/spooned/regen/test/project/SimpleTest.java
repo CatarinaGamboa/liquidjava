@@ -27,7 +27,7 @@ package regen.test.project;
 @repair.regen.specification.RefinementAlias("type Percentage(int x) { 0 <= x && x >= 100}")
 public class SimpleTest {
     @repair.regen.specification.Refinement("Percentage(_)")
-    public static int addBonus(@repair.regen.specification.Refinement("Percentage(gruade)")
+    public static int addBonus(@repair.regen.specification.Refinement("Percentage(grade)")
     int grade, @repair.regen.specification.Refinement("Percentage(bonus) && (bonus < grade)")
     int bonus) {
         if ((grade + bonus) > 100)

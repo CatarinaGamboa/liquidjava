@@ -143,7 +143,7 @@ public class AuxVisitTree {
 		return false;
 	}
 
-	
+	//DONE IN ANTLR
 	public static Expression changeStateRefinements(Expression exp, List<GhostState> ghostState) {
 		Expression e = null;
 		if(exp instanceof UnaryExpression) {
