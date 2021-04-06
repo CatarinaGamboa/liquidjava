@@ -122,11 +122,14 @@ public class TranslatorToZ3 {
 		return getVariableTranslation(name);//int[] not in varTranslation
 	}
 
-	public Expr makeFunctionInvocation(String name, Expr[] params) {
+	public Expr makeFunctionInvocation(String name, Expr[] params) throws Exception{
 		if(name.equals("addToIndex"))
 			return makeStore(name, params);
 		if(name.equals("getFromIndex"))
 			return makeSelect(name, params);
+		
+		if(!funcTranslation.containsKey(name))
+			throw new NotFoundError("Function '"+ name + "' not found");
 
 		FuncDecl fd = funcTranslation.get(name);
 		Sort[] s  =fd.getDomain();
