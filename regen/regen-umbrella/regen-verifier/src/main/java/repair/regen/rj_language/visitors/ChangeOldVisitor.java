@@ -21,7 +21,8 @@ public class ChangeOldVisitor {
 					rewriter.replace(gcc.start, gcc.stop, previous);
 				}
 			}
-		}else if (rc.getChildCount() > 0) {
+		}
+		if (rc.getChildCount() > 0) {
 			int i = rc.getChildCount();
 			for (int j = 0; j < i; j++) {
 				changeOldTo(rc.getChild(j), previous, now);

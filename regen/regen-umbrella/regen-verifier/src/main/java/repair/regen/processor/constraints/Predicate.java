@@ -102,6 +102,8 @@ public class Predicate extends Constraint{
 	}
 	
 	public List<GhostState> getGhostInvocations(List<GhostState> lgs) {
+		if(lgs == null)
+			return new ArrayList<>();
 		List<String> ls = lgs.stream().map(p->p.getName()).collect(Collectors.toList());
 		List<String> l = null;
 		try {

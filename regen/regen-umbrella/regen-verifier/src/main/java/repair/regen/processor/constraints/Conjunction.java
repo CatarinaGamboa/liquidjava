@@ -52,12 +52,12 @@ public class Conjunction extends Constraint{
 
 	@Override
 	public String toString() {
-		return String.format("((%s) && (%s))", c1.getExpression(), c2.getExpression());
+		return String.format("(%s && %s)", group(c1.getExpression()), group(c2.getExpression()));
 	}
 
 	@Override
 	public String getExpression() {
-		return String.format("((%s) && (%s))", c1.getExpression(), c2.getExpression());
+		return toString();
 	}
 	
 	@Override
@@ -77,6 +77,15 @@ public class Conjunction extends Constraint{
 	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange)  {
 		return new Conjunction(c1.changeStatesToRefinements(ghostState, toChange), 
 				c2.changeStatesToRefinements(ghostState, toChange));
+	}
+	
+
+	private String group(String expression) {
+		if(expression.length() < 0)
+			return expression;
+		char i = expression.charAt(0);
+		char f = expression.charAt(expression.length()-1);
+		return (i =='(') && (f == ')')? expression : "("+expression+")";
 	}
 
 
