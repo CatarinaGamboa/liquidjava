@@ -84,12 +84,17 @@ public class RefinementsParser {
 		return av.getAlias(rc);
 	}
 	
-	private static Triple<String, String, List<Pair<String,String>>> getGhostDeclaration(String s) throws ParsingException{
+	/**
+	 * The triple information of the ghost declaration in the order <type, name, list<type,name>>
+	 * @param s
+	 * @return
+	 * @throws ParsingException
+	 */
+	public static Triple<String, String, List<Pair<String,String>>> getGhostDeclaration(String s) throws ParsingException{
 		ParseTree rc = compile(s);
 		return GhostVisitor.getGhostDecl(rc);
 	}
 
-	
 	
 	private static RuleContext compile(String toParse) throws ParsingException {
 		CodePointCharStream input;

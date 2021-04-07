@@ -1,13 +1,10 @@
 package repair.regen.processor.context;
 
-import static org.junit.Assert.assertFalse;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.language.function.FunctionDeclaration;
-import repair.regen.language.function.MultipleTypes;
-import repair.regen.language.function.Type;
+import repair.regen.utils.Pair;
+import repair.regen.utils.Triple;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -19,19 +16,16 @@ public class GhostFunction {
 	
 	private String klassName;
 	
-	public GhostFunction(FunctionDeclaration fdExp, Factory factory, String path, String klass) {
-		name = fdExp.getName().toString();
-		Type t = fdExp.getReturnType();
-		return_type = Utils.getType(t.toString().equals(klass)? path: t.toString(), factory);
+	public GhostFunction(Triple<String, String, List<Pair<String,String>>> f, Factory factory, String path, String klass) {
+		name = f.getSecond();
+		return_type = Utils.getType(f.getFist().equals(klass)? path: f.getFist(), factory);
 		param_types = new ArrayList<>();
-		MultipleTypes[] pts = fdExp.getArgTypes();
-		for(MultipleTypes mt: pts) {
-			String mType = mt.getType().toString();
-			param_types.add(Utils.getType(mType.equals(klass)? path : mType, factory));
+		for(Pair<String,String> p : f.getThird()) {
+			param_types.add(Utils.getType(p.getFirst().equals(klass)? path : p.getFirst(), factory));
 		}
 	}
 	
-	public GhostFunction(String name,List<String> param_types, CtTypeReference<?> return_type, 
+	public GhostFunction(String name, List<String> param_types, CtTypeReference<?> return_type, 
 			Factory factory, String path, String klass) {
 		this.name = name;
 		this.return_type = Utils.getType(return_type.toString().equals(klass)? path: return_type.toString(), factory);

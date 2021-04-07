@@ -1,31 +1,24 @@
 package repair.regen.processor.refinement_checker;
 
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.language.function.FunctionDeclaration;
-import repair.regen.language.parser.RefinementParser;
-import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
-import repair.regen.processor.context.RefinedFunction;
-import spoon.reflect.code.CtExpression;
-import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtLiteral;
-import spoon.reflect.declaration.CtAnnotation;
+import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.RefinementsParser;
+import repair.regen.utils.Pair;
+import repair.regen.utils.Triple;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
-import spoon.reflect.visitor.CtScanner;
 
 public class ExternalRefinementTypeChecker extends TypeChecker{
 	String prefix;
@@ -74,19 +67,20 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 
 	protected void getGhostFunction(String value, CtElement element) {
 		try {
-			Optional<FunctionDeclaration> ofd = 
-					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent() && element.getParent() instanceof CtInterface<?>) {
+//			Optional<FunctionDeclaration> ofd = 
+//					RefinementParser.parseFunctionDecl(value);
+			Triple<String, String, List<Pair<String,String>>> f = RefinementsParser.getGhostDeclaration(value);
+			if(f != null && element.getParent() instanceof CtInterface<?>) {
 				String[] a = prefix.split("\\.");
 				String d =  a[a.length-1];
-				GhostFunction gh = new GhostFunction(ofd.get(), factory,prefix,a[a.length-1]); 
+				GhostFunction gh = new GhostFunction(f, factory,prefix,a[a.length-1]); 
 				context.addGhostFunction(gh);
 				System.out.println(gh.toString());
 			}
 
-		} catch (SyntaxException e) {
-			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
-			e.printStackTrace();
+		} catch (ParsingException e) {
+			ErrorPrinter.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+//			e.printStackTrace();
 		}
 	}
 	

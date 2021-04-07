@@ -26,20 +26,23 @@ package regen.test.project;
 // double c = b;
 @repair.regen.specification.RefinementAlias("type Percentage(int x) { 0 <= x && x >= 100}")
 public class SimpleTest {
-    // public static void addZ(@Refinement("a > 0")int a) {
-    // @Refinement("_ > 0")
-    // int d = a;
-    // if(d > 5) {
-    // @Refinement("b > 5")
-    // int b = d;
-    // }else {
-    // @Refinement("_ <= 5")
-    // int c = d;
-    // d = 10;
-    // @Refinement("b > 10")
-    // int b = d;
-    // }
-    // }
+    // @RefinementPredicate("int length(int[] a)")
+    public static void addZ(@repair.regen.specification.Refinement("a > 0")
+    int a) {
+        // @Refinement("_ > 0")
+        // int d = a;
+        // if(d > 5) {
+        // @Refinement("b > 5")
+        // int b = d;
+        // }else {
+        // @Refinement("_ <= 5")
+        // int c = d;
+        // d = 10;
+        // @Refinement("b > 10")
+        // int b = d;
+        // }
+    }
+
     public static void main(java.lang.String[] args) throws java.io.IOException {
         // @Refinement("_ > 10")
         // int i = 10;

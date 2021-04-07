@@ -1,24 +1,17 @@
 package repair.regen.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import javax.lang.model.element.Element;
-
-import repair.regen.language.alias.Alias;
 import repair.regen.language.function.FunctionDeclaration;
 import repair.regen.language.parser.RefinementParser;
 import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
-import repair.regen.processor.constraints.Implication;
 import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.LiteralPredicate;
-import repair.regen.processor.constraints.OperationPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
@@ -192,23 +185,23 @@ public abstract class TypeChecker extends CtScanner{
 
 	protected void getGhostFunction(String value, CtElement element) {
 		try {
-			Optional<FunctionDeclaration> ofd = 
-					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
+			Triple<String, String, List<Pair<String,String>>> f = RefinementsParser.getGhostDeclaration(value);
+			if(f != null && element.getParent() instanceof CtClass<?>) {
 				CtClass<?> klass =(CtClass<?>) element.getParent(); 
-				GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
+				GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName(), klass.getSimpleName()); 
 				context.addGhostFunction(gh);
 				System.out.println(gh.toString());
 			}
-		} catch (SyntaxException e) {
-			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
-			e.printStackTrace();
-		}
+		} catch (ParsingException e) {
+			ErrorPrinter.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+			//	e.printStackTrace();
+		} 
 	}
 
 	protected void handleAlias(String value, CtElement element) {	
-		try {
+		try {		
 			Triple<String, String, List<Pair<String, String>>> a = RefinementsParser.getAliasDeclaration(value);
+			
 			if(a != null) {
 				String klass = null;
 				String path = null;

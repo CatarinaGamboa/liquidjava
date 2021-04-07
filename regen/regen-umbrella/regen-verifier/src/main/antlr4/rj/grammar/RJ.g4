@@ -81,7 +81,8 @@ type:
 	|	'float'
 	|	'boolean'
 	|	ID_UPPER
-	|	OBJECT_TYPE;  
+	|	OBJECT_TYPE
+	|	type '[]';
 
 
 ////UNARY_OP: '!' | '-' | '+';
