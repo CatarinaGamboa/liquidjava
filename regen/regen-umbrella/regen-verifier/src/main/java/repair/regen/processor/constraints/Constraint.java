@@ -16,6 +16,7 @@ public abstract class Constraint {
 	public abstract boolean isBooleanTrue();
 	public abstract Constraint changeOldMentions(String previousName, String newName);
 	public abstract Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange);
+	public abstract String getExpression();
 	
 
 }

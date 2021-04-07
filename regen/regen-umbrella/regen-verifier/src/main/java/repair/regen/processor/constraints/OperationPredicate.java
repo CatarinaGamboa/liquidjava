@@ -1,7 +1,7 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.language.BinaryExpression;
-import repair.regen.language.ExpressionGroup;
+import static org.junit.Assert.fail;
+
 import repair.regen.language.operators.AdditionOperator;
 import repair.regen.language.operators.AndOperator;
 import repair.regen.language.operators.BiconditionalOperator;
@@ -24,12 +24,9 @@ public class OperationPredicate extends Predicate{
 	public OperationPredicate(Constraint c1, String op, Constraint c2) {
 		super();
 		if(c1 != null && c2 != null && op != null)
-			setExpression(new ExpressionGroup(new BinaryExpression(
-					c1.getExpression(), 
-					operationFromString(op), 
-					c2.getExpression())));
+			exp = String.format("(%s %s %s)", c1.getExpression(), operationFromString(op), c2.getExpression());
 		else
-			System.out.println("Something to implement later on Operation Predicate!");
+			fail("Something to implement later on Operation Predicate!");
 	}
 	
 	private BinaryOperator operationFromString(String s) {
@@ -53,7 +50,7 @@ public class OperationPredicate extends Predicate{
 		case "<-->":  return new BiconditionalOperator();
 		case "-->":  return new ImpliesOperator();
 		default:
-			System.out.println("ERROR in creation of OperationPredicate");
+			fail("ERROR in creation of Operation Predicate");
 			return null;
 		}
 	}

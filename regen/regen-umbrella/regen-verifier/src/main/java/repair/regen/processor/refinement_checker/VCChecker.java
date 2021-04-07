@@ -40,8 +40,10 @@ public class VCChecker {
 
 		HashMap<String, String> map = new HashMap<String, String>();
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
-		premises = premises.changeStatesToRefinements(list);
-		Constraint et = expectedType.changeStatesToRefinements(list);
+		
+		String[] s = {"this", "_"};
+		premises = premises.changeStatesToRefinements(list, s);
+		Constraint et = expectedType.changeStatesToRefinements(list, s);
 		smtChecking(premises, et, element, map);
 	}
 

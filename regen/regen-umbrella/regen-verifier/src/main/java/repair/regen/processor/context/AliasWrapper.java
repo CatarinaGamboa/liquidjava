@@ -59,7 +59,7 @@ public class AliasWrapper {
 		return (Predicate) expression.clone();
 	}
 
-	public Expression getNewExpression(List<String> newNames) {
+	public String getNewExpression(List<String> newNames) {
 		Constraint expr = getClonedConstraint();
 		for (int i = 0; i < newNames.size(); i++) {
 			expr = expr.substituteVariable(varNames.get(i), newNames.get(i));
@@ -68,7 +68,7 @@ public class AliasWrapper {
 	}
 	
 	
-	public Expression getPremises(List<Expression> list, List<String> newNames){
+	public String getPremises(List<String> list, List<String> newNames){
 		List<Predicate> invocationPredicates = getPredicatesFromExpression(list);
 		Constraint prem = new Predicate();
 		for (int i = 0; i < invocationPredicates.size(); i++) {
@@ -78,9 +78,9 @@ public class AliasWrapper {
 		return prem.getExpression();
 	}
 
-	private List<Predicate> getPredicatesFromExpression(List<Expression> list) {
+	private List<Predicate> getPredicatesFromExpression(List<String> list) {
 		List<Predicate> lp = new ArrayList<>();
-		for(Expression e: list)
+		for(String e: list)
 			lp.add(new Predicate(e));
 	
 		return lp;

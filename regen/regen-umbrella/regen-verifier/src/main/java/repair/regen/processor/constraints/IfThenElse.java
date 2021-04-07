@@ -14,8 +14,8 @@ public class IfThenElse extends Constraint{
 	private Constraint ite;
 	
 	public IfThenElse(Constraint a, Constraint b, Constraint c) {
-		ite = new Predicate(new ExpressionGroup(new IfElseExpression(a.getExpression(), 
-				b.getExpression(), c.getExpression())));
+		String s = String.format("(%s) ? (%s) :_(%s)", a, b, c);
+		ite = new Predicate(s);
 	}
 	public IfThenElse(Constraint e) {
 		ite = e;
@@ -29,7 +29,7 @@ public class IfThenElse extends Constraint{
 
 	@Override
 	public Constraint negate() {
-		return new Predicate(new UnaryExpression(new NotOperator(), ite.getExpression()));
+		return new Predicate(String.format("!(%s)", getExpression()));
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class IfThenElse extends Constraint{
 	}
 	
 	@Override
-	public Expression getExpression() {
+	public String getExpression() {
 		return ite.getExpression();
 	}
 	@Override
@@ -65,8 +65,8 @@ public class IfThenElse extends Constraint{
 	}
 	
 	@Override
-	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
-		return ite.changeStatesToRefinements(ghostState);
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls) {
+		return ite.changeStatesToRefinements(ghostState, ls);
 	}
 
 }

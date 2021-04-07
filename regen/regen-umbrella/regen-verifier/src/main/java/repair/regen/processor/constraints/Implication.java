@@ -29,7 +29,7 @@ public class Implication extends Constraint{
 
 	@Override
 	public Constraint negate() {
-		return new Predicate(new UnaryExpression(new NotOperator(), getExpression()));
+		return new Predicate(String.format("!(%s)", getExpression()));
 	}
 
 	@Override
@@ -50,12 +50,8 @@ public class Implication extends Constraint{
 	}
 
 	@Override
-	public Expression getExpression() {
-		BinaryExpression be = new BinaryExpression(
-				new ExpressionGroup(c1.getExpression()), 
-				new ImpliesOperator(), 
-				new ExpressionGroup(c2.getExpression()));
-		return new ExpressionGroup(be);
+	public String getExpression() {
+		return String.format("(%s)->(%s)", c1.getExpression(), c2.getExpression());
 	}
 
 	@Override
@@ -71,7 +67,8 @@ public class Implication extends Constraint{
 	}
 
 	@Override
-	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
-		return new Implication(c1.changeStatesToRefinements(ghostState), c2.changeStatesToRefinements(ghostState));
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls) {
+		return new Implication(c1.changeStatesToRefinements(ghostState, ls), 
+				c2.changeStatesToRefinements(ghostState, ls));
 	}
 }

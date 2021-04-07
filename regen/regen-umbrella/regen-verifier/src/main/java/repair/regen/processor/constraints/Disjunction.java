@@ -42,7 +42,8 @@ public class Disjunction extends Constraint{
 
 	@Override
 	public Constraint negate() {
-		return new Predicate(new UnaryExpression(new NotOperator(), getExpression()));
+		String n = String.format("!(%s)", getExpression());
+		return new Predicate(n);
 	}
 
 	@Override
@@ -63,8 +64,8 @@ public class Disjunction extends Constraint{
 	}
 	
 	@Override
-	public Expression getExpression() {
-		return new ExpressionGroup(new BinaryExpression(c1.getExpression(), new OrOperator(), c2.getExpression()));
+	public String getExpression() {
+		return String.format("((%s) || (%s))", c1.getExpression(), c2.getExpression());
 	}
 
 	@Override
@@ -80,8 +81,9 @@ public class Disjunction extends Constraint{
 	}
 	
 	@Override
-	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
-		return new Disjunction(c1.changeStatesToRefinements(ghostState), c2.changeStatesToRefinements(ghostState));
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls) {
+		return new Disjunction(c1.changeStatesToRefinements(ghostState, ls), 
+				c2.changeStatesToRefinements(ghostState, ls));
 	}
 
 
