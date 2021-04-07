@@ -19,21 +19,15 @@ public class SimpleTest {
 	
 	
 //	@RefinementPredicate("int length(int[] a)")
-	public static void addZ(@Refinement("a > 0")int a) {
+//	public static void addZ(@Refinement("a > 0")int a) {
 //		@Refinement("_ > 0")
 //		int d = a;
 //		if(d > 5) {
-//			@Refinement("b > 5")
-//			int b = d;
-//		}else {
-//			@Refinement("_ <= 5")
-//			int c = d;
-//			d = 10;
-//			@Refinement("b > 10")
+//			@Refinement("b > 5 && b < a && d == (50 + a)")
 //			int b = d;
 //		}
-	}
-	
+//	}
+//	
 	public static void main(String[] args) throws IOException{
 		
 		

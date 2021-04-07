@@ -1,6 +1,7 @@
 package regen.test.project;
 
 
+// @RefinementAlias("type Percentage(int x) { 0 <= x && x >= 100}")
 // InputStreamReader isr = new InputStreamReader(System.in);
 // isr.read();
 // isr.read();
@@ -24,23 +25,16 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
-@repair.regen.specification.RefinementAlias("type Percentage(int x) { 0 <= x && x >= 100}")
 public class SimpleTest {
     // @RefinementPredicate("int length(int[] a)")
     public static void addZ(@repair.regen.specification.Refinement("a > 0")
     int a) {
-        // @Refinement("_ > 0")
-        // int d = a;
-        // if(d > 5) {
-        // @Refinement("b > 5")
-        // int b = d;
-        // }else {
-        // @Refinement("_ <= 5")
-        // int c = d;
-        // d = 10;
-        // @Refinement("b > 10")
-        // int b = d;
-        // }
+        @repair.regen.specification.Refinement("_ > 0")
+        int d = a;
+        if (d > 5) {
+            @repair.regen.specification.Refinement("b > 5 && b < a && d == (50 + a)")
+            int b = d;
+        }
     }
 
     public static void main(java.lang.String[] args) throws java.io.IOException {

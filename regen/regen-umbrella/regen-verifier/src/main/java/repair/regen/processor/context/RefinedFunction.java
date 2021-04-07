@@ -10,7 +10,7 @@ import java.util.Optional;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.refinement_checker.ErrorPrinter;
+import repair.regen.utils.ErrorPrinter;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtAnnotation;

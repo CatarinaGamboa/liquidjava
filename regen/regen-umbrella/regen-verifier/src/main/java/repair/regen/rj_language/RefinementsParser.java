@@ -1,8 +1,8 @@
 package repair.regen.rj_language;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CodePointCharStream;
@@ -29,7 +29,7 @@ import rj.grammar.RJParser;
 
 public class RefinementsParser {
 	public static void main(String[] args) throws Exception {
-		String toParse = "int between(double x, int low, java.lang.String)";
+//		String toParse = "int between(double x, int low, java.lang.String)";
 //		String rr = "Between(5, 10 + 4, yy) && yy > 10 && foo(x)";
 		
 //		List<String> vars = new ArrayList<>();
@@ -40,31 +40,45 @@ public class RefinementsParser {
 //		m.put("Between", p);
 //		String r = changeAlias(rr, m);
 //		System.out.println(r);
-		
-		System.out.println(getGhostDeclaration(toParse));
+		ParseTree t = compile("b > 5 && b < a && d = (50 + a)");
+		System.out.println(t.getText());
 		
 	}
 
 
 
 	public static Expr eval(String s, TranslatorToZ3 ctx) throws Exception {
-		RuleContext rc = compile(s);
+		ParseTree rc = compile(s);
 		EvalVisitor visitor = new EvalVisitor(ctx);
 		Expr e =  visitor.eval(rc);
 		return e;
 	}
 	
 	public static boolean isTrue(String s) throws ParsingException {
-		RuleContext rc = compile(s);
+		ParseTree rc = compile(s);
 		return BooleanTrueVisitor.isTrue(rc);
 	}
 	
 	public static List<String> getGhostInvocations(String s, List<String> all) throws ParsingException {
-		RuleContext rc = compile(s);
+		ParseTree rc = compile(s);
 		return GhostVisitor.getGhostInvocations(rc, all);
+	}
+	
+	/**
+	 * The triple information of the ghost declaration in the order <type, name, list<type,name>>
+	 * @param s
+	 * @return
+	 * @throws ParsingException
+	 */
+	public static Triple<String, String, List<Pair<String,String>>> getGhostDeclaration(String s) throws ParsingException{
+		ParseTree rc = compile(s);
+		return GhostVisitor.getGhostDecl(rc);
 	}
 
 	public static Triple<String, String, List<Pair<String,String>>> getAliasDeclaration(String s) throws ParsingException{
+		Optional<String> os = getErrors(s);
+		if(os.isPresent())
+			throw new ParsingException(os.get());
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();
@@ -84,24 +98,15 @@ public class RefinementsParser {
 		return av.getAlias(rc);
 	}
 	
-	/**
-	 * The triple information of the ghost declaration in the order <type, name, list<type,name>>
-	 * @param s
-	 * @return
-	 * @throws ParsingException
-	 */
-	public static Triple<String, String, List<Pair<String,String>>> getGhostDeclaration(String s) throws ParsingException{
-		ParseTree rc = compile(s);
-		return GhostVisitor.getGhostDecl(rc);
-	}
-
-	
-	private static RuleContext compile(String toParse) throws ParsingException {
-		CodePointCharStream input;
-//		toParse = "x>low&&x<high";
+	public static ParseTree compile(String toParse) throws ParsingException {
+//		toParse = "x > low && x < high";
 //		toParse = "((((( Sum (#a_21) == (sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
 //		toParse = "((#i_0 == 10) && !(#i_0 > 10))";
-		input = CharStreams.fromString(toParse);
+		Optional<String> s = getErrors(toParse);
+		if(s.isPresent())
+			throw new ParsingException(s.get());
+		
+		CodePointCharStream input = CharStreams.fromString(toParse);
 		RJErrorListener err = new RJErrorListener();
 		
 		RJLexer lexer = new RJLexer(input);
@@ -117,15 +122,21 @@ public class RefinementsParser {
 		parser.addErrorListener(err);
 //		parser.start(); //all consumed
 
-		if(err.getErrors() > 0) {
-			throw new ParsingException(err.getMessages());
-		}
+	
+		
 		return parser.prog();
 	}
 	
 	
 	
+
+
+
 	public static String changeOldTo(String s, String previous, String now) throws ParsingException {
+		Optional<String> os = getErrors(s);
+		if(os.isPresent())
+			throw new ParsingException(os.get());
+		
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();
@@ -148,7 +159,11 @@ public class RefinementsParser {
 		return rewriter.getText();
 	}
 	
-	public static String substitute(String s, String from, String to) throws Exception {
+	public static String substitute(String s, String from, String to) throws ParsingException {
+		Optional<String> os = getErrors(s);
+		if(os.isPresent())
+			throw new ParsingException(os.get());
+		
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();
@@ -174,6 +189,9 @@ public class RefinementsParser {
 	}
 	
 	public static String changeStateRefinement(String s, Map<String,String> nameRefinementMap, String[] toChange) throws Exception {
+		Optional<String> os = getErrors(s);
+		if(os.isPresent())
+			throw new ParsingException(os.get());
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();
@@ -199,6 +217,9 @@ public class RefinementsParser {
 	
 	
 	public static String changeState(String s, Map<String,String> nameRefinementMap, String[] toChange) throws Exception {
+		Optional<String> os = getErrors(s);
+		if(os.isPresent())
+			throw new ParsingException(os.get());
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();
@@ -225,6 +246,9 @@ public class RefinementsParser {
 
 	
 	public static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
+		Optional<String> os = getErrors(s);
+		if(os.isPresent())
+			throw new ParsingException(os.get());
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();
@@ -246,6 +270,28 @@ public class RefinementsParser {
 		sv.changeAlias(rc, m);
 		
 		return rewriter.getText();
+	}
+
+	private static Optional<String> getErrors(String toParse) {
+		CodePointCharStream input = CharStreams.fromString(toParse);
+		RJErrorListener err = new RJErrorListener();
+		
+		RJLexer lexer = new RJLexer(input);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(err);
+			
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		
+		RJParser parser = new RJParser(tokens);
+		parser.setBuildParseTree(true);
+		parser.removeErrorListeners();
+//		parser.addParseListener(new RJListener());
+		parser.addErrorListener(err);
+		parser.start(); //all consumed
+		if(err.getErrors() > 0)
+			return Optional.of(err.getMessages());
+		return Optional.empty();
+
 	}
 
 	

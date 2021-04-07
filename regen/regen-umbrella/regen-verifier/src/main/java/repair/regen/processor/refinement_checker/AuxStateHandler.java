@@ -28,6 +28,7 @@ import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Utils;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
+import repair.regen.utils.ErrorPrinter;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;

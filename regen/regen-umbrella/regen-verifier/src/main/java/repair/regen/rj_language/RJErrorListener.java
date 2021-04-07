@@ -5,6 +5,7 @@ import java.util.BitSet;
 import java.util.List;
 
 import org.antlr.v4.runtime.ANTLRErrorListener;
+import org.antlr.v4.runtime.LexerNoViableAltException;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -25,9 +26,17 @@ public class RJErrorListener implements ANTLRErrorListener {
 	@Override
 	public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
 			String msg, RecognitionException e){
-		// TODO Auto-generated method stub
+		//Hint for == instead of =
+		String hint = null;
+		if( e instanceof LexerNoViableAltException) {
+			LexerNoViableAltException l = (LexerNoViableAltException)e;
+			char c = l.getInputStream().toString().charAt(charPositionInLine);
+			if(c == '=')
+				hint = "Predicates must be compared with == instead of =";
+		}
 		errors++;
-		msgs.add("Error in "+ msg + ", in the position "+charPositionInLine);
+		String ms = "Error in "+ msg + ", in the position "+charPositionInLine;
+		msgs.add( ms + (hint==null?"":"\n\tHint: "+hint));
 	}
 
 	@Override

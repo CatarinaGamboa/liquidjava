@@ -10,6 +10,7 @@ import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
+import repair.regen.utils.ErrorPrinter;
 import repair.regen.utils.Pair;
 import repair.regen.utils.Triple;
 import spoon.reflect.declaration.CtClass;

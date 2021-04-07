@@ -20,6 +20,7 @@ import repair.regen.smt.NotFoundError;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import repair.regen.smt.TypeMismatchError;
+import repair.regen.utils.ErrorPrinter;
 import spoon.reflect.declaration.CtElement;
 
 public class VCChecker {

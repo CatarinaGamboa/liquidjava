@@ -1,13 +1,9 @@
 package repair.regen.rj_language.visitors;
 
-import org.antlr.v4.runtime.Token;
-
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import org.antlr.v4.runtime.RuleContext;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import com.microsoft.z3.Expr;
@@ -52,7 +48,7 @@ public class EvalVisitor {
 		this.ctx = ctx;
 	}
 
-	public Expr eval(RuleContext rc) throws Exception{
+	public Expr eval(ParseTree rc) throws Exception{
 		if(rc instanceof ProgContext)
 			return progEvaluate((ProgContext)rc);
 		else if(rc instanceof StartContext)
@@ -82,14 +78,14 @@ public class EvalVisitor {
 		return null;
 	}
 
-	private Expr startEvaluate(RuleContext rc) throws Exception{
+	private Expr startEvaluate(ParseTree rc) throws Exception{
 		if(rc instanceof StartPredContext)
 			return eval(((StartPredContext) rc).pred());
 		//alias and ghost do not have evaluation
 		return null;
 	}
 
-	private Expr predEvaluate(RuleContext rc) throws Exception {
+	private Expr predEvaluate(ParseTree rc) throws Exception {
 		if(rc instanceof PredGroupContext)
 			return eval(((PredGroupContext)rc).pred());
 		else if(rc instanceof PredNegateContext)
@@ -110,7 +106,7 @@ public class EvalVisitor {
 		}
 	}
 
-	private Expr expEvaluate(RuleContext rc) throws Exception {
+	private Expr expEvaluate(ParseTree rc) throws Exception {
 		if(rc instanceof ExpGroupContext)
 			return eval(((ExpGroupContext)rc).exp());
 		else if(rc instanceof ExpBoolContext) {
@@ -124,7 +120,7 @@ public class EvalVisitor {
 		}
 	}
 
-	private Expr operandEvaluate(RuleContext rc) throws Exception{
+	private Expr operandEvaluate(ParseTree rc) throws Exception{
 		if(rc instanceof OpLiteralContext)
 			return eval(((OpLiteralContext)rc).literalExpression());
 		else if(rc instanceof OpArithContext) {
@@ -146,7 +142,7 @@ public class EvalVisitor {
 		} 
 	}
 
-	private Expr literalExpressionEvaluate(RuleContext rc) throws Exception{
+	private Expr literalExpressionEvaluate(ParseTree rc) throws Exception{
 		if(rc instanceof LitGroupContext)
 			return eval(((LitGroupContext)rc).literalExpression());
 		else if(rc instanceof LitContext)
