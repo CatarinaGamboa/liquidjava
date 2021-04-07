@@ -4,6 +4,7 @@ import java.util.List;
 
 import repair.regen.language.Expression;
 import repair.regen.processor.context.GhostState;
+import spoon.reflect.declaration.CtElement;
 
 public abstract class Constraint {
 	

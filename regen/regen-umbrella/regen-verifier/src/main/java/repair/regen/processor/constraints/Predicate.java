@@ -2,30 +2,15 @@ package repair.regen.processor.constraints;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-import repair.regen.language.BinaryExpression;
 import repair.regen.language.BooleanLiteral;
 import repair.regen.language.Expression;
-import repair.regen.language.ExpressionGroup;
-import repair.regen.language.IfElseExpression;
-import repair.regen.language.LiteralExpression;
-import repair.regen.language.UnaryExpression;
-import repair.regen.language.Variable;
-import repair.regen.language.alias.Alias;
-import repair.regen.language.alias.AliasUsage;
-import repair.regen.language.function.Argument;
-import repair.regen.language.function.FollowUpArgument;
-import repair.regen.language.function.FunctionInvocationExpression;
-import repair.regen.language.function.ObjectFieldInvocation;
-import repair.regen.language.operators.NotOperator;
-import repair.regen.language.parser.RefinementParser;
-import repair.regen.language.parser.SyntaxException;
-import repair.regen.processor.context.Context;
-import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
+import repair.regen.utils.ErrorPrinter;
+import spoon.reflect.declaration.CtElement;
 
 public class Predicate extends Constraint{
 	
@@ -55,7 +40,7 @@ public class Predicate extends Constraint{
 //	}
 
 
-	protected Expression parse(String ref) {
+	protected Expression parse(String ref, CtElement element) {
 		try{
 			//Optional<Expression> oe = RefinementParser.parse(ref);
 			RefinementsParser.compile(ref);
@@ -70,8 +55,7 @@ public class Predicate extends Constraint{
 //			printSyntaxError(ref);
 //			
 		} catch (ParsingException e1) {
-			// TODO Auto-generated catch block
-			printSyntaxError(ref);
+			ErrorPrinter.printSyntaxError(e1.getMessage(), ref, element);
 		}	
 		return null;
 	}
@@ -94,30 +78,45 @@ public class Predicate extends Constraint{
 	@Override
 	public Constraint substituteVariable(String from, String to) {
 		try {
-			String s = RefinementsParser.substitute(s, from, to);
+			String ns = RefinementsParser.substitute(s, from, to);
+			return new Predicate(ns);
 		}catch(ParsingException e) {
-			
+			ErrorPrinter.printSyntaxError(e.getMessage(), s);
 		}
 		
-		Predicate c = (Predicate) this.clone();
-		if(from.equals(to))
-			return c;
-		AuxVisitTree.substituteVariable(c.getExpression(), from, to);
+//		Predicate c = (Predicate) this.clone();
+//		if(from.equals(to))
+//			return c;
+//		AuxVisitTree.substituteVariable(c.getExpression(), from, to);
 //		c.exp.substituteVariable(from, to);
-		return c;
+		return null;
 	}
 
 	@Override
 	public List<String> getVariableNames() {
 		List<String> l = new ArrayList<>();
-		exp.getVariableNames(l);
+//		exp.getVariableNames(l);
+		
+		//TODO
 		return l;
 	}
 	
 	public List<GhostState> getGhostInvocations(List<GhostState> lgs) {
+		List<String> ls = lgs.stream().map(p->p.getName()).collect(Collectors.toList());
+		List<String> l = null;
+		try {
+			l = RefinementsParser.getGhostInvocations(s, ls);
+		} catch (ParsingException e) {
+			ErrorPrinter.printSyntaxError(e.getMessage(), s);
+		}
+		
 		List<GhostState> gh = new ArrayList<>();
-		if(lgs != null)
-			AuxVisitTree.getGhostInvocations(exp, gh, lgs);
+		for(String n: l) {
+			for(GhostState g:lgs)
+				if(g.getName().equals(n))
+					gh.add(g);
+		}
+
 		return gh;
 	}
 

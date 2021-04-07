@@ -10,6 +10,7 @@ import spoon.reflect.declaration.CtElement;
 
 public class ErrorPrinter {
 
+
 	/**
 	 * Prints the error message
 	 * @param <T>
@@ -130,4 +131,29 @@ public class ErrorPrinter {
 		
 	}
 
+	
+	public static void printSyntaxError(String msg, String ref, CtElement element) {
+		System.out.println("______________________________________________________");
+		System.err.println("Syntax error with message");
+		System.out.println(msg);
+		System.out.println("Found in refinement:");
+		System.out.println(ref);
+		System.out.println("In:");
+		System.out.println(element);
+		System.out.println("Location: " + element.getPosition());
+		System.out.println("______________________________________________________");
+		System.exit(2);
+		
+	}
+	
+	public static void printSyntaxError(String msg, String ref) {
+		System.out.println("______________________________________________________");
+		System.err.println("Syntax error with message");
+		System.out.println(msg);
+		System.out.println("Found in refinement:");
+		System.out.println(ref);
+		System.out.println("______________________________________________________");
+		System.exit(2);
+		
+	}
 }

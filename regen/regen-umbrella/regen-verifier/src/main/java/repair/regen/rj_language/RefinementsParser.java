@@ -40,8 +40,8 @@ public class RefinementsParser {
 //		m.put("Between", p);
 //		String r = changeAlias(rr, m);
 //		System.out.println(r);
-		ParseTree t = compile("b > 5 && b < a && d = (50 + a)");
-		System.out.println(t.getText());
+//		ParseTree t = compile("b > 5 && b < a && d == (50 + a)");
+//		System.out.println(t.getText());
 		
 	}
 
