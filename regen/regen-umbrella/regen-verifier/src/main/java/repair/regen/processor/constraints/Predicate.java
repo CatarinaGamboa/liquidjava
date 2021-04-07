@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import repair.regen.language.Expression;
 import repair.regen.processor.context.GhostState;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
@@ -38,25 +37,25 @@ public class Predicate extends Constraint{
 //	}
 
 
-	protected Expression parse(String ref, CtElement element) {
-		try{
-			//Optional<Expression> oe = RefinementParser.parse(ref);
-			RefinementsParser.compile(ref);
-			
-			//System.out.println(oe.toString());
-//			if(oe.isPresent()) {
-//				Expression e = oe.get();
-//				return e;
-//			}
+//	protected String parse(String ref, CtElement element) {
+//		try{
+//			//Optional<Expression> oe = RefinementParser.parse(ref);
+//			RefinementsParser.compile(ref);
 //			
-//		} catch (SyntaxException e1) {
-//			printSyntaxError(ref);
-//			
-		} catch (ParsingException e1) {
-			ErrorPrinter.printSyntaxError(e1.getMessage(), ref, element);
-		}	
-		return null;
-	}
+//			//System.out.println(oe.toString());
+////			if(oe.isPresent()) {
+////				Expression e = oe.get();
+////				return e;
+////			}
+////			
+////		} catch (SyntaxException e1) {
+////			printSyntaxError(ref);
+////			
+//		} catch (ParsingException e1) {
+//			ErrorPrinter.printSyntaxError(e1.getMessage(), ref, element);
+//		}	
+//		return null;
+//	}
 	
 	
 //	public Expression getExpression() {

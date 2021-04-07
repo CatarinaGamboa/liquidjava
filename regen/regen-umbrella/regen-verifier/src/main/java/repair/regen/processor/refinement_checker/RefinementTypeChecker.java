@@ -1,16 +1,10 @@
 package repair.regen.processor.refinement_checker;
 
-import static org.junit.Assert.assertFalse;
-
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.language.alias.Alias;
-import repair.regen.language.function.FunctionDeclaration;
-import repair.regen.language.parser.RefinementParser;
-import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
@@ -18,10 +12,7 @@ import repair.regen.processor.constraints.FunctionPredicate;
 import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
-import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
-import repair.regen.processor.context.GhostFunction;
-import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
@@ -52,15 +43,12 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtPackage;
-import spoon.reflect.declaration.CtType;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtFieldReference;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.reference.CtVariableReference;
 import spoon.support.reflect.code.CtVariableWriteImpl;
-import spoon.support.sniper.internal.ElementSourceFragment;
 
 public class RefinementTypeChecker extends TypeChecker {
 	// This class should do the following:

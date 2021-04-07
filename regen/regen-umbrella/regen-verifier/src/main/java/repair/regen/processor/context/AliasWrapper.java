@@ -2,15 +2,11 @@ package repair.regen.processor.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import repair.regen.language.Expression;
-import repair.regen.language.alias.Alias;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.Disjunction;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
@@ -18,7 +14,6 @@ import repair.regen.utils.Pair;
 import repair.regen.utils.Triple;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
-import spoon.reflect.visitor.filter.CatchVariableScopeFunction;
 
 public class AliasWrapper {
 	private String name;

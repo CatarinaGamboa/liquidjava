@@ -1,36 +1,14 @@
 package regen.test.project;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.spi.FileSystemProvider;
-import java.util.ArrayList;
 
-import bufferedreader.Account;
-import bufferedreader.Order;
-import bufferedreader.OrderSimple;
-import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.RefinementPredicate;
-import repair.regen.specification.StateSet;
 
-//@RefinementAlias("type Percentage(int x) { 0 <= x && x >= 100}")
+@RefinementAlias("type Percentage(int x) { x >= 0 && x <= 100}")
 public class SimpleTest {
-	
-	
-//	@RefinementPredicate("int length(int[] a)")
-//	public static void addZ(@Refinement("a > 0")int a) {
-//		@Refinement("_ > 0")
-//		int d = a;
-//		if(d > 5) {
-//			@Refinement("b > 5 && b < a && d == (50 + a)")
-//			int b = d;
-//		}
-//	}
-//	
+
 	public static void main(String[] args) throws IOException{
-		
-		
+	
 //		@Refinement("_ > 10")
 //		int i = 10;
 

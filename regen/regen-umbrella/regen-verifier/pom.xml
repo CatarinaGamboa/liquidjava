@@ -109,13 +109,6 @@
 			<version>4.8.7.1</version>
 		</dependency>
 		<dependency>
-			<groupId>modelcc</groupId>
-			<artifactId>modelcc</artifactId>
-			<version>2015</version>
-			<scope>system</scope>
-			<systemPath>C:/Regen/regen/regen/regen-umbrella/regen-verifier/lib/ModelCC.r2015.jar</systemPath>
-		</dependency>
-		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 			<version>${version.junit}</version>

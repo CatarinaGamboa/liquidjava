@@ -2,9 +2,7 @@ package repair.regen.processor.context;
 
 import java.util.List;
 
-import repair.regen.language.function.FunctionDeclaration;
 import repair.regen.processor.constraints.Constraint;
-import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
 public class GhostState extends GhostFunction{

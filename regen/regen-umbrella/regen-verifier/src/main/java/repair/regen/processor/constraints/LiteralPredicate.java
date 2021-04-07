@@ -1,7 +1,5 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.language.IntegerLiteral;
-
 public class LiteralPredicate {
 	
 	public static Constraint getIntPredicate(int i) {

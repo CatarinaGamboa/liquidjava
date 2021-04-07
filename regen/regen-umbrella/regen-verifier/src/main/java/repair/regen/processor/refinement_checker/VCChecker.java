@@ -32,22 +32,24 @@ public class VCChecker {
 		pathVariables = new Stack<>();
 	}
 
-	public void processSubtyping(Constraint expectedType, List<GhostState> list, CtElement element) {
+	public void processSubtyping(Constraint expectedType, List<GhostState> list, String wild_var, String this_var, CtElement element) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		if(expectedType.isBooleanTrue())
 			return;
 
 		HashMap<String, String> map = new HashMap<String, String>();
-		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
-		
-		String[] s = {"this", "_"};
-		premises = premises.changeStatesToRefinements(list, s);
-		Constraint et = expectedType.changeStatesToRefinements(list, s);
+		String[] s = {wild_var, this_var};
+		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map)
+							.changeStatesToRefinements(list, s)
+							.changeAliasToRefinement(context, element);
+		Constraint et = expectedType
+							.changeStatesToRefinements(list, s)
+							.changeAliasToRefinement(context, element);
 		smtChecking(premises, et, element, map);
 	}
 
-	public boolean processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, CtElement element) {
+	public boolean processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, String wild_var, String this_var,CtElement element) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		gatherVariables(type, lrv, mainVars);
@@ -57,10 +59,14 @@ public class VCChecker {
 
 //		Constraint premises = joinConstraints(type, element, mainVars, lrv);
 		HashMap<String, String> map = new HashMap<String, String>();
+		String[] s = {wild_var, this_var};
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
-		premises = Conjunction.createConjunction(premises, type);//TODO add to print
-		premises = premises.changeStatesToRefinements(list);
-		Constraint et = expectedType.changeStatesToRefinements(list);
+		premises = Conjunction.createConjunction(premises, type)
+							  .changeStatesToRefinements(list, s)
+							  .changeAliasToRefinement(context, element);
+		Constraint et = expectedType
+							  .changeStatesToRefinements(list, s)
+							  .changeAliasToRefinement(context, element);
 		return smtChecks(premises, et, element);
 	}
 

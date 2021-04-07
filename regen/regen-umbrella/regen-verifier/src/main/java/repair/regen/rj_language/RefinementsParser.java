@@ -225,7 +225,13 @@ public class RefinementsParser {
 	
 	
 
-	
+	/**
+	 * 
+	 * @param s
+	 * @param m key:aliasName, pair<refinement, list<var names>>
+	 * @return
+	 * @throws Exception
+	 */
 	public static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
 		Optional<String> os = getErrors(s);
 		if(os.isPresent())

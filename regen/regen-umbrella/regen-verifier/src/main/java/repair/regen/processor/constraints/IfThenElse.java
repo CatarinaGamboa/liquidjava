@@ -3,11 +3,6 @@ package repair.regen.processor.constraints;
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.language.Expression;
-import repair.regen.language.ExpressionGroup;
-import repair.regen.language.IfElseExpression;
-import repair.regen.language.UnaryExpression;
-import repair.regen.language.operators.NotOperator;
 import repair.regen.processor.context.GhostState;
 
 public class IfThenElse extends Constraint{

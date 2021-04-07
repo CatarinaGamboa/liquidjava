@@ -1,21 +1,16 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.language.BinaryExpression;
-import repair.regen.language.Expression;
-import repair.regen.language.ExpressionGroup;
-import repair.regen.language.operators.EqualsOperator;
-
 public class EqualsPredicate extends Predicate {
 	
 	public EqualsPredicate(Constraint c1, Constraint c2) {
 		super();
-		exp = String.format("((%s) == (%s))",c1.toString(), c2.toString());		
+		exp = String.format("(%s == %s)",c1.toString(), c2.toString());		
 	}
 
 
 	public EqualsPredicate(Constraint c1, String c2) {
 		super();
-		exp = String.format("((%s) == (%s))",c1.toString(), c2);	
+		exp = String.format("(%s == %s)",c1.toString(), c2);	
 	}
 	
 //	public EqualsPredicate(String variable, Constraint c) {

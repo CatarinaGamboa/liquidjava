@@ -2,12 +2,6 @@ package repair.regen.processor.constraints;
 
 import java.util.List;
 
-import repair.regen.language.BinaryExpression;
-import repair.regen.language.Expression;
-import repair.regen.language.ExpressionGroup;
-import repair.regen.language.UnaryExpression;
-import repair.regen.language.operators.AndOperator;
-import repair.regen.language.operators.NotOperator;
 import repair.regen.processor.context.GhostState;
 
 public class Conjunction extends Constraint{
@@ -58,7 +52,7 @@ public class Conjunction extends Constraint{
 
 	@Override
 	public String toString() {
-		return "("+c1.toString() + " && " + c2.toString()+")";
+		return String.format("((%s) && (%s))", c1.getExpression(), c2.getExpression());
 	}
 
 	@Override

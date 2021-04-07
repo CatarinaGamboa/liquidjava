@@ -33,7 +33,7 @@ public class AliasVisitor {
 	/**
 	 * Changes present Alias by their refinement expression
 	 * @param rc
-	 * @param map
+	 * @param map key:aliasName, pair<refinement, list<var names>>
 	 * @throws Exception
 	 */
 	public void changeAlias(ParseTree rc,  HashMap<String, Pair<String, List<String>>> map) throws Exception {
@@ -50,7 +50,7 @@ public class AliasVisitor {
 				+acc.getText() + "\nAlias "+name+" expecting "+args.size()+" arguments");
 				
 				String newRef = substituteInRefinement(refinement, args, calledArgs);
-				rewriter.replace(acc.start, acc.stop, "("+newRef+")");
+				rewriter.replace(acc.start, acc.stop, newRef);
 				
 			}
 		}else if (rc.getChildCount() > 0) {
@@ -121,7 +121,7 @@ public class AliasVisitor {
 	private String substituteInRefinement(String refinement, List<String> args, List<String> calledArgs) throws Exception {
 		String r = refinement;
 		for (int i = 0; i < args.size(); i++)
-			r = RefinementsParser.substitute(r, args.get(i), "("+calledArgs.get(i)+")");
+			r = RefinementsParser.substitute(r, args.get(i), calledArgs.get(i));
 		return r;
 	}
 

@@ -5,9 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.language.function.FunctionDeclaration;
-import repair.regen.language.parser.RefinementParser;
-import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.InvocationPredicate;
@@ -238,12 +235,12 @@ public abstract class TypeChecker extends CtScanner{
 
 
 	void checkSMT(Constraint expectedType, CtElement element) {
-		vcChecker.processSubtyping(expectedType, context.getGhostState(), element);
+		vcChecker.processSubtyping(expectedType, context.getGhostState(), WILD_VAR, THIS, element);
 		element.putMetadata(REFINE_KEY, expectedType);	
 	}
 
 	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		return vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), target);
+		return vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target);
 	}
 
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, 

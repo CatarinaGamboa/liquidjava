@@ -1,19 +1,11 @@
 package repair.regen.processor.refinement_checker;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import repair.regen.language.function.FunctionDeclaration;
-import repair.regen.language.parser.RefinementParser;
-import repair.regen.language.parser.SyntaxException;
-import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.context.Context;
-import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
-import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtType;
