@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.TokenStreamRewriter;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.antlr.v4.runtime.misc.Interval;
 
 import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.Pair;
@@ -18,9 +20,14 @@ import rj.grammar.RJParser.PredContext;
 
 public class AliasVisitor {
 	TokenStreamRewriter rewriter;
+	CodePointCharStream input;
 	
 	public AliasVisitor(TokenStreamRewriter rewriter) {
 		this.rewriter = rewriter;
+	}
+	
+	public AliasVisitor(CodePointCharStream input) {
+		this.input = input;
 	}
 
 	/**
@@ -60,12 +67,11 @@ public class AliasVisitor {
 	 * @param rc
 	 * @return
 	 */
-	public static Triple<String, String,List<Pair<String,String>>> getAlias(ParseTree rc) {
+	public Triple<String, String,List<Pair<String,String>>> getAlias(ParseTree rc) {
 		if(rc instanceof AliasContext) {
 			AliasContext ac = (AliasContext) rc;
 			String name = ac.ID_UPPER().getText();
-			String ref = ac.pred().getText();
-			
+			String ref = getText(ac.pred());
 			List<Pair<String,String>> args = getArgsDecl(ac.argDeclID());
 			return new Triple<String, String, List<Pair<String,String>>>(name, ref, args);
 			
@@ -78,13 +84,25 @@ public class AliasVisitor {
 		return null;
 	}
 
-	private static List<Pair<String, String>> getArgsDecl(ArgDeclIDContext argDeclID) {
+	/**
+	 * Returns text with whitespaces
+	 * @param pred
+	 * @return
+	 */
+	private String getText(PredContext pred) {
+		int a = pred.start.getStartIndex();
+		int b = pred.stop.getStopIndex();
+		Interval interval = new Interval(a,b);
+		return input.getText(interval);
+	}
+
+	private List<Pair<String, String>> getArgsDecl(ArgDeclIDContext argDeclID) {
 		List<Pair<String, String>> l = new ArrayList<Pair<String, String>>();
 		auxGetArgsDecl(argDeclID, l);
 		return l;
 	}
 
-	private static void auxGetArgsDecl(ArgDeclIDContext argDeclID, List<Pair<String, String>> l) {
+	private void auxGetArgsDecl(ArgDeclIDContext argDeclID, List<Pair<String, String>> l) {
 		String type = argDeclID.type().getText();
 		String name = argDeclID.ID().getText();
 		l.add(new Pair<>(type, name));

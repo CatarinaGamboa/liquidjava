@@ -25,6 +25,10 @@ import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.RefinementsParser;
+import repair.regen.utils.Pair;
+import repair.regen.utils.Triple;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtNewArray;
@@ -113,8 +117,8 @@ public abstract class TypeChecker extends CtScanner{
 		GhostFunction g = og.get();
 		context.addGhostFunction(g);
 		context.addGhostClass(g.getParentClassName());
-		
-		
+
+
 		List<CtExpression<?>> ls = e.getElements();
 		InvocationPredicate ip = new InvocationPredicate(g.getName(), THIS);
 		int order = 0;
@@ -131,7 +135,7 @@ public abstract class TypeChecker extends CtScanner{
 			}
 			order++;
 		}
-		
+
 	}
 
 	private void createStateGhost(String string, String an, CtElement element) {
@@ -146,7 +150,7 @@ public abstract class TypeChecker extends CtScanner{
 		GhostState gs = new GhostState(s[1], param, r, qn);
 		context.addToGhostClass(sn, gs);
 	}
-	
+
 	protected String getQualifiedClassName(CtElement element) {
 		if(element.getParent() instanceof CtClass<?>) {
 			return ((CtClass<?>) element.getParent()).getQualifiedName();
@@ -155,7 +159,7 @@ public abstract class TypeChecker extends CtScanner{
 		}
 		return null;
 	}
-	
+
 	protected String getSimpleClassName(CtElement element) {
 		if(element.getParent() instanceof CtClass<?>) {
 			return ((CtClass<?>) element.getParent()).getSimpleName();
@@ -166,7 +170,7 @@ public abstract class TypeChecker extends CtScanner{
 
 	}
 
-	
+
 	protected Optional<GhostFunction> createStateGhost(int order, CtElement element){
 		CtClass<?> klass = null; 
 		if(element.getParent() instanceof CtClass<?>) {
@@ -202,10 +206,10 @@ public abstract class TypeChecker extends CtScanner{
 		}
 	}
 
-	protected void handleAlias(String value, CtElement element) {
+	protected void handleAlias(String value, CtElement element) {	
 		try {
-			Optional<Alias> oa = RefinementParser.parseAlias(value);
-			if(oa.isPresent()) {
+			Triple<String, String, List<Pair<String, String>>> a = RefinementsParser.getAliasDeclaration(value);
+			if(a != null) {
 				String klass = null;
 				String path = null;
 				if(element instanceof CtClass) {
@@ -216,12 +220,13 @@ public abstract class TypeChecker extends CtScanner{
 					path = ((CtInterface<?>) element).getQualifiedName();
 				}
 				if(klass != null && path != null) {
-					AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
-					context.addAlias(a);
+					AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
+					context.addAlias(aw);
 				}	
 			}
-		} catch (SyntaxException e) {
-			e.printStackTrace();
+		} catch (ParsingException e) {
+			ErrorPrinter.printCostumeError(element, e.getMessage());
+//			e.printStackTrace();
 		}
 	}
 

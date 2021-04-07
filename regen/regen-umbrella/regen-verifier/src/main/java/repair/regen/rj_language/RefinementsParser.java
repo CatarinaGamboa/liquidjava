@@ -64,9 +64,24 @@ public class RefinementsParser {
 		return GhostVisitor.getGhostInvocations(rc, all);
 	}
 
-	private static Triple<String, String, List<Pair<String,String>>> getAliasDeclaration(String s) throws ParsingException{
-		ParseTree rc = compile(s);
-		return AliasVisitor.getAlias(rc);
+	public static Triple<String, String, List<Pair<String,String>>> getAliasDeclaration(String s) throws ParsingException{
+		CodePointCharStream input;
+		input = CharStreams.fromString(s);
+		RJErrorListener err = new RJErrorListener();
+		RJLexer lexer = new RJLexer(input);
+		lexer.removeErrorListeners();
+		lexer.addErrorListener(err);
+		
+		CommonTokenStream tokens = new CommonTokenStream(lexer);
+		RJParser parser = new RJParser(tokens);
+		parser.setBuildParseTree(true);
+		parser.removeErrorListeners();
+//		parser.addParseListener(new RJListener());
+		parser.addErrorListener(err);
+		
+		RuleContext rc = parser.prog();
+		AliasVisitor av = new AliasVisitor(input);
+		return av.getAlias(rc);
 	}
 	
 	private static Triple<String, String, List<Pair<String,String>>> getGhostDeclaration(String s) throws ParsingException{
@@ -76,7 +91,7 @@ public class RefinementsParser {
 
 	
 	
-	public static RuleContext compile(String toParse) throws ParsingException {
+	private static RuleContext compile(String toParse) throws ParsingException {
 		CodePointCharStream input;
 //		toParse = "x>low&&x<high";
 //		toParse = "((((( Sum (#a_21) == (sum (#a_19) + #v_20)) && (sum (#a_19) == #v_17)) && (#v_17 == 50.0)) && (#v_20 == 60.0)) && !(sum (#a_21) > 30.0))";
@@ -87,7 +102,7 @@ public class RefinementsParser {
 		RJLexer lexer = new RJLexer(input);
 		lexer.removeErrorListeners();
 		lexer.addErrorListener(err);
-		
+			
 		CommonTokenStream tokens = new CommonTokenStream(lexer);
 		
 		RJParser parser = new RJParser(tokens);
@@ -204,7 +219,7 @@ public class RefinementsParser {
 	
 
 	
-	private static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
+	public static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
 		CodePointCharStream input;
 		input = CharStreams.fromString(s);
 		RJErrorListener err = new RJErrorListener();

@@ -14,6 +14,8 @@ import repair.regen.processor.constraints.Disjunction;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
+import repair.regen.utils.Pair;
+import repair.regen.utils.Triple;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.filter.CatchVariableScopeFunction;
@@ -23,19 +25,22 @@ public class AliasWrapper {
 	private List<CtTypeReference<?>> varTypes;
 	private List<String> varNames;
 	private Predicate expression;
-	private Context context;
+//	private Context context;
 	
 	private String newAliasFormat = "#alias_%s_%d";
 
-	public AliasWrapper(Alias alias, Factory factory, String wildvar, Context c, String klass, String path) {
-		name = alias.getName();
-		this.varNames = alias.getVariableNames();
-		this.varTypes = new ArrayList<>();
-		for(String t:alias.getTypesNames())
-			this.varTypes.add(Utils.getType(t.toString().equals(klass)? path: t.toString(), factory));
-//			this.varTypes.add(Utils.getType(t, factory));
-		this.expression = new Predicate(alias.getExpression());
-		context= c;
+	public AliasWrapper(Triple<String, String, List<Pair<String, String>>> alias, Factory factory, String wILD_VAR,
+			Context context2, String klass, String path) {
+		name = alias.getFist();
+		expression = new Predicate(alias.getSecond());
+		
+		varTypes = new ArrayList<>();
+		varNames = new ArrayList<>();
+		for(Pair<String,String> p : alias.getThird()) {
+			CtTypeReference<?> r = Utils.getType(p.getFirst().equals(klass)? path: p.getFirst(), factory);
+			varTypes.add(r);
+			varNames.add(p.getSecond());
+		}			
 	}
 
 	public String getName() {
@@ -81,7 +86,7 @@ public class AliasWrapper {
 		return lp;
 	}
 
-	public List<String> getNewVariables() {
+	public List<String> getNewVariables(Context context) {
 		List<String> n = new ArrayList<>();
 		for(int i=0; i < varNames.size(); i++) 
 			n.add(String.format(newAliasFormat, varNames.get(i), context.getCounter()));

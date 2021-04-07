@@ -1,6 +1,7 @@
 package repair.regen.smt;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -300,35 +301,36 @@ public class TranslatorToZ3 {
 
 	//REMAKE
 	public Expression makeAlias(AliasName name, List<Expression> list) throws TypeMismatchError, Exception {
-		if(!aliasTranslation.containsKey(name.toString()))
-			throw new NotFoundError("Alias '"+ name.toString() + "' not found");
-		AliasWrapper al = aliasTranslation.get(name.toString());
-		if(al.getVarNames().size() != list.size())
-			throw new TypeMismatchError("Arguments do not match: invocation size "+
-		list.size()+", expected size:"+al.getVarNames().size());
-		List<String> newNames = al.getNewVariables();
-		TranslatorContextToZ3.translateVariables(z3, al.getTypes(newNames), varTranslation);
-		
-		checkTypes(list, al.getTypes());
-		
-		Expression e = al.getNewExpression(newNames);
-		Expression add = al.getPremises(list, newNames);
-		premisesToAdd.add(add);
-
-//		System.out.println("Make Alias:" + e.toString());
-		return e;
+//		if(!aliasTranslation.containsKey(name.toString()))
+//			throw new NotFoundError("Alias '"+ name.toString() + "' not found");
+//		AliasWrapper al = aliasTranslation.get(name.toString());
+//		if(al.getVarNames().size() != list.size())
+//			throw new TypeMismatchError("Arguments do not match: invocation size "+
+//		list.size()+", expected size:"+al.getVarNames().size());
+//		List<String> newNames = al.getNewVariables();
+//		TranslatorContextToZ3.translateVariables(z3, al.getTypes(newNames), varTranslation);
+//		
+//		checkTypes(list, al.getTypes());
+//		
+//		Expression e = al.getNewExpression(newNames);
+//		Expression add = al.getPremises(list, newNames);
+//		premisesToAdd.add(add);
+//
+////		System.out.println("Make Alias:" + e.toString());
+		fail("Came to eval alias");
+		return null;
 	}
 
 	//REMAKE
 	private void checkTypes(List<Expression> list, List<CtTypeReference<?>> types) throws Exception {
-		for (int i = 0; i < list.size(); i++) {
-			Sort se = (list.get(i).eval(this)).getSort();
-			Sort st = TranslatorContextToZ3.getSort(z3,types.get(i).getQualifiedName());
-			if(!se.equals(st))
-				throw new TypeMismatchError("Types of arguments do not match. Got "+
-						list.get(i)+":"+se.toString()+" but expected "+st.toString());
-		}
-		
+//		for (int i = 0; i < list.size(); i++) {
+//			Sort se = (list.get(i).eval(this)).getSort();
+//			Sort st = TranslatorContextToZ3.getSort(z3,types.get(i).getQualifiedName());
+//			if(!se.equals(st))
+//				throw new TypeMismatchError("Types of arguments do not match. Got "+
+//						list.get(i)+":"+se.toString()+" but expected "+st.toString());
+//		}
+//		
 	}
 
 }
