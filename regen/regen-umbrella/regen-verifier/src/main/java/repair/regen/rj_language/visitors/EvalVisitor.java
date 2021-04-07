@@ -1,5 +1,7 @@
 package repair.regen.rj_language.visitors;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +26,7 @@ import rj.grammar.RJParser.LitGroupContext;
 import rj.grammar.RJParser.LiteralContext;
 import rj.grammar.RJParser.LiteralExpressionContext;
 import rj.grammar.RJParser.OpArithContext;
+import rj.grammar.RJParser.OpGroupContext;
 import rj.grammar.RJParser.OpLiteralContext;
 import rj.grammar.RJParser.OpMinusContext;
 import rj.grammar.RJParser.OpNotContext;
@@ -136,10 +139,15 @@ public class EvalVisitor {
 		}else if(rc instanceof OpMinusContext) {
 			OpMinusContext omc = (OpMinusContext) rc;
 			return ctx.makeMinus(eval(omc.operand()));
-		}else {
+		}else if(rc instanceof OpNotContext){
 			OpNotContext onc = (OpNotContext) rc;
 			return ctx.mkNot(eval(onc.operand()));
-		} 
+		} else if(rc instanceof OpGroupContext) {
+			OpGroupContext onc = (OpGroupContext) rc;
+			return eval(onc.operand());
+		}
+		fail("Error achevied case not covered in operandEvaluate");
+		return null;
 	}
 
 	private Expr literalExpressionEvaluate(ParseTree rc) throws Exception{
@@ -148,7 +156,6 @@ public class EvalVisitor {
 		else if(rc instanceof LitContext)
 			return eval(((LitContext)rc).literal());
 		else if(rc instanceof VarContext) {
-//			((VarContext)rc)
 			return varEvaluate(((VarContext)rc).ID());
 		}else if(rc instanceof TargetInvocationContext) {
 			//TODO Finish Invocation with Target (a.len())
@@ -168,13 +175,6 @@ public class EvalVisitor {
 			}else {
 				Expr[] ps = new Expr[0];
 				return ctx.makeFunctionInvocation(c.ID().getText(), ps);
-			}
-		}else {
-			AliasCallContext c = rc.aliasCall();
-			if(c.args() != null) {
-				//TODO Alias Call
-			}else {
-				//TODO Alias Call
 			}
 		}
 		return null;

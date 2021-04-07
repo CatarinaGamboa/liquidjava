@@ -9,7 +9,7 @@ public class IfThenElse extends Constraint{
 	private Constraint ite;
 	
 	public IfThenElse(Constraint a, Constraint b, Constraint c) {
-		String s = String.format("(%s) ? (%s) :_(%s)", a, b, c);
+		String s = String.format("((%s) ? (%s) : (%s))", a, b, c);
 		ite = new Predicate(s);
 	}
 	public IfThenElse(Constraint e) {

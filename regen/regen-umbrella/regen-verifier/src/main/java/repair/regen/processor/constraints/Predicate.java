@@ -146,7 +146,7 @@ public class Predicate extends Constraint{
 	}
 
 
-	public boolean isBooleanTrue() {//TODO rever
+	public boolean isBooleanTrue() {
 		try {
 			return RefinementsParser.isTrue(exp);
 		} catch (ParsingException e) {

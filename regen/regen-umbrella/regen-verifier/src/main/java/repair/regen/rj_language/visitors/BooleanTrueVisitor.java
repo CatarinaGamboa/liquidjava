@@ -33,9 +33,9 @@ public class BooleanTrueVisitor {
 			return isTrue(((PredLogicContext)rc).pred(0)) &&
 				   isTrue(((PredLogicContext)rc).pred(1));
 		}else if(rc instanceof IteContext)	
-			return isTrue(((PredLogicContext)rc).pred(0)) &&
-					   isTrue(((PredLogicContext)rc).pred(1))&&
-					   isTrue(((PredLogicContext)rc).pred(2));
+			return isTrue(((IteContext)rc).pred(0)) &&
+					   isTrue(((IteContext)rc).pred(1))&&
+					   isTrue(((IteContext)rc).pred(2));
 		else if(rc instanceof PredExpContext)
 			return isTrue(((PredExpContext)rc).exp());
 		else if(rc instanceof ExpGroupContext)

@@ -29,6 +29,7 @@ operand:
 	|	operand '-'	operand			#opSub
 	|	'-' operand					#opMinus
 	|	'!' operand					#opNot
+	|	'(' operand ')'				#opGroup
 	;
 
 	 
@@ -94,7 +95,7 @@ BOOL    : 'true' | 'false';
 ID_UPPER: ([A-Z][a-zA-Z0-9]*);
 OBJECT_TYPE: 
 		  (([a-zA-Z][a-zA-Z0-9]+) ('.' [a-zA-Z][a-zA-Z0-9]*)+);
-ID     	: '#'*[a-zA-Z_][a-zA-Z0-9_]*;
+ID     	: '#'*[a-zA-Z_][a-zA-Z0-9_#]*;
 STRING  : '"'(~["])*'"';
 INT     : 	(([0-9]+) |	([0-9]+('_'[0-9]+)*));
 REAL   	: (([0-9]+('.'[0-9]+)?) | '.'[0-9]+);
