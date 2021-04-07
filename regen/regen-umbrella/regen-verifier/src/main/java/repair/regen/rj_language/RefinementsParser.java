@@ -20,6 +20,7 @@ import repair.regen.rj_language.visitors.EvalVisitor;
 import repair.regen.rj_language.visitors.GhostVisitor;
 import repair.regen.rj_language.visitors.StateVisitor;
 import repair.regen.rj_language.visitors.SubstituteVisitor;
+import repair.regen.rj_language.visitors.VariableVisitor;
 import repair.regen.smt.TranslatorToZ3;
 import repair.regen.utils.Pair;
 import repair.regen.utils.Triple;
@@ -43,6 +44,8 @@ public class RefinementsParser {
 //		ParseTree t = compile("b > 5 && b < a && d == (50 + a)");
 //		System.out.println(t.getText());
 		
+//		System.out.println(getVariableNames("a && b == 7 && olhaoutravariavel != 0"));
+		
 	}
 
 
@@ -57,6 +60,11 @@ public class RefinementsParser {
 	public static boolean isTrue(String s) throws ParsingException {
 		ParseTree rc = compile(s);
 		return BooleanTrueVisitor.isTrue(rc);
+	}
+	
+	public static List<String> getVariableNames(String s) throws ParsingException {
+		ParseTree rc = compile(s);
+		return VariableVisitor.getNames(rc);
 	}
 	
 	public static List<String> getGhostInvocations(String s, List<String> all) throws ParsingException {
@@ -215,33 +223,6 @@ public class RefinementsParser {
 		return rewriter.getText();
 	}
 	
-	
-	public static String changeState(String s, Map<String,String> nameRefinementMap, String[] toChange) throws Exception {
-		Optional<String> os = getErrors(s);
-		if(os.isPresent())
-			throw new ParsingException(os.get());
-		CodePointCharStream input;
-		input = CharStreams.fromString(s);
-		RJErrorListener err = new RJErrorListener();
-		RJLexer lexer = new RJLexer(input);
-		lexer.removeErrorListeners();
-		lexer.addErrorListener(err);
-		
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
-		
-		RJParser parser = new RJParser(tokens);
-		parser.setBuildParseTree(true);
-		parser.removeErrorListeners();
-//		parser.addParseListener(new RJListener());
-		parser.addErrorListener(err);
-		
-		RuleContext rc = parser.prog();
-		StateVisitor sv = new StateVisitor(rewriter);
-		sv.changeState(rc, nameRefinementMap, toChange);
-		
-		return rewriter.getText();
-	}
 	
 
 	

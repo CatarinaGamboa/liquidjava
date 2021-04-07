@@ -31,8 +31,8 @@ public class TestInsideClasses {
 		GhostState sss = new GhostState("red", l, intt, "A");
 		List<GhostState> gh = new ArrayList<>();
 		gh.add(s);gh.add(ss);gh.add(sss);
-		Predicate p = new Predicate("green(this) && red(this) == 10 && u(3)");
-		System.out.println(p.getGhostInvocations(gh));
+		Predicate p = new Predicate("green(this) && red(this) == iio && u(3)");
+		System.out.println(p.getVariableNames());
 		
 	}
 

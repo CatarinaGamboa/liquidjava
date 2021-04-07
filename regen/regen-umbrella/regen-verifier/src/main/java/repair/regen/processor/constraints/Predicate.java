@@ -1,10 +1,11 @@
 package repair.regen.processor.constraints;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import repair.regen.language.BooleanLiteral;
 import repair.regen.language.Expression;
 import repair.regen.processor.context.GhostState;
 import repair.regen.rj_language.ParsingException;
@@ -95,9 +96,12 @@ public class Predicate extends Constraint{
 	@Override
 	public List<String> getVariableNames() {
 		List<String> l = new ArrayList<>();
-//		exp.getVariableNames(l);
-		
-		//TODO
+		try {
+			l = RefinementsParser.getVariableNames(s);
+			return l;
+		}catch(ParsingException e) {
+			ErrorPrinter.printSyntaxError(e.getMessage(), s);
+		}
 		return l;
 	}
 	
@@ -121,26 +125,43 @@ public class Predicate extends Constraint{
 	}
 
 	public Constraint changeOldMentions(String previousName, String newName) {
-		Constraint c = this.clone();
-		AuxVisitTree.changeOldMentions(c.getExpression(), previousName, newName);
-		return c;
+		try {
+			String ns = RefinementsParser.changeOldTo(s, previousName, newName);
+			return new Predicate(ns);
+		} catch (ParsingException e) {
+			ErrorPrinter.printSyntaxError(e.getMessage(), s);
+		}
+		return null;
 	}
 	
 	@Override
-	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
-		Constraint c = this.clone();
-		AuxVisitTree.changeStateRefinements(c.getExpression(), ghostState);
-		return c;
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange) {
+		Map<String,String> nameRefinementMap = new HashMap<>();
+		for(GhostState gs: ghostState)
+			nameRefinementMap.put(gs.getName(), gs.getRefinement().toString());
+		
+		try {
+			String ns = RefinementsParser.changeStateRefinement(s, nameRefinementMap, toChange);
+			return new Predicate(ns);
+		} catch (Exception e) {
+			ErrorPrinter.printSyntaxError(e.getMessage(), s);
+		}
+		return null;
 	}
 
 
 	public boolean isBooleanTrue() {//TODO rever
-		return exp instanceof BooleanLiteral || AuxVisitTree.isTrue(exp);
+		try {
+			return RefinementsParser.isTrue(s);
+		} catch (ParsingException e) {
+			ErrorPrinter.printSyntaxError(e.getMessage(), s);
+		}
+		return false;
 	}
 	
 	@Override
 	public String toString() {
-		return exp.toString();
+		return s;
 	}
 
 	@Override

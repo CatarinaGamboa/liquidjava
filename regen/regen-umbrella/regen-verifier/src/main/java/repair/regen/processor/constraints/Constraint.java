@@ -13,10 +13,9 @@ public abstract class Constraint {
 	public abstract Constraint clone();
 	public abstract List<String> getVariableNames();
 	public abstract String toString();
-	public abstract Expression getExpression();
 	public abstract boolean isBooleanTrue();
 	public abstract Constraint changeOldMentions(String previousName, String newName);
-	public abstract Constraint changeStatesToRefinements(List<GhostState> ghostState);
+	public abstract Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange);
 	
 
 }
