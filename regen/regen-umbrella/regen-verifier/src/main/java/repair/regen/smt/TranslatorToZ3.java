@@ -82,7 +82,7 @@ public class TranslatorToZ3 {
 	
 	private Expr getVariableTranslation(String name) throws Exception {
 		if(!varTranslation.containsKey(name))
-			throw new NotFoundError("Variable "+ name.toString() + " not found");
+			throw new NotFoundError("Variable '"+ name.toString() + "' not found");
 		Expr e= varTranslation.get(name);
 		if(e == null)
 			e = varTranslation.get(String.format("this#%s", name));
