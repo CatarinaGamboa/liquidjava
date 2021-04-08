@@ -10,6 +10,7 @@ public class GroupExpression extends Expression {
 	private Expression e;
 	public GroupExpression(Expression e) {
 		this.e = e;
+		addChild(e);
 	}
 
 	@Override

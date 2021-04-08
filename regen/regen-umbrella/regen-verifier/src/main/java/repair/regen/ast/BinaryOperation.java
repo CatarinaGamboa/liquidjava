@@ -15,6 +15,8 @@ public class BinaryOperation extends Expression{
 		this.e1 = e1;
 		this.op = op;
 		this.e2 = e2;
+		addChild(e1);
+		addChild(e2);
 	}
 	
 	@Override

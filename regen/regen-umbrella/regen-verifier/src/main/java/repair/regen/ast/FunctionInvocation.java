@@ -16,6 +16,8 @@ public class FunctionInvocation extends Expression{
 	public FunctionInvocation(String name, List<Expression> args) {
 		this.name = name;
 		this.args = args;
+		for(Expression e: args)
+			addChild(e);
 	}
 
 	@Override

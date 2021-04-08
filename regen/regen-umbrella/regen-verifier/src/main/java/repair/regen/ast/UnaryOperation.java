@@ -14,6 +14,7 @@ public class UnaryOperation extends Expression{
 	public UnaryOperation(String op, Expression e) {
 		this.op = op;
 		this.e = e;
+		addChild(e);
 	}
 	
 	@Override

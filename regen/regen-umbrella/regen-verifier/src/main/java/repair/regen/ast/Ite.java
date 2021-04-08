@@ -15,6 +15,9 @@ public class Ite extends Expression{
 		cond = e1;
 		then = e2;
 		els = e3;
+		addChild(cond);
+		addChild(then);
+		addChild(els);
 	}
 
 	@Override
