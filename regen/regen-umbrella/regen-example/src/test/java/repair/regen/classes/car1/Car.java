@@ -25,10 +25,10 @@ public class Car {
 	}
 
 
-	@Refinement("_ == GreaterThan(year, y)")
-	public boolean isOlderThan(int y) {
-		return this.year > y;
-	}
+//	@Refinement("_ == GreaterThan(year, y)")
+//	public boolean isOlderThan(int y) {
+//		return this.year > y;
+//	}
 
 
 }

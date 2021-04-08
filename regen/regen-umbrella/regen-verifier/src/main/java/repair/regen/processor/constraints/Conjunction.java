@@ -52,7 +52,7 @@ public class Conjunction extends Constraint{
 
 	@Override
 	public String toString() {
-		return String.format("(%s && %s)", group(c1.getExpression()), group(c2.getExpression()));
+		return String.format("((%s) && (%s))", group(c1.getExpression()), group(c2.getExpression()));
 	}
 
 	@Override

@@ -1,6 +1,18 @@
 package repair.regen.classes.traffic_light_1;
 
 
+// @StateRefinement(from="green(this)", to="solidAmber(this)")
+// @Refinement("this == _")
+// public TrafficLight transitionToAmber2() {
+// //...
+// return this;
+// }
+// @StateRefinement(to="green(this)")
+// @Refinement("_ >= 0")
+// public int getTotalChangesReset() {
+// return 0;//count
+// }
+// 
 // @StateRefinement(from="red(this)")
 // public void passagersCross() {}
 // 
@@ -46,19 +58,6 @@ public class TrafficLight {
         t.transitionToAmber();
         t.transitionToRed();
         return t;
-    }
-
-    // @StateRefinement(from="green(this)", to="solidAmber(this)")
-    // @Refinement("this == _")
-    // public TrafficLight transitionToAmber2() {
-    // //...
-    // return this;
-    // }
-    @repair.regen.specification.StateRefinement(to = "green(this)")
-    @repair.regen.specification.Refinement("_ >= 0")
-    public int getTotalChangesReset() {
-        return 0;// count
-
     }
 }
 
