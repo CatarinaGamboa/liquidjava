@@ -27,10 +27,8 @@ package regen.test.project;
 @repair.regen.specification.RefinementAlias("type Percentage(int x) { x >= 0 && x <= 100}")
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        @repair.regen.specification.Refinement("Percentage(a)")
-        int a = 10;
-        @repair.regen.specification.Refinement("t > 0")
-        int t = a + 1;
+        @repair.regen.specification.Refinement("b > 6 && b < 50")
+        int b = 10;
         // @Refinement("_ > 10")
         // int i = 10;
         // @Refinement("sum(_) > 30")

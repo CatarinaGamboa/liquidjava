@@ -33,7 +33,9 @@ import rj.grammar.RJParser;
 public class RefinementsParser {
 	public static void main(String[] args) throws Exception {
 //		String toParse = "int between(double x, int low, java.lang.String)";
-//		String rr = "Between(5, 10 + 4, yy) && yy > 10 && foo(x)";
+		String rr = "Between(5, 10 + 4, yy) && yy > 10 && foo(x)";
+		Expression e = createAST(rr);
+		System.out.println(e);
 		
 //		List<String> vars = new ArrayList<>();
 //		vars.add("x");vars.add("low");vars.add("high");
@@ -62,6 +64,10 @@ public class RefinementsParser {
 		ParseTree rc = compile(s);
 		EvalVisitor visitor = new EvalVisitor(ctx);
 		Expr e =  visitor.eval(rc);
+		
+		Expression ee = createAST(s); 
+		Expr e2 = ee.eval(ctx);
+		
 		return e;
 	}
 	

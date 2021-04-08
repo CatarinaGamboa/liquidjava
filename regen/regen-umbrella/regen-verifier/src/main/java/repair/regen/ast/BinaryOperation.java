@@ -25,11 +25,11 @@ public class BinaryOperation extends Expression{
 	private Expr evalBinaryOp(TranslatorToZ3 ctx, Expr e1, Expr e2) {
 		switch (op) {
 		case "&&":
-			return ctx.makeEquals(e1, e2);
+			return ctx.makeAnd(e1, e2);
 		case "||":
-			return ctx.mkNot(ctx.makeEquals(e1, e2));
+			return ctx.makeOr(e1,e2);
 		case "-->":
-			return ctx.makeGtEq(e1, e2);
+			return ctx.makeImplies(e1, e2);
 		case "==":
 			return ctx.makeEquals(e1, e2);
 		case "!=":
