@@ -24,6 +24,4 @@ public class LiteralBoolean extends Expression{
 		return Boolean.toString(value);
 	}
 
-	
-
 }

@@ -13,9 +13,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import com.microsoft.z3.Expr;
 
+import repair.regen.ast.Expression;
 import repair.regen.rj_language.visitors.AliasVisitor;
 import repair.regen.rj_language.visitors.BooleanTrueVisitor;
 import repair.regen.rj_language.visitors.ChangeOldVisitor;
+import repair.regen.rj_language.visitors.CreateASTVisitor;
 import repair.regen.rj_language.visitors.EvalVisitor;
 import repair.regen.rj_language.visitors.GhostVisitor;
 import repair.regen.rj_language.visitors.StateVisitor;
@@ -46,6 +48,12 @@ public class RefinementsParser {
 		
 //		System.out.println(getVariableNames("a && b == 7 && olhaoutravariavel != 0"));
 		
+	}
+	
+	
+	public static Expression createAST(String toParse) throws ParsingException {
+		ParseTree pt = compile(toParse);
+		return CreateASTVisitor.create(pt);
 	}
 
 
