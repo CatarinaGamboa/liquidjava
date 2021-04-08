@@ -1,5 +1,7 @@
 package repair.regen.ast;
 
+import java.util.List;
+
 import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
@@ -19,6 +21,27 @@ public class Var extends Expression{
 	
 	public String toString() {
 		return name;
+	}
+
+	@Override
+	public void substitute(String from, String to) {
+		if(name.equals(from))
+			name = to;
+	}
+
+	@Override
+	public void getVariableNames(List<String> toAdd) {
+		toAdd.add(name);
+	}
+
+	@Override
+	public void getGhostInvocations(List<String> toAdd) {
+		//end leaf
+	}
+
+	@Override
+	public Expression clone() {
+		return new Var(name);
 	}
 	
 	

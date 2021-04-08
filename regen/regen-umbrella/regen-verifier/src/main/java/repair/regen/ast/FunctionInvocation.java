@@ -1,5 +1,6 @@
 package repair.regen.ast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -29,6 +30,34 @@ public class FunctionInvocation extends Expression{
 	@Override
 	public String toString() {
 		return name+"("+args.stream().map(p->p.toString()).collect(Collectors.joining(","))+")";
+	}
+
+	@Override
+	public void substitute(String from, String to) {
+		for(Expression e: args)
+			e.substitute(from, to);
+	}
+
+	@Override
+	public void getVariableNames(List<String> toAdd) {
+		for(Expression e: args)
+			e.getVariableNames(toAdd);
+		
+	}
+
+	@Override
+	public void getGhostInvocations(List<String> toAdd) {
+		toAdd.add(name);
+		for(Expression e: args)
+			e.getGhostInvocations(toAdd);
+	}
+
+	@Override
+	public Expression clone() {
+		List<Expression> le = new ArrayList<>();
+		for(Expression e: args)
+			le.add(e.clone());
+		return new FunctionInvocation(name, le);
 	}
 
 }

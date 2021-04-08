@@ -1,5 +1,7 @@
 package repair.regen.ast;
 
+import java.util.List;
+
 import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
@@ -56,6 +58,29 @@ public class BinaryOperation extends Expression{
 	@Override
 	public String toString() {
 		return e1.toString() + " " + op + " " + e2.toString();
+	}
+
+	@Override
+	public void substitute(String from, String to) {
+		e1.substitute(from, to);
+		e2.substitute(from, to);
+	}
+
+	@Override
+	public void getVariableNames(List<String> toAdd) {
+		e1.getVariableNames(toAdd);
+		e2.getVariableNames(toAdd);
+	}
+
+	@Override
+	public void getGhostInvocations(List<String> toAdd) {
+		e1.getGhostInvocations(toAdd);
+		e2.getGhostInvocations(toAdd);
+	}
+
+	@Override
+	public Expression clone() {
+		return new BinaryOperation(e1.clone(), op, e2.clone());
 	}
 
 }
