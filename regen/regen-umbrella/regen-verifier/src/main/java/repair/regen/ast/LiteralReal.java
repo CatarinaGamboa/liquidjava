@@ -50,4 +50,8 @@ public class LiteralReal extends Expression{
 		return new LiteralReal(value);
 	}
 	
+	@Override
+	public boolean isBooleanTrue() {
+		return false;
+	}
 }

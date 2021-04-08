@@ -31,7 +31,8 @@ public class Var extends Expression{
 
 	@Override
 	public void getVariableNames(List<String> toAdd) {
-		toAdd.add(name);
+		if(!toAdd.contains(name))
+			toAdd.add(name);
 	}
 
 	@Override
@@ -44,6 +45,9 @@ public class Var extends Expression{
 		return new Var(name);
 	}
 	
-	
+	@Override
+	public boolean isBooleanTrue() {
+		return false;
+	}
 
 }

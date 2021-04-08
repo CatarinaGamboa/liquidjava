@@ -49,7 +49,8 @@ public class FunctionInvocation extends Expression{
 
 	@Override
 	public void getGhostInvocations(List<String> toAdd) {
-		toAdd.add(name);
+		if(!toAdd.contains(name))
+			toAdd.add(name);
 		for(Expression e: args)
 			e.getGhostInvocations(toAdd);
 	}
@@ -60,6 +61,11 @@ public class FunctionInvocation extends Expression{
 		for(Expression e: args)
 			le.add(e.clone());
 		return new FunctionInvocation(name, le);
+	}
+	
+	@Override
+	public boolean isBooleanTrue() {
+		return false;
 	}
 
 }

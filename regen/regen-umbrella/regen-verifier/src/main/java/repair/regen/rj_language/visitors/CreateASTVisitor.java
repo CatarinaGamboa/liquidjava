@@ -8,7 +8,7 @@ import java.util.List;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import repair.regen.ast.AliasInvocation;
-import repair.regen.ast.BinaryOperation;
+import repair.regen.ast.BinaryExpression;
 import repair.regen.ast.Expression;
 import repair.regen.ast.FunctionInvocation;
 import repair.regen.ast.GroupExpression;
@@ -17,7 +17,7 @@ import repair.regen.ast.LiteralBoolean;
 import repair.regen.ast.LiteralInt;
 import repair.regen.ast.LiteralReal;
 import repair.regen.ast.LiteralString;
-import repair.regen.ast.UnaryOperation;
+import repair.regen.ast.UnaryExpression;
 import repair.regen.ast.Var;
 import rj.grammar.RJParser.AliasCallContext;
 import rj.grammar.RJParser.ArgsContext;
@@ -94,10 +94,10 @@ public class CreateASTVisitor {
 		if(rc instanceof PredGroupContext)
 			return new GroupExpression(create(((PredGroupContext)rc).pred()));
 		else if(rc instanceof PredNegateContext)
-			return new UnaryOperation("!", 
+			return new UnaryExpression("!", 
 					create(((PredNegateContext)rc).pred()));
 		else if(rc instanceof PredLogicContext)
-			return new BinaryOperation(
+			return new BinaryExpression(
 					create(((PredLogicContext)rc).pred(0)),
 					((PredLogicContext)rc).LOGOP().getText(),
 					create(((PredLogicContext)rc).pred(1)));
@@ -114,7 +114,7 @@ public class CreateASTVisitor {
 		if(rc instanceof ExpGroupContext)
 			return new GroupExpression(create(((ExpGroupContext)rc).exp()));
 		else if(rc instanceof ExpBoolContext) {
-			return new BinaryOperation(
+			return new BinaryExpression(
 					create(((ExpBoolContext)rc).exp(0)),
 					((ExpBoolContext)rc).BOOLOP().getText(),
 					create(((ExpBoolContext)rc).exp(1)));
@@ -128,19 +128,19 @@ public class CreateASTVisitor {
 		if(rc instanceof OpLiteralContext)
 			return create(((OpLiteralContext)rc).literalExpression());
 		else if(rc instanceof OpArithContext)
-			return new BinaryOperation(
+			return new BinaryExpression(
 					create(((OpArithContext)rc).operand(0)),
 					((OpArithContext)rc).ARITHOP().getText(),
 					create(((OpArithContext)rc).operand(1)));
 		else if(rc instanceof OpSubContext) 
-			return new BinaryOperation(
-					create(((OpArithContext)rc).operand(0)),
+			return new BinaryExpression(
+					create(((OpSubContext)rc).operand(0)),
 					"-",
-					create(((OpArithContext)rc).operand(1)));
+					create(((OpSubContext)rc).operand(1)));
 		else if(rc instanceof OpMinusContext)
-			return new UnaryOperation("-", create(((OpMinusContext)rc).operand()));
+			return new UnaryExpression("-", create(((OpMinusContext)rc).operand()));
 		else if(rc instanceof OpNotContext)
-			return new UnaryOperation("!", create(((OpMinusContext)rc).operand()));
+			return new UnaryExpression("!", create(((OpNotContext)rc).operand()));
 		else if(rc instanceof OpGroupContext)
 			return new GroupExpression(create(((OpGroupContext)rc).operand()));
 		

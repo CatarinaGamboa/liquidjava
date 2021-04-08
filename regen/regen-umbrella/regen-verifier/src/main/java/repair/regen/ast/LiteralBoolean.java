@@ -46,5 +46,9 @@ public class LiteralBoolean extends Expression{
 	public Expression clone() {
 		return new LiteralBoolean(value);
 	}
+	@Override
+	public boolean isBooleanTrue() {
+		return value;
+	}
 
 }

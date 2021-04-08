@@ -58,4 +58,9 @@ public class AliasInvocation extends Expression{
 			le.add(e.clone());
 		return new AliasInvocation(name, le);
 	}
+
+	@Override
+	public boolean isBooleanTrue() {
+		return false;
+	}
 }

@@ -1,4 +1,5 @@
 package repair.regen.rj_language;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,25 +66,53 @@ public class RefinementsParser {
 		EvalVisitor visitor = new EvalVisitor(ctx);
 		Expr e =  visitor.eval(rc);
 		
+		//try ast
 		Expression ee = createAST(s); 
 		Expr e2 = ee.eval(ctx);
+		
+		assert(e.equals(e2));
 		
 		return e;
 	}
 	
 	public static boolean isTrue(String s) throws ParsingException {
 		ParseTree rc = compile(s);
-		return BooleanTrueVisitor.isTrue(rc);
+		
+		//test ast
+		List<String> la = new ArrayList<>();
+		Expression ee = createAST(s); 
+		boolean eb = ee.isBooleanTrue();
+		
+		boolean b = BooleanTrueVisitor.isTrue(rc);
+		assert(eb == b); 
+		return b;
 	}
 	
 	public static List<String> getVariableNames(String s) throws ParsingException {
 		ParseTree rc = compile(s);
-		return VariableVisitor.getNames(rc);
+		//test ast
+		List<String> la = new ArrayList<>();
+		Expression ee = createAST(s); 
+		ee.getVariableNames(la);
+		
+		List<String> l = VariableVisitor.getNames(rc);
+		assert(l.equals(la));
+		
+		return l;
 	}
 	
 	public static List<String> getGhostInvocations(String s, List<String> all) throws ParsingException {
 		ParseTree rc = compile(s);
-		return GhostVisitor.getGhostInvocations(rc, all);
+		
+		//test ast
+		List<String> la = new ArrayList<>();
+		Expression ee = createAST(s); 
+		ee.getGhostInvocations(la);
+	
+		List<String> l = GhostVisitor.getGhostInvocations(rc, all);
+		assert(l.equals(la));
+		
+		return l;
 	}
 	
 	/**

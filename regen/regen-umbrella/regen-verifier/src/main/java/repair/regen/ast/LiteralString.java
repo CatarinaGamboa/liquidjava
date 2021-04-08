@@ -39,5 +39,10 @@ public class LiteralString extends Expression{
 	public Expression clone() {
 		return new LiteralString(value);
 	}
+	
+	@Override
+	public boolean isBooleanTrue() {
+		return false;
+	}
 
 }

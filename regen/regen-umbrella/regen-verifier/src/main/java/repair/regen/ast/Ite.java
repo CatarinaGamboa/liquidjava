@@ -53,10 +53,14 @@ public class Ite extends Expression{
 
 	@Override
 	public Expression clone() {
-		// TODO Auto-generated method stub
-		return null;
+		return new Ite(cond.clone(), then.clone(), els.clone());
 	}
 	
+	@Override
+	public boolean isBooleanTrue() {
+		return cond.isBooleanTrue() && then.isBooleanTrue() 
+				&& els.isBooleanTrue();
+	}
 	
 
 }

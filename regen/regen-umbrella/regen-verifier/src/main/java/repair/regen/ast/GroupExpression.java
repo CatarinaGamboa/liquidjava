@@ -19,7 +19,7 @@ public class GroupExpression extends Expression {
 	}
 	
 	public String toString() {
-		return e.toString();
+		return "("+e.toString()+")";
 	}
 
 	@Override
@@ -40,6 +40,11 @@ public class GroupExpression extends Expression {
 	@Override
 	public Expression clone() {
 		return new GroupExpression(e.clone());
+	}
+	
+	@Override
+	public boolean isBooleanTrue() {
+		return e.isBooleanTrue();
 	}
 	
 

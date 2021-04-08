@@ -51,5 +51,9 @@ public class LiteralInt extends Expression{
 		return new LiteralInt(value);
 	}
 	
+	@Override
+	public boolean isBooleanTrue() {
+		return false;
+	}
 
 }

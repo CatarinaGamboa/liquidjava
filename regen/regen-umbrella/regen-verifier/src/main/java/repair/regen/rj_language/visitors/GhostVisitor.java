@@ -26,7 +26,8 @@ public class GhostVisitor {
 			for(String name:all)
 				if(name.equals(ghostName))
 					toAdd.add(name);	
-		}else if (rc.getChildCount() > 0) {
+		}
+		if (rc.getChildCount() > 0) {
 			int i = rc.getChildCount();
 			for (int j = 0; j < i; j++) {
 				getGhostsInvocations(rc.getChild(j), toAdd, all);

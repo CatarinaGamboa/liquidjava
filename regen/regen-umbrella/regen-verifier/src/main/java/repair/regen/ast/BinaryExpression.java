@@ -6,12 +6,12 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-public class BinaryOperation extends Expression{
+public class BinaryExpression extends Expression{
 	private Expression e1;
 	private String op;
 	private Expression e2;
 
-	public BinaryOperation(Expression e1, String op, Expression e2) {
+	public BinaryExpression(Expression e1, String op, Expression e2) {
 		this.e1 = e1;
 		this.op = op;
 		this.e2 = e2;
@@ -78,11 +78,29 @@ public class BinaryOperation extends Expression{
 	public void getGhostInvocations(List<String> toAdd) {
 		e1.getGhostInvocations(toAdd);
 		e2.getGhostInvocations(toAdd);
+		System.out.println();
 	}
 
 	@Override
 	public Expression clone() {
-		return new BinaryOperation(e1.clone(), op, e2.clone());
+		return new BinaryExpression(e1.clone(), op, e2.clone());
+	}
+	
+	@Override
+	public boolean isBooleanTrue() {
+		switch(op) {
+		case "&&":
+			return e1.isBooleanTrue() && e2.isBooleanTrue();
+		case "||":
+			return e1.isBooleanTrue() && e2.isBooleanTrue();
+		case "-->":
+			return e1.isBooleanTrue() && e2.isBooleanTrue();
+		case "==":
+			return e1.isBooleanTrue() && e2.isBooleanTrue();
+		default:
+			return false;
+		}
+		
 	}
 
 }

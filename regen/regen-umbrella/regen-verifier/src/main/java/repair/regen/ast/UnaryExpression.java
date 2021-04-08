@@ -6,12 +6,12 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-public class UnaryOperation extends Expression{
+public class UnaryExpression extends Expression{
 	
 	private String op;
 	private Expression e;
 	
-	public UnaryOperation(String op, Expression e) {
+	public UnaryExpression(String op, Expression e) {
 		this.op = op;
 		this.e = e;
 		addChild(e);
@@ -50,7 +50,12 @@ public class UnaryOperation extends Expression{
 
 	@Override
 	public Expression clone() {
-		return new UnaryOperation(op, e.clone());
+		return new UnaryExpression(op, e.clone());
+	}
+	
+	@Override
+	public boolean isBooleanTrue() {
+		return false;
 	}
 
 }
