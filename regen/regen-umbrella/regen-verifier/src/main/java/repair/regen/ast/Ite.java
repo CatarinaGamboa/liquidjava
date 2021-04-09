@@ -68,6 +68,43 @@ public class Ite extends Expression{
 		return cond.isBooleanTrue() && then.isBooleanTrue() 
 				&& els.isBooleanTrue();
 	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((cond == null) ? 0 : cond.hashCode());
+		result = prime * result + ((els == null) ? 0 : els.hashCode());
+		result = prime * result + ((then == null) ? 0 : then.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Ite other = (Ite) obj;
+		if (cond == null) {
+			if (other.cond != null)
+				return false;
+		} else if (!cond.equals(other.cond))
+			return false;
+		if (els == null) {
+			if (other.els != null)
+				return false;
+		} else if (!els.equals(other.els))
+			return false;
+		if (then == null) {
+			if (other.then != null)
+				return false;
+		} else if (!then.equals(other.then))
+			return false;
+		return true;
+	}
 	
 
 }

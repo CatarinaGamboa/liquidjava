@@ -200,7 +200,22 @@ public class RefinementsParser {
 		RuleContext rc = parser.prog();
 		ChangeOldVisitor co = new ChangeOldVisitor(rewriter);
 		co.changeOldTo(rc, previous, now);
-		return rewriter.getText();
+		
+		String rs = rewriter.getText();
+		
+		//test ast ###########################
+		List<String> la = new ArrayList<>();
+		Expression ee = createAST(s); 
+		
+		Expression params = createAST(now);
+		List<Expression> lee = new ArrayList<>();
+		lee.add(params);
+		ee.substituteFunction("old", lee, createAST(previous));
+		String astOld = ee.toString();
+		
+		assert(rs.equals(astOld));
+		
+		return rs;
 	}
 	
 	public static String substitute(String s, String from, String to) throws ParsingException {
