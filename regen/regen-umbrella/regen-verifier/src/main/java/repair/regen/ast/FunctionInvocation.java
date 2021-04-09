@@ -19,6 +19,12 @@ public class FunctionInvocation extends Expression{
 		for(Expression e: args)
 			addChild(e);
 	}
+	
+	public void setChild(int index, Expression element) {
+		super.setChild(index, element);
+		args.set(index, element);
+	}
+	
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {

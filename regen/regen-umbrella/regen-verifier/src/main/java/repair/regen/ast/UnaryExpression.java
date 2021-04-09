@@ -17,6 +17,11 @@ public class UnaryExpression extends Expression{
 		addChild(e);
 	}
 	
+	public void setChild(int index, Expression element) {
+		super.setChild(index, element);
+		e = element;
+	}
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		switch(op) {

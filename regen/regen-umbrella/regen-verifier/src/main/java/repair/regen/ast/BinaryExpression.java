@@ -21,6 +21,15 @@ public class BinaryExpression extends Expression{
 		addChild(e2);
 	}
 	
+	public void setChild(int index, Expression element) {
+		super.setChild(index, element);
+		if(index == 0)
+			e1 = element;
+		else
+			e2 = element;
+	}
+	
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		Expr ee1 = e1.eval(ctx);

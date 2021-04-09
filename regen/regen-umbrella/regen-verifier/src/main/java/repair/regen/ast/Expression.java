@@ -8,6 +8,19 @@ import com.microsoft.z3.Expr;
 import repair.regen.smt.TranslatorToZ3;
 
 public abstract class Expression {
+
+	public abstract Expr eval(TranslatorToZ3 ctx) throws Exception;
+	public abstract void substitute(String from, String to);
+	public abstract void getVariableNames(List<String> toAdd);
+	public abstract void getStateInvocations(List<String> toAdd, List<String> all);
+	public abstract boolean isBooleanTrue();
+	//	public abstract void changeOld(String s, Expression e); 
+	//	public abstract void changeStateRefinement(String s, Expression e);
+	//	public abstract void changeAlias(String s, Expression e);
+	public abstract Expression clone();
+	public abstract String toString();
+	
+	
 	
 	List<Expression> children = new ArrayList<>();
 	public void addChild(Expression e) {
@@ -22,17 +35,18 @@ public abstract class Expression {
 		return children.size() > 0;
 	}
 	
-	public abstract Expr eval(TranslatorToZ3 ctx) throws Exception;
-	public abstract void substitute(String from, String to);
-	public abstract void getVariableNames(List<String> toAdd);
-	public abstract void getStateInvocations(List<String> toAdd, List<String> all);
-	public abstract boolean isBooleanTrue();
-	//	public abstract void changeOld(String s, Expression e); 
-	//	public abstract void changeStateRefinement(String s, Expression e);
-	//	public abstract void changeAlias(String s, Expression e);
-	public abstract Expression clone();
-	public abstract String toString();
+	public void setChild(int index, Expression element) {
+		children.set(index, element);
+	}
 	
+	/**
+	 * Substitutes the function call with the given parameter to the expression e
+	 * @param s
+	 * @param e
+	 */
+	public void substituteFunction(String functionName, Var parameter, Expression e) {
+		
+	}
 	
 
 }

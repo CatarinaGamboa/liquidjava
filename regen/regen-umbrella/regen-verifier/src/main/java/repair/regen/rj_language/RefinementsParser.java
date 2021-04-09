@@ -37,20 +37,7 @@ public class RefinementsParser {
 		String rr = "Between(5, 10 + 4, yy) && yy > 10 && foo(x)";
 		Expression e = createAST(rr);
 		System.out.println(e);
-		
-//		List<String> vars = new ArrayList<>();
-//		vars.add("x");vars.add("low");vars.add("high");
-//		Pair<String, List<String>> p = new Pair<>("x > low && x < high", vars);
-//		
-//		HashMap<String, Pair<String, List<String>>> m = new HashMap<>();
-//		m.put("Between", p);
-//		String r = changeAlias(rr, m);
-//		System.out.println(r);
-//		ParseTree t = compile("b > 5 && b < a && d == (50 + a)");
-//		System.out.println(t.getText());
-		
-//		System.out.println(getVariableNames("a && b == 7 && olhaoutravariavel != 0"));
-		
+	
 	}
 	
 	
@@ -61,6 +48,7 @@ public class RefinementsParser {
 
 
 
+	//DONE IN EXP
 	public static Expr eval(String s, TranslatorToZ3 ctx) throws Exception {
 		ParseTree rc = compile(s);
 		EvalVisitor visitor = new EvalVisitor(ctx);
@@ -75,6 +63,7 @@ public class RefinementsParser {
 		return e;
 	}
 	
+	//DONE IN EXP
 	public static boolean isTrue(String s) throws ParsingException {
 		ParseTree rc = compile(s);
 		
@@ -88,6 +77,7 @@ public class RefinementsParser {
 		return b;
 	}
 	
+	//DONE IN EXP
 	public static List<String> getVariableNames(String s) throws ParsingException {
 		ParseTree rc = compile(s);
 		//test ast
@@ -101,6 +91,7 @@ public class RefinementsParser {
 		return l;
 	}
 	
+	//DONE IN EXP
 	public static List<String> getStateInvocations(String s, List<String> all) throws ParsingException {
 		ParseTree rc = compile(s);
 		
@@ -115,6 +106,7 @@ public class RefinementsParser {
 		return l;
 	}
 	
+	//MAINTAIN
 	/**
 	 * The triple information of the ghost declaration in the order <type, name, list<type,name>>
 	 * @param s
@@ -126,6 +118,7 @@ public class RefinementsParser {
 		return GhostVisitor.getGhostDecl(rc);
 	}
 
+	//MAINTAIN
 	public static Triple<String, String, List<Pair<String,String>>> getAliasDeclaration(String s) throws ParsingException{
 		Optional<String> os = getErrors(s);
 		if(os.isPresent())

@@ -19,6 +19,13 @@ public class Ite extends Expression{
 		addChild(then);
 		addChild(els);
 	}
+	
+	public void setChild(int index, Expression element) {
+		super.setChild(index, element);
+		if(index == 0) cond = element;
+		else if(index == 1) then = element;
+		else els = element;
+	}
 
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
