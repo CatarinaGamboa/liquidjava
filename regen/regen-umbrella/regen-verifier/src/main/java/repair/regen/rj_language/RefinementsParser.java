@@ -101,13 +101,13 @@ public class RefinementsParser {
 		return l;
 	}
 	
-	public static List<String> getGhostInvocations(String s, List<String> all) throws ParsingException {
+	public static List<String> getStateInvocations(String s, List<String> all) throws ParsingException {
 		ParseTree rc = compile(s);
 		
 		//test ast
 		List<String> la = new ArrayList<>();
 		Expression ee = createAST(s); 
-		ee.getGhostInvocations(la);
+		ee.getStateInvocations(la, all);
 	
 		List<String> l = GhostVisitor.getGhostInvocations(rc, all);
 		assert(l.equals(la));

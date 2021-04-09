@@ -48,11 +48,11 @@ public class FunctionInvocation extends Expression{
 	}
 
 	@Override
-	public void getGhostInvocations(List<String> toAdd) {
-		if(!toAdd.contains(name))
+	public void getStateInvocations(List<String> toAdd, List<String> all) {
+		if(!toAdd.contains(name) && all.contains(name))
 			toAdd.add(name);
 		for(Expression e: args)
-			e.getGhostInvocations(toAdd);
+			e.getStateInvocations(toAdd, all);
 	}
 
 	@Override

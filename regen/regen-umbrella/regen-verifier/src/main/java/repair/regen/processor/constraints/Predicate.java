@@ -101,13 +101,13 @@ public class Predicate extends Constraint{
 		return l;
 	}
 	
-	public List<GhostState> getGhostInvocations(List<GhostState> lgs) {
+	public List<GhostState> getStateInvocations(List<GhostState> lgs) {
 		if(lgs == null)
 			return new ArrayList<>();
 		List<String> ls = lgs.stream().map(p->p.getName()).collect(Collectors.toList());
 		List<String> l = null;
 		try {
-			l = RefinementsParser.getGhostInvocations(exp, ls);
+			l = RefinementsParser.getStateInvocations(exp, ls);
 		} catch (ParsingException e) {
 			ErrorPrinter.printSyntaxError(e.getMessage(), exp);
 		}

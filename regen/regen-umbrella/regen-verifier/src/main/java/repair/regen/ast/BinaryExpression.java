@@ -1,5 +1,7 @@
 package repair.regen.ast;
 
+import static org.junit.Assert.fail;
+
 import java.util.List;
 
 import com.microsoft.z3.Expr;
@@ -48,12 +50,17 @@ public class BinaryExpression extends Expression{
 			return ctx.makeLt(e1, e2);
 		case "+":
 			return ctx.makeAdd(e1, e2);
+		case "-":
+			return ctx.makeSub(e1, e2);
 		case "*":
 			return ctx.makeMul(e1, e2);
 		case "/":
 			return ctx.makeDiv(e1, e2);
-		default: //last case %
+		case "%":
 			return ctx.makeMod(e1, e2);
+		default: //last case %
+			fail("Reached unkown operation "+ op);
+			return null;
 		}
 	}
 
@@ -75,9 +82,9 @@ public class BinaryExpression extends Expression{
 	}
 
 	@Override
-	public void getGhostInvocations(List<String> toAdd) {
-		e1.getGhostInvocations(toAdd);
-		e2.getGhostInvocations(toAdd);
+	public void getStateInvocations(List<String> toAdd, List<String> all) {
+		e1.getStateInvocations(toAdd, all);
+		e2.getStateInvocations(toAdd, all);
 		System.out.println();
 	}
 

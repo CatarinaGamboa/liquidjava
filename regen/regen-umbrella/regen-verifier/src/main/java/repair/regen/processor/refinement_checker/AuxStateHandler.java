@@ -188,7 +188,7 @@ public class AuxStateHandler {
 	private static Constraint getMissingStates(String t, TypeChecker tc, Predicate p) {
 		String[] temp= t.split("\\.");
 		String simpleT = temp[temp.length-1];
-		List<GhostState> gs = p.getGhostInvocations(tc.context.getGhostState(simpleT));
+		List<GhostState> gs = p.getStateInvocations(tc.context.getGhostState(simpleT));
 		List<GhostFunction> sets = getDifferentSets(tc, simpleT);
 		for(GhostState g: gs) {
 			if(g.getParent() == null && sets.contains(g))

@@ -45,9 +45,9 @@ public class AliasInvocation extends Expression{
 	}
 
 	@Override
-	public void getGhostInvocations(List<String> toAdd) {
+	public void getStateInvocations(List<String> toAdd, List<String> all) {
 		for(Expression e: args)
-			e.getGhostInvocations(toAdd);
+			e.getStateInvocations(toAdd, all);
 		
 	}
 

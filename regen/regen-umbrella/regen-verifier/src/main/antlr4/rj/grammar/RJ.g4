@@ -26,7 +26,7 @@ exp:
 operand:
 		literalExpression			#opLiteral
 	|	operand ARITHOP	operand		#opArith
-	|	operand '-'	operand			#opSub
+	|	operand '-'	operand			#opSub 
 	|	'-' operand					#opMinus
 	|	'!' operand					#opNot
 	|	'(' operand ')'				#opGroup

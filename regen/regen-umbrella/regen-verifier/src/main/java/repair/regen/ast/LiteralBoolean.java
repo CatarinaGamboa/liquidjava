@@ -37,7 +37,7 @@ public class LiteralBoolean extends Expression{
 	}
 
 	@Override
-	public void getGhostInvocations(List<String> toAdd) {
+	public void getStateInvocations(List<String> toAdd, List<String> all) {
 		// end leaf
 		
 	}

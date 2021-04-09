@@ -45,10 +45,10 @@ public class Ite extends Expression{
 	}
 
 	@Override
-	public void getGhostInvocations(List<String> toAdd) {
-		cond.getGhostInvocations(toAdd);
-		then.getGhostInvocations(toAdd);
-		els.getGhostInvocations(toAdd);
+	public void getStateInvocations(List<String> toAdd, List<String> all) {
+		cond.getStateInvocations(toAdd, all);
+		then.getStateInvocations(toAdd, all);
+		els.getStateInvocations(toAdd, all);
 	}
 
 	@Override

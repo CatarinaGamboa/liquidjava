@@ -33,8 +33,8 @@ public class GroupExpression extends Expression {
 	}
 
 	@Override
-	public void getGhostInvocations(List<String> toAdd) {
-		e.getGhostInvocations(toAdd);
+	public void getStateInvocations(List<String> toAdd, List<String> all) {
+		e.getStateInvocations(toAdd, all);
 	}
 
 	@Override
