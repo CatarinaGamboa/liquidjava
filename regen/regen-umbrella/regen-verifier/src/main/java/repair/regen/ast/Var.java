@@ -14,6 +14,10 @@ public class Var extends Expression{
 		this.name = name;
 	}
 
+	public String getName() {
+		return name;
+	}
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
 		return ctx.makeVariable(name);

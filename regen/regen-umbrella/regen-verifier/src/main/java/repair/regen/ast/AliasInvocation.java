@@ -28,7 +28,7 @@ public class AliasInvocation extends Expression{
 
 	@Override
 	public String toString() {
-		return name+"("+args.stream().map(p->p.toString()).collect(Collectors.joining(","))+")";
+		return name+"("+args.stream().map(p->p.toString()).collect(Collectors.joining(", "))+")";
 	}
 
 	@Override
