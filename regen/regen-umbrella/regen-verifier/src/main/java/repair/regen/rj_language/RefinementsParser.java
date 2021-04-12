@@ -328,6 +328,7 @@ public class RefinementsParser {
 	 * @return
 	 * @throws Exception
 	 */
+	//DONE in AST
 	public static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
 		Optional<String> os = getErrors(s);
 		if(os.isPresent())
