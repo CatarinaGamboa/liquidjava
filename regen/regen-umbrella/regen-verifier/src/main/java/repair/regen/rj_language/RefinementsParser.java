@@ -222,7 +222,7 @@ public class RefinementsParser {
 		return rs;
 	}
 
-	
+	//DONE IN AST
 	public static String substitute(String s, String from, String to) throws ParsingException {
 		Optional<String> os = getErrors(s);
 		if(os.isPresent())
@@ -351,8 +351,29 @@ public class RefinementsParser {
 		RuleContext rc = parser.prog();
 		AliasVisitor sv = new AliasVisitor(rewriter);
 		sv.changeAlias(rc, m);
+		
+		
+		String rwt = rewriter.getText();
 
-		return rewriter.getText();
+		//########TEST ast
+		Expression r = createAST(s);
+		HashMap<String, Pair<Expression, List<Expression>>> mapAlias = new HashMap();
+		for(String aName : m.keySet()) {
+			Expression ref = createAST(m.get(aName).getFirst());
+			List<Expression> le = new ArrayList<>();
+			for(String varName : m.get(aName).getSecond()) {
+				le.add(createAST(varName));
+			}
+			mapAlias.put(aName, new Pair<Expression, List<Expression>>(ref, le));
+		}
+		
+		r = r.changeAlias(mapAlias);
+		String rr = rwt.toString();
+		rwt = rwt.replaceAll(" ", "");
+		rr = rr.replaceAll(" ", "");
+		assertEquals(rwt, rr);
+		
+		return rwt;
 	}
 
 	private static Optional<String> getErrors(String toParse) {

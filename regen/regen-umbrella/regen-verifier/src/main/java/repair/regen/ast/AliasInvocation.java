@@ -15,6 +15,8 @@ public class AliasInvocation extends Expression{
 	public AliasInvocation(String name, List<Expression> args) {
 		this.name = name;
 		this.args = args;
+		for(Expression e:args)
+			addChild(e);
 	}
 
 	@Override
