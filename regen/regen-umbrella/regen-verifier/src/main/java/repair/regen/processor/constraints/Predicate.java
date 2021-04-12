@@ -91,8 +91,7 @@ public class Predicate extends Constraint{
 		for(GhostState gs: ghostState)
 			nameRefinementMap.put(gs.getName(), parse(gs.getRefinement().toString()));
 		
-		Expression e = exp.clone();
-		e.substituteState(nameRefinementMap, toChange);
+		Expression e = exp.substituteState(nameRefinementMap, toChange);
 		return new Predicate(e);
 	}
 

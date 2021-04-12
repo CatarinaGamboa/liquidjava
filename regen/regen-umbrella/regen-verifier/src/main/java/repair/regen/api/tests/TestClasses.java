@@ -81,7 +81,7 @@ public class TestClasses extends TestAbstract{
 	}
 	
 	@Test
-	public void correctEmail3() {
+	public void errorEmail3() {
 		testWrong(testPath+"/classes/email3");
 	}
 	

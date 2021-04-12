@@ -46,6 +46,8 @@ public class VCChecker {
 		Constraint et = expectedType
 							.changeStatesToRefinements(list, s)
 							.changeAliasToRefinement(context, element);
+		
+		System.out.println(premises.toString() + "\n"+et.toString());
 		smtChecking(premises, et, element, map);
 	}
 
@@ -67,6 +69,7 @@ public class VCChecker {
 		Constraint et = expectedType
 							  .changeStatesToRefinements(list, s)
 							  .changeAliasToRefinement(context, element);
+		System.out.println(premises.toString() + "\n"+et.toString());
 		return smtChecks(premises, et, element);
 	}
 
