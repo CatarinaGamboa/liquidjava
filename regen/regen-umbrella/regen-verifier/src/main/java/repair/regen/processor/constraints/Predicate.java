@@ -6,114 +6,68 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import repair.regen.ast.Expression;
+import repair.regen.ast.GroupExpression;
+import repair.regen.ast.LiteralBoolean;
+import repair.regen.ast.UnaryExpression;
 import repair.regen.processor.context.GhostState;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;
-import spoon.reflect.declaration.CtElement;
 
 public class Predicate extends Constraint{
-	
-	protected String exp;
+	private final String OLD = "old";
+	protected Expression exp;
 	/**
 	 * Create a predicate with the expression true
 	 */
 	public Predicate() {
-//		exp = new BooleanLiteral(true);
-		exp = "true";
+		exp = new LiteralBoolean(true);
 	}
 
 	public Predicate(String ref) {
-//		exp = parse(ref);
-//		if(!(exp instanceof ExpressionGroup) && !(exp instanceof LiteralExpression)) {
-//			exp = new ExpressionGroup(exp);
-//		}
-//		
-		exp = ref;
+		exp = parse(ref);
+		if(!(exp instanceof GroupExpression)) {
+			exp = new GroupExpression(exp);
+		}
+		parse(ref);
 	}
-	
-//	public Predicate(Expression exp) {
-//		this.exp = exp;
-//	}
 
+	/**
+	 * Create a predicate with the expression true
+	 */
+	public Predicate(Expression e) {
+		exp = e;
+	}
 
-//	protected String parse(String ref, CtElement element) {
-//		try{
-//			//Optional<Expression> oe = RefinementParser.parse(ref);
-//			RefinementsParser.compile(ref);
-//			
-//			//System.out.println(oe.toString());
-////			if(oe.isPresent()) {
-////				Expression e = oe.get();
-////				return e;
-////			}
-////			
-////		} catch (SyntaxException e1) {
-////			printSyntaxError(ref);
-////			
-//		} catch (ParsingException e1) {
-//			ErrorPrinter.printSyntaxError(e1.getMessage(), ref, element);
-//		}	
-//		return null;
-//	}
-	
-	
-//	public Expression getExpression() {
-//		return exp;
-//	}
-//	
-//	protected void setExpression(Expression e) {
-//		exp = e;
-//	}
-	
-	
 	@Override
 	public Constraint negate() {
-		return new Predicate(String.format("!(%s)", exp));
+		return new Predicate(new UnaryExpression("!", exp));
 	}
 
 	@Override
 	public Constraint substituteVariable(String from, String to) {
-		try {
-			String ns = RefinementsParser.substitute(exp, from, to);
-			return new Predicate(ns);
-		}catch(ParsingException e) {
-			ErrorPrinter.printSyntaxError(e.getMessage(), exp);
-		}
-		
-//		Predicate c = (Predicate) this.clone();
-//		if(from.equals(to))
-//			return c;
-//		AuxVisitTree.substituteVariable(c.getExpression(), from, to);
-//		c.exp.substituteVariable(from, to);
-		return null;
+		Expression ec = exp.clone();
+		ec.substitute(from, to);
+		return new Predicate(ec);
 	}
 
 	@Override
 	public List<String> getVariableNames() {
 		List<String> l = new ArrayList<>();
-		try {
-			l = RefinementsParser.getVariableNames(exp);
-			return l;
-		}catch(ParsingException e) {
-			ErrorPrinter.printSyntaxError(e.getMessage(), exp);
-		}
+		exp.getVariableNames(l);
 		return l;
 	}
-	
+
 	public List<GhostState> getStateInvocations(List<GhostState> lgs) {
 		if(lgs == null)
 			return new ArrayList<>();
-		List<String> ls = lgs.stream().map(p->p.getName()).collect(Collectors.toList());
-		List<String> l = null;
-		try {
-			l = RefinementsParser.getStateInvocations(exp, ls);
-		} catch (ParsingException e) {
-			ErrorPrinter.printSyntaxError(e.getMessage(), exp);
-		}
+		List<String> all = lgs.stream().map(p->p.getName()).collect(Collectors.toList());
+		List<String> toAdd = new ArrayList<>();
+		exp.getStateInvocations(toAdd, all);
 		
 		List<GhostState> gh = new ArrayList<>();
-		for(String n: l) {
+		for(String n: toAdd) {
 			for(GhostState g:lgs)
 				if(g.getName().equals(n))
 					gh.add(g);
@@ -123,64 +77,44 @@ public class Predicate extends Constraint{
 	}
 
 	public Constraint changeOldMentions(String previousName, String newName) {
-		try {
-			String ns = RefinementsParser.changeOldTo(exp, previousName, newName);
-			return new Predicate(ns);
-		} catch (ParsingException e) {
-			ErrorPrinter.printSyntaxError(e.getMessage(), exp);
-		}
-		return null;
+		Expression e = exp.clone();
+		Expression prev = parse(previousName);
+		List<Expression> le = new ArrayList<>();
+		le.add(parse(newName));
+		e.substituteFunction(OLD, le, prev);
+		return new Predicate(e);
 	}
-	
+
 	@Override
 	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange) {
-		Map<String,String> nameRefinementMap = new HashMap<>();
+		Map<String,Expression> nameRefinementMap = new HashMap<>();
 		for(GhostState gs: ghostState)
-			nameRefinementMap.put(gs.getName(), gs.getRefinement().toString());
+			nameRefinementMap.put(gs.getName(), parse(gs.getRefinement().toString()));
 		
-		try {
-			String ns = RefinementsParser.changeStateRefinement(exp, nameRefinementMap, toChange);
-			return new Predicate(ns);
-		} catch (Exception e) {
-			ErrorPrinter.printSyntaxError(e.getMessage(), exp);
-		}
-		return null;
+		Expression e = exp.clone();
+		e.substituteState(nameRefinementMap, toChange);
+		return new Predicate(e);
 	}
 
 
 	public boolean isBooleanTrue() {
-		try {
-			return RefinementsParser.isTrue(exp);
-		} catch (ParsingException e) {
-			ErrorPrinter.printSyntaxError(e.getMessage(), exp);
-		}
-		return false;
+		return exp.isBooleanTrue();
 	}
-	
+
 	@Override
 	public String toString() {
-		return exp;
+		return exp.toString();
 	}
 
 	@Override
 	public Constraint clone() {
-//		System.out.println("Beginning clone");
-//		long a = System.currentTimeMillis();
-		Constraint c = new Predicate(exp);
-//		long b = System.currentTimeMillis();
-//		System.out.println("End new clone:" + (b-a));
+		Constraint c = new Predicate(exp.clone());
 		return c;
 	}
 
 	@Override
-	public String getExpression() {
+	public Expression getExpression() {
 		return exp;
 	}
-
-
-
-
-
-	
 
 }

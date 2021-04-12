@@ -2,6 +2,10 @@ package repair.regen.processor.constraints;
 
 import java.util.List;
 
+import repair.regen.ast.BinaryExpression;
+import repair.regen.ast.Expression;
+import repair.regen.ast.GroupExpression;
+import repair.regen.ast.UnaryExpression;
 import repair.regen.processor.context.GhostState;
 
 public class Conjunction extends Constraint{
@@ -33,12 +37,6 @@ public class Conjunction extends Constraint{
 	}
 
 	@Override
-	public Constraint negate() {
-		String s = String.format("!(%s)", getExpression());
-		return new Predicate(s);
-	}
-
-	@Override
 	public Constraint clone() {
 		return new Conjunction(c1.clone(), c2.clone());
 	}
@@ -52,12 +50,13 @@ public class Conjunction extends Constraint{
 
 	@Override
 	public String toString() {
-		return String.format("((%s) && (%s))", group(c1.getExpression()), group(c2.getExpression()));
+		return String.format("((%s) && (%s))", c1.getExpression().toString(), 
+											   c2.getExpression().toString());
 	}
 
 	@Override
-	public String getExpression() {
-		return toString();
+	public Expression getExpression() {
+		return new GroupExpression(new BinaryExpression(c1.getExpression(), "&&", c2.getExpression()));
 	}
 	
 	@Override
@@ -79,14 +78,5 @@ public class Conjunction extends Constraint{
 				c2.changeStatesToRefinements(ghostState, toChange));
 	}
 	
-
-	private String group(String expression) {
-		if(expression.length() < 0)
-			return expression;
-		char i = expression.charAt(0);
-		char f = expression.charAt(expression.length()-1);
-		return (i =='(') && (f == ')')? expression : "("+expression+")";
-	}
-
 
 }

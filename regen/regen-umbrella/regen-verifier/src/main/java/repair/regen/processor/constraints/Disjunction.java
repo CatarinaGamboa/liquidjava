@@ -2,6 +2,11 @@ package repair.regen.processor.constraints;
 
 import java.util.List;
 
+
+import repair.regen.ast.BinaryExpression;
+import repair.regen.ast.UnaryExpression;
+import repair.regen.ast.Expression;
+import repair.regen.ast.GroupExpression;
 import repair.regen.processor.context.GhostState;
 
 public class Disjunction extends Constraint{
@@ -34,12 +39,6 @@ public class Disjunction extends Constraint{
 	}
 
 	@Override
-	public Constraint negate() {
-		String n = String.format("!(%s)", getExpression());
-		return new Predicate(n);
-	}
-
-	@Override
 	public Constraint clone() {
 		return new Disjunction(c1.clone(), c2.clone());
 	}
@@ -57,8 +56,8 @@ public class Disjunction extends Constraint{
 	}
 	
 	@Override
-	public String getExpression() {
-		return String.format("((%s) || (%s))", c1.getExpression(), c2.getExpression());
+	public Expression getExpression() {
+		return new GroupExpression(new BinaryExpression(c1.getExpression(), "||", c2.getExpression()));
 	}
 
 	@Override

@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import repair.regen.ast.Expression;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
@@ -54,23 +55,23 @@ public class AliasWrapper {
 		return (Predicate) expression.clone();
 	}
 
-	public String getNewExpression(List<String> newNames) {
+	public Expression getNewExpression(List<String> newNames) {
 		Constraint expr = getClonedConstraint();
 		for (int i = 0; i < newNames.size(); i++) {
 			expr = expr.substituteVariable(varNames.get(i), newNames.get(i));
 		}
-		return (new Predicate(expr.toString())).getExpression();		
+		return expr.getExpression().clone();		
 	}
 	
 	
-	public String getPremises(List<String> list, List<String> newNames){
+	public Constraint getPremises(List<String> list, List<String> newNames){
 		List<Predicate> invocationPredicates = getPredicatesFromExpression(list);
 		Constraint prem = new Predicate();
 		for (int i = 0; i < invocationPredicates.size(); i++) {
 			prem = Conjunction.createConjunction(prem, 
 					new EqualsPredicate(new VariablePredicate(newNames.get(i)) , invocationPredicates.get(i)));
 		}
-		return prem.getExpression();
+		return prem.clone();
 	}
 
 	private List<Predicate> getPredicatesFromExpression(List<String> list) {

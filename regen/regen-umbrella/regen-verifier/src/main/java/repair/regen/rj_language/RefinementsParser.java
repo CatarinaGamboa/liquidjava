@@ -51,62 +51,62 @@ public class RefinementsParser {
 
 
 	//DONE IN EXP
-	public static Expr eval(String s, TranslatorToZ3 ctx) throws Exception {
-		ParseTree rc = compile(s);
-		EvalVisitor visitor = new EvalVisitor(ctx);
-		Expr e =  visitor.eval(rc);
-
-		//try ast
-		Expression ee = createAST(s); 
-		Expr e2 = ee.eval(ctx);
-
-		assert(e.equals(e2));
-
-		return e;
-	}
-
-	//DONE IN EXP
-	public static boolean isTrue(String s) throws ParsingException {
-		ParseTree rc = compile(s);
-
-		//test ast
-		List<String> la = new ArrayList<>();
-		Expression ee = createAST(s); 
-		boolean eb = ee.isBooleanTrue();
-
-		boolean b = BooleanTrueVisitor.isTrue(rc);
-		assert(eb == b); 
-		return b;
-	}
+//	public static Expr eval(String s, TranslatorToZ3 ctx) throws Exception {
+//		ParseTree rc = compile(s);
+//		EvalVisitor visitor = new EvalVisitor(ctx);
+//		Expr e =  visitor.eval(rc);
+//
+//		//try ast
+//		Expression ee = createAST(s); 
+//		Expr e2 = ee.eval(ctx);
+//
+//		assert(e.equals(e2));
+//
+//		return e;
+//	}
 
 	//DONE IN EXP
-	public static List<String> getVariableNames(String s) throws ParsingException {
-		ParseTree rc = compile(s);
-		//test ast
-		List<String> la = new ArrayList<>();
-		Expression ee = createAST(s); 
-		ee.getVariableNames(la);
-
-		List<String> l = VariableVisitor.getNames(rc);
-		assert(l.equals(la));
-
-		return l;
-	}
+//	public static boolean isTrue(String s) throws ParsingException {
+//		ParseTree rc = compile(s);
+//
+//		//test ast
+//		List<String> la = new ArrayList<>();
+//		Expression ee = createAST(s); 
+//		boolean eb = ee.isBooleanTrue();
+//
+//		boolean b = BooleanTrueVisitor.isTrue(rc);
+//		assert(eb == b); 
+//		return b;
+//	}
 
 	//DONE IN EXP
-	public static List<String> getStateInvocations(String s, List<String> all) throws ParsingException {
-		ParseTree rc = compile(s);
+//	public static List<String> getVariableNames(String s) throws ParsingException {
+//		ParseTree rc = compile(s);
+//		//test ast
+//		List<String> la = new ArrayList<>();
+//		Expression ee = createAST(s); 
+//		ee.getVariableNames(la);
+//
+//		List<String> l = VariableVisitor.getNames(rc);
+//		assert(l.equals(la));
+//
+//		return l;
+//	}
 
-		//test ast
-		List<String> la = new ArrayList<>();
-		Expression ee = createAST(s); 
-		ee.getStateInvocations(la, all);
-
-		List<String> l = GhostVisitor.getGhostInvocations(rc, all);
-		assert(l.equals(la));
-
-		return l;
-	}
+	//DONE IN EXP
+//	public static List<String> getStateInvocations(String s, List<String> all) throws ParsingException {
+//		ParseTree rc = compile(s);
+//
+//		//test ast
+//		List<String> la = new ArrayList<>();
+//		Expression ee = createAST(s); 
+//		ee.getStateInvocations(la, all);
+//
+//		List<String> l = GhostVisitor.getGhostInvocations(rc, all);
+//		assert(l.equals(la));
+//
+//		return l;
+//	}
 
 	//MAINTAIN
 	/**
@@ -178,146 +178,146 @@ public class RefinementsParser {
 
 
 	//DONE IN AST
-	public static String changeOldTo(String s, String previous, String now) throws ParsingException {
-		Optional<String> os = getErrors(s);
-		if(os.isPresent())
-			throw new ParsingException(os.get());
-
-		CodePointCharStream input;
-		input = CharStreams.fromString(s);
-		RJErrorListener err = new RJErrorListener();
-		RJLexer lexer = new RJLexer(input);
-		lexer.removeErrorListeners();
-		lexer.addErrorListener(err);
-
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
-
-		RJParser parser = new RJParser(tokens);
-		parser.setBuildParseTree(true);
-		parser.removeErrorListeners();
-		//		parser.addParseListener(new RJListener());
-		parser.addErrorListener(err);
-
-		RuleContext rc = parser.prog();
-		ChangeOldVisitor co = new ChangeOldVisitor(rewriter);
-		co.changeOldTo(rc, previous, now);
-
-		String rs = rewriter.getText();
-
-		//test ast ###########################
-		List<String> la = new ArrayList<>();
-		Expression ee = createAST(s); 
-
-		Expression params = createAST(now);
-		List<Expression> lee = new ArrayList<>();
-		lee.add(params);
-		ee.substituteFunction("old", lee, createAST(previous));
-		String astOld = ee.toString();
-
-		rs = rs.replaceAll(" ", "");
-		astOld = astOld.replaceAll(" ", "");
-		assertEquals(rs, astOld);
-
-		return rs;
-	}
+//	public static String changeOldTo(String s, String previous, String now) throws ParsingException {
+//		Optional<String> os = getErrors(s);
+//		if(os.isPresent())
+//			throw new ParsingException(os.get());
+//
+//		CodePointCharStream input;
+//		input = CharStreams.fromString(s);
+//		RJErrorListener err = new RJErrorListener();
+//		RJLexer lexer = new RJLexer(input);
+//		lexer.removeErrorListeners();
+//		lexer.addErrorListener(err);
+//
+//		CommonTokenStream tokens = new CommonTokenStream(lexer);
+//		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+//
+//		RJParser parser = new RJParser(tokens);
+//		parser.setBuildParseTree(true);
+//		parser.removeErrorListeners();
+//		//		parser.addParseListener(new RJListener());
+//		parser.addErrorListener(err);
+//
+//		RuleContext rc = parser.prog();
+//		ChangeOldVisitor co = new ChangeOldVisitor(rewriter);
+//		co.changeOldTo(rc, previous, now);
+//
+//		String rs = rewriter.getText();
+//
+//		//test ast ###########################
+//		List<String> la = new ArrayList<>();
+//		Expression ee = createAST(s); 
+//
+//		Expression params = createAST(now);
+//		List<Expression> lee = new ArrayList<>();
+//		lee.add(params);
+//		ee.substituteFunction("old", lee, createAST(previous));
+//		String astOld = ee.toString();
+//
+//		rs = rs.replaceAll(" ", "");
+//		astOld = astOld.replaceAll(" ", "");
+//		assertEquals(rs, astOld);
+//
+//		return rs;
+//	}
 
 	//DONE IN AST
-	public static String substitute(String s, String from, String to) throws ParsingException {
-		Optional<String> os = getErrors(s);
-		if(os.isPresent())
-			throw new ParsingException(os.get());
-
-		CodePointCharStream input;
-		input = CharStreams.fromString(s);
-		RJErrorListener err = new RJErrorListener();
-		RJLexer lexer = new RJLexer(input);
-		lexer.removeErrorListeners();
-		lexer.addErrorListener(err);
-
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
-
-		RJParser parser = new RJParser(tokens);
-		parser.setBuildParseTree(true);
-		parser.removeErrorListeners();
-		//		parser.addParseListener(new RJListener());
-		parser.addErrorListener(err);
-		
-
-		RuleContext rc = parser.prog();
-		SubstituteVisitor sv = new SubstituteVisitor(rewriter);
-		sv.subtitute(rc, from, to);
-		
-		//test ast
-		Expression ee = createAST(s); 
-		ee.substitute(from, to);
-		String es = ee.toString();
-		
-		String r  = rewriter.getText();
-		r = r.replaceAll(" ", "");
-		es = es.replaceAll(" ", "");
-		if(!r.equals(es))
-			System.out.println();
-		
-//		es = es.replaceAll(" ", "");
+//	public static String substitute(String s, String from, String to) throws ParsingException {
+//		Optional<String> os = getErrors(s);
+//		if(os.isPresent())
+//			throw new ParsingException(os.get());
+//
+//		CodePointCharStream input;
+//		input = CharStreams.fromString(s);
+//		RJErrorListener err = new RJErrorListener();
+//		RJLexer lexer = new RJLexer(input);
+//		lexer.removeErrorListeners();
+//		lexer.addErrorListener(err);
+//
+//		CommonTokenStream tokens = new CommonTokenStream(lexer);
+//		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+//
+//		RJParser parser = new RJParser(tokens);
+//		parser.setBuildParseTree(true);
+//		parser.removeErrorListeners();
+//		//		parser.addParseListener(new RJListener());
+//		parser.addErrorListener(err);
+//		
+//
+//		RuleContext rc = parser.prog();
+//		SubstituteVisitor sv = new SubstituteVisitor(rewriter);
+//		sv.subtitute(rc, from, to);
+//		
+//		//test ast
+//		Expression ee = createAST(s); 
+//		ee.substitute(from, to);
+//		String es = ee.toString();
+//		
+//		String r  = rewriter.getText();
 //		r = r.replaceAll(" ", "");
-		assertEquals(es, r);
-		
-		return r;
-
-	}
+//		es = es.replaceAll(" ", "");
+//		if(!r.equals(es))
+//			System.out.println();
+//		
+////		es = es.replaceAll(" ", "");
+////		r = r.replaceAll(" ", "");
+//		assertEquals(es, r);
+//		
+//		return r;
+//
+//	}
 
 	//DONE IN AST
-	public static String changeStateRefinement(String s, Map<String,String> nameRefinementMap, String[] toChange) throws Exception {
-		Optional<String> os = getErrors(s);
-		if(os.isPresent())
-			throw new ParsingException(os.get());
-		CodePointCharStream input;
-		input = CharStreams.fromString(s);
-		RJErrorListener err = new RJErrorListener();
-		RJLexer lexer = new RJLexer(input);
-		lexer.removeErrorListeners();
-		lexer.addErrorListener(err);
-
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
-
-		RJParser parser = new RJParser(tokens);
-		parser.setBuildParseTree(true);
-		parser.removeErrorListeners();
-		//		parser.addParseListener(new RJListener());
-		parser.addErrorListener(err);
-
-		RuleContext rc = parser.prog();
-		StateVisitor sv = new StateVisitor(rewriter);
-		sv.changeState(rc, nameRefinementMap, toChange);
-
-
-		//test ast ###########################
-		List<String> la = new ArrayList<>();
-		Expression ee = createAST(s); 
-		Map<String, Expression> m = new HashMap<>();
-		for(String k:nameRefinementMap.keySet())
-			m.put(k, createAST(nameRefinementMap.get(k)));
-		ee = ee.substituteState(m, toChange);
-		
-		String se = ee.toString();
-		//##########################################
-
-		String rs = rewriter.getText();  
-		
-		se = se.replaceAll(" ", "");
-		rs = rs.replaceAll(" ", "");
-		
-//		if(!rs.equals(se));
-//			System.out.println();
-		
-		assertEquals(rs, se);
-
-
-		return rs;
-	}
+//	public static String changeStateRefinement(String s, Map<String,String> nameRefinementMap, String[] toChange) throws Exception {
+//		Optional<String> os = getErrors(s);
+//		if(os.isPresent())
+//			throw new ParsingException(os.get());
+//		CodePointCharStream input;
+//		input = CharStreams.fromString(s);
+//		RJErrorListener err = new RJErrorListener();
+//		RJLexer lexer = new RJLexer(input);
+//		lexer.removeErrorListeners();
+//		lexer.addErrorListener(err);
+//
+//		CommonTokenStream tokens = new CommonTokenStream(lexer);
+//		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+//
+//		RJParser parser = new RJParser(tokens);
+//		parser.setBuildParseTree(true);
+//		parser.removeErrorListeners();
+//		//		parser.addParseListener(new RJListener());
+//		parser.addErrorListener(err);
+//
+//		RuleContext rc = parser.prog();
+//		StateVisitor sv = new StateVisitor(rewriter);
+//		sv.changeState(rc, nameRefinementMap, toChange);
+//
+//
+//		//test ast ###########################
+//		List<String> la = new ArrayList<>();
+//		Expression ee = createAST(s); 
+//		Map<String, Expression> m = new HashMap<>();
+//		for(String k:nameRefinementMap.keySet())
+//			m.put(k, createAST(nameRefinementMap.get(k)));
+//		ee = ee.substituteState(m, toChange);
+//		
+//		String se = ee.toString();
+//		//##########################################
+//
+//		String rs = rewriter.getText();  
+//		
+//		se = se.replaceAll(" ", "");
+//		rs = rs.replaceAll(" ", "");
+//		
+////		if(!rs.equals(se));
+////			System.out.println();
+//		
+//		assertEquals(rs, se);
+//
+//
+//		return rs;
+//	}
 
 
 
@@ -329,53 +329,53 @@ public class RefinementsParser {
 	 * @throws Exception
 	 */
 	//DONE in AST
-	public static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
-		Optional<String> os = getErrors(s);
-		if(os.isPresent())
-			throw new ParsingException(os.get());
-		CodePointCharStream input;
-		input = CharStreams.fromString(s);
-		RJErrorListener err = new RJErrorListener();
-		RJLexer lexer = new RJLexer(input);
-		lexer.removeErrorListeners();
-		lexer.addErrorListener(err);
-
-		CommonTokenStream tokens = new CommonTokenStream(lexer);
-		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
-
-		RJParser parser = new RJParser(tokens);
-		parser.setBuildParseTree(true);
-		parser.removeErrorListeners();
-		//		parser.addParseListener(new RJListener());
-		parser.addErrorListener(err);
-
-		RuleContext rc = parser.prog();
-		AliasVisitor sv = new AliasVisitor(rewriter);
-		sv.changeAlias(rc, m);
-		
-		
-		String rwt = rewriter.getText();
-
-		//########TEST ast
-		Expression r = createAST(s);
-		HashMap<String, Pair<Expression, List<Expression>>> mapAlias = new HashMap();
-		for(String aName : m.keySet()) {
-			Expression ref = createAST(m.get(aName).getFirst());
-			List<Expression> le = new ArrayList<>();
-			for(String varName : m.get(aName).getSecond()) {
-				le.add(createAST(varName));
-			}
-			mapAlias.put(aName, new Pair<Expression, List<Expression>>(ref, le));
-		}
-		
-		r = r.changeAlias(mapAlias);
-		String rr = rwt.toString();
-		rwt = rwt.replaceAll(" ", "");
-		rr = rr.replaceAll(" ", "");
-		assertEquals(rwt, rr);
-		
-		return rwt;
-	}
+//	public static String changeAlias(String s, HashMap<String, Pair<String, List<String>>> m) throws Exception {
+//		Optional<String> os = getErrors(s);
+//		if(os.isPresent())
+//			throw new ParsingException(os.get());
+//		CodePointCharStream input;
+//		input = CharStreams.fromString(s);
+//		RJErrorListener err = new RJErrorListener();
+//		RJLexer lexer = new RJLexer(input);
+//		lexer.removeErrorListeners();
+//		lexer.addErrorListener(err);
+//
+//		CommonTokenStream tokens = new CommonTokenStream(lexer);
+//		TokenStreamRewriter rewriter = new TokenStreamRewriter(tokens);
+//
+//		RJParser parser = new RJParser(tokens);
+//		parser.setBuildParseTree(true);
+//		parser.removeErrorListeners();
+//		//		parser.addParseListener(new RJListener());
+//		parser.addErrorListener(err);
+//
+//		RuleContext rc = parser.prog();
+//		AliasVisitor sv = new AliasVisitor(rewriter);
+//		sv.changeAlias(rc, m);
+//		
+//		
+//		String rwt = rewriter.getText();
+//
+//		//########TEST ast
+//		Expression r = createAST(s);
+//		HashMap<String, Pair<Expression, List<Expression>>> mapAlias = new HashMap();
+//		for(String aName : m.keySet()) {
+//			Expression ref = createAST(m.get(aName).getFirst());
+//			List<Expression> le = new ArrayList<>();
+//			for(String varName : m.get(aName).getSecond()) {
+//				le.add(createAST(varName));
+//			}
+//			mapAlias.put(aName, new Pair<Expression, List<Expression>>(ref, le));
+//		}
+//		
+//		r = r.changeAlias(mapAlias);
+//		String rr = rwt.toString();
+//		rwt = rwt.replaceAll(" ", "");
+//		rr = rr.replaceAll(" ", "");
+//		assertEquals(rwt, rr);
+//		
+//		return rwt;
+//	}
 
 	private static Optional<String> getErrors(String toParse) {
 		CodePointCharStream input = CharStreams.fromString(toParse);

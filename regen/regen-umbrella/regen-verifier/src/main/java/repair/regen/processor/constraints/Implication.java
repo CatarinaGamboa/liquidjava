@@ -2,6 +2,8 @@ package repair.regen.processor.constraints;
 
 import java.util.List;
 
+import repair.regen.ast.BinaryExpression;
+import repair.regen.ast.Expression;
 import repair.regen.processor.context.GhostState;
 
 public class Implication extends Constraint{
@@ -18,11 +20,6 @@ public class Implication extends Constraint{
 	@Override
 	public Constraint substituteVariable(String from, String to) {
 		return new Implication(c1.substituteVariable(from, to), c2.substituteVariable(from, to));
-	}
-
-	@Override
-	public Constraint negate() {
-		return new Predicate(String.format("!(%s)", getExpression()));
 	}
 
 	@Override
@@ -43,8 +40,8 @@ public class Implication extends Constraint{
 	}
 
 	@Override
-	public String getExpression() {
-		return String.format("(%s)->(%s)", c1.getExpression(), c2.getExpression());
+	public Expression getExpression() {
+		return new BinaryExpression(c1.getExpression(), "->", c2.getExpression());
 	}
 
 	@Override

@@ -1,16 +1,21 @@
 package repair.regen.processor.constraints;
 
+import repair.regen.ast.BinaryExpression;
+import repair.regen.ast.GroupExpression;
+
 public class EqualsPredicate extends Predicate {
 	
 	public EqualsPredicate(Constraint c1, Constraint c2) {
 		super();
-		exp = String.format("(%s == %s)",c1.toString(), c2.toString());		
+		exp = new GroupExpression(
+				new BinaryExpression(c1.getExpression(), "==", c2.getExpression()));
 	}
 
 
 	public EqualsPredicate(Constraint c1, String c2) {
 		super();
-		exp = String.format("(%s == %s)",c1.toString(), c2);	
+		exp = new GroupExpression(
+				new BinaryExpression(c1.getExpression(), "==", parse(c2)));
 	}
 	
 //	public EqualsPredicate(String variable, Constraint c) {

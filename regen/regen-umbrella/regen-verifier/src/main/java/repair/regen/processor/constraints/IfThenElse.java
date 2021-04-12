@@ -3,15 +3,18 @@ package repair.regen.processor.constraints;
 import java.util.ArrayList;
 import java.util.List;
 
+import repair.regen.ast.Expression;
+import repair.regen.ast.Ite;
 import repair.regen.processor.context.GhostState;
 
 public class IfThenElse extends Constraint{
 	private Constraint ite;
 	
 	public IfThenElse(Constraint a, Constraint b, Constraint c) {
-		String s = String.format("((%s) ? (%s) : (%s))", a, b, c);
-		ite = new Predicate(s);
+		Expression e = new Ite(a.getExpression(), b.getExpression(), c.getExpression());
+		ite = new Predicate(e);
 	}
+	
 	public IfThenElse(Constraint e) {
 		ite = e;
 	}
@@ -22,10 +25,6 @@ public class IfThenElse extends Constraint{
 		return new IfThenElse(i);
 	}
 
-	@Override
-	public Constraint negate() {
-		return new Predicate(String.format("!(%s)", getExpression()));
-	}
 
 	@Override
 	public Constraint clone() {
@@ -47,7 +46,7 @@ public class IfThenElse extends Constraint{
 	}
 	
 	@Override
-	public String getExpression() {
+	public Expression getExpression() {
 		return ite.getExpression();
 	}
 	@Override
