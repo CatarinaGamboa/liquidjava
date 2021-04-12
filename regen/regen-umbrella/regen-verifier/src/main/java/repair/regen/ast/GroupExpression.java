@@ -7,56 +7,54 @@ import com.microsoft.z3.Expr;
 import repair.regen.smt.TranslatorToZ3;
 
 public class GroupExpression extends Expression {
-	private Expression e;
+	
 	public GroupExpression(Expression e) {
-		this.e = e;
 		addChild(e);
 	}
 	
-	public void setChild(int index, Expression element) {
-		super.setChild(index, element);
-		e = element;
+	public Expression getExpression() {
+		return children.get(0);
 	}
-
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
-		return e.eval(ctx);
+		return getExpression().eval(ctx);
 	}
 	
 	public String toString() {
-		return "("+e.toString()+")";
+		return "("+getExpression().toString()+")";
 	}
 
 	@Override
 	public void substitute(String from, String to) {
-		e.substitute(from, to);		
+		getExpression().substitute(from, to);		
 	}
 
 	@Override
 	public void getVariableNames(List<String> toAdd) {
-		e.getVariableNames(toAdd);
+		getExpression().getVariableNames(toAdd);
 	}
 
 	@Override
 	public void getStateInvocations(List<String> toAdd, List<String> all) {
-		e.getStateInvocations(toAdd, all);
+		getExpression().getStateInvocations(toAdd, all);
 	}
 
 	@Override
 	public Expression clone() {
-		return new GroupExpression(e.clone());
+		return new GroupExpression(getExpression().clone());
 	}
 	
 	@Override
 	public boolean isBooleanTrue() {
-		return e.isBooleanTrue();
+		return getExpression().isBooleanTrue();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((e == null) ? 0 : e.hashCode());
+		result = prime * result + ((getExpression() == null) ? 0 : getExpression().hashCode());
 		return result;
 	}
 
@@ -69,10 +67,10 @@ public class GroupExpression extends Expression {
 		if (getClass() != obj.getClass())
 			return false;
 		GroupExpression other = (GroupExpression) obj;
-		if (e == null) {
-			if (other.e != null)
+		if (getExpression() == null) {
+			if (other.getExpression() != null)
 				return false;
-		} else if (!e.equals(other.e))
+		} else if (!getExpression().equals(other.getExpression()))
 			return false;
 		return true;
 	}

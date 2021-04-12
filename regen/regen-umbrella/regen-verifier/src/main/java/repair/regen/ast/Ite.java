@@ -7,75 +7,72 @@ import com.microsoft.z3.Expr;
 import repair.regen.smt.TranslatorToZ3;
 
 public class Ite extends Expression{
-	private Expression cond;
-	private Expression then;
-	private Expression els;
 	
 	public Ite(Expression e1, Expression e2, Expression e3) {
-		cond = e1;
-		then = e2;
-		els = e3;
-		addChild(cond);
-		addChild(then);
-		addChild(els);
+		addChild(e1);
+		addChild(e2);
+		addChild(e3);
 	}
 	
-	public void setChild(int index, Expression element) {
-		super.setChild(index, element);
-		if(index == 0) cond = element;
-		else if(index == 1) then = element;
-		else els = element;
+	public Expression getCondition() {
+		return children.get(0);
 	}
-
+	public Expression getThen() {
+		return children.get(1);
+	}
+	public Expression getElse() {
+		return children.get(2);
+	}
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
-		return ctx.makeIte(cond.eval(ctx), then.eval(ctx), els.eval(ctx));
+		return ctx.makeIte(getCondition().eval(ctx), getThen().eval(ctx), getElse().eval(ctx));
 	}
 
 	@Override
 	public String toString() {
-		return cond.toString() +"?"+then.toString()+":"+els.toString();
+		return getCondition().toString() +"?"+getThen().toString()+":"+getElse().toString();
 	}
 
 	@Override
 	public void substitute(String from, String to) {
-		cond.substitute(from, to);
-		then.substitute(from, to);
-		els.substitute(from, to);
+		getCondition().substitute(from, to);
+		getThen().substitute(from, to);
+		getElse().substitute(from, to);
 	}
 
 	@Override
 	public void getVariableNames(List<String> toAdd) {
-		cond.getVariableNames(toAdd);
-		then.getVariableNames(toAdd);
-		els.getVariableNames(toAdd);
+		getCondition().getVariableNames(toAdd);
+		getThen().getVariableNames(toAdd);
+		getElse().getVariableNames(toAdd);
 	}
 
 	@Override
 	public void getStateInvocations(List<String> toAdd, List<String> all) {
-		cond.getStateInvocations(toAdd, all);
-		then.getStateInvocations(toAdd, all);
-		els.getStateInvocations(toAdd, all);
+		getCondition().getStateInvocations(toAdd, all);
+		getThen().getStateInvocations(toAdd, all);
+		getElse().getStateInvocations(toAdd, all);
 	}
 
 	@Override
 	public Expression clone() {
-		return new Ite(cond.clone(), then.clone(), els.clone());
+		return new Ite(getCondition().clone(), getThen().clone(), getElse().clone());
 	}
 	
 	@Override
 	public boolean isBooleanTrue() {
-		return cond.isBooleanTrue() && then.isBooleanTrue() 
-				&& els.isBooleanTrue();
+		return getCondition().isBooleanTrue() && getThen().isBooleanTrue() 
+				&& getElse().isBooleanTrue();
 	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((cond == null) ? 0 : cond.hashCode());
-		result = prime * result + ((els == null) ? 0 : els.hashCode());
-		result = prime * result + ((then == null) ? 0 : then.hashCode());
+		result = prime * result + ((getCondition() == null) ? 0 : getCondition().hashCode());
+		result = prime * result + ((getElse() == null) ? 0 : getElse().hashCode());
+		result = prime * result + ((getThen() == null) ? 0 : getThen().hashCode());
 		return result;
 	}
 
@@ -88,20 +85,20 @@ public class Ite extends Expression{
 		if (getClass() != obj.getClass())
 			return false;
 		Ite other = (Ite) obj;
-		if (cond == null) {
-			if (other.cond != null)
+		if (getCondition() == null) {
+			if (other.getCondition() != null)
 				return false;
-		} else if (!cond.equals(other.cond))
+		} else if (!getCondition().equals(other.getCondition()))
 			return false;
-		if (els == null) {
-			if (other.els != null)
+		if (getElse() == null) {
+			if (other.getElse() != null)
 				return false;
-		} else if (!els.equals(other.els))
+		} else if (!getElse().equals(other.getElse()))
 			return false;
-		if (then == null) {
-			if (other.then != null)
+		if (getThen() == null) {
+			if (other.getThen() != null)
 				return false;
-		} else if (!then.equals(other.then))
+		} else if (!getThen().equals(other.getThen()))
 			return false;
 		return true;
 	}

@@ -10,45 +10,47 @@ import repair.regen.smt.TranslatorToZ3;
 
 public class AliasInvocation extends Expression{
 	String name;
-	List<Expression> args;
 	
 	public AliasInvocation(String name, List<Expression> args) {
 		this.name = name;
-		this.args = args;
 		for(Expression e:args)
 			addChild(e);
 	}
 
+	public List<Expression> getArgs(){
+		return children;
+	}
+	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
-		Expr[] argsExpr  = new Expr[args.size()];
+		Expr[] argsExpr  = new Expr[getArgs().size()];
 		for (int i = 0; i < argsExpr.length; i++) {
-			argsExpr[i] =  args.get(i).eval(ctx);
+			argsExpr[i] =  getArgs().get(i).eval(ctx);
 		}
 		return ctx.makeFunctionInvocation(name, argsExpr);
 	}
 
 	@Override
 	public String toString() {
-		return name+"("+args.stream().map(p->p.toString()).collect(Collectors.joining(", "))+")";
+		return name+"("+getArgs().stream().map(p->p.toString()).collect(Collectors.joining(", "))+")";
 	}
 
 	@Override
 	public void substitute(String from, String to) {
-		for(Expression e: args)
+		for(Expression e: getArgs())
 			e.substitute(from, to);
 	}
 
 	@Override
 	public void getVariableNames(List<String> toAdd) {
-		for(Expression e: args)
+		for(Expression e: getArgs())
 			e.getVariableNames(toAdd);
 		
 	}
 
 	@Override
 	public void getStateInvocations(List<String> toAdd, List<String> all) {
-		for(Expression e: args)
+		for(Expression e: getArgs())
 			e.getStateInvocations(toAdd, all);
 		
 	}
@@ -56,7 +58,7 @@ public class AliasInvocation extends Expression{
 	@Override
 	public Expression clone() {
 		List<Expression> le = new ArrayList<>();
-		for(Expression e: args)
+		for(Expression e: getArgs())
 			le.add(e.clone());
 		return new AliasInvocation(name, le);
 	}
@@ -70,7 +72,7 @@ public class AliasInvocation extends Expression{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((args == null) ? 0 : args.hashCode());
+		result = prime * result + ((getArgs() == null) ? 0 : getArgs().hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		return result;
 	}
@@ -84,10 +86,10 @@ public class AliasInvocation extends Expression{
 		if (getClass() != obj.getClass())
 			return false;
 		AliasInvocation other = (AliasInvocation) obj;
-		if (args == null) {
-			if (other.args != null)
+		if (getArgs() == null) {
+			if (other.getArgs() != null)
 				return false;
-		} else if (!args.equals(other.args))
+		} else if (!getArgs().equals(other.getArgs()))
 			return false;
 		if (name == null) {
 			if (other.name != null)

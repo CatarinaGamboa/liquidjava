@@ -9,32 +9,28 @@ import com.microsoft.z3.Expr;
 import repair.regen.smt.TranslatorToZ3;
 
 public class BinaryExpression extends Expression{
-	private Expression e1;
+	
 	private String op;
-	private Expression e2;
 
 	public BinaryExpression(Expression e1, String op, Expression e2) {
-		this.e1 = e1;
 		this.op = op;
-		this.e2 = e2;
 		addChild(e1);
 		addChild(e2);
 	}
 	
-	public void setChild(int index, Expression element) {
-		super.setChild(index, element);
-		if(index == 0)
-			e1 = element;
-		else
-			e2 = element;
+	public Expression getFirstOperand() {
+		return children.get(0);
 	}
 	
-	
+	public Expression getSecondOperand() {
+		return children.get(1);
+	}
+		
 	
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {
-		Expr ee1 = e1.eval(ctx);
-		Expr ee2 = e2.eval(ctx);
+		Expr ee1 = getFirstOperand().eval(ctx);
+		Expr ee2 = getSecondOperand().eval(ctx);
 		return evalBinaryOp(ctx, ee1, ee2);
 	}
 
@@ -76,44 +72,44 @@ public class BinaryExpression extends Expression{
 
 	@Override
 	public String toString() {
-		return e1.toString() + " " + op + " " + e2.toString();
+		return getFirstOperand().toString() + " " + op + " " + getSecondOperand().toString();
 	}
 
 	@Override
 	public void substitute(String from, String to) {
-		e1.substitute(from, to);
-		e2.substitute(from, to);
+		getFirstOperand().substitute(from, to);
+		getSecondOperand().substitute(from, to);
 	}
 
 	@Override
 	public void getVariableNames(List<String> toAdd) {
-		e1.getVariableNames(toAdd);
-		e2.getVariableNames(toAdd);
+		getFirstOperand().getVariableNames(toAdd);
+		getSecondOperand().getVariableNames(toAdd);
 	}
 
 	@Override
 	public void getStateInvocations(List<String> toAdd, List<String> all) {
-		e1.getStateInvocations(toAdd, all);
-		e2.getStateInvocations(toAdd, all);
+		getFirstOperand().getStateInvocations(toAdd, all);
+		getSecondOperand().getStateInvocations(toAdd, all);
 		System.out.println();
 	}
 
 	@Override
 	public Expression clone() {
-		return new BinaryExpression(e1.clone(), op, e2.clone());
+		return new BinaryExpression(getFirstOperand().clone(), op, getSecondOperand().clone());
 	}
 	
 	@Override
 	public boolean isBooleanTrue() {
 		switch(op) {
 		case "&&":
-			return e1.isBooleanTrue() && e2.isBooleanTrue();
+			return getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
 		case "||":
-			return e1.isBooleanTrue() && e2.isBooleanTrue();
+			return getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
 		case "-->":
-			return e1.isBooleanTrue() && e2.isBooleanTrue();
+			return getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
 		case "==":
-			return e1.isBooleanTrue() && e2.isBooleanTrue();
+			return getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
 		default:
 			return false;
 		}
@@ -124,8 +120,8 @@ public class BinaryExpression extends Expression{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((e1 == null) ? 0 : e1.hashCode());
-		result = prime * result + ((e2 == null) ? 0 : e2.hashCode());
+		result = prime * result + ((getFirstOperand() == null) ? 0 : getFirstOperand().hashCode());
+		result = prime * result + ((getSecondOperand() == null) ? 0 : getSecondOperand().hashCode());
 		result = prime * result + ((op == null) ? 0 : op.hashCode());
 		return result;
 	}
@@ -139,15 +135,15 @@ public class BinaryExpression extends Expression{
 		if (getClass() != obj.getClass())
 			return false;
 		BinaryExpression other = (BinaryExpression) obj;
-		if (e1 == null) {
-			if (other.e1 != null)
+		if (getFirstOperand() == null) {
+			if (other.getFirstOperand() != null)
 				return false;
-		} else if (!e1.equals(other.e1))
+		} else if (!getFirstOperand().equals(other.getFirstOperand()))
 			return false;
-		if (e2 == null) {
-			if (other.e2 != null)
+		if (getSecondOperand() == null) {
+			if (other.getSecondOperand() != null)
 				return false;
-		} else if (!e2.equals(other.e2))
+		} else if (!getSecondOperand().equals(other.getSecondOperand()))
 			return false;
 		if (op == null) {
 			if (other.op != null)
