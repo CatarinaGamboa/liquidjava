@@ -75,8 +75,6 @@ public class CreateASTVisitor {
 	}
 
 
-
-
 	private static Expression progCreate(ProgContext rc){
 		if(rc.start() != null)
 			return create(rc.start());
@@ -190,8 +188,6 @@ public class CreateASTVisitor {
 	}
 
 
-
-
 	private static Expression literalCreate(LiteralContext literalContext) {
 		if(literalContext.BOOL() != null)
 			return new LiteralBoolean(literalContext.BOOL().getText());
@@ -204,14 +200,6 @@ public class CreateASTVisitor {
 		fail("Error got to unexistant literal.");
 		return null;
 	}
-
-
-
-
-
-
-
-
 
 
 }

@@ -10,6 +10,7 @@ import repair.regen.ast.Expression;
 import repair.regen.ast.GroupExpression;
 import repair.regen.ast.LiteralBoolean;
 import repair.regen.ast.UnaryExpression;
+import repair.regen.ast.Var;
 import repair.regen.processor.context.GhostState;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
@@ -48,6 +49,7 @@ public class Predicate extends Constraint{
 	@Override
 	public Constraint substituteVariable(String from, String to) {
 		Expression ec = exp.clone();
+//		ec = ec.substitute(new Var(from), new Var(to));
 		ec.substitute(from, to);
 		return new Predicate(ec);
 	}

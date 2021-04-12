@@ -21,47 +21,11 @@ import rj.grammar.RJParser.PredContext;
 public class AliasVisitor {
 	TokenStreamRewriter rewriter;
 	CodePointCharStream input;
-	
-	public AliasVisitor(TokenStreamRewriter rewriter) {
-		this.rewriter = rewriter;
-	}
-	
+
 	public AliasVisitor(CodePointCharStream input) {
 		this.input = input;
 	}
 
-	/**
-	 * Changes present Alias by their refinement expression
-	 * @param rc
-	 * @param map key:aliasName, pair<refinement, list<var names>>
-	 * @throws Exception
-	 */
-	public void changeAlias(ParseTree rc,  HashMap<String, Pair<String, List<String>>> map) throws Exception {
-		if(rc instanceof AliasCallContext) {
-			AliasCallContext acc = (AliasCallContext) rc;
-			String name = acc.ID_UPPER().getText();
-			if(map.containsKey(name)) {
-				Pair<String, List<String>> p = map.get(name);
-				String refinement = p.getFirst();
-				List<String> args = p.getSecond();
-				List<String> calledArgs = getArgsText(acc.args());
-				if(args.size() != calledArgs.size())
-					throw new Exception("Invocation with wrong number of arguments:\nInvocation:"
-				+acc.getText() + "\nAlias "+name+" expecting "+args.size()+" arguments");
-				
-				String newRef = substituteInRefinement(refinement, args, calledArgs);
-				rewriter.replace(acc.start, acc.stop, newRef);
-				
-			}
-		}else if (rc.getChildCount() > 0) {
-			int i = rc.getChildCount();
-			for (int j = 0; j < i; j++) {
-				changeAlias(rc.getChild(j), map);
-			}
-		}		
-	}
-
-	
 	/**
 	 * Gets information about the alias
 	 * @param rc
@@ -110,19 +74,5 @@ public class AliasVisitor {
 			auxGetArgsDecl(argDeclID.argDeclID(), l);
 	}
 
-	private List<String> getArgsText(ArgsContext args) {
-		List<String> ls = new ArrayList<>();
-		for(PredContext p: args.pred())
-			ls.add(p.getText());
-		return ls;
-	}
-	
-
-	private String substituteInRefinement(String refinement, List<String> args, List<String> calledArgs) throws Exception {
-		String r = refinement;
-		for (int i = 0; i < args.size(); i++)
-			r = RefinementsParser.substitute(r, args.get(i), calledArgs.get(i));
-		return r;
-	}
 
 }

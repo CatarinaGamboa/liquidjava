@@ -13,28 +13,6 @@ import rj.grammar.RJParser.GhostCallContext;
 import rj.grammar.RJParser.GhostContext;
 
 public class GhostVisitor {
-	public static List<String> getGhostInvocations(ParseTree rc,  List<String> all) {
-		List<String> ls = new ArrayList<>();
-		getGhostsInvocations(rc, ls, all);
-		return ls;
-	}
-
-	private static void getGhostsInvocations(ParseTree rc,List<String> toAdd, List<String> all) {
-		if(rc instanceof GhostCallContext) {
-			GhostCallContext gc = (GhostCallContext)rc;
-			String ghostName = gc.ID().getText();
-			for(String name:all)
-				if(name.equals(ghostName))
-					toAdd.add(name);	
-		}
-		if (rc.getChildCount() > 0) {
-			int i = rc.getChildCount();
-			for (int j = 0; j < i; j++) {
-				getGhostsInvocations(rc.getChild(j), toAdd, all);
-			}
-		}
-	}
-	
 	
 	public static Triple<String, String, List<Pair<String,String>>> getGhostDecl(ParseTree rc) {
 		if(rc instanceof GhostContext) {
