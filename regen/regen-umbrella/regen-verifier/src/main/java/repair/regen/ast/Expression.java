@@ -124,7 +124,7 @@ public abstract class Expression {
 							sub = sub.substitute(new Var(s), v);
 						}
 						//substitute by sub in parent
-						setChild(i, new GroupExpression(sub));
+						setChild(i, (sub instanceof GroupExpression)? sub : new GroupExpression(sub));
 					}
 
 				}

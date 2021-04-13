@@ -31,7 +31,6 @@ public class Predicate extends Constraint{
 		if(!(exp instanceof GroupExpression)) {
 			exp = new GroupExpression(exp);
 		}
-		parse(ref);
 	}
 
 	/**
