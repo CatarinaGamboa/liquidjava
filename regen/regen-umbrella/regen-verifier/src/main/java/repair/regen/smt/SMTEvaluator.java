@@ -20,13 +20,9 @@ public class SMTEvaluator {
 		Constraint toVerify = Conjunction.createConjunction(subRef, supRef.negate());
 		System.out.println(toVerify.toString()); //TODO remover
 		
-//		testAntlr(toVerify.toString(), c);
 		
 		try {
 			Expression exp = toVerify.getExpression();
-//			TranslatorToZ3 tz3 = new TranslatorToZ3(c);
-//			Status s = tz3.verifyExpression(e);
-
 			TranslatorToZ3 tz3 = new TranslatorToZ3(c);
 			Expr e = exp.eval(tz3);
 			Status s = tz3.verifyExpression(e);

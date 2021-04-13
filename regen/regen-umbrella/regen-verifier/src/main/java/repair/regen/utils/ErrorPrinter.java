@@ -15,13 +15,19 @@ public class ErrorPrinter {
 	 * Prints the error message
 	 * @param <T>
 	 * @param var
+	 * @param s 
 	 * @param expectedType
 	 * @param cSMT
 	 */
 	public static <T> void printError(CtElement var, Constraint expectedType, Constraint cSMT) {
+		printError(var, null, expectedType, cSMT);
+	}
+	public static <T> void printError(CtElement var, String moreInfo, Constraint expectedType, Constraint cSMT) {
 		System.out.println("______________________________________________________");
 		System.err.println("Failed to check refinement at: ");
 		System.out.println();
+		if(moreInfo!=null)
+			System.out.println(moreInfo);
 		System.out.println(var);
 		System.out.println();
 		System.out.println("Type expected:" + expectedType.toString());

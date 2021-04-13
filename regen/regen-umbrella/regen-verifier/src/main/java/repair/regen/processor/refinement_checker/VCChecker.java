@@ -21,6 +21,7 @@ import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import repair.regen.smt.TypeMismatchError;
 import repair.regen.utils.ErrorPrinter;
+import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtElement;
 
 public class VCChecker {
@@ -207,11 +208,16 @@ public class VCChecker {
 	 */
 	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element, HashMap<String, String> map) {
 		//		printVCs("", cSMT.toString(), expectedType);
+		String s = null;
+		if(element instanceof CtInvocation) {
+			CtInvocation ci = (CtInvocation) element;
+			s = "Method invocation " + ci.getExecutable().toString() + " in:";
+		}
 		try {
 			new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
 			System.out.println("End smt checking");
 		} catch (TypeCheckError e) {
-			ErrorPrinter.printError(element, substituteByMap(expectedType, map), substituteByMap(cSMT, map));
+			ErrorPrinter.printError(element, s, substituteByMap(expectedType, map), substituteByMap(cSMT, map));
 		}catch (GhostFunctionError e) {
 			ErrorPrinter.printErrorArgs(element, substituteByMap(expectedType, map), e.getMessage());
 		}catch(TypeMismatchError e) {
