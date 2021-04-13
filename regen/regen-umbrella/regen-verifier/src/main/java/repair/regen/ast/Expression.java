@@ -13,7 +13,7 @@ import repair.regen.utils.Pair;
 public abstract class Expression {
 
 	public abstract Expr eval(TranslatorToZ3 ctx) throws Exception;
-	public abstract void substitute(String from, String to);
+//	public abstract void substitute(String from, String to);
 	public abstract void getVariableNames(List<String> toAdd);
 	public abstract void getStateInvocations(List<String> toAdd, List<String> all);
 	public abstract boolean isBooleanTrue();
@@ -102,7 +102,7 @@ public abstract class Expression {
 				Var v = (Var)fi.children.get(0);
 				Expression sub = subMap.get(fi.name).clone();
 				for(String s: toChange) {
-					sub.substitute(s, v.getName());
+					sub = sub.substitute(new Var(s),v);
 				}
 				//substitute by sub in parent
 				e = new GroupExpression(sub);
@@ -123,7 +123,7 @@ public abstract class Expression {
 						Var v = (Var)fi.children.get(0);
 						Expression sub = subMap.get(fi.name).clone();
 						for(String s: toChange) {
-							sub.substitute(s, v.getName());
+							sub = sub.substitute(new Var(s), v);
 						}
 						//substitute by sub in parent
 						setChild(i, new GroupExpression(sub));

@@ -28,11 +28,6 @@ public class LiteralInt extends Expression{
 		return Integer.toString(value);
 	}
 
-	@Override
-	public void substitute(String from, String to) {
-		//end leaf
-		
-	}
 
 	@Override
 	public void getVariableNames(List<String> toAdd) {

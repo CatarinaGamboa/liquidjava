@@ -76,12 +76,6 @@ public class BinaryExpression extends Expression{
 	}
 
 	@Override
-	public void substitute(String from, String to) {
-		getFirstOperand().substitute(from, to);
-		getSecondOperand().substitute(from, to);
-	}
-
-	@Override
 	public void getVariableNames(List<String> toAdd) {
 		getFirstOperand().getVariableNames(toAdd);
 		getSecondOperand().getVariableNames(toAdd);

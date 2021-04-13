@@ -26,11 +26,6 @@ public class GroupExpression extends Expression {
 	}
 
 	@Override
-	public void substitute(String from, String to) {
-		getExpression().substitute(from, to);		
-	}
-
-	@Override
 	public void getVariableNames(List<String> toAdd) {
 		getExpression().getVariableNames(toAdd);
 	}

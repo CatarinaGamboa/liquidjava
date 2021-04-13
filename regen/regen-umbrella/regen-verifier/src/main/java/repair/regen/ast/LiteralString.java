@@ -20,11 +20,7 @@ public class LiteralString extends Expression{
 	public String toString() {
 		return value;
 	}
-	@Override
-	public void substitute(String from, String to) {
-		//end leaf
-		
-	}
+
 	@Override
 	public void getVariableNames(List<String> toAdd) {
 		//end leaf

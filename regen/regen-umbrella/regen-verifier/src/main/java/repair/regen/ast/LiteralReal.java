@@ -28,12 +28,6 @@ public class LiteralReal extends Expression{
 	}
 
 	@Override
-	public void substitute(String from, String to) {
-		//end leaf
-		
-	}
-
-	@Override
 	public void getVariableNames(List<String> toAdd) {
 		//end leaf
 		

@@ -49,8 +49,7 @@ public class Predicate extends Constraint{
 	@Override
 	public Constraint substituteVariable(String from, String to) {
 		Expression ec = exp.clone();
-//		ec = ec.substitute(new Var(from), new Var(to));
-		ec.substitute(from, to);
+		ec = ec.substitute(new Var(from), new Var(to));
 		return new Predicate(ec);
 	}
 

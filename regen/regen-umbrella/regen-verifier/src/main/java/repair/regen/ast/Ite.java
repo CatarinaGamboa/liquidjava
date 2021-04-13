@@ -34,12 +34,6 @@ public class Ite extends Expression{
 		return getCondition().toString() +"?"+getThen().toString()+":"+getElse().toString();
 	}
 
-	@Override
-	public void substitute(String from, String to) {
-		getCondition().substitute(from, to);
-		getThen().substitute(from, to);
-		getElse().substitute(from, to);
-	}
 
 	@Override
 	public void getVariableNames(List<String> toAdd) {

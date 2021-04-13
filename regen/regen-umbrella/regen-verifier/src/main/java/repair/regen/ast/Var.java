@@ -28,12 +28,6 @@ public class Var extends Expression{
 	}
 
 	@Override
-	public void substitute(String from, String to) {
-		if(name.equals(from))
-			name = to;
-	}
-
-	@Override
 	public void getVariableNames(List<String> toAdd) {
 		if(!toAdd.contains(name))
 			toAdd.add(name);

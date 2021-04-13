@@ -43,12 +43,6 @@ public class FunctionInvocation extends Expression{
 	}
 
 	@Override
-	public void substitute(String from, String to) {
-		for(Expression e: getArgs())
-			e.substitute(from, to);
-	}
-
-	@Override
 	public void getVariableNames(List<String> toAdd) {
 		for(Expression e: getArgs())
 			e.getVariableNames(toAdd);
