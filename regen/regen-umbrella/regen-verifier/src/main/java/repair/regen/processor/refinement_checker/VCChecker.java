@@ -30,6 +30,7 @@ public class VCChecker {
 	private Context context;
 	private List<RefinedVariable> pathVariables;
 	Pattern thisPattern = Pattern.compile("#this_\\d+");
+	Pattern instancePattern = Pattern.compile("^#(.+)_[0-9]+$");
 	
 	
 	public VCChecker() {
@@ -122,6 +123,10 @@ public class VCChecker {
 			VariableInstance vi = (VariableInstance) var;
 			if(vi.getParent().isPresent())
 				map.put(vi.getName(), vi.getParent().get().getName());	
+			else if(instancePattern.matcher(var.getName()).matches()){
+				String result = var.getName().replaceAll("(_[0-9]+)$", "").replaceAll("^#", "");
+				map.put(var.getName(), result);
+			}
 		}else if(thisPattern.matcher(var.getName()).matches())
 				map.put(var.getName(), "this");
 	}
