@@ -9,6 +9,7 @@ public class ErrorAliasTypeMismatch {
         double positiveGrade2 = (20 * 0.5) + (20 * 0.5);
         @repair.regen.specification.Refinement("Positive(_)")
         double positive = positiveGrade2;
+        // Positive(_)   fica   positive > 0
     }
 }
 

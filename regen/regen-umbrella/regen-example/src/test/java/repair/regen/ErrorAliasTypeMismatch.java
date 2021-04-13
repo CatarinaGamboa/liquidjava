@@ -13,7 +13,7 @@ public class ErrorAliasTypeMismatch {
 		
 		@Refinement("Positive(_)")
 		double positive = positiveGrade2;
-		//positive > 0
+		//Positive(_)   fica   positive > 0
 	}
 
 }

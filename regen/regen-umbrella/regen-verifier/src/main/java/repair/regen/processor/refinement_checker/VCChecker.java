@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import repair.regen.processor.constraints.Conjunction;
@@ -14,6 +15,7 @@ import repair.regen.processor.constraints.VCImplication;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.smt.GhostFunctionError;
 import repair.regen.smt.NotFoundError;
@@ -27,7 +29,9 @@ import spoon.reflect.declaration.CtElement;
 public class VCChecker {
 	private Context context;
 	private List<RefinedVariable> pathVariables;
-
+	Pattern thisPattern = Pattern.compile("#this_\\d+");
+	
+	
 	public VCChecker() {
 		context = Context.getInstance();
 		pathVariables = new Stack<>();
@@ -117,9 +121,9 @@ public class VCChecker {
 		if(var instanceof VariableInstance) {
 			VariableInstance vi = (VariableInstance) var;
 			if(vi.getParent().isPresent())
-				map.put(vi.getName(), vi.getParent().get().getName());
-				
-		}
+				map.put(vi.getName(), vi.getParent().get().getName());	
+		}else if(thisPattern.matcher(var.getName()).matches())
+				map.put(var.getName(), "this");
 	}
 
 	private void gatherVariables(Constraint expectedType, List<RefinedVariable> lrv, List<RefinedVariable> mainVars) {
