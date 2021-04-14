@@ -8,10 +8,7 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import repair.regen.processor.facade.GhostDTO;
 import repair.regen.utils.Pair;
-import repair.regen.utils.Triple;
 import rj.grammar.RJParser.ArgDeclContext;
-import rj.grammar.RJParser.ArgDeclIDContext;
-import rj.grammar.RJParser.GhostCallContext;
 import rj.grammar.RJParser.GhostContext;
 
 public class GhostVisitor {

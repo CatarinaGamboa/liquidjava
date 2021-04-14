@@ -20,8 +20,6 @@ import repair.regen.processor.facade.GhostDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;
-import repair.regen.utils.Pair;
-import repair.regen.utils.Triple;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtNewArray;

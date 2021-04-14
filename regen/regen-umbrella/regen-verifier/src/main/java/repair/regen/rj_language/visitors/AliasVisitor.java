@@ -1,24 +1,19 @@
 package repair.regen.rj_language.visitors;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.TokenStreamRewriter;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.ParseTree;
 
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ParsingException;
-import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.Pair;
-import repair.regen.utils.Triple;
-import rj.grammar.RJParser.AliasCallContext;
 import rj.grammar.RJParser.AliasContext;
 import rj.grammar.RJParser.ArgDeclIDContext;
-import rj.grammar.RJParser.ArgsContext;
 import rj.grammar.RJParser.PredContext;
 
 public class AliasVisitor {
