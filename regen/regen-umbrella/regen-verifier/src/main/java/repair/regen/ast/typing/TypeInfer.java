@@ -99,7 +99,7 @@ public class TypeInfer {
 			if(!t1.isPresent() || !t2.isPresent()) return Optional.empty();
 			if(t1.get().equals(t2.get()))
 				return t1;
-			//TODO
+			//TODO if the types are different ex: double, int
 			fail("To implement in TypeInfer: Binary type, arithmetic with different arg types");
 		}
 		return null;
