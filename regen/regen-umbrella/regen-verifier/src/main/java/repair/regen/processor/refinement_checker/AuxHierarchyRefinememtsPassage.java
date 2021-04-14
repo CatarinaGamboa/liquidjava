@@ -85,7 +85,7 @@ public class AuxHierarchyRefinememtsPassage {
 				System.out.println(arg.getName()+" has ref boolean true");
 				arg.setRefinement(superArgRef.substituteVariable(newName, arg.getName()));
 			} else {
-				boolean f = tc.checkStateSMT(superArgRef, argRef, params.get(i));
+				boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i));
 				if(!f)
 					ErrorPrinter.printError(method, argRef, superArgRef);
 			}
@@ -109,9 +109,10 @@ public class AuxHierarchyRefinememtsPassage {
 			for(String m:super2function.keySet()) 
 				functionRef  = functionRef.substituteVariable(m, super2function.get(m));
 		
-			boolean f = tc.checkStateSMT(functionRef, superRef, method);
-			if(!f)
-				ErrorPrinter.printError(method, superRef, functionRef);
+			tc.checkStateSMT(functionRef, superRef, method, "Return Refinement of Subclass must be subtype of the Return Refinement of the Superclass");
+//			boolean f = tc.checkStateSMT(functionRef, superRef, method);
+//			if(!f)
+//				ErrorPrinter.printError(method, superRef, functionRef);
 		}
 	}
 
@@ -149,16 +150,18 @@ public class AuxHierarchyRefinememtsPassage {
 							subFunction, subState.getFrom());
 
 					//fromSup <: fromSub   <==> fromSup is sub type and fromSub is expectedType
-					boolean correct = tc.checkStateSMT(superConst, subConst, method);
-					if(!correct) ErrorPrinter.printError(method, subState.getFrom(), superState.getFrom());
+					tc.checkStateSMT(superConst, subConst, method, "FROM State from Superclass must be subtype of FROM State from Subclass");
+//					boolean correct = tc.checkStateSMT(superConst, subConst, method);
+//					if(!correct) ErrorPrinter.printError(method, subState.getFrom(), superState.getFrom());
 					System.out.println("Came to checkStates hierarchy");
 
 					
 					superConst = matchVariableNames(tc.THIS, thisName, superState.getTo());
 					subConst = matchVariableNames(tc.THIS, thisName,superFunction, subFunction, subState.getTo());
 					//toSub <: toSup   <==> ToSub is sub type and toSup is expectedType
-					correct = tc.checkStateSMT(subConst, superConst, method);
-					if(!correct) ErrorPrinter.printError(method, subState.getTo(), superState.getTo());
+					tc.checkStateSMT(subConst, superConst, method, "TO State from Subclass must be subtype of TO State from Superclass");
+//					boolean correct = tc.checkStateSMT(subConst, superConst, method);
+//					if(!correct) ErrorPrinter.printError(method, subState.getTo(), superState.getTo());
 				}
 			}
 		}

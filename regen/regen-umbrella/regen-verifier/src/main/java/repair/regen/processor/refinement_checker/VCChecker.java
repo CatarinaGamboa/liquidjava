@@ -31,8 +31,8 @@ public class VCChecker {
 	private List<RefinedVariable> pathVariables;
 	Pattern thisPattern = Pattern.compile("#this_\\d+");
 	Pattern instancePattern = Pattern.compile("^#(.+)_[0-9]+$");
-	
-	
+
+
 	public VCChecker() {
 		context = Context.getInstance();
 		pathVariables = new Stack<>();
@@ -46,18 +46,40 @@ public class VCChecker {
 
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] s = {wild_var, this_var};
-		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map)
-							.changeStatesToRefinements(list, s)
-							.changeAliasToRefinement(context, element);
+		Constraint premisesBeforeChange = joinConstraints(expectedType, element, mainVars, lrv, map);
+		Constraint premises = premisesBeforeChange 
+				.changeStatesToRefinements(list, s)
+				.changeAliasToRefinement(context, element);
 		Constraint et = expectedType
-							.changeStatesToRefinements(list, s)
-							.changeAliasToRefinement(context, element);
-		
+				.changeStatesToRefinements(list, s)
+				.changeAliasToRefinement(context, element);
+
 		System.out.println(premises.toString() + "\n"+et.toString());
-		smtChecking(premises, et, element, map);
+		try {
+			smtChecking(premises, et, element, map);
+		} catch (Exception e) {
+			//To emit the message we use the constraints before the alias and state change
+			printError(e, premisesBeforeChange, expectedType, element, map);
+		}
 	}
 
-	public boolean processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, String wild_var, String this_var,CtElement element) {
+	
+	public void processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, String wild_var, String this_var,CtElement element, String string) {
+		boolean b = canProcessSubtyping(type, expectedType, list, wild_var, this_var, element);
+		if(!b) {
+			List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
+			gatherVariables(expectedType, lrv, mainVars);
+			gatherVariables(type, lrv, mainVars);
+			HashMap<String, String> map = new HashMap<String, String>();
+			String[] s = {wild_var, this_var};
+			Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
+			printError(premises, expectedType, element, map, string);
+		}
+	}
+
+
+
+	public boolean canProcessSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, String wild_var, String this_var,CtElement element) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		gatherVariables(type, lrv, mainVars);
@@ -65,16 +87,16 @@ public class VCChecker {
 			return true;
 
 
-//		Constraint premises = joinConstraints(type, element, mainVars, lrv);
+		//		Constraint premises = joinConstraints(type, element, mainVars, lrv);
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] s = {wild_var, this_var};
 		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
 		premises = Conjunction.createConjunction(premises, type)
-							  .changeStatesToRefinements(list, s)
-							  .changeAliasToRefinement(context, element);
+				.changeStatesToRefinements(list, s)
+				.changeAliasToRefinement(context, element);
 		Constraint et = expectedType
-							  .changeStatesToRefinements(list, s)
-							  .changeAliasToRefinement(context, element);
+				.changeStatesToRefinements(list, s)
+				.changeAliasToRefinement(context, element);
 		System.out.println(premises.toString() + "\n"+et.toString());
 		return smtChecks(premises, et, element);
 	}
@@ -94,7 +116,7 @@ public class VCChecker {
 			if(firstSi == null) {
 				firstSi = si; lastSi = si;
 			}
-			
+
 		}
 
 		for(RefinedVariable var:vars) {//join refinements of vars
@@ -128,7 +150,7 @@ public class VCChecker {
 				map.put(var.getName(), result);
 			}
 		}else if(thisPattern.matcher(var.getName()).matches())
-				map.put(var.getName(), "this");
+			map.put(var.getName(), "this");
 	}
 
 	private void gatherVariables(Constraint expectedType, List<RefinedVariable> lrv, List<RefinedVariable> mainVars) {
@@ -214,37 +236,13 @@ public class VCChecker {
 	 * @param expectedType
 	 * @param element
 	 * @param map 
+	 * @throws Exception 
+	 * @throws GhostFunctionError 
+	 * @throws TypeCheckError 
 	 */
-	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element, HashMap<String, String> map) {
-		//		printVCs("", cSMT.toString(), expectedType);
-		String s = null;
-		if(element instanceof CtInvocation) {
-			CtInvocation ci = (CtInvocation) element;
-			s = "Method invocation " + ci.getExecutable().toString() + " in:";
-		}
-		try {
-			new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
-			System.out.println("End smt checking");
-		} catch (TypeCheckError e) {
-			ErrorPrinter.printError(element, s, substituteByMap(expectedType, map), substituteByMap(cSMT, map));
-		}catch (GhostFunctionError e) {
-			ErrorPrinter.printErrorArgs(element, substituteByMap(expectedType, map), e.getMessage());
-		}catch(TypeMismatchError e) {
-			ErrorPrinter.printErrorTypeMismatch(element, substituteByMap(expectedType, map), e.getMessage());
-		}catch(NotFoundError e) {
-			ErrorPrinter.printNotFound(element, substituteByMap(cSMT, map), substituteByMap(expectedType, map), e.getMessage());
-		}catch (Exception e) {
-			System.err.println("Unknown error:"+e.getMessage());
-			e.printStackTrace();
-			System.exit(7);
-
-		}
-		//catch(NullPointerException e) {
-		//	printErrorUnknownVariable(element, expectedType, correctRefinement);
-		//}
-
+	private void smtChecking(Constraint cSMT, Constraint expectedType, CtElement element, HashMap<String, String> map) throws TypeCheckError, GhostFunctionError, Exception {
+		new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
 	}
-
 
 	/**
 	 * Change variables in constraint by their value expression in the map
@@ -286,5 +284,38 @@ public class VCChecker {
 	}
 
 
+	private void printError(Exception e, Constraint premisesBeforeChange, Constraint expectedType, CtElement element,
+			HashMap<String, String> map) {
+		String s = null;
+		if(element instanceof CtInvocation) {
+			CtInvocation ci = (CtInvocation) element;
+			s = "Method invocation " + ci.getExecutable().toString() + " in:";
+		}
+
+		Constraint etMessageReady =  substituteByMap(expectedType, map);
+		Constraint cSMTMessageReady = substituteByMap(premisesBeforeChange, map);
+
+		if ( e instanceof TypeCheckError) {
+			ErrorPrinter.printError(element, s, etMessageReady, cSMTMessageReady);
+		}else if(e instanceof GhostFunctionError) {
+			ErrorPrinter.printErrorArgs(element, etMessageReady, e.getMessage());
+		}else if(e instanceof TypeMismatchError) {
+			ErrorPrinter.printErrorTypeMismatch(element, etMessageReady, e.getMessage());
+		}else if(e instanceof NotFoundError) {
+			ErrorPrinter.printNotFound(element, cSMTMessageReady, etMessageReady, e.getMessage());
+		}else {
+			System.err.println("Unknown error:"+e.getMessage());
+			e.printStackTrace();
+			System.exit(7);
+		}
+	}
+	
+	private void printError(Constraint premises, Constraint expectedType, CtElement element,
+			HashMap<String, String> map, String s) {
+		Constraint etMessageReady =  substituteByMap(expectedType, map);
+		Constraint cSMTMessageReady = substituteByMap(premises, map);
+		ErrorPrinter.printError(element, s, etMessageReady, cSMTMessageReady);
+		
+	}
 
 }

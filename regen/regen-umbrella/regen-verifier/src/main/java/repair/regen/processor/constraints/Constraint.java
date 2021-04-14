@@ -57,6 +57,7 @@ public abstract class Constraint {
 		ref = ref.changeAlias(mapAlias);
 		return new Predicate(ref);
 	}
+
 	
 
 }

@@ -176,7 +176,7 @@ public class AuxStateHandler {
 		Constraint c1 = isTo? getMissingStates(t, tc, p): p;
 		Constraint c = c1.substituteVariable(tc.THIS, name);
 		c = c.changeOldMentions(nameOld, name);
-		boolean b = tc.checkStateSMT(new Predicate(), c.negate(), e);
+		boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e);
 		if(b) ErrorPrinter.printSameStateSetError(e, p, t);	
 
 		return c1;
@@ -316,7 +316,7 @@ public class AuxStateHandler {
 				}
 				expectState = expectState.changeOldMentions(vi.getName(), instanceName);
 				
-				found = tc.checkStateSMT(prevCheck, expectState, invocation);
+				found = tc.checksStateSMT(prevCheck, expectState, invocation);
 				if(found && os.hasTo()) {
 					String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
 					Constraint transitionedState = os.getTo()

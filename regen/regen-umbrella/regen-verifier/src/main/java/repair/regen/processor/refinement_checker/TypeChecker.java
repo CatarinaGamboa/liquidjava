@@ -232,17 +232,6 @@ public abstract class TypeChecker extends CtScanner{
 		return ref;
 	}
 
-
-
-	void checkSMT(Constraint expectedType, CtElement element) {
-		vcChecker.processSubtyping(expectedType, context.getGhostState(), WILD_VAR, THIS, element);
-		element.putMetadata(REFINE_KEY, expectedType);	
-	}
-
-	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		return vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target);
-	}
-
 	void checkVariableRefinements(Constraint refinementFound, String simpleName, 
 			CtTypeReference type, CtElement usage, CtElement variable) {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
@@ -276,4 +265,18 @@ public abstract class TypeChecker extends CtScanner{
 		checkSMT(cEt, usage);//TODO CHANGE
 		context.addRefinementToVariableInContext(simpleName,type , cet);
 	}
+	
+	void checkSMT(Constraint expectedType, CtElement element) {
+		vcChecker.processSubtyping(expectedType, context.getGhostState(), WILD_VAR, THIS, element);
+		element.putMetadata(REFINE_KEY, expectedType);	
+	}
+	
+	 void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target, String string) {
+		vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target, string);
+	}
+
+	protected boolean checksStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
+		return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target);
+	}
+
 }
