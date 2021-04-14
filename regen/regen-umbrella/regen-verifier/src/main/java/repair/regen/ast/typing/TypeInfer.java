@@ -29,6 +29,12 @@ public class TypeInfer {
 		return t1.isPresent() && t2.isPresent() && t1.get().equals(t2.get());
 	}
 	
+	public static boolean checkCompatibleType(String type, Expression e, Context ctx, Factory factory) {
+		Optional<CtTypeReference<?>> t1 = getType(ctx, factory, e);
+		CtTypeReference<?> t2 = Utils.getType(type, factory);
+		return t1.isPresent() && t1.get().equals(t2);
+	}
+	
 	public static Optional<CtTypeReference<?>> getType(Context ctx, Factory factory, Expression e) {
 		if(e instanceof LiteralString)
 			return Optional.of(Utils.getType("String", factory));
@@ -107,6 +113,8 @@ public class TypeInfer {
 	private static Optional<CtTypeReference<?>> boolType(Factory factory){
 		return Optional.of(Utils.getType("boolean", factory));
 	}
+
+
 
 
 }

@@ -136,18 +136,18 @@ public abstract class Expression {
 		}
 
 	}
-	public Expression changeAlias(HashMap<String, Pair<Expression, List<Expression>>> mapAlias, Context ctx, Factory f) throws Exception {
+	public Expression changeAlias(HashMap<String, Pair<Expression, List<Pair<String, Expression>>>> mapAlias, Context ctx, Factory f) throws Exception {
 		Expression e = clone();
 		if(this instanceof AliasInvocation) {
 			AliasInvocation ai = (AliasInvocation)this;
 			if(mapAlias.containsKey(ai.name)) {//object state
 				Expression sub = mapAlias.get(ai.name).getFirst().clone();
-				List<Expression> vars = mapAlias.get(ai.name).getSecond();
+				List<Pair<String, Expression>> vars = mapAlias.get(ai.name).getSecond();
 				for (int i = 0; i < children.size(); i++) {
-					Expression varExp = vars.get(i).clone();
+					Expression varExp = vars.get(i).getSecond();
 					Expression aliasExp = children.get(i);
 					
-					boolean checks = TypeInfer.checkCompatibleType(varExp, aliasExp, ctx, f);
+					boolean checks = TypeInfer.checkCompatibleType(vars.get(i).getFirst(), aliasExp, ctx, f);
 					if(!checks)
 						throw new Exception("Type Mismatch: Cannoy substitute "+ 
 								aliasExp + " : "+ TypeInfer.getType(ctx, f, aliasExp).get().getQualifiedName() 
@@ -162,23 +162,23 @@ public abstract class Expression {
 		return e; 
 	}
 
-	private void auxChangeAlias(HashMap<String, Pair<Expression, List<Expression>>> mapAlias, Context ctx, Factory f) throws Exception {
+	private void auxChangeAlias(HashMap<String, Pair<Expression, List<Pair<String, Expression>>>> mapAlias, Context ctx, Factory f) throws Exception {
 		if(hasChildren())
 			for (int i = 0; i < children.size(); i++) {
 				if(children.get(i) instanceof AliasInvocation) {
 					AliasInvocation ai = (AliasInvocation)children.get(i);
 					Expression sub = mapAlias.get(ai.name).getFirst().clone();
-					List<Expression> vars = mapAlias.get(ai.name).getSecond();
+					List<Pair<String, Expression>> vars = mapAlias.get(ai.name).getSecond();
 					if(ai.hasChildren())
 						for (int j = 0; j< ai.children.size(); j++) {
-							Expression varExp = vars.get(j).clone();
+							Expression varExp = vars.get(j).getSecond().clone();
 							Expression aliasExp = ai.children.get(j);
-							
-							boolean checks = TypeInfer.checkCompatibleType(varExp, aliasExp, ctx, f);
+							String varType = vars.get(j).getFirst();
+							boolean checks = TypeInfer.checkCompatibleType(varType, aliasExp, ctx, f);
 							if(!checks)
-								throw new Exception("Type Mismatch: Cannoy substitute "+ 
-										aliasExp + " : "+ TypeInfer.getType(ctx, f, aliasExp).get().getQualifiedName() 
-								+ " by "+ varExp + " : "+ TypeInfer.getType(ctx, f, varExp).get().getQualifiedName());
+								throw new Exception("Type Mismatch: Cannot substitute "+ 
+										aliasExp + ":"+ TypeInfer.getType(ctx, f, aliasExp).get().getQualifiedName() 
+								+ " by "+ varExp + ":"+ varType + " in alias '"+ai.name+"'");
 							
 							sub = sub.substitute(varExp, aliasExp);
 						}
