@@ -137,6 +137,7 @@ public abstract class Expression {
 		}
 
 	}
+	
 	public Expression changeAlias(Map<String, AliasDTO> alias, Context ctx, Factory f) throws Exception {
 		Expression e = clone();
 		if(this instanceof AliasInvocation) {

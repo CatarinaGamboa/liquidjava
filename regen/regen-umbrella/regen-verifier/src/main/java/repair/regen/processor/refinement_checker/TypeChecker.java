@@ -16,6 +16,7 @@ import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.facade.AliasDTO;
+import repair.regen.processor.facade.GhostDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;
@@ -184,7 +185,7 @@ public abstract class TypeChecker extends CtScanner{
 
 	protected void getGhostFunction(String value, CtElement element) {
 		try {
-			Triple<String, String, List<Pair<String,String>>> f = RefinementsParser.getGhostDeclaration(value);
+			GhostDTO f = RefinementsParser.getGhostDeclaration(value);
 			if(f != null && element.getParent() instanceof CtClass<?>) {
 				CtClass<?> klass =(CtClass<?>) element.getParent(); 
 				GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName(), klass.getSimpleName()); 

@@ -1,5 +1,4 @@
 package repair.regen.rj_language;
-import java.util.List;
 import java.util.Optional;
 
 import org.antlr.v4.runtime.CharStreams;
@@ -10,11 +9,10 @@ import org.antlr.v4.runtime.tree.ParseTree;
 
 import repair.regen.ast.Expression;
 import repair.regen.processor.facade.AliasDTO;
+import repair.regen.processor.facade.GhostDTO;
 import repair.regen.rj_language.visitors.AliasVisitor;
 import repair.regen.rj_language.visitors.CreateASTVisitor;
 import repair.regen.rj_language.visitors.GhostVisitor;
-import repair.regen.utils.Pair;
-import repair.regen.utils.Triple;
 import rj.grammar.RJLexer;
 import rj.grammar.RJParser;
 
@@ -32,7 +30,7 @@ public class RefinementsParser {
 	 * @return
 	 * @throws ParsingException
 	 */
-	public static Triple<String, String, List<Pair<String,String>>> getGhostDeclaration(String s) throws ParsingException{
+	public static GhostDTO getGhostDeclaration(String s) throws ParsingException{
 		ParseTree rc = compile(s);
 		return GhostVisitor.getGhostDecl(rc);
 	}

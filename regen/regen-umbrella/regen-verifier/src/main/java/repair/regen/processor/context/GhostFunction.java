@@ -3,6 +3,7 @@ package repair.regen.processor.context;
 import java.util.ArrayList;
 import java.util.List;
 
+import repair.regen.processor.facade.GhostDTO;
 import repair.regen.utils.Pair;
 import repair.regen.utils.Triple;
 import repair.regen.utils.Utils;
@@ -17,12 +18,12 @@ public class GhostFunction {
 	
 	private String klassName;
 	
-	public GhostFunction(Triple<String, String, List<Pair<String,String>>> f, Factory factory, String path, String klass) {
-		name = f.getSecond();
-		return_type = Utils.getType(f.getFist().equals(klass)? path: f.getFist(), factory);
+	public GhostFunction(GhostDTO f, Factory factory, String path, String klass) {
+		name = f.getName();
+		return_type = Utils.getType(f.getReturn_type().equals(klass)? path: f.getReturn_type(), factory);
 		param_types = new ArrayList<>();
-		for(Pair<String,String> p : f.getThird()) {
-			param_types.add(Utils.getType(p.getFirst().equals(klass)? path : p.getFirst(), factory));
+		for(String t: f.getParam_types()) {
+			param_types.add(Utils.getType(t.equals(klass)? path : t, factory));
 		}
 	}
 	

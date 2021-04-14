@@ -8,6 +8,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
+import repair.regen.processor.facade.GhostDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;
@@ -70,7 +71,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		try {
 //			Optional<FunctionDeclaration> ofd = 
 //					RefinementParser.parseFunctionDecl(value);
-			Triple<String, String, List<Pair<String,String>>> f = RefinementsParser.getGhostDeclaration(value);
+			GhostDTO f = RefinementsParser.getGhostDeclaration(value);
 			if(f != null && element.getParent() instanceof CtInterface<?>) {
 				String[] a = prefix.split("\\.");
 				String d =  a[a.length-1];
