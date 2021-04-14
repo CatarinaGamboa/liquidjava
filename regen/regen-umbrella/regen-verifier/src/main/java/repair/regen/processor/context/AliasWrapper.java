@@ -11,6 +11,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
+import repair.regen.processor.facade.AliasDTO;
 import repair.regen.utils.Pair;
 import repair.regen.utils.Triple;
 import repair.regen.utils.Utils;
@@ -26,17 +27,16 @@ public class AliasWrapper {
 	
 	private String newAliasFormat = "#alias_%s_%d";
 
-	public AliasWrapper(Triple<String, String, List<Pair<String, String>>> alias, Factory factory, String wILD_VAR,
+	public AliasWrapper(AliasDTO a, Factory factory, String wILD_VAR,
 			Context context2, String klass, String path) {
-		name = alias.getFist();
-		expression = new Predicate(alias.getSecond());
+		name = a.getName();
+		expression = new Predicate(a.getExpression());
 		
 		varTypes = new ArrayList<>();
-		varNames = new ArrayList<>();
-		for(Pair<String,String> p : alias.getThird()) {
-			CtTypeReference<?> r = Utils.getType(p.getFirst().equals(klass)? path: p.getFirst(), factory);
+		varNames = a.getVarNames();
+		for(String s: a.getVarTypes()) {
+			CtTypeReference<?> r = Utils.getType(s.equals(klass)? path: s, factory);
 			varTypes.add(r);
-			varNames.add(p.getSecond());
 		}			
 	}
 
@@ -96,6 +96,10 @@ public class AliasWrapper {
 			m.put(names.get(i), varTypes.get(i));
 		}
 		return m;
+	}
+
+	public AliasDTO createAliasDTO() {
+		return new AliasDTO(name, varTypes, varNames, expression.getExpression());		
 	}
 	
 

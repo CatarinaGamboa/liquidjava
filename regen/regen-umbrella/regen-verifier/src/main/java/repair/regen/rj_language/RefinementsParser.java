@@ -9,6 +9,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import repair.regen.ast.Expression;
+import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.visitors.AliasVisitor;
 import repair.regen.rj_language.visitors.CreateASTVisitor;
 import repair.regen.rj_language.visitors.GhostVisitor;
@@ -37,7 +38,7 @@ public class RefinementsParser {
 	}
 
 	
-	public static Triple<String, String, List<Pair<String,String>>> getAliasDeclaration(String s) throws ParsingException{
+	public static AliasDTO getAliasDeclaration(String s) throws ParsingException{
 		Optional<String> os = getErrors(s);
 		if(os.isPresent())
 			throw new ParsingException(os.get());

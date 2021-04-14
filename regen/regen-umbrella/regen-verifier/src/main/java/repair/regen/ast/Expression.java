@@ -9,6 +9,7 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.ast.typing.TypeInfer;
 import repair.regen.processor.context.Context;
+import repair.regen.processor.facade.AliasDTO;
 import repair.regen.smt.TranslatorToZ3;
 import repair.regen.utils.Pair;
 import spoon.reflect.factory.Factory;
@@ -136,18 +137,19 @@ public abstract class Expression {
 		}
 
 	}
-	public Expression changeAlias(HashMap<String, Pair<Expression, List<Pair<String, Expression>>>> mapAlias, Context ctx, Factory f) throws Exception {
+	public Expression changeAlias(Map<String, AliasDTO> alias, Context ctx, Factory f) throws Exception {
 		Expression e = clone();
 		if(this instanceof AliasInvocation) {
 			AliasInvocation ai = (AliasInvocation)this;
-			if(mapAlias.containsKey(ai.name)) {//object state
-				Expression sub = mapAlias.get(ai.name).getFirst().clone();
-				List<Pair<String, Expression>> vars = mapAlias.get(ai.name).getSecond();
+			if(alias.containsKey(ai.name)) {//object state
+				AliasDTO dto = alias.get(ai.name);
+				Expression sub = dto.getExpression().clone();
 				for (int i = 0; i < children.size(); i++) {
-					Expression varExp = vars.get(i).getSecond();
+					Expression varExp = new Var(dto.getVarNames().get(i));
+					String varType = dto.getVarTypes().get(i);
 					Expression aliasExp = children.get(i);
 					
-					boolean checks = TypeInfer.checkCompatibleType(vars.get(i).getFirst(), aliasExp, ctx, f);
+					boolean checks = TypeInfer.checkCompatibleType(varType, aliasExp, ctx, f);
 					if(!checks)
 						throw new Exception("Type Mismatch: Cannoy substitute "+ 
 								aliasExp + " : "+ TypeInfer.getType(ctx, f, aliasExp).get().getQualifiedName() 
@@ -158,33 +160,34 @@ public abstract class Expression {
 				e = new GroupExpression(sub);
 			}
 		}
-		e.auxChangeAlias(mapAlias, ctx, f);
+		e.auxChangeAlias(alias, ctx, f);
 		return e; 
 	}
 
-	private void auxChangeAlias(HashMap<String, Pair<Expression, List<Pair<String, Expression>>>> mapAlias, Context ctx, Factory f) throws Exception {
+	private void auxChangeAlias(Map<String, AliasDTO> alias, Context ctx, Factory f) throws Exception {
 		if(hasChildren())
 			for (int i = 0; i < children.size(); i++) {
 				if(children.get(i) instanceof AliasInvocation) {
 					AliasInvocation ai = (AliasInvocation)children.get(i);
-					Expression sub = mapAlias.get(ai.name).getFirst().clone();
-					List<Pair<String, Expression>> vars = mapAlias.get(ai.name).getSecond();
+					AliasDTO dto = alias.get(ai.name);
+					Expression sub = dto.getExpression().clone();
 					if(ai.hasChildren())
 						for (int j = 0; j< ai.children.size(); j++) {
-							Expression varExp = vars.get(j).getSecond().clone();
+							Expression varExp = new Var(dto.getVarNames().get(j));
+							String varType = dto.getVarTypes().get(j);
 							Expression aliasExp = ai.children.get(j);
-							String varType = vars.get(j).getFirst();
+							
 							boolean checks = TypeInfer.checkCompatibleType(varType, aliasExp, ctx, f);
 							if(!checks)
-								throw new Exception("Type Mismatch: Cannot substitute "+ 
-										aliasExp + ":"+ TypeInfer.getType(ctx, f, aliasExp).get().getQualifiedName() 
-								+ " by "+ varExp + ":"+ varType + " in alias '"+ai.name+"'");
+								throw new Exception("Type Mismatch: Cannot substitute "+ varExp + ":"+  varType
+								+ " by "+ aliasExp + ":"+ TypeInfer.getType(ctx, f, aliasExp).get().getQualifiedName() 
+								+ " in alias '"+ai.name+"'");
 							
 							sub = sub.substitute(varExp, aliasExp);
 						}
 					setChild(i, sub);
 				}
-				children.get(i).auxChangeAlias(mapAlias, ctx, f);
+				children.get(i).auxChangeAlias(alias, ctx, f);
 			}
 		
 	}

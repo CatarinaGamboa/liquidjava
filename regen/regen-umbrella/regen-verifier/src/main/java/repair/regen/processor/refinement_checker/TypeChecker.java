@@ -15,6 +15,7 @@ import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;
@@ -198,7 +199,7 @@ public abstract class TypeChecker extends CtScanner{
 
 	protected void handleAlias(String value, CtElement element) {	
 		try {		
-			Triple<String, String, List<Pair<String, String>>> a = RefinementsParser.getAliasDeclaration(value);
+			AliasDTO a = RefinementsParser.getAliasDeclaration(value);
 			
 			if(a != null) {
 				String klass = null;

@@ -1,20 +1,18 @@
 package repair.regen.processor.constraints;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import repair.regen.ast.Expression;
 import repair.regen.ast.UnaryExpression;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostState;
+import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;
-import repair.regen.utils.Pair;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 
@@ -48,22 +46,28 @@ public abstract class Constraint {
 	
 	public Constraint changeAliasToRefinement(Context context, CtElement element, Factory f) throws Exception {
 		Expression ref = getExpression();
-		//      name         refinement             type    variable
-		HashMap<String, Pair<Expression, List<Pair<String, Expression>>>> mapAlias = new HashMap();
+		
+		Map<String, AliasDTO> alias = new HashMap<>();
 		for(AliasWrapper aw : context.getAlias()) {
-			List<Expression> argumentsExpressions = aw.getVarNames().stream().map(p->parse(p)).collect(Collectors.toList());
-			List<String> argumentsTypes = aw.getTypes().stream().map(p->p.getQualifiedName()).collect(Collectors.toList());
-			
-			List<Pair<String, Expression>> l = new ArrayList<>();
-			//zip
-			for (int i = 0; i < argumentsExpressions.size(); i++)
-				l.add(new Pair<>(argumentsTypes.get(i), argumentsExpressions.get(i)));
-			
-			Pair<Expression, List<Pair<String, Expression>>> p = 
-					new Pair<>(aw.getClonedConstraint().getExpression(), l);
-			mapAlias.put(aw.getName(), p);
+			alias.put(aw.getName(), aw.createAliasDTO());
 		}
-		ref = ref.changeAlias(mapAlias, context, f);
+		
+		//      name         refinement             type    variable
+//		HashMap<String, Pair<Expression, List<Pair<String, Expression>>>> mapAlias = new HashMap();
+//		for(AliasWrapper aw : context.getAlias()) {
+//			List<Expression> argumentsExpressions = aw.getVarNames().stream().map(p->parse(p)).collect(Collectors.toList());
+//			List<String> argumentsTypes = aw.getTypes().stream().map(p->p.getQualifiedName()).collect(Collectors.toList());
+//			
+//			List<Pair<String, Expression>> l = new ArrayList<>();
+//			//zip
+//			for (int i = 0; i < argumentsExpressions.size(); i++)
+//				l.add(new Pair<>(argumentsTypes.get(i), argumentsExpressions.get(i)));
+//			
+//			Pair<Expression, List<Pair<String, Expression>>> p = 
+//					new Pair<>(aw.getClonedConstraint().getExpression(), l);
+//			mapAlias.put(aw.getName(), p);
+//		}
+		ref = ref.changeAlias(alias, context, f);
 		return new Predicate(ref);
 	}
 
