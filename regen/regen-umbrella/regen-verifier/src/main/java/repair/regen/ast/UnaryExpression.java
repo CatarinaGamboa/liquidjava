@@ -18,6 +18,10 @@ public class UnaryExpression extends Expression{
 	public Expression getExpression() {
 		return children.get(0);
 	}
+	
+	public String getOp() {
+		return op;
+	}
 		
 	@Override
 	public Expr eval(TranslatorToZ3 ctx) throws Exception {

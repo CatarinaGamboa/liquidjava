@@ -25,6 +25,7 @@ import repair.regen.smt.TypeMismatchError;
 import repair.regen.utils.ErrorPrinter;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.factory.Factory;
 
 public class VCChecker {
 	private Context context;
@@ -38,7 +39,8 @@ public class VCChecker {
 		pathVariables = new Stack<>();
 	}
 
-	public void processSubtyping(Constraint expectedType, List<GhostState> list, String wild_var, String this_var, CtElement element) {
+	public void processSubtyping(Constraint expectedType, List<GhostState> list, String wild_var, 
+			String this_var, CtElement element, Factory f) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		if(expectedType.isBooleanTrue())
@@ -47,12 +49,19 @@ public class VCChecker {
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] s = {wild_var, this_var};
 		Constraint premisesBeforeChange = joinConstraints(expectedType, element, mainVars, lrv, map);
-		Constraint premises = premisesBeforeChange 
+		Constraint premises = null;
+		Constraint et = null;
+		try {
+			premises = premisesBeforeChange 
+					.changeStatesToRefinements(list, s)
+					.changeAliasToRefinement(context, element, f);
+		
+			et = expectedType
 				.changeStatesToRefinements(list, s)
-				.changeAliasToRefinement(context, element);
-		Constraint et = expectedType
-				.changeStatesToRefinements(list, s)
-				.changeAliasToRefinement(context, element);
+				.changeAliasToRefinement(context, element, f);
+		} catch (Exception e1) {
+			printError(premises, expectedType, element, map, e1.getMessage());
+		}
 
 		System.out.println(premises.toString() + "\n"+et.toString());
 		try {
@@ -64,8 +73,9 @@ public class VCChecker {
 	}
 
 	
-	public void processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, String wild_var, String this_var,CtElement element, String string) {
-		boolean b = canProcessSubtyping(type, expectedType, list, wild_var, this_var, element);
+	public void processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, 
+			String wild_var, String this_var,CtElement element, String string, Factory f) {
+		boolean b = canProcessSubtyping(type, expectedType, list, wild_var, this_var, element, f);
 		if(!b) {
 			List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 			gatherVariables(expectedType, lrv, mainVars);
@@ -79,7 +89,8 @@ public class VCChecker {
 
 
 
-	public boolean canProcessSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, String wild_var, String this_var,CtElement element) {
+	public boolean canProcessSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, 
+			String wild_var, String this_var,CtElement element, Factory f) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		gatherVariables(type, lrv, mainVars);
@@ -90,13 +101,21 @@ public class VCChecker {
 		//		Constraint premises = joinConstraints(type, element, mainVars, lrv);
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] s = {wild_var, this_var};
-		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
-		premises = Conjunction.createConjunction(premises, type)
-				.changeStatesToRefinements(list, s)
-				.changeAliasToRefinement(context, element);
-		Constraint et = expectedType
-				.changeStatesToRefinements(list, s)
-				.changeAliasToRefinement(context, element);
+		
+		Constraint premises = null; 
+		Constraint et = null;
+		try {
+			premises = joinConstraints(expectedType, element, mainVars, lrv, map);
+			premises = Conjunction.createConjunction(premises, type)
+					.changeStatesToRefinements(list, s)
+					.changeAliasToRefinement(context, element, f);
+			et = expectedType
+					.changeStatesToRefinements(list, s)
+					.changeAliasToRefinement(context, element, f);
+		} catch (Exception e) {
+			printError(premises, expectedType, element, map, e.getMessage());
+		}
+		
 		System.out.println(premises.toString() + "\n"+et.toString());
 		return smtChecks(premises, et, element);
 	}

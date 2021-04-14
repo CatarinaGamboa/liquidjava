@@ -267,16 +267,19 @@ public abstract class TypeChecker extends CtScanner{
 	}
 	
 	void checkSMT(Constraint expectedType, CtElement element) {
-		vcChecker.processSubtyping(expectedType, context.getGhostState(), WILD_VAR, THIS, element);
+		vcChecker.processSubtyping(expectedType, context.getGhostState(), 
+				WILD_VAR, THIS, element, factory);
 		element.putMetadata(REFINE_KEY, expectedType);	
 	}
 	
 	 void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target, String string) {
-		vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target, string);
+		vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), 
+				WILD_VAR, THIS, target, string, factory);
 	}
 
 	protected boolean checksStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target);
+		return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), 
+				WILD_VAR, THIS, target, factory);
 	}
 
 }

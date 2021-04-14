@@ -16,6 +16,10 @@ public class AliasInvocation extends Expression{
 		for(Expression e:args)
 			addChild(e);
 	}
+	
+	public String getName() {
+		return name;
+	}
 
 	public List<Expression> getArgs(){
 		return children;

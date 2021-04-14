@@ -18,6 +18,10 @@ public class FunctionInvocation extends Expression{
 			addChild(e);
 	}
 	
+	public String getName() {
+		return name;
+	}
+	
 	public List<Expression> getArgs(){
 		return children;
 	}

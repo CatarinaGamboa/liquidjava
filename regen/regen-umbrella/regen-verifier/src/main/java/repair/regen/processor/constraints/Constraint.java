@@ -15,6 +15,7 @@ import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;
 import repair.regen.utils.Pair;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.factory.Factory;
 
 public abstract class Constraint {
 	
@@ -44,7 +45,7 @@ public abstract class Constraint {
 	}
 
 	
-	public Constraint changeAliasToRefinement(Context context, CtElement element) {
+	public Constraint changeAliasToRefinement(Context context, CtElement element, Factory f) throws Exception {
 		Expression ref = getExpression();
 		
 		HashMap<String, Pair<Expression, List<Expression>>> mapAlias = new HashMap();
@@ -54,7 +55,7 @@ public abstract class Constraint {
 					new Pair<>(aw.getClonedConstraint().getExpression(), le);
 			mapAlias.put(aw.getName(), p);
 		}
-		ref = ref.changeAlias(mapAlias);
+		ref = ref.changeAlias(mapAlias, context, f);
 		return new Predicate(ref);
 	}
 

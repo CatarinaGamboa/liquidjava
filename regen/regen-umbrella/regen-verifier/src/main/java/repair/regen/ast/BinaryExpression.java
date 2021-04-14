@@ -22,8 +22,25 @@ public class BinaryExpression extends Expression{
 		return children.get(0);
 	}
 	
+	public String getOperator() {
+		return op;
+	}
+	
 	public Expression getSecondOperand() {
 		return children.get(1);
+	}
+	
+	public boolean isLogicOperation() {
+		return op.equals("||") || op.equals("&&") || op.equals("-->");   
+	}
+	
+	public boolean isBooleanOperation() {
+		return op.equals("==") || op.equals("!=") || op.equals(">=") ||
+			   op.equals(">") || op.equals("<=") || op.equals("<");   
+	}
+	
+	public boolean isArithmeticOperation() {
+		return !isLogicOperation() && !isBooleanOperation();  
 	}
 		
 	
@@ -85,7 +102,6 @@ public class BinaryExpression extends Expression{
 	public void getStateInvocations(List<String> toAdd, List<String> all) {
 		getFirstOperand().getStateInvocations(toAdd, all);
 		getSecondOperand().getStateInvocations(toAdd, all);
-		System.out.println();
 	}
 
 	@Override
