@@ -44,14 +44,14 @@ public class AuxHierarchyRefinememtsPassage {
 	}
 
 	static void transferRefinements(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method, TypeChecker tc) {
-		HashMap<String, String> super2function = getParametersMap(superFunction, function, tc);
+		HashMap<String, String> super2function = getParametersMap(superFunction, function, tc, method);
 		transferReturnRefinement(superFunction,function, method, tc, super2function);
 		transferArgumentsRefinements(superFunction, function, method, tc, super2function);
 		transferStateRefinements(superFunction, function, method, tc);
 	}
 
 
-	private static HashMap<String, String> getParametersMap(RefinedFunction superFunction, RefinedFunction function, TypeChecker tc) {
+	private static HashMap<String, String> getParametersMap(RefinedFunction superFunction, RefinedFunction function, TypeChecker tc, CtMethod<?> method) {
 		List<Variable> superArgs = superFunction.getArguments();
 		List<Variable> fArgs = function.getArguments();
 		HashMap<String, String> m = new HashMap<String, String>();
@@ -59,7 +59,8 @@ public class AuxHierarchyRefinememtsPassage {
 			String newName = String.format(tc.instanceFormat, fArgs.get(i).getName(), tc.context.getCounter());
 			m.put(superArgs.get(i).getName(), newName); 
 			m.put(fArgs.get(i).getName(), newName);
-			RefinedVariable rv = tc.context.addVarToContext(newName, superArgs.get(i).getType(), new Predicate());
+			RefinedVariable rv = tc.context.addVarToContext(newName, superArgs.get(i).getType(), 
+					new Predicate(), method.getParameters().get(i));
 			for(CtTypeReference<?> t : fArgs.get(i).getSuperTypes()) {
 				rv.addSuperType(t);
 			}
@@ -100,7 +101,7 @@ public class AuxHierarchyRefinememtsPassage {
 			function.setRefinement(superRef);
 		else{
 			String name = String.format(tc.freshFormat, tc.context.getCounter());
-			tc.context.addVarToContext(name, superFunction.getType(), new Predicate());
+			tc.context.addVarToContext(name, superFunction.getType(), new Predicate(), method);
 			//functionRef might be stronger than superRef -> check (superRef <: functionRef)
 			functionRef = functionRef.substituteVariable(tc.WILD_VAR, name);
 			superRef = superRef.substituteVariable(tc.WILD_VAR, name);
@@ -143,7 +144,7 @@ public class AuxHierarchyRefinememtsPassage {
 					ObjectState subState = subStates.get(i);
 
 					String thisName = String.format(tc.freshFormat, tc.context.getCounter());
-					createVariableInContext(thisName, tc, subFunction, superFunction);
+					createVariableInContext(thisName, tc, subFunction, superFunction, method.getParameters().get(i));
 					
 					Constraint superConst = matchVariableNames(tc.THIS, thisName, superState.getFrom());
 					Constraint subConst = matchVariableNames(tc.THIS, thisName, superFunction, 
@@ -170,9 +171,10 @@ public class AuxHierarchyRefinememtsPassage {
 
 	}
 
-	private static void createVariableInContext(String thisName, TypeChecker tc, RefinedFunction subFunction, RefinedFunction superFunction) {
+	private static void createVariableInContext(String thisName, TypeChecker tc,
+			RefinedFunction subFunction, RefinedFunction superFunction, CtParameter<?> ctParameter) {
 		RefinedVariable rv  = tc.context.addVarToContext(thisName, Utils.getType(subFunction.getTargetClass(), tc.factory), 
-				new Predicate());
+				new Predicate(), ctParameter);
 		rv.addSuperType(Utils.getType(superFunction.getTargetClass(), tc.factory));//TODO: change: this only works for one superclass
 		
 	}

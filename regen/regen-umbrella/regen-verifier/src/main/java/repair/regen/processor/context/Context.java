@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.Stack;
 
 import repair.regen.processor.constraints.Constraint;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -129,26 +130,32 @@ public class Context {
 		var.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
 	}
 
-	public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
+	public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, 
+			Constraint c, CtElement placementInCode) {
 		RefinedVariable vi = new Variable(simpleName, type, c);
+		vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
 		vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
 		addVarToContext(vi);
 		return vi;
 	}
 
-	public RefinedVariable addInstanceToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
+	public RefinedVariable addInstanceToContext(String simpleName, CtTypeReference<?> type, 
+			Constraint c, CtElement placementInCode) {
 		RefinedVariable vi = new VariableInstance(simpleName, type, c);
+		vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
 		if(!ctxSpecificVars.contains(vi))
 			addSpecificVariable(vi);
 		return vi;
 	}
 
-	public void addRefinementToVariableInContext(String name, CtTypeReference<?> type, Constraint et) {
+	public void addRefinementToVariableInContext(String name, CtTypeReference<?> type, 
+			Constraint et, CtElement placementInCode) {
 		if(hasVariable(name)){
 			RefinedVariable vi = getVariableByName(name);
 			vi.setRefinement(et);
+			vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
 		}else {
-			addVarToContext(name, type, et);
+			addVarToContext(name, type, et, placementInCode);
 		}
 	}
 

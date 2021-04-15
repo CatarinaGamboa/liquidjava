@@ -257,13 +257,13 @@ public abstract class TypeChecker extends CtScanner{
 		cEt = cEt.substituteVariable(simpleName, newName);
 
 		//Substitute variable in verification
-		RefinedVariable rv= context.addInstanceToContext(newName, type, correctNewRefinement);
+		RefinedVariable rv= context.addInstanceToContext(newName, type, correctNewRefinement, usage);
 		for(CtTypeReference t: mainRV.getSuperTypes())
 			rv.addSuperType(t);
 		context.addRefinementInstanceToVariable(simpleName, newName);
 		//smt check
 		checkSMT(cEt, usage);//TODO CHANGE
-		context.addRefinementToVariableInContext(simpleName,type , cet);
+		context.addRefinementToVariableInContext(simpleName,type , cet, usage);
 	}
 	
 	void checkSMT(Constraint expectedType, CtElement element) {

@@ -163,16 +163,18 @@ public class VCChecker {
 
 
 	private void addMap(RefinedVariable var, Map<String, String> map) {
-		if(var instanceof VariableInstance) {
-			VariableInstance vi = (VariableInstance) var;
-			if(vi.getParent().isPresent())
-				map.put(vi.getName(), vi.getParent().get().getName());	
-			else if(instancePattern.matcher(var.getName()).matches()){
-				String result = var.getName().replaceAll("(_[0-9]+)$", "").replaceAll("^#", "");
-				map.put(var.getName(), result);
-			}
-		}else if(thisPattern.matcher(var.getName()).matches())
-			map.put(var.getName(), "this");
+		map.put(var.getName(), var.getPlacementInCode().toString());
+		System.out.println();
+//		if(var instanceof VariableInstance) {
+//			VariableInstance vi = (VariableInstance) var;
+//			if(vi.getParent().isPresent())
+//				map.put(vi.getName(), vi.getParent().get().getName());	
+//			else if(instancePattern.matcher(var.getName()).matches()){
+//				String result = var.getName().replaceAll("(_[0-9]+)$", "").replaceAll("^#", "");
+//				map.put(var.getName(), result);
+//			}
+//		}else if(thisPattern.matcher(var.getName()).matches())
+//			map.put(var.getName(), "this");
 	}
 
 	private void gatherVariables(Constraint expectedType, List<RefinedVariable> lrv, List<RefinedVariable> mainVars) {
@@ -312,9 +314,12 @@ public class VCChecker {
 			s = "Method invocation " + ci.getExecutable().toString() + " in:";
 		}
 
-		Constraint etMessageReady =  substituteByMap(expectedType, map);
-		Constraint cSMTMessageReady = substituteByMap(premisesBeforeChange, map);
+		Constraint etMessageReady =  expectedType;//substituteByMap(expectedType, map);
+		Constraint cSMTMessageReady = premisesBeforeChange;//substituteByMap(premisesBeforeChange, map);
 
+		printMap(map);
+		
+		
 		if ( e instanceof TypeCheckError) {
 			ErrorPrinter.printError(element, s, etMessageReady, cSMTMessageReady);
 		}else if(e instanceof GhostFunctionError) {
@@ -331,12 +336,19 @@ public class VCChecker {
 		}
 	}
 
+	private void printMap(HashMap<String, String> map) {
+//		System.out.println("Instance translation table:");
+//		for(String s : map.keySet()) {
+//			System.out.println("  "+s+"  |  "+map.get(s));
+//		}
+		
+	}
+
 	private void printError(Constraint premises, Constraint expectedType, CtElement element,
 			HashMap<String, String> map, String s) {
 		Constraint etMessageReady =  substituteByMap(expectedType, map);
 		Constraint cSMTMessageReady = substituteByMap(premises, map);
 		ErrorPrinter.printError(element, s, etMessageReady, cSMTMessageReady);
-
 	}
 
 }

@@ -116,7 +116,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		if(localVariable.getAssignment() == null) {
 			Optional<Constraint> a = getRefinementFromAnnotation(localVariable);
 			context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), 
-					a.isPresent()? a.get() : new Predicate());
+					a.isPresent()? a.get() : new Predicate(), localVariable);
 		}else {
 			String varName = localVariable.getSimpleName();
 			CtExpression<?> e = localVariable.getAssignment();
@@ -124,7 +124,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			Constraint refinementFound = getRefinement(e);
 			if (refinementFound == null)
 				refinementFound = new Predicate();
-			context.addVarToContext(varName, localVariable.getType(), new Predicate());
+			context.addVarToContext(varName, localVariable.getType(), new Predicate(), e);
 
 			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable, localVariable);
 
@@ -145,7 +145,7 @@ public class RefinementTypeChecker extends TypeChecker {
 				c = c.substituteVariable(WILD_VAR, name);
 			else
 				c = new EqualsPredicate(new VariablePredicate(name), c);
-			context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c);
+			context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, exp);
 			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR), new VariablePredicate(name));
 			newArray.putMetadata(REFINE_KEY, ep);
 		}
@@ -196,7 +196,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	public <T> void visitCtArrayRead(CtArrayRead<T> arrayRead) {
 		super.visitCtArrayRead(arrayRead);
 		String name = String.format(instanceFormat, "arrayAccess", context.getCounter());
-		context.addVarToContext(name, arrayRead.getType(), new Predicate());
+		context.addVarToContext(name, arrayRead.getType(), new Predicate(), arrayRead);
 		arrayRead.putMetadata(REFINE_KEY, new VariablePredicate(name));
 		//TODO predicate for now is always TRUE
 	}
@@ -247,7 +247,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		Constraint ret = new Predicate();
 		if(c.isPresent())
 			ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
-		RefinedVariable v = context.addVarToContext(nname, f.getType(),ret);
+		RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, f);
 		if(v instanceof Variable)
 			((Variable)v).setLocation("this");
 
@@ -338,7 +338,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			expRefs = new Predicate();
 		
 		RefinedVariable freshRV = context.addInstanceToContext(freshVarName, 
-				factory.Type().INTEGER_PRIMITIVE, expRefs);
+				factory.Type().INTEGER_PRIMITIVE, expRefs, exp);
 		vcChecker.addPathVariable(freshRV);
 		
 		context.variablesNewIfCombination();

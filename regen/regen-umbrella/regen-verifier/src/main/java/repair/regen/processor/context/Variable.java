@@ -171,7 +171,9 @@ public class Variable extends RefinedVariable{
 			else
 				ref = createITEConstraint(nName, cond.negate(), get(ifelseIndex));	
 		}
-		return Optional.of(new VariableInstance(nName, super.getType(), ref, this));
+		VariableInstance jointReturn = new VariableInstance(nName, super.getType(), ref, this);
+		jointReturn.addPlacementInCode(getPlacementInCode());
+		return Optional.of(jointReturn);
 	}
 
 

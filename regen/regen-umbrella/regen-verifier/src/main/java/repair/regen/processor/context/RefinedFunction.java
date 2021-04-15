@@ -60,11 +60,11 @@ public class RefinedFunction extends Refined{
 		return targetClass;
 	}
 	
-	public Constraint getRenamedRefinements(Context c) {
-		return getRenamedRefinements(getAllRefinements(), c);
+	public Constraint getRenamedRefinements(Context c, CtElement element) {
+		return getRenamedRefinements(getAllRefinements(), c, element);
 	}
 	
-	private Constraint getRenamedRefinements(Constraint place, Context context) {
+	private Constraint getRenamedRefinements(Constraint place, Context context, CtElement element) {
 		Constraint update = place.clone();
 		for(Variable p: argRefinements) {
 			String varName = p.getName();
@@ -74,7 +74,7 @@ public class RefinedFunction extends Refined{
 				varName = ovi.get().getName();
 				c = p.getRenamedRefinements(varName);
 			}
-			context.addVarToContext(varName, p.getType(), c);
+			context.addVarToContext(varName, p.getType(), c, element);
 			update = update.substituteVariable(p.getName(), varName);
 		}
 		return update;

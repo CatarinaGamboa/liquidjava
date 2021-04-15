@@ -33,7 +33,7 @@ public class SimpleTest {
         // .addGift()  //#f2.addGift()
         // .sendToAddress("home");
         int a = 10;
-        @repair.regen.specification.Refinement(" (b == 6)")
+        @repair.regen.specification.Refinement("(b == 6)")
         boolean b = true;
         // @Refinement("_ > 10")
         // int i = 10;
