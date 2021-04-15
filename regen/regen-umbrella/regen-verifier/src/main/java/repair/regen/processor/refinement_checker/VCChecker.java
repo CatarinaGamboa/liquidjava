@@ -8,6 +8,8 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.microsoft.z3.Z3Exception;
+
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
@@ -55,10 +57,10 @@ public class VCChecker {
 			premises = premisesBeforeChange 
 					.changeStatesToRefinements(list, s)
 					.changeAliasToRefinement(context, element, f);
-		
+
 			et = expectedType
-				.changeStatesToRefinements(list, s)
-				.changeAliasToRefinement(context, element, f);
+					.changeStatesToRefinements(list, s)
+					.changeAliasToRefinement(context, element, f);
 		} catch (Exception e1) {
 			printError(premises, expectedType, element, map, e1.getMessage());
 		}
@@ -68,11 +70,12 @@ public class VCChecker {
 			smtChecking(premises, et, element, map);
 		} catch (Exception e) {
 			//To emit the message we use the constraints before the alias and state change
+			System.out.println();
 			printError(e, premisesBeforeChange, expectedType, element, map);
 		}
 	}
 
-	
+
 	public void processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, 
 			String wild_var, String this_var,CtElement element, String string, Factory f) {
 		boolean b = canProcessSubtyping(type, expectedType, list, wild_var, this_var, element, f);
@@ -101,7 +104,7 @@ public class VCChecker {
 		//		Constraint premises = joinConstraints(type, element, mainVars, lrv);
 		HashMap<String, String> map = new HashMap<String, String>();
 		String[] s = {wild_var, this_var};
-		
+
 		Constraint premises = null; 
 		Constraint et = null;
 		try {
@@ -115,7 +118,7 @@ public class VCChecker {
 		} catch (Exception e) {
 			printError(premises, expectedType, element, map, e.getMessage());
 		}
-		
+
 		System.out.println(premises.toString() + "\n"+et.toString());
 		return smtChecks(premises, et, element);
 	}
@@ -323,18 +326,19 @@ public class VCChecker {
 		}else if(e instanceof NotFoundError) {
 			ErrorPrinter.printNotFound(element, cSMTMessageReady, etMessageReady, e.getMessage());
 		}else {
-			System.err.println("Unknown error:"+e.getMessage());
-			e.printStackTrace();
-			System.exit(7);
+			ErrorPrinter.printCostumeError(element, e.getMessage());
+//			System.err.println("Unknown error:"+e.getMessage());
+//			e.printStackTrace();
+//			System.exit(7);
 		}
 	}
-	
+
 	private void printError(Constraint premises, Constraint expectedType, CtElement element,
 			HashMap<String, String> map, String s) {
 		Constraint etMessageReady =  substituteByMap(expectedType, map);
 		Constraint cSMTMessageReady = substituteByMap(premises, map);
 		ErrorPrinter.printError(element, s, etMessageReady, cSMTMessageReady);
-		
+
 	}
 
 }

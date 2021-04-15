@@ -24,11 +24,17 @@ package regen.test.project;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
-@repair.regen.specification.RefinementAlias("type Percentage(int x) { x >= 0 && x <= 100}")
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        @repair.regen.specification.Refinement("b > 6 && b < 50")
-        int b = 10;
+        // Order f = new Order();
+        // //#f0
+        // f.addItem("shirt", 20) //#f0.addItem() -> #f1
+        // .pay(00000) //#f1.pay() -> #f2
+        // .addGift()  //#f2.addGift()
+        // .sendToAddress("home");
+        int a = 10;
+        @repair.regen.specification.Refinement(" (b == 6)")
+        boolean b = true;
         // @Refinement("_ > 10")
         // int i = 10;
         // @Refinement("sum(_) > 30")

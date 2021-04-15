@@ -38,7 +38,8 @@ public class SMTEvaluator {
 					e.getLocalizedMessage().substring(0, 13).equals("Sort mismatch"))
 				throw new GhostFunctionError(e.getLocalizedMessage());
 			else
-				e.printStackTrace();
+				throw new Z3Exception(e.getLocalizedMessage());
+//				e.printStackTrace();
 		}
 
 	}
