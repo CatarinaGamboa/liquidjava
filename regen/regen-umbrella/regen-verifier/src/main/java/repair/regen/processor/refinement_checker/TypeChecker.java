@@ -22,11 +22,13 @@ import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
+import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtNewArray;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtInterface;
+import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
@@ -256,8 +258,10 @@ public abstract class TypeChecker extends CtScanner{
 		correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
 		cEt = cEt.substituteVariable(simpleName, newName);
 
+		
 		//Substitute variable in verification
-		RefinedVariable rv= context.addInstanceToContext(newName, type, correctNewRefinement, usage);
+		RefinedVariable rv= context.addInstanceToContext(newName, type, 
+				correctNewRefinement, usage);
 		for(CtTypeReference t: mainRV.getSuperTypes())
 			rv.addSuperType(t);
 		context.addRefinementInstanceToVariable(simpleName, newName);

@@ -35,8 +35,8 @@ public class ErrorPrinter {
 		System.out.println(var);
 		System.out.println();
 		System.out.println("Type expected:" + expectedType.toString());
-		System.out.println("Refinement found:" + cSMT.toString());
 		printMap(map);
+		System.out.println("Refinement found:" + cSMT.toString());
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);
@@ -49,8 +49,8 @@ public class ErrorPrinter {
 		System.out.println(element);
 		System.out.println();
 		System.out.println("Expected possible states:" + states);
-		System.out.println("State found:" + c.toString());
 		printMap(map);
+		System.out.println("State found:" + c.toString());
 		System.out.println("Location: " + element.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);
@@ -175,14 +175,17 @@ public class ErrorPrinter {
 	}
 	
 	private static void printMap(HashMap<String, PlacementInCode> map) {
+		if(map.isEmpty()) return;
 		System.out.println("\nInstance translation table:");
-		for (int i = 0; i < 130; i++) System.out.print("-");
-		System.out.format("\n|%-32s | %-60s | %-1s \n", "Variable Name", "Saves the result of", "File");
-		for (int i = 0; i < 130; i++) System.out.print("-");
+		for (int i = 0; i < 130; i++) System.out.print("-");//-----------
+		//title
+		System.out.format("\n| %-32s | %-60s | %-1s \n", "Variable Name", "Saves the result of", "File");
+		for (int i = 0; i < 130; i++) System.out.print("-");//----------
+		//data
 		System.out.println();
 		for(String s : map.keySet())
-			System.out.format("|%-32s | %-60s | %-1s \n", s, map.get(s).getText(), map.get(s).getSimplePosition());
-		
+			System.out.format("| %-32s | %-60s | %-1s \n", s, map.get(s).getText(), map.get(s).getSimplePosition());
+		//end
 		for (int i = 0; i < 130; i++) System.out.print("-");
 		System.out.println();
 		

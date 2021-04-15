@@ -128,7 +128,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
 			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable, localVariable);
 
-//			AuxStateHandler.addStateRefinements(context, STATE_KEY, THIS, varName, e);
 			AuxStateHandler.addStateRefinements(this, varName, e);
 		}
 	}
