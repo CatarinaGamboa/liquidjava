@@ -179,19 +179,18 @@ public class VCChecker {
 		for(String s: expectedType.getVariableNames()) {
 			if(context.hasVariable(s)) {
 				RefinedVariable rv = context.getVariableByName(s);
-				if(!mainVars.contains(rv))
+				if(!mainVars.contains(rv) && !lrv.contains(rv))
 					mainVars.add(rv);
 				List<RefinedVariable> lm = getVariables(rv.getMainRefinement(), rv.getName());
-				addAllDiferent(lrv, lm);
+				addAllDiferent(lrv, lm,  mainVars);
 			}
 		}
-
 	}
 
 
-	private void addAllDiferent(List<RefinedVariable> toExpand, List<RefinedVariable> from) {
+	private void addAllDiferent(List<RefinedVariable> toExpand, List<RefinedVariable> from, List<RefinedVariable> remove) {
 		for(RefinedVariable rv:from) {
-			if(!toExpand.contains(rv))
+			if(!toExpand.contains(rv) && !remove.contains(rv))
 				toExpand.add(rv);
 		}
 	}
@@ -203,7 +202,6 @@ public class VCChecker {
 				.map(a->a.getName())
 				.collect(Collectors.toList());
 		getVariablesFromContext(pathNames, allVars, "");
-
 
 		return allVars;
 	}
