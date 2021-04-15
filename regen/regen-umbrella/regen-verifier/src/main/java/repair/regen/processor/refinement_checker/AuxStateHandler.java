@@ -178,7 +178,7 @@ public class AuxStateHandler {
 		Constraint c = c1.substituteVariable(tc.THIS, name);
 		c = c.changeOldMentions(nameOld, name);
 		boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e);
-		if(b) ErrorPrinter.printSameStateSetError(e, p, t);	
+		if(b) tc.createSameStateError(e, p, t);	
 
 		return c1;
 
@@ -344,7 +344,8 @@ public class AuxStateHandler {
 				System.out.println();
 			}
 				
-			ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState, states);
+			tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
+//			ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState, states);
 		}
 		return new Predicate();
 	}

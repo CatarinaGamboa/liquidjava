@@ -32,8 +32,12 @@ public class PlacementInCode {
 		return new PlacementInCode(elem.toString(), elem.getPosition());
 	}
 	
+	public String getSimplePosition() {
+		return position.getFile().getName()+":"+position.getLine()+", "+position.getColumn();
+	}
+	
 	public String toString() {
-		return text + "  at:" +position.getFile()+":"+position.getLine()+", "+position.getColumn();
+		return text + "  at:" +position.getFile().getName()+":"+position.getLine()+", "+position.getColumn();
 	}
 
 }

@@ -281,5 +281,16 @@ public abstract class TypeChecker extends CtScanner{
 		return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), 
 				WILD_VAR, THIS, target, factory);
 	}
+	
+	void createError(CtElement element, Constraint expectedType, Constraint foundType, String customeMessage) {
+		 vcChecker.printSubtypingError(element, expectedType, foundType,customeMessage); 
+	}
+	void createSameStateError(CtElement element, Constraint expectedType, String klass) {
+		 vcChecker.printSameStateError(element, expectedType,klass); 
+	}
+	
+	void createStateMismatchError(CtElement element, String method, Constraint c, String states) {
+		vcChecker.printStateMismatchError(element, method, c, states);
+	}
 
 }
