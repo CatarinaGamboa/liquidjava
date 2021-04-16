@@ -329,7 +329,13 @@ public class VCChecker {
 		String s = null;
 		if(element instanceof CtInvocation) {
 			CtInvocation ci = (CtInvocation) element;
-			s = "Method invocation " + ci.getExecutable().toString() + " in:";
+			String totalS = ci.getExecutable().toString();
+			if(ci.getTarget() != null) {
+				int targetL = ci.getTarget().toString().length();
+				totalS = ci.toString().substring(targetL+1);
+			}
+			s = "Method invocation " + totalS + " in:";
+			System.out.println();
 		}
 
 		Constraint etMessageReady =  expectedType;//substituteByMap(expectedType, map);
