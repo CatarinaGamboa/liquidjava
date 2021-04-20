@@ -4,25 +4,17 @@ import java.io.IOException;
 
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
-
 public class SimpleTest {
-
+	
 	public static void main(String[] args) throws IOException{
 		
-//		Order f = new Order();
-//		//#f0
-//		f.addItem("shirt", 20) //#f0.addItem() -> #f1
-//		 .pay(00000) //#f1.pay() -> #f2
-//		 .addGift()  //#f2.addGift()
-//		 .sendToAddress("home");
-		
-		int a = 10;
-		
-		@Refinement("(b == 6)")
-		boolean b = true;
-		
-		
-		
+		Order f = new Order();
+		//#f0
+		f.addItem("shirt", 20) //#f0.addItem() -> #f1
+		 .pay(00000) //#f1.pay() -> #f2
+		 .addGift()  //#f2.addGift()
+		 .sendToAddress("home");
+
 		
 		
 		

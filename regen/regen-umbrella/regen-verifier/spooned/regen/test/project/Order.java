@@ -2,9 +2,8 @@ package regen.test.project;
 
 
 @repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "closed" })
+@repair.regen.specification.Ghost("int totalPrice")
 public class Order {
-    @repair.regen.specification.RefinementPredicate("int totalPrice(Order o)")
-    @repair.regen.specification.StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
     public Order() {
     }
 
@@ -15,7 +14,7 @@ public class Order {
         return this;
     }
 
-    @repair.regen.specification.StateRefinement(from = "addingItems(this)", to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+    @repair.regen.specification.StateRefinement(from = "addingItems(this)", to = "checkout(this)")
     @repair.regen.specification.Refinement("_ == this")
     public regen.test.project.Order pay(int cardNumber) {
         return this;
@@ -27,13 +26,19 @@ public class Order {
         return this;
     }
 
+    @repair.regen.specification.StateRefinement(from = "checkout(this)", to = "totalPrice(this) == (totalPrice(old(this)) + 3)")
+    @repair.regen.specification.Refinement("_ == this")
+    public regen.test.project.Order addTransportCosts() {
+        return this;
+    }
+
     @repair.regen.specification.StateRefinement(from = "checkout(this)", to = "closed(this)")
     @repair.regen.specification.Refinement("_ == this")
     public regen.test.project.Order sendToAddress(java.lang.String a) {
         return this;
     }
 
-    @repair.regen.specification.StateRefinement(to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+    @repair.regen.specification.StateRefinement(to = "checkout(this)")
     @repair.regen.specification.Refinement("(totalPrice(_) == 0) && empty(_)")
     public regen.test.project.Order getNewOrderPayThis() {
         return new regen.test.project.Order();

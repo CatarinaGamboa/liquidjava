@@ -381,7 +381,7 @@ public class AuxStateHandler {
 
 
 	/**
-	 * Adds a new instance with the given state
+	 * Adds a new instance with the given state to the parent variable
 	 * @param tc
 	 * @param superName
 	 * @param name2
@@ -400,10 +400,14 @@ public class AuxStateHandler {
 		for(CtTypeReference<?> t: rv.getSuperTypes())
 			vi2.addSuperType(t);
 		
-		Constraint superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
-		tc.checkSMT(superC, invocation);
-		//verify super main refinement 
-		tc.context.addRefinementInstanceToVariable(superName, name2);
+		//if the variable is a parent (not a VariableInstance) we need to check that this refinement
+		//is a subtype of the variable's main refinement
+		if(rv instanceof Variable) {
+			Constraint superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
+			tc.checkSMT(superC, invocation);
+			tc.context.addRefinementInstanceToVariable(superName, name2);
+		}
+		
 		invocation.putMetadata(tc.TARGET_KEY, vi2);
 		return name2;
 	}

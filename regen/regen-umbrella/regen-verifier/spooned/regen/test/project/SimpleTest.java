@@ -26,15 +26,12 @@ package regen.test.project;
 // double c = b;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        // Order f = new Order();
-        // //#f0
-        // f.addItem("shirt", 20) //#f0.addItem() -> #f1
-        // .pay(00000) //#f1.pay() -> #f2
-        // .addGift()  //#f2.addGift()
-        // .sendToAddress("home");
-        int a = 10;
-        @repair.regen.specification.Refinement("(b == 6)")
-        boolean b = true;
+        regen.test.project.Order f = new regen.test.project.Order();
+        // #f0
+        // #f2.addGift()
+        // #f1.pay() -> #f2
+        // #f0.addItem() -> #f1
+        f.addItem("shirt", 20).pay(0).addGift().sendToAddress("home");
         // @Refinement("_ > 10")
         // int i = 10;
         // @Refinement("sum(_) > 30")
