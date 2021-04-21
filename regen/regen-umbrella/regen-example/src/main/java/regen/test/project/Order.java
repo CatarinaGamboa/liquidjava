@@ -1,14 +1,15 @@
 package regen.test.project;
 
+import repair.regen.specification.Ghost;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 
 @StateSet({"empty","addingItems", "checkout", "closed"})
+@Ghost("int totalPrice")
 public class Order {
 	
-	@RefinementPredicate("int totalPrice(Order o)")
 	@StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
 	public Order() {}
 	
@@ -20,7 +21,7 @@ public class Order {
 	}
 	
 	@StateRefinement(from = "addingItems(this)", 
-					 to   = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+					 to   = "checkout(this)")
 	@Refinement("_ == this")
 	public Order pay(int cardNumber) {
 		return this;
@@ -38,7 +39,7 @@ public class Order {
 		return this;
 	}
 
-	@StateRefinement(to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+	@StateRefinement(to = "checkout(this)")
 	@Refinement("(totalPrice(_) == 0) && empty(_)")
 	public Order getNewOrderPayThis() {
 		return new Order();

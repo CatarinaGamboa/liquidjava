@@ -2,8 +2,8 @@ package repair.regen.classes.order_gift_error;
 
 
 @repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "closed" })
+@repair.regen.specification.Ghost("int totalPrice")
 public class Order {
-    @repair.regen.specification.RefinementPredicate("int totalPrice(Order o)")
     @repair.regen.specification.StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
     public Order() {
     }
@@ -15,7 +15,7 @@ public class Order {
         return this;
     }
 
-    @repair.regen.specification.StateRefinement(from = "addingItems(this)", to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+    @repair.regen.specification.StateRefinement(from = "addingItems(this)", to = "checkout(this)")
     @repair.regen.specification.Refinement("_ == this")
     public repair.regen.classes.order_gift_error.Order pay(int cardNumber) {
         return this;
@@ -33,7 +33,7 @@ public class Order {
         return this;
     }
 
-    @repair.regen.specification.StateRefinement(to = "checkout(this) && (totalPrice(this) == totalPrice(old(this)))")
+    @repair.regen.specification.StateRefinement(to = "checkout(this)")
     @repair.regen.specification.Refinement("(totalPrice(_) == 0) && empty(_)")
     public repair.regen.classes.order_gift_error.Order getNewOrderPayThis() {
         return new repair.regen.classes.order_gift_error.Order();

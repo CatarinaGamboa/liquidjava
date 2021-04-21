@@ -110,7 +110,8 @@ public class VCChecker {
 					.changeStatesToRefinements(list, s)
 					.changeAliasToRefinement(context, element, f);
 		} catch (Exception e) {
-			printError(premises, expectedType, element, map, e.getMessage());
+			return false;
+//			printError(premises, expectedType, element, map, e.getMessage());
 		}
 
 		System.out.println(premises.toString() + "\n"+et.toString());

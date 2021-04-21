@@ -89,7 +89,8 @@ public class Predicate extends Constraint{
 	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange) {
 		Map<String,Expression> nameRefinementMap = new HashMap<>();
 		for(GhostState gs: ghostState)
-			nameRefinementMap.put(gs.getName(), parse(gs.getRefinement().toString()));
+			if(gs.getRefinement() != null) //is a state and not a ghost state
+				nameRefinementMap.put(gs.getName(), parse(gs.getRefinement().toString()));
 		
 		Expression e = exp.substituteState(nameRefinementMap, toChange);
 		return new Predicate(e);
