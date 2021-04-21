@@ -101,6 +101,10 @@ public class TestClasses extends TestAbstract{
 		testWrong(testPath+"/classes/order_gift_error");
 	}
 
+	@Test
+	public void errorGhostState() {
+		testWrong(testPath+"/classes/ErrorGhostState.java");
+	}
 
 
 }

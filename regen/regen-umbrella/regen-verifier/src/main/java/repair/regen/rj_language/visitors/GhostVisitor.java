@@ -32,7 +32,8 @@ public class GhostVisitor {
 
 	private static List<Pair<String, String>> getArgsDecl(ArgDeclContext argDecl) {
 		List<Pair<String, String>> l = new ArrayList<Pair<String, String>>();
-		auxGetArgsDecl(argDecl, l);
+		if(argDecl != null)
+			auxGetArgsDecl(argDecl, l);
 		return l;
 	}
 

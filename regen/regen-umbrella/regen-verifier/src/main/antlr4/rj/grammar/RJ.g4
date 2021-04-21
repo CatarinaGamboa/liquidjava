@@ -65,9 +65,8 @@ literal:
 alias:
 	'type'? ID_UPPER '(' argDeclID ')' '{' pred '}';
 
-
 ghost: 
-	'ghost'? type ID '(' argDecl ')';
+	'ghost'? type ID ('(' argDecl? ')')?;
 
 argDecl:
 	type ID? (',' argDecl)?;	
@@ -75,7 +74,6 @@ argDecl:
 argDeclID:
 	type ID (',' argDeclID)?;
 
-	
 type:
 		'int'
 	|	'double' 
@@ -86,7 +84,6 @@ type:
 	|	type '[]';
 
 
-////UNARY_OP: '!' | '-' | '+';
 LOGOP   : '&&'|'||'| '-->';
 BOOLOP	 : '=='|'!='|'>='|'>'|'<='|'<';
 ARITHOP : '+'|'*'|'/'|'%';//|'-';

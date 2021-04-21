@@ -7,7 +7,7 @@ import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 
 @StateSet({"empty","addingItems", "checkout", "closed"})
-@Ghost("int totalPrice")
+@Ghost("int totalPrice(Order o)")
 public class Order {
 	
 	@StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")

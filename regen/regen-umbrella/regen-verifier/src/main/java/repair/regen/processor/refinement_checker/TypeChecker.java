@@ -101,7 +101,7 @@ public abstract class TypeChecker extends CtScanner{
 			}
 			if(an.contentEquals("repair.regen.specification.Ghost")) {
 				CtLiteral<String> s = (CtLiteral<String>)ann.getAllValues().get("value"); 
-				createStateGhost(s.getValue(), an, element);
+				createStateGhost(s.getValue(), ann, an, element);
 			}	
 		}
 	}
@@ -137,16 +137,25 @@ public abstract class TypeChecker extends CtScanner{
 
 	}
 
-	private void createStateGhost(String string, String an, CtElement element) {
-		String[] s = string.split(" ");
+	private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, String an, CtElement element) {
+		GhostDTO gd = null;
+		try {
+			gd = RefinementsParser.getGhostDeclaration(string);
+		} catch (ParsingException e) {
+			ErrorPrinter.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+		}
+		if(gd.getParam_types().size() > 0) {
+			ErrorPrinter.printCostumeError(ann, "Ghost States have the class as parameter "
+					+ "by default, no other parameters are allowed in '"+string+"'");
+		}
+		//Set class as parameter of Ghost
 		String qn = getQualifiedClassName(element);
 		String sn = getSimpleClassName(element);
 		context.addGhostClass(sn);
-		if(s.length < 2)
-			ErrorPrinter.printCostumeError(element, "Syntax error in defining ghost "+string);
 		List<CtTypeReference<?>> param = Arrays.asList(factory.Type().createReference(qn));
-		CtTypeReference r = factory.Type().createReference(s[0]);
-		GhostState gs = new GhostState(s[1], param, r, qn);
+		
+		CtTypeReference r = factory.Type().createReference(gd.getReturn_type());
+		GhostState gs = new GhostState(gd.getName(), param, r, qn);
 		context.addToGhostClass(sn, gs);
 	}
 
