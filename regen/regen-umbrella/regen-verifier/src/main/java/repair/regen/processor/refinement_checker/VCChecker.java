@@ -51,7 +51,8 @@ public class VCChecker {
 
 		HashMap<String, PlacementInCode> map = new HashMap<>();
 		String[] s = {wild_var, this_var};
-		Constraint premisesBeforeChange = joinConstraints(expectedType, element, mainVars, lrv, map);
+		Constraint premisesBeforeChange = joinConstraints(expectedType, element, mainVars, lrv, map)
+				.toConjunctions();
 		Constraint premises = null;
 		Constraint et = null;
 		try {
@@ -101,7 +102,7 @@ public class VCChecker {
 		Constraint premises = null; 
 		Constraint et = null;
 		try {
-			premises = joinConstraints(expectedType, element, mainVars, lrv, map);
+			premises = joinConstraints(expectedType, element, mainVars, lrv, map).toConjunctions();
 			premises = Conjunction.createConjunction(premises, type)
 					.changeStatesToRefinements(list, s)
 					.changeAliasToRefinement(context, element, f);
@@ -116,7 +117,7 @@ public class VCChecker {
 		return smtChecks(premises, et, element);
 	}
 
-	private Constraint joinConstraints(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 
+	private /*Constraint*/VCImplication joinConstraints(Constraint expectedType, CtElement element, List<RefinedVariable> mainVars, 
 			List<RefinedVariable> vars, HashMap<String, PlacementInCode> map) {
 
 		VCImplication firstSi = null;
@@ -144,14 +145,14 @@ public class VCChecker {
 				firstSi = si; lastSi = si;
 			}
 		}
-		Constraint cSMT = new Predicate();
+		VCImplication cSMT = new VCImplication(new Predicate());
 		if(firstSi != null && lastSi != null) {
-			cSMT = firstSi.toConjunctions();
+			cSMT = firstSi.clone();
 			lastSi.setNext(new VCImplication(expectedType));
 			printVCs(firstSi.toString(), cSMT.toString(), expectedType);
 		}
 
-		return cSMT;
+		return cSMT;//firstSi != null ? firstSi : new VCImplication(new Predicate());
 	}
 
 
@@ -309,12 +310,13 @@ public class VCChecker {
 		return map;
 	}
 	
-	protected void printSubtypingError(CtElement element, Constraint expectedType, Constraint foundType, String customeMsg) {
+	protected void printSubtypingError(CtElement element, Constraint expectedType, 
+			Constraint foundType, String customeMsg) {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(expectedType, lrv, mainVars);
 		gatherVariables(foundType, lrv, mainVars);
 		HashMap<String, PlacementInCode> map = new HashMap<>();
-		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map);
+		Constraint premises = joinConstraints(expectedType, element, mainVars, lrv, map).toConjunctions();
 		printError(premises, expectedType, element, map, customeMsg);
 	}
 
@@ -367,7 +369,7 @@ public class VCChecker {
 		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
 		gatherVariables(c, lrv, mainVars);
 		HashMap<String, PlacementInCode> map = new HashMap<>();
-		Constraint constraintForErrorMsg = joinConstraints(c, element, mainVars, lrv, map);
+		VCImplication constraintForErrorMsg = joinConstraints(c, element, mainVars, lrv, map);
 //		HashMap<String, PlacementInCode> map = createMap(element, c);
 		ErrorPrinter.printStateMismatch(element, method, constraintForErrorMsg, states, map);
 	}

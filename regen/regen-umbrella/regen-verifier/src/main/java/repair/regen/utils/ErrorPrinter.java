@@ -5,6 +5,7 @@ import java.util.List;
 
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
+import repair.regen.processor.constraints.VCImplication;
 import repair.regen.processor.context.PlacementInCode;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtConstructor;
@@ -42,14 +43,20 @@ public class ErrorPrinter {
 		System.exit(1);
 	}
 	
-	public static void printStateMismatch(CtElement element, String method, Constraint c, String states, HashMap<String, PlacementInCode> map) {
+	public static void printStateMismatch(CtElement element, String method, VCImplication constraintForErrorMsg, 
+			String states, HashMap<String, PlacementInCode> map) {
 		System.out.println("______________________________________________________");
 		System.err.println(" Failed to check state transitions when calling "+ method+" in:");
 		System.out.println();
 		System.out.println(element);
 		System.out.println();
 		System.out.println("Expected possible states:" + states);
-		System.out.println("State found:" + c.toString());
+		System.out.println("\nState found:");
+		//TODO SHOW
+		printLine();
+		System.out.println(constraintForErrorMsg/*.toConjunctions()*/.toString());
+		printLine();
+		System.out.println();
 		printMap(map);
 		System.out.println("Location: " + element.getPosition());
 		System.out.println("______________________________________________________");
@@ -174,19 +181,23 @@ public class ErrorPrinter {
 		
 	}
 	
+	private static void printLine() {
+		for (int i = 0; i < 130; i++) System.out.print("-");//-----------
+	}
+	
 	private static void printMap(HashMap<String, PlacementInCode> map) {
 		if(map.isEmpty()) return;
 		System.out.println("\nInstance translation table:");
-		for (int i = 0; i < 130; i++) System.out.print("-");//-----------
+		printLine();
 		//title
 		System.out.format("\n| %-32s | %-60s | %-1s \n", "Variable Name", "Created in", "File");
-		for (int i = 0; i < 130; i++) System.out.print("-");//----------
+		printLine();
 		//data
 		System.out.println();
 		for(String s : map.keySet())
 			System.out.format("| %-32s | %-60s | %-1s \n", s, map.get(s).getText(), map.get(s).getSimplePosition());
 		//end
-		for (int i = 0; i < 130; i++) System.out.print("-");
+		printLine();
 		System.out.println();
 		
 	}

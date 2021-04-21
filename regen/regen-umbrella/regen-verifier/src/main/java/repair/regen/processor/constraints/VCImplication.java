@@ -27,15 +27,17 @@ public class VCImplication{
 			String qualType = type.getQualifiedName();
 			String simpleType = qualType.contains(".")?
 					qualType.substring(qualType.lastIndexOf(".")+1):qualType;
-			return String.format("%-20s %s => \n%s", "∀"+name+":"+ 
+			return String.format("%-20s %s %s", "∀"+name+":"+ 
 					simpleType+",", refinement.toString(), 
-					next != null?next.toString(): "");
+					next != null?" => \n"+next.toString(): "");
 		}else
 			return String.format("%-20s %s", "",refinement.toString());
 	}
 	
 	public Constraint toConjunctions() {
 		Constraint c = new Predicate();
+		if(name == null && type == null && next == null)
+			return c;
 		c = auxConjunction(c);
 		return c;
 	}
@@ -45,6 +47,13 @@ public class VCImplication{
 			return t;
 		t = next.auxConjunction(t);
 		return t;
+	}
+	
+	public VCImplication clone() {
+		 VCImplication vc = new VCImplication(this.name, this.type, this.refinement.clone());
+		 if(this.next != null)
+			 vc.next = this.next.clone();
+		 return vc;
 	}
 	
 }
