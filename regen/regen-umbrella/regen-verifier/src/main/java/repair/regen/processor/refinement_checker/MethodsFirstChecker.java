@@ -54,7 +54,6 @@ public class MethodsFirstChecker extends TypeChecker{
 
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
-		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
 		if(visitedClasses.contains(intrface.getQualifiedName()))
 			return;
 		else

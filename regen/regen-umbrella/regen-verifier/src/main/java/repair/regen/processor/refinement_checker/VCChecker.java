@@ -149,7 +149,7 @@ public class VCChecker {
 		if(firstSi != null && lastSi != null) {
 			cSMT = firstSi.clone();
 			lastSi.setNext(new VCImplication(expectedType));
-			printVCs(firstSi.toString(), cSMT.toString(), expectedType);
+			printVCs(firstSi.toString(), cSMT.toConjunctions().toString(), expectedType);
 		}
 
 		return cSMT;//firstSi != null ? firstSi : new VCImplication(new Predicate());
@@ -292,8 +292,8 @@ public class VCChecker {
 	}
 
 	private void printVCs(String string, String stringSMT, Constraint expectedType) {
-		System.out.println("\n----------------------------VC--------------------------------");
-		System.out.println("VC:\n"+string);
+		System.out.println("\n----------------------------VC--------------------------------\n");
+		System.out.println(string);
 		System.out.println("\nSMT subtyping:" + stringSMT + " <: " + expectedType.toString());
 		System.out.println("--------------------------------------------------------------");
 

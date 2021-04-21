@@ -97,7 +97,6 @@ public class AuxStateHandler {
 		List<ObjectState> los = new ArrayList<>();
 		los.add(os);
 		f.setAllStates(los);
-		//		System.out.println();
 	}
 
 	private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klass) {
@@ -275,8 +274,6 @@ public class AuxStateHandler {
 				ref = changeState(tc, target, f, parentTargetName, map, invocation);
 			if(!f.hasStateChange()) 
 				ref = sameState(tc, target, parentTargetName, invocation);
-
-			System.out.println();
 		}
 
 	}
@@ -342,7 +339,6 @@ public class AuxStateHandler {
 			if(invocation instanceof CtInvocation) {
 				CtInvocation i = (CtInvocation) invocation;
 				simpleInvocation = i.getExecutable().toString();
-				System.out.println();
 			}
 				
 			tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);

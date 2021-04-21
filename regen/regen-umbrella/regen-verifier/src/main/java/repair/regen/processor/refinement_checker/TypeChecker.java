@@ -183,7 +183,6 @@ public abstract class TypeChecker extends CtScanner{
 			GhostFunction gh = new GhostFunction(String.format("%s_state%d", klass.getSimpleName().toLowerCase(), order), 
 					params, ret , factory, 
 					klass.getQualifiedName(), klass.getSimpleName()); 
-			System.out.println(gh.toString());
 			return Optional.of(gh);
 		}
 		return Optional.empty();
@@ -196,7 +195,6 @@ public abstract class TypeChecker extends CtScanner{
 				CtClass<?> klass =(CtClass<?>) element.getParent(); 
 				GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName(), klass.getSimpleName()); 
 				context.addGhostFunction(gh);
-				System.out.println(gh.toString());
 			}
 		} catch (ParsingException e) {
 			ErrorPrinter.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());

@@ -99,15 +99,8 @@ public class MethodsFunctionsChecker {
 		}
 		rtc.getContext().addFunctionToContext(f);
 		
-		long d1 = System.currentTimeMillis();
 		auxGetMethodRefinements(method, f);
-		long d2 = System.currentTimeMillis();
-		System.out.println("auxGetMethod refinements:" + (d2-d1));
-		
-		d1 = System.currentTimeMillis();
 		AuxStateHandler.handleMethodState(method, f, rtc);
-		d2 = System.currentTimeMillis();
-		System.out.println("handleState refinements:" + (d2-d1));
 		
 		if(klass != null)
 			AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
@@ -248,7 +241,6 @@ public class MethodsFunctionsChecker {
 		}else if(method.getParent() instanceof CtClass){
 			String ctype = ((CtClass)method.getParent()).getQualifiedName();
 			RefinedFunction f = rtc.getContext().getFunction(method.getSimpleName(), ctype);
-			System.out.println("function found:"+f);
 			if(f != null) {//inside rtc.context
 				checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), 
 						method.getSimpleName(), ctype);

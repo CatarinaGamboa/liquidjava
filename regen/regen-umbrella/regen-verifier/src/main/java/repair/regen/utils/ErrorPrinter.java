@@ -54,7 +54,7 @@ public class ErrorPrinter {
 		System.out.println("\nState found:");
 		//TODO SHOW
 		printLine();
-		System.out.println(constraintForErrorMsg/*.toConjunctions()*/.toString());
+		System.out.println("\n"+constraintForErrorMsg/*.toConjunctions()*/.toString());
 		printLine();
 		System.out.println();
 		printMap(map);
