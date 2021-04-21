@@ -9,6 +9,7 @@ import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.facade.GhostDTO;
+import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import repair.regen.utils.ErrorPrinter;

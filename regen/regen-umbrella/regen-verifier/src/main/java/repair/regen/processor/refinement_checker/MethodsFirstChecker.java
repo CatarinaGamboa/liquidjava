@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import repair.regen.processor.context.Context;
+import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtInterface;

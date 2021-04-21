@@ -1,4 +1,4 @@
-package repair.regen.processor.refinement_checker;
+package repair.regen.processor.refinement_checker.object_checkers;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
@@ -27,6 +27,7 @@ import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
+import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.utils.ErrorPrinter;
 import repair.regen.utils.Utils;
 import spoon.reflect.code.CtConstructorCall;
@@ -101,7 +102,7 @@ public class AuxStateHandler {
 
 	private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klass) {
 		List<GhostFunction> sets = new ArrayList<>();
-		List<GhostState> l = tc.context.getGhostState(klass);
+		List<GhostState> l = tc.getContext().getGhostState(klass);
 		if(l != null)
 			for(GhostState g: l) {
 				if(g.getParent() == null) {
@@ -166,12 +167,12 @@ public class AuxStateHandler {
 	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e, boolean isTo) {
 		Predicate p = new Predicate(value);
 		String t = f.getTargetClass();
-		CtTypeReference<?> r = tc.factory.Type().createReference(t);
+		CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
 
-		String nameOld = String.format(tc.instanceFormat, tc.THIS, tc.context.getCounter());
-		String name = String.format(tc.instanceFormat, tc.THIS, tc.context.getCounter());
-		tc.context.addVarToContext(name, r, new Predicate(), e);
-		tc.context.addVarToContext(nameOld, r, new Predicate(), e);
+		String nameOld = String.format(tc.instanceFormat, tc.THIS, tc.getContext().getCounter());
+		String name = String.format(tc.instanceFormat, tc.THIS, tc.getContext().getCounter());
+		tc.getContext().addVarToContext(name, r, new Predicate(), e);
+		tc.getContext().addVarToContext(nameOld, r, new Predicate(), e);
 		//TODO REVER!!
 
 		Constraint c1 = isTo? getMissingStates(t, tc, p): p;
@@ -189,7 +190,7 @@ public class AuxStateHandler {
 	private static Constraint getMissingStates(String t, TypeChecker tc, Predicate p) {
 		String[] temp= t.split("\\.");
 		String simpleT = temp[temp.length-1];
-		List<GhostState> gs = p.getStateInvocations(tc.context.getGhostState(simpleT));
+		List<GhostState> gs = p.getStateInvocations(tc.getContext().getGhostState(simpleT));
 		List<GhostFunction> sets = getDifferentSets(tc, simpleT);
 		for(GhostState g: gs) {
 			if(g.getParent() == null && sets.contains(g))
@@ -247,7 +248,7 @@ public class AuxStateHandler {
 	 * @param e
 	 */
 	public static void addStateRefinements(TypeChecker tc, String varName, CtExpression<?> e) {
-		Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(varName);
+		Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(varName);
 		if(ovi.isPresent() && e.getMetadata(tc.REFINE_KEY) != null) {
 			VariableInstance vi = ovi.get(); 
 			Constraint c = (Constraint)e.getMetadata(tc.REFINE_KEY);
@@ -319,7 +320,7 @@ public class AuxStateHandler {
 				
 				found = tc.checksStateSMT(prevCheck, expectState, invocation);
 				if(found && os.hasTo()) {
-					String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
+					String newInstanceName = String.format(tc.instanceFormat, name, tc.getContext().getCounter()); 
 					Constraint transitionedState = os.getTo()
 							.substituteVariable(tc.WILD_VAR, newInstanceName)
 							.substituteVariable(tc.THIS, newInstanceName);
@@ -367,7 +368,7 @@ public class AuxStateHandler {
 	private static Constraint sameState(TypeChecker tc, VariableInstance variableInstance, String name, CtElement invocation) {
 		//		if(variableInstance.getState() != null) {
 		if(variableInstance.getRefinement() != null) {
-			String newInstanceName = String.format(tc.instanceFormat, name, tc.context.getCounter()); 
+			String newInstanceName = String.format(tc.instanceFormat, name, tc.getContext().getCounter()); 
 			//			Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(), newInstanceName);
 			Constraint c = variableInstance.getRefinement()
 					.substituteVariable(tc.WILD_VAR, newInstanceName)
@@ -392,11 +393,11 @@ public class AuxStateHandler {
 	 */
 	private static String addInstanceWithState(TypeChecker tc, String superName, 
 			String name2, VariableInstance prevInstance, Constraint transitionedState, CtElement invocation) {
-		VariableInstance vi2 = (VariableInstance)tc.context.addInstanceToContext( 
+		VariableInstance vi2 = (VariableInstance)tc.getContext().addInstanceToContext( 
 				name2, prevInstance.getType() , prevInstance.getRefinement(), invocation);
 		//		vi2.setState(transitionedState);
 		vi2.setRefinement(transitionedState);
-		RefinedVariable rv = tc.context.getVariableByName(superName);
+		RefinedVariable rv = tc.getContext().getVariableByName(superName);
 		for(CtTypeReference<?> t: rv.getSuperTypes())
 			vi2.addSuperType(t);
 		
@@ -405,7 +406,7 @@ public class AuxStateHandler {
 		if(rv instanceof Variable) {
 			Constraint superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
 			tc.checkSMT(superC, invocation);
-			tc.context.addRefinementInstanceToVariable(superName, name2);
+			tc.getContext().addRefinementInstanceToVariable(superName, name2);
 		}
 		
 		invocation.putMetadata(tc.TARGET_KEY, vi2);
@@ -423,15 +424,15 @@ public class AuxStateHandler {
 		if(elem instanceof CtVariableRead<?>) {
 			CtVariableRead<?> v = (CtVariableRead<?>)elem;
 			String name = v.getVariable().getSimpleName();
-			Optional<VariableInstance> ovi = tc.context.getLastVariableInstance(name);
+			Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(name);
 			if(ovi.isPresent())
 				invocation.putMetadata(tc.TARGET_KEY, ovi.get());
 			else if( elem.getMetadata(tc.TARGET_KEY) == null) {
-				RefinedVariable var = tc.context.getVariableByName(name);
-				String nName = String.format(tc.instanceFormat, name, tc.context.getCounter());
-				RefinedVariable rv = tc.context.addInstanceToContext(nName, var.getType(), 
+				RefinedVariable var = tc.getContext().getVariableByName(name);
+				String nName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
+				RefinedVariable rv = tc.getContext().addInstanceToContext(nName, var.getType(), 
 						var.getRefinement().substituteVariable(name, nName), elem);
-				tc.context.addRefinementInstanceToVariable(name, nName);
+				tc.getContext().addRefinementInstanceToVariable(name, nName);
 				invocation.putMetadata(tc.TARGET_KEY, rv);
 			}
 				

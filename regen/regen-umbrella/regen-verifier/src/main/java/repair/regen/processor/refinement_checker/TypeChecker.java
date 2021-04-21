@@ -42,7 +42,7 @@ public abstract class TypeChecker extends CtScanner{
 	public final String freshFormat = "#fresh_%d";
 	public final String instanceFormat = "#%s_%d";
 	public final String thisFormat = "this#%s";
-	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double", "int[]"}; //TODO add types
+	public String[] implementedTypes = {"boolean", "int", "short", "long", "float","double", "int[]"}; //TODO add types
 
 	Context context;
 	Factory factory;
@@ -53,8 +53,14 @@ public abstract class TypeChecker extends CtScanner{
 		this.factory = fac;
 	}
 
+	public Context getContext() {
+		return context;
+	}
+	public Factory getFactory() {
+		return factory;
+	}
 
-	Constraint getRefinement(CtElement elem) {
+	public Constraint getRefinement(CtElement elem) {
 		return (Constraint)elem.getMetadata(REFINE_KEY);
 	}
 
@@ -234,7 +240,7 @@ public abstract class TypeChecker extends CtScanner{
 		return ref;
 	}
 
-	void checkVariableRefinements(Constraint refinementFound, String simpleName, 
+	public void checkVariableRefinements(Constraint refinementFound, String simpleName, 
 			CtTypeReference type, CtElement usage, CtElement variable) {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
 		Constraint cEt;
@@ -270,30 +276,30 @@ public abstract class TypeChecker extends CtScanner{
 		context.addRefinementToVariableInContext(simpleName,type , cet, usage);
 	}
 	
-	void checkSMT(Constraint expectedType, CtElement element) {
+	public void checkSMT(Constraint expectedType, CtElement element) {
 		vcChecker.processSubtyping(expectedType, context.getGhostState(), 
 				WILD_VAR, THIS, element, factory);
 		element.putMetadata(REFINE_KEY, expectedType);	
 	}
 	
-	 void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target, String string) {
+	 public void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target, String string) {
 		vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), 
 				WILD_VAR, THIS, target, string, factory);
 	}
 
-	protected boolean checksStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
+	public boolean checksStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
 		return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), 
 				WILD_VAR, THIS, target, factory);
 	}
 	
-	void createError(CtElement element, Constraint expectedType, Constraint foundType, String customeMessage) {
+	public void createError(CtElement element, Constraint expectedType, Constraint foundType, String customeMessage) {
 		 vcChecker.printSubtypingError(element, expectedType, foundType,customeMessage); 
 	}
-	void createSameStateError(CtElement element, Constraint expectedType, String klass) {
+	public void createSameStateError(CtElement element, Constraint expectedType, String klass) {
 		 vcChecker.printSameStateError(element, expectedType,klass); 
 	}
 	
-	void createStateMismatchError(CtElement element, String method, Constraint c, String states) {
+	public void createStateMismatchError(CtElement element, String method, Constraint c, String states) {
 		vcChecker.printStateMismatchError(element, method, c, states);
 	}
 

@@ -10,7 +10,7 @@ public class SimpleTest {
 		
 		Order f = new Order();
 		//#f0
-		f.addItem("shirt", 21) //#f0.addItem() -> #f1
+		f.addItem("shirt", 1) //#f0.addItem() -> #f1
 		 .pay(00000) //#f1.pay() -> #f2
 		 .addGift()  //#f2.addGift()
 		 .sendToAddress("home");

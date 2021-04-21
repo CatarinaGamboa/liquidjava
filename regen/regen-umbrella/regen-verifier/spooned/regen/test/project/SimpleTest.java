@@ -31,7 +31,7 @@ public class SimpleTest {
         // #f2.addGift()
         // #f1.pay() -> #f2
         // #f0.addItem() -> #f1
-        f.addItem("shirt", 21).pay(0).addGift().sendToAddress("home");
+        f.addItem("shirt", 1).pay(0).addGift().sendToAddress("home");
         // @Refinement("_ > 10")
         // int i = 10;
         // @Refinement("sum(_) > 30")
