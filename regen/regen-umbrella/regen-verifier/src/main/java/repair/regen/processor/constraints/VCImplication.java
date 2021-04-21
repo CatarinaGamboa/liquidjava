@@ -23,11 +23,15 @@ public class VCImplication{
 	}
 	
 	public String toString() {
-		if(name!=null && type!= null)
-			return String.format("∀%s:%s, (%s) => \n%s", name, type.getQualifiedName(), refinement.toString(), 
+		if(name!=null && type!= null) {
+			String qualType = type.getQualifiedName();
+			String simpleType = qualType.contains(".")?
+					qualType.substring(qualType.lastIndexOf(".")+1):qualType;
+			return String.format("%-20s %s => \n%s", "∀"+name+":"+ 
+					simpleType+",", refinement.toString(), 
 					next != null?next.toString(): "");
-		else
-			return refinement.toString();
+		}else
+			return String.format("%-20s %s", "",refinement.toString());
 	}
 	
 	public Constraint toConjunctions() {

@@ -364,8 +364,12 @@ public class VCChecker {
 	}
 
 	public void printStateMismatchError(CtElement element, String method, Constraint c, String states) {
-		HashMap<String, PlacementInCode> map = createMap(element, c);
-		ErrorPrinter.printStateMismatch(element, method, c, states, map);
+		List<RefinedVariable> lrv = new ArrayList<>(),  mainVars = new ArrayList<>();
+		gatherVariables(c, lrv, mainVars);
+		HashMap<String, PlacementInCode> map = new HashMap<>();
+		Constraint constraintForErrorMsg = joinConstraints(c, element, mainVars, lrv, map);
+//		HashMap<String, PlacementInCode> map = createMap(element, c);
+		ErrorPrinter.printStateMismatch(element, method, constraintForErrorMsg, states, map);
 	}
 
 

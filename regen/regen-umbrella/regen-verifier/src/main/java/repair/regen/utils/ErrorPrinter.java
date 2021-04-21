@@ -35,8 +35,8 @@ public class ErrorPrinter {
 		System.out.println(var);
 		System.out.println();
 		System.out.println("Type expected:" + expectedType.toString());
-		printMap(map);
 		System.out.println("Refinement found:" + cSMT.toString());
+		printMap(map);
 		System.out.println("Location: " + var.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);
@@ -49,8 +49,8 @@ public class ErrorPrinter {
 		System.out.println(element);
 		System.out.println();
 		System.out.println("Expected possible states:" + states);
-		printMap(map);
 		System.out.println("State found:" + c.toString());
+		printMap(map);
 		System.out.println("Location: " + element.getPosition());
 		System.out.println("______________________________________________________");
 		System.exit(1);
@@ -179,7 +179,7 @@ public class ErrorPrinter {
 		System.out.println("\nInstance translation table:");
 		for (int i = 0; i < 130; i++) System.out.print("-");//-----------
 		//title
-		System.out.format("\n| %-32s | %-60s | %-1s \n", "Variable Name", "Saves the result of", "File");
+		System.out.format("\n| %-32s | %-60s | %-1s \n", "Variable Name", "Created in", "File");
 		for (int i = 0; i < 130; i++) System.out.print("-");//----------
 		//data
 		System.out.println();
