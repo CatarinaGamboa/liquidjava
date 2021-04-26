@@ -1,17 +1,17 @@
 package repair.regen.api;
-import java.util.Collection;
 
 import repair.regen.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.factory.PackageFactory;
 import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
 	public static void main(String[] args) {
-		String file = args.length == 0? "../regen-example/src/main/java/":args[0];
+		String allPath = "../regen/regen-umbrella/regen-example/src/main/java/regen/test/project";
+		//In eclipse only needed this:"../regen-example/src/main/java/"
+		String file = args.length == 0? allPath:args[0];
 		process(file);
 	}
 

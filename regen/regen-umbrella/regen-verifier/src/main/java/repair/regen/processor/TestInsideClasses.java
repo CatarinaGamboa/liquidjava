@@ -2,10 +2,6 @@ package repair.regen.processor;
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.processor.constraints.Conjunction;
-import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.EqualsPredicate;
-import repair.regen.processor.constraints.FunctionPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
@@ -23,7 +19,7 @@ public class TestInsideClasses {
         
         final Factory factory = launcher.getFactory();
 		RefinedVariable vi2 = new Variable("a",factory.Type().INTEGER_PRIMITIVE, new Predicate("a > 0"));
-		CtTypeReference intt = factory.Type().INTEGER_PRIMITIVE;
+		CtTypeReference<?> intt = factory.Type().INTEGER_PRIMITIVE;
 		List<CtTypeReference<?>> l = new ArrayList<>();
 		l.add(intt);
 		GhostState s = new GhostState("green", l, intt, "A");

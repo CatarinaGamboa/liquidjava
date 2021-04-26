@@ -6,14 +6,18 @@ import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 public class SimpleTest {
 	
+
+	
 	public static void main(String[] args) throws IOException{
 		
 		Order f = new Order();
-		//#f0
-		f.addItem("shirt", 1) //#f0.addItem() -> #f1
-		 .pay(00000) //#f1.pay() -> #f2
-		 .addGift()  //#f2.addGift()
+
+		f.addItem("shirt", 1) 
+		 .pay(00000) 
+		 .addGift()  //needs > 20 in totalPrice
 		 .sendToAddress("home");
+		
+		
 
 		
 		

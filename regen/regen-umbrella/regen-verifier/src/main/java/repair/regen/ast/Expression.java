@@ -1,7 +1,6 @@
 package repair.regen.ast;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +10,6 @@ import repair.regen.ast.typing.TypeInfer;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.smt.TranslatorToZ3;
-import repair.regen.utils.Pair;
 import spoon.reflect.factory.Factory;
 
 public abstract class Expression {

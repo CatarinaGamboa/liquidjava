@@ -27,10 +27,7 @@ package regen.test.project;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         regen.test.project.Order f = new regen.test.project.Order();
-        // #f0
-        // #f2.addGift()
-        // #f1.pay() -> #f2
-        // #f0.addItem() -> #f1
+        // needs > 20 in totalPrice
         f.addItem("shirt", 1).pay(0).addGift().sendToAddress("home");
         // @Refinement("_ > 10")
         // int i = 10;
