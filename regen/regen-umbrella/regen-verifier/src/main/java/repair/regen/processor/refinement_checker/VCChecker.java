@@ -67,7 +67,7 @@ public class VCChecker {
 			printError(premises, expectedType, element, map, e1.getMessage());
 		}
 
-		System.out.println(premises.toString() + "\n"+et.toString());
+//		System.out.println(premises.toString() + "\n"+et.toString());
 		try {
 			smtChecking(premises, et, element);
 		} catch (Exception e) {
@@ -77,14 +77,12 @@ public class VCChecker {
 		}
 	}
 
-
 	public void processSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, 
 			String wild_var, String this_var, CtElement element, String string, Factory f) {
 		boolean b = canProcessSubtyping(type, expectedType, list, wild_var, this_var, element, f);
 		if(!b)
 			printSubtypingError(element, expectedType, type, string);
 	}
-
 
 	public boolean canProcessSubtyping(Constraint type, Constraint expectedType, List<GhostState> list, 
 			String wild_var, String this_var,CtElement element, Factory f) {
@@ -156,7 +154,6 @@ public class VCChecker {
 		return cSMT;//firstSi != null ? firstSi : new VCImplication(new Predicate());
 	}
 
-
 	private void addMap(RefinedVariable var, HashMap<String, PlacementInCode> map) {
 		map.put(var.getName(), var.getPlacementInCode());
 //		System.out.println();
@@ -183,7 +180,6 @@ public class VCChecker {
 			}
 		}
 	}
-
 
 	private void addAllDiferent(List<RefinedVariable> toExpand, List<RefinedVariable> from, List<RefinedVariable> remove) {
 		for(RefinedVariable rv:from) {

@@ -13,7 +13,7 @@ public abstract class TestAbstract {
 		MySecurityManager secManager = new MySecurityManager();
 	    System.setSecurityManager(secManager);
 	    try {
-	    	CommandLineLauncher.process(filename);    
+	    	CommandLineLauncher.launch(filename);    
 	    } catch (SecurityException e) {
 	      fail();
 	    }
@@ -24,7 +24,7 @@ public abstract class TestAbstract {
 		MySecurityManager secManager = new MySecurityManager();
 	    System.setSecurityManager(secManager);
 	    try {
-	    	CommandLineLauncher.process(filename);    
+	    	CommandLineLauncher.launch(filename);    
 	    } catch (SecurityException e) {
 	      return;
 	    }

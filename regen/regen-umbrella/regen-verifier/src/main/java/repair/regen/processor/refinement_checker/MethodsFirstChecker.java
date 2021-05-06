@@ -13,6 +13,9 @@ import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
+/**
+ * First visit to Spoon AST to get the method's refinements
+ */
 public class MethodsFirstChecker extends TypeChecker{
 	MethodsFunctionsChecker mfc;
 	List<String> visitedClasses;

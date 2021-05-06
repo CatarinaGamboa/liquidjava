@@ -110,12 +110,12 @@ public class Context {
 		return ret;
 	}
 
+	//---------------------- Global variables ----------------------
 	public void addGlobalVariableToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
 		RefinedVariable vi = new Variable(simpleName, type, c);
 		ctxGlobalVars.add(vi);
 		vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
 	}
-
 	public void addGlobalVariableToContext(String simpleName, String location,
 			CtTypeReference<?> type, Constraint c) {
 		RefinedVariable vi = new Variable(simpleName, location, type, c);
@@ -123,6 +123,8 @@ public class Context {
 		ctxGlobalVars.add(vi);
 	}
 
+	
+	//---------------------- Add variables and instances ----------------------
 	public void addVarToContext(RefinedVariable var) {
 		//if(!hasVariable(var.getName()))
 		ctxVars.peek().add(var);
@@ -174,105 +176,6 @@ public class Context {
 
 	public Constraint getVariableRefinements(String varName) {
 		return hasVariable(varName)?getVariableByName(varName).getRefinement() : null; 
-	}
-
-	public void variablesSetBeforeIf() {
-		for(RefinedVariable vi: getAllVariables())
-			if(vi instanceof Variable)
-				((Variable)vi).saveInstanceBeforeIf();
-	}
-	public void variablesSetThenIf() {
-		for(RefinedVariable vi: getAllVariables())
-			if(vi instanceof Variable)
-				((Variable)vi).saveInstanceThen();
-	}
-	public void variablesSetElseIf() {
-		for(RefinedVariable vi: getAllVariables())
-			if(vi instanceof Variable)
-				((Variable)vi).saveInstanceElse();
-	}
-
-	public void variablesNewIfCombination() {
-		for(RefinedVariable vi: getAllVariables())
-			if(vi instanceof Variable)
-				((Variable)vi).newIfCombination();
-
-	}
-
-	public void variablesFinishIfCombination() {
-		for(RefinedVariable vi: getAllVariables())
-			if(vi instanceof Variable)
-				((Variable)vi).finishIfCombination();
-	}
-
-	public void variablesCombineFromIf(Constraint cond) {
-		for(RefinedVariable vi: getAllVariables()) {
-			if(vi instanceof Variable) {
-				Optional<VariableInstance>ovi = 
-						((Variable) vi).getIfInstanceCombination(getCounter(), cond);
-				if(ovi.isPresent()) {
-					RefinedVariable vii = ovi.get();
-					addVarToContext(vii);
-					addRefinementInstanceToVariable(vi.getName(), vii.getName());
-
-				}
-			}
-		}
-	}
-
-
-
-	public void addFunctionToContext(RefinedFunction f) {
-		if(!ctxFunctions.contains(f))
-			ctxFunctions.add(f);
-	}
-	//	public void addGlobalFunctionToContext(RefinedFunction f) {
-	//		if(!ctxGlobalFunctions.contains(f))
-	//			ctxGlobalFunctions.add(f);
-	//	}
-
-	//	public RefinedFunction getFunctionByName(String name) {
-	//		for(RefinedFunction fi: ctxFunctions) {
-	//			if(fi.getName().equals(name))
-	//				return fi;
-	//		}
-	//		for(RefinedFunction fi: ctxGlobalFunctions) {
-	//			if(fi.getName().equals(name))
-	//				return fi;
-	//		}
-	//		return null;
-	//	}
-
-	public RefinedFunction getFunction(String name, String target) {
-		for(RefinedFunction fi: ctxFunctions) {
-			if(fi.getTargetClass() != null &&
-					fi.getName().equals(name) && fi.getTargetClass().equals(target))
-				return fi;
-		}
-		//		for(RefinedFunction fi: ctxGlobalFunctions) {
-		//			if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
-		//				return fi;
-		//		}
-		return null;
-	}
-
-	public RefinedFunction getFunction(String name, String target, int size) {
-		for(RefinedFunction fi: ctxFunctions) {
-			if(fi.getTargetClass() != null &&
-					fi.getName().equals(name) && fi.getTargetClass().equals(target) && fi.getArguments().size() == size)
-				return fi;
-		}
-		return null;
-	}
-
-
-	public List<RefinedFunction> getAllMethodsWithNameSize(String name, int size) {
-		List<RefinedFunction> l = new ArrayList<>();
-		for(RefinedFunction fi: ctxFunctions) {
-			if(fi.getName().equals(name) && fi.getArguments().size() == size)
-				l.add(fi);
-		}
-		return l;
 	}
 
 
@@ -361,6 +264,92 @@ public class Context {
 	}
 
 
+	//---------------------- Variables - if information storing ----------------------
+	public void variablesSetBeforeIf() {
+		for(RefinedVariable vi: getAllVariables())
+			if(vi instanceof Variable)
+				((Variable)vi).saveInstanceBeforeIf();
+	}
+	public void variablesSetThenIf() {
+		for(RefinedVariable vi: getAllVariables())
+			if(vi instanceof Variable)
+				((Variable)vi).saveInstanceThen();
+	}
+	public void variablesSetElseIf() {
+		for(RefinedVariable vi: getAllVariables())
+			if(vi instanceof Variable)
+				((Variable)vi).saveInstanceElse();
+	}
+
+	public void variablesNewIfCombination() {
+		for(RefinedVariable vi: getAllVariables())
+			if(vi instanceof Variable)
+				((Variable)vi).newIfCombination();
+
+	}
+
+	public void variablesFinishIfCombination() {
+		for(RefinedVariable vi: getAllVariables())
+			if(vi instanceof Variable)
+				((Variable)vi).finishIfCombination();
+	}
+
+	public void variablesCombineFromIf(Constraint cond) {
+		for(RefinedVariable vi: getAllVariables()) {
+			if(vi instanceof Variable) {
+				Optional<VariableInstance>ovi = 
+						((Variable) vi).getIfInstanceCombination(getCounter(), cond);
+				if(ovi.isPresent()) {
+					RefinedVariable vii = ovi.get();
+					addVarToContext(vii);
+					addRefinementInstanceToVariable(vi.getName(), vii.getName());
+
+				}
+			}
+		}
+	}
+
+
+	//---------------------- Functions ----------------------
+	public void addFunctionToContext(RefinedFunction f) {
+		if(!ctxFunctions.contains(f))
+			ctxFunctions.add(f);
+	}
+
+	public RefinedFunction getFunction(String name, String target) {
+		for(RefinedFunction fi: ctxFunctions) {
+			if(fi.getTargetClass() != null &&
+					fi.getName().equals(name) && fi.getTargetClass().equals(target))
+				return fi;
+		}
+		//		for(RefinedFunction fi: ctxGlobalFunctions) {
+		//			if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
+		//				return fi;
+		//		}
+		return null;
+	}
+
+	public RefinedFunction getFunction(String name, String target, int size) {
+		for(RefinedFunction fi: ctxFunctions) {
+			if(fi.getTargetClass() != null &&
+					fi.getName().equals(name) && fi.getTargetClass().equals(target) && fi.getArguments().size() == size)
+				return fi;
+		}
+		return null;
+	}
+
+	public List<RefinedFunction> getAllMethodsWithNameSize(String name, int size) {
+		List<RefinedFunction> l = new ArrayList<>();
+		for(RefinedFunction fi: ctxFunctions) {
+			if(fi.getName().equals(name) && fi.getArguments().size() == size)
+				l.add(fi);
+		}
+		return l;
+	}
+	
+
+	
+	//---------------------- Ghost Predicates ----------------------
 	public void addGhostFunction(GhostFunction gh) {
 		ghosts.add(gh);
 	}
@@ -400,6 +389,9 @@ public class Context {
 		return lgs;
 	}
 
+	
+	
+	//---------------------- Alias ----------------------
 	public void addAlias(AliasWrapper aw) {
 		if(!alias.contains(aw))
 			alias.add(aw);

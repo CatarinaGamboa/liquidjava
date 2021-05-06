@@ -18,7 +18,12 @@ import repair.regen.utils.ErrorPrinter;
 
 public class Predicate extends Constraint{
 	private final String OLD = "old";
+	
+	
 	protected Expression exp;
+	
+	
+	
 	/**
 	 * Create a predicate with the expression true
 	 */

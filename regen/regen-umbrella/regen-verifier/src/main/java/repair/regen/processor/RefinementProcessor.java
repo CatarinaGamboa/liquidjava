@@ -27,12 +27,15 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
 	@Override
 	public void process(CtPackage pkg) {
 		if (!visitedPackages.contains(pkg)) {
-			Set<CtPackage> sp = pkg.getPackages();
 			visitedPackages.add(pkg);
 			Context c = Context.getInstance();
 			c.reinitializeAllContext();
+			
+			//void spoon.reflect.visitor.CtVisitable.accept(CtVisitor arg0)
 			pkg.accept(new ExternalRefinementTypeChecker(c, factory));
-			pkg.accept(new MethodsFirstChecker(c, factory));
+			
+			pkg.accept(new MethodsFirstChecker(c, factory));//double passing idea
+			
 			pkg.accept(new RefinementTypeChecker(c, factory));
 		}
 

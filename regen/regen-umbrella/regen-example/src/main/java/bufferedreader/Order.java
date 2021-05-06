@@ -1,4 +1,4 @@
-package regen.test.project;
+package bufferedreader;
 
 import repair.regen.specification.Ghost;
 import repair.regen.specification.Refinement;

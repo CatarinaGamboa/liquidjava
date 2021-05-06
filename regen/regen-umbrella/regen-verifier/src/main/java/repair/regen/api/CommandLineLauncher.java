@@ -9,13 +9,14 @@ import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
 	public static void main(String[] args) {
-		String allPath = "../regen/regen-umbrella/regen-example/src/main/java/regen/test/project";
+		String allPath = "../regen-example/src/main/java/regen/test/project";
 		//In eclipse only needed this:"../regen-example/src/main/java/"
+		//In VSCode needs: "../regen/regen-umbrella/regen-example/src/main/java/regen/test/project";
 		String file = args.length == 0? allPath:args[0];
-		process(file);
+		launch(file);
 	}
 
-	public static void process(String file) {
+	public static void launch(String file) {
 		Launcher launcher = new Launcher();
         launcher.addInputResource(file);
         launcher.getEnvironment().setNoClasspath(true);

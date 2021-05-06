@@ -5,7 +5,7 @@ prog: start | ;
 start:
 		pred	#startPred
 	|	alias	#startAlias
-	|	ghost	#startGhost
+	|	ghost	#startGhost 
 	;
 
 

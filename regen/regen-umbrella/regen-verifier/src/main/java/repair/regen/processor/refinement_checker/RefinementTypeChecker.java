@@ -59,7 +59,7 @@ public class RefinementTypeChecker extends TypeChecker {
 	// 1. Keep track of the context variable types
 	// 2. Do type checking and inference
 	
-	//Auxiliar TypeCheckers
+	//Auxiliary TypeCheckers
 	OperationsChecker otc;
 	MethodsFunctionsChecker mfc;
 
@@ -87,7 +87,6 @@ public class RefinementTypeChecker extends TypeChecker {
 		super.visitCtInterface(intrface);
 	}
 
-
 	@Override
 	public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
 		super.visitCtAnnotationType(annotationType);
@@ -100,7 +99,6 @@ public class RefinementTypeChecker extends TypeChecker {
 		super.visitCtConstructor(c);
 		context.exitContext();
 	}
-
 
 	public <R> void visitCtMethod(CtMethod<R> method) {
 		context.enterContext();
@@ -177,8 +175,6 @@ public class RefinementTypeChecker extends TypeChecker {
 			String name = var.getSimpleName();
 			checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), assignement, varDecl);
 
-			//			if(varDecl.getType() instanceof CtArrayTypeReferenceImpl)
-			//				checkArray(varDecl);
 
 		}else if(ex instanceof CtFieldWrite) {
 			CtFieldReference<?> cr = ((CtFieldWrite<?>) ex).getVariable();
@@ -188,7 +184,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 		}
 		if(ex instanceof CtArrayWrite) {
-			Constraint c = getRefinement(ex);
+			//Constraint c = getRefinement(ex);
 			//TODO continue
 			//c.substituteVariable(WILD_VAR, );
 		}
@@ -203,27 +199,6 @@ public class RefinementTypeChecker extends TypeChecker {
 		//TODO predicate for now is always TRUE
 	}
 
-	private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, 
-			CtExpression<?> assignment, CtElement parentElem, CtElement varDecl) {
-		getPutVariableMetadada(ex, name);
-
-		Constraint refinementFound = getRefinement(assignment);
-		if (refinementFound == null) {
-			RefinedVariable rv =context.getVariableByName(name);
-			if(rv instanceof Variable)
-				refinementFound = rv.getMainRefinement();
-			else
-				refinementFound = new Predicate();
-		}
-		Optional<VariableInstance> r = context.getLastVariableInstance(name);
-		if(r.isPresent())
-			vcChecker.removePathVariableThatIncludes(r.get().getName());//AQUI!!
-
-		vcChecker.removePathVariableThatIncludes(name);//AQUI!!
-		checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
-
-	}
-
 	@Override
 	public <T> void visitCtLiteral(CtLiteral<T> lit) {
 		List<String> types = Arrays.asList(implementedTypes);
@@ -236,7 +211,6 @@ public class RefinementTypeChecker extends TypeChecker {
 					lit.getType().getQualifiedName()));
 		}
 	}	
-
 
 	@Override
 	public <T> void visitCtField(CtField<T> f) {
@@ -254,8 +228,6 @@ public class RefinementTypeChecker extends TypeChecker {
 			((Variable)v).setLocation("this");
 
 	}
-
-
 
 	@Override
 	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
@@ -284,7 +256,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
 		super.visitCtFieldRead(fieldRead);
 	}
-
 
 	@Override
 	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
@@ -323,7 +294,6 @@ public class RefinementTypeChecker extends TypeChecker {
 		mfc.getReturnRefinements(ret);
 
 	}
-
 
 	@Override
 	public void visitCtIf(CtIf ifElement) {
@@ -372,7 +342,6 @@ public class RefinementTypeChecker extends TypeChecker {
 		context.variablesFinishIfCombination();
 	}
 
-
 	@Override
 	public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
 		super.visitCtArrayWrite(arrayWrite);
@@ -381,21 +350,6 @@ public class RefinementTypeChecker extends TypeChecker {
 				arrayWrite.getTarget().toString(), index.toString(), WILD_VAR);
 		arrayWrite.putMetadata(REFINE_KEY, fp);
 		//TODO fazer mais...? faz sentido
-	}
-
-
-
-	private Constraint substituteAllVariablesForLastInstance(Constraint c) {
-		Constraint ret = c;
-		List<String> ls = c.getVariableNames();
-		for(String s:ls) {
-			Optional<VariableInstance> rv = context.getLastVariableInstance(s);
-			if(rv.isPresent()) {
-				VariableInstance vi = rv.get();
-				ret = ret.substituteVariable(s, vi.getName());
-			}
-		}
-		return ret;
 	}
 
 	@Override
@@ -408,14 +362,11 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	}
 
-
-
 	@Override
 	public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
 		super.visitCtConstructorCall(ctConstructorCall);
 		mfc.getConstructorInvocationRefinements(ctConstructorCall);
 	}
-	
 	
 	@Override
 	public <T> void visitCtNewClass(CtNewClass<T> newClass) {
@@ -424,9 +375,27 @@ public class RefinementTypeChecker extends TypeChecker {
 	}
 
 
-
 	//############################### Inner Visitors  ##########################################
+	private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, 
+			CtExpression<?> assignment, CtElement parentElem, CtElement varDecl) {
+		getPutVariableMetadada(ex, name);
 
+		Constraint refinementFound = getRefinement(assignment);
+		if (refinementFound == null) {
+			RefinedVariable rv =context.getVariableByName(name);
+			if(rv instanceof Variable)
+				refinementFound = rv.getMainRefinement();
+			else
+				refinementFound = new Predicate();
+		}
+		Optional<VariableInstance> r = context.getLastVariableInstance(name);
+		if(r.isPresent())
+			vcChecker.removePathVariableThatIncludes(r.get().getName());//AQUI!!
+
+		vcChecker.removePathVariableThatIncludes(name);//AQUI!!
+		checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
+
+	}
 	private Constraint getExpressionRefinements(CtExpression element) {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
@@ -449,7 +418,18 @@ public class RefinementTypeChecker extends TypeChecker {
 		}
 		return getRefinement(element);
 	}
-
+	private Constraint substituteAllVariablesForLastInstance(Constraint c) {
+		Constraint ret = c;
+		List<String> ls = c.getVariableNames();
+		for(String s:ls) {
+			Optional<VariableInstance> rv = context.getLastVariableInstance(s);
+			if(rv.isPresent()) {
+				VariableInstance vi = rv.get();
+				ret = ret.substituteVariable(s, vi.getName());
+			}
+		}
+		return ret;
+	}
 
 	//############################### Get Metadata ##########################################
 

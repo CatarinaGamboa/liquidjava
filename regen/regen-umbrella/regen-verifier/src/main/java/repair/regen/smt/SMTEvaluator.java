@@ -14,16 +14,17 @@ import repair.regen.rj_language.RefinementsParser;
 public class SMTEvaluator {
 
 	public void verifySubtype(Constraint subRef, Constraint supRef, Context c) throws TypeCheckError, GhostFunctionError, Exception {
-		// TODO: create a parser for our SMT-ready refinement language
-		// TODO: discharge the verification to z3 
+		// Creates a parser for our SMT-ready refinement language
+		// Discharges the verification to z3 
 
 		Constraint toVerify = Conjunction.createConjunction(subRef, supRef.negate());
-		System.out.println(toVerify.toString()); //TODO remover
+		System.out.println(toVerify.toString()); //TODO remove
 		
 		
 		try {
 			Expression exp = toVerify.getExpression();
 			TranslatorToZ3 tz3 = new TranslatorToZ3(c);
+			//com.microsoft.z3.Expr
 			Expr e = exp.eval(tz3);
 			Status s = tz3.verifyExpression(e);
 			if (s.equals(Status.SATISFIABLE)) {
@@ -39,7 +40,6 @@ public class SMTEvaluator {
 				throw new GhostFunctionError(e.getLocalizedMessage());
 			else
 				throw new Z3Exception(e.getLocalizedMessage());
-//				e.printStackTrace();
 		}
 
 	}

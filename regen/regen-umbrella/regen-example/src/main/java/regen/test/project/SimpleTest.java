@@ -2,29 +2,26 @@ package regen.test.project;
 
 import java.io.IOException;
 
+import bufferedreader.TrafficLight;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
-public class SimpleTest {
-	
 
-	
+public class SimpleTest {
+		
+		
+
 	public static void main(String[] args) throws IOException{
 		
-		Order f = new Order();
-
-		f.addItem("shirt", 1) 
-		 .pay(00000) 
-		 .addGift()  //needs > 20 in totalPrice
-		 .sendToAddress("home");
+		@Refinement("a > 4")
+		int a = 10;
 		
+		for (int i = 0; i < args.length; i++) {
+			a  = 4;//Erro, 5 certo
+		}
 		
-
-		
-		
-		
-		
-		
-		
+	}
+	
+}
 
 		
 		
@@ -34,6 +31,52 @@ public class SimpleTest {
 		
 		
 		
+		
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+		
+		
+
+
+		
+//@RefinementAlias("Percentage(int x) { 0 <= x && x <= 100 }")
+//@Refinement("Percentage(_)")
+//public static int addBonus(
+//                  @Refinement("Percentage(grade)") int grade, 
+//                  @Refinement("Percentage(bonus) && (bonus < grade)") 
+//                  int bonus) {
+//
+//    if((grade + bonus) > 100)
+//        return 100;
+//
+//    else
+//        return grade+bonus;
+//}		
+//	
+		
+		
+	
 		
 		
 		
@@ -101,7 +144,6 @@ public class SimpleTest {
 //		 .addItem("h", 20)
 //		 .addItem("h", 6);
 
-	}
 	
 	
 	
@@ -143,8 +185,3 @@ public class SimpleTest {
 	//		@Refinement("_ > 5")
 	//		double c = b;
 
-
-
-
-
-}
