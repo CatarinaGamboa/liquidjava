@@ -1,5 +1,7 @@
 package repair.regen.processor.refinement_checker;
 
+import static org.junit.Assert.fail;
+
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
@@ -116,8 +118,8 @@ public abstract class TypeChecker extends CtScanner{
 	private void createStateSet(CtNewArray<String> e,  int set, CtElement element) {
 		Optional<GhostFunction> og = createStateGhost(set, element);
 		if(!og.isPresent()) {
-			System.out.println("Error in creation of GhostFunction");
-			System.exit(8);
+			System.out.println("Error in creation of GhostFunction");	
+			fail();
 		}
 		GhostFunction g = og.get();
 		context.addGhostFunction(g);

@@ -1,14 +1,13 @@
 package repair.regen.processor.refinement_checker;
 
+import static org.junit.Assert.fail;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Stack;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import com.microsoft.z3.Z3Exception;
 
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
@@ -18,8 +17,6 @@ import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.PlacementInCode;
 import repair.regen.processor.context.RefinedVariable;
-import repair.regen.processor.context.Variable;
-import repair.regen.processor.context.VariableInstance;
 import repair.regen.smt.GhostFunctionError;
 import repair.regen.smt.NotFoundError;
 import repair.regen.smt.SMTEvaluator;
@@ -240,7 +237,8 @@ public class VCChecker {
 		}catch(Exception e) {
 			System.err.println("Unknown error:"+e.getMessage());
 			e.printStackTrace();
-			System.exit(7);
+//			System.exit(7);
+			fail();
 		}
 		return true;
 	}
