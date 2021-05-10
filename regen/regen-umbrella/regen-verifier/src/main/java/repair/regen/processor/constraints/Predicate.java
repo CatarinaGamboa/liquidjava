@@ -12,9 +12,7 @@ import repair.regen.ast.LiteralBoolean;
 import repair.regen.ast.UnaryExpression;
 import repair.regen.ast.Var;
 import repair.regen.processor.context.GhostState;
-import repair.regen.rj_language.ParsingException;
-import repair.regen.rj_language.RefinementsParser;
-import repair.regen.utils.ErrorHandler;
+import spoon.reflect.declaration.CtElement;
 
 public class Predicate extends Constraint{
 	private final String OLD = "old";
@@ -31,8 +29,8 @@ public class Predicate extends Constraint{
 		exp = new LiteralBoolean(true);
 	}
 
-	public Predicate(String ref) {
-		exp = parse(ref);
+	public Predicate(String ref, CtElement element) {
+		exp = parse(ref, element);
 		if(!(exp instanceof GroupExpression)) {
 			exp = new GroupExpression(exp);
 		}
@@ -83,9 +81,9 @@ public class Predicate extends Constraint{
 
 	public Constraint changeOldMentions(String previousName, String newName) {
 		Expression e = exp.clone();
-		Expression prev = parse(previousName);
+		Expression prev = innerParse(previousName);
 		List<Expression> le = new ArrayList<>();
-		le.add(parse(newName));
+		le.add(innerParse(newName));
 		e.substituteFunction(OLD, le, prev);
 		return new Predicate(e);
 	}
@@ -95,7 +93,7 @@ public class Predicate extends Constraint{
 		Map<String,Expression> nameRefinementMap = new HashMap<>();
 		for(GhostState gs: ghostState)
 			if(gs.getRefinement() != null) //is a state and not a ghost state
-				nameRefinementMap.put(gs.getName(), parse(gs.getRefinement().toString()));
+				nameRefinementMap.put(gs.getName(), innerParse(gs.getRefinement().toString()));
 		
 		Expression e = exp.substituteState(nameRefinementMap, toChange);
 		return new Predicate(e);

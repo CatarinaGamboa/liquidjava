@@ -146,7 +146,8 @@ public class RefinementTypeChecker extends TypeChecker {
 			else
 				c = new EqualsPredicate(new VariablePredicate(name), c);
 			context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, exp);
-			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR), new VariablePredicate(name));
+			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR, newArray), 
+					new VariablePredicate(name));
 			newArray.putMetadata(REFINE_KEY, ep);
 		}
 	}
@@ -248,7 +249,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
 			String targetName = fieldRead.getTarget().toString();
 			fieldRead.putMetadata(REFINE_KEY, 
-					new EqualsPredicate(new VariablePredicate(WILD_VAR), FunctionPredicate.builtin_length(targetName)));
+					new EqualsPredicate(new VariablePredicate(WILD_VAR), FunctionPredicate.builtin_length(targetName, fieldRead)));
 		}else{
 			fieldRead.putMetadata(REFINE_KEY, new Predicate());
 			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
@@ -347,7 +348,7 @@ public class RefinementTypeChecker extends TypeChecker {
 		super.visitCtArrayWrite(arrayWrite);
 		CtExpression<?> index = arrayWrite.getIndexExpression();
 		FunctionPredicate fp = FunctionPredicate.builtin_addToIndex(
-				arrayWrite.getTarget().toString(), index.toString(), WILD_VAR);
+				arrayWrite.getTarget().toString(), index.toString(), WILD_VAR, arrayWrite);
 		arrayWrite.putMetadata(REFINE_KEY, fp);
 		//TODO fazer mais...? faz sentido
 	}
@@ -410,7 +411,7 @@ public class RefinementTypeChecker extends TypeChecker {
 			return getRefinement(op);
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
-			return new Predicate(l.getValue().toString());
+			return new Predicate(l.getValue().toString(), l);
 		}else if(element instanceof CtInvocation<?>) {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
 			visitCtInvocation(inv);

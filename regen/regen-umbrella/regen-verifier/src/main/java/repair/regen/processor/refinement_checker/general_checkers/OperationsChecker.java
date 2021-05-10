@@ -128,7 +128,7 @@ public class OperationsChecker {
 			newName = String.format(name, rtc.getContext().getCounter());
 		Constraint newMeta = metadata.substituteVariable(rtc.WILD_VAR, newName);
 		
-		Constraint unOp = getOperatorFromKind(operator.getKind());
+		Constraint unOp = getOperatorFromKind(operator.getKind(), operator);
 		CtElement p = operator.getParent();
 		Constraint opS = unOp.substituteVariable(rtc.WILD_VAR, newName);
 	
@@ -213,11 +213,11 @@ public class OperationsChecker {
 			a = a.substituteVariable(rtc.WILD_VAR, "");
 			String s = a.toString().replace("(", "").replace(")", "")
 					.replace("==", "").replace(" ", "");//TODO IMPROVE
-			return new Predicate(String.format("(%s)",s));
+			return new Predicate(String.format("(%s)",s), element);
 			
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
-			return new Predicate(l.getValue().toString());
+			return new Predicate(l.getValue().toString(), element);
 
 		}else if(element instanceof CtInvocation<?>) {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
@@ -231,7 +231,7 @@ public class OperationsChecker {
 			
 			innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
 			RefinedVariable rv = rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
-			return new Predicate(newName);//Return variable that represents the invocation
+			return new Predicate(newName, inv);//Return variable that represents the invocation
 		}
 		return rtc.getRefinement(element);
 		//TODO Maybe add cases
@@ -256,7 +256,7 @@ public class OperationsChecker {
 		metadada = metadada.substituteVariable(rtc.WILD_VAR, newName);
 		metadada = metadada.substituteVariable(name, newName);
 		
-		Constraint c = getOperatorFromKind(operator.getKind()).substituteVariable(rtc.WILD_VAR, newName);
+		Constraint c = getOperatorFromKind(operator.getKind(), ex).substituteVariable(rtc.WILD_VAR, newName);
 		
 		RefinedVariable rv = rtc.getContext().addVarToContext(newName, w.getType(), metadada, w);
 		return new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), c);
@@ -292,7 +292,7 @@ public class OperationsChecker {
 		}
 	}
 
-	private Constraint getOperatorFromKind(UnaryOperatorKind kind) {
+	private Constraint getOperatorFromKind(UnaryOperatorKind kind, CtElement elem) {
 		String ret = null;
 		switch(kind) {
 		case POSTINC:	ret = rtc.WILD_VAR+" + 1";break;
@@ -304,6 +304,6 @@ public class OperationsChecker {
 		case POS: 	ret = "0 + "+ rtc.WILD_VAR;break;
 		case NEG: 	ret = "-" + rtc.WILD_VAR;
 		}
-		return new Predicate(ret);
+		return new Predicate(ret, elem);
 	}
 }

@@ -11,14 +11,14 @@ public class InvocationPredicate extends Predicate{
 	public InvocationPredicate(String name, String... params) {
 		List<Expression> le = new ArrayList<>();
 		for(String s: params) {
-			le.add(parse(s));
+			le.add(innerParse(s));
 		}
 		exp = new FunctionInvocation(name, le);
 	}
 	
 	public InvocationPredicate(String name, String s) {
 		List<Expression> le = new ArrayList<>();
-		le.add(parse(s));
+		le.add(innerParse(s));
 		exp = new FunctionInvocation(name, le);
 	}
 

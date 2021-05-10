@@ -164,7 +164,7 @@ public class AuxStateHandler {
 
 
 	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e, boolean isTo) {
-		Predicate p = new Predicate(value);
+		Predicate p = new Predicate(value, e);
 		String t = f.getTargetClass();
 		CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
 

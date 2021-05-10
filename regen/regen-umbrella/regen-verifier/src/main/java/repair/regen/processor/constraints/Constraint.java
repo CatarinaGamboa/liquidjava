@@ -34,7 +34,16 @@ public abstract class Constraint {
 		return new Predicate(e);
 	}
 
-	protected Expression parse(String ref) {
+	protected Expression parse(String ref, CtElement element) {
+		try{
+			return RefinementsParser.createAST(ref);	 
+		} catch (ParsingException e1) {
+			ErrorHandler.printSyntaxError(e1.getMessage(), ref, element);
+		}	
+		return null;
+	}
+	
+	protected Expression innerParse(String ref) {
 		try{
 			return RefinementsParser.createAST(ref);	 
 		} catch (ParsingException e1) {

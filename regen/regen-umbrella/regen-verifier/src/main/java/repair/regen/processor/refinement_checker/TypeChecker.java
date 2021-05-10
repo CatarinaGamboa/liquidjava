@@ -86,7 +86,7 @@ public abstract class TypeChecker extends CtScanner{
 
 		}
 		if(ref.isPresent()) 
-			constr = Optional.of(new Predicate(ref.get()));
+			constr = Optional.of(new Predicate(ref.get(), element));
 
 		return constr;
 	}

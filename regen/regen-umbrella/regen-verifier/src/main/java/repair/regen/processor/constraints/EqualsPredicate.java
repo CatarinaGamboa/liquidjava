@@ -15,7 +15,7 @@ public class EqualsPredicate extends Predicate {
 	public EqualsPredicate(Constraint c1, String c2) {
 		super();
 		exp = new GroupExpression(
-				new BinaryExpression(c1.getExpression(), "==", parse(c2)));
+				new BinaryExpression(c1.getExpression(), "==", innerParse(c2)));
 	}
 	
 }
