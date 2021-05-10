@@ -15,7 +15,7 @@ import spoon.reflect.declaration.CtElement;
 
 public class ErrorHandler {
 	
-	ErrorListener el = ErrorListener.getInstance();
+	static Error errorl = Error.getInstance();
 
 
 	/**
@@ -45,6 +45,9 @@ public class ErrorHandler {
 		sb.append(printMap(map));
 		sb.append("Location: " + var.getPosition()+ "\n");
 		sb.append("______________________________________________________\n");
+		
+		errorl.addError(sb.toString(), var.getPosition(), 1);
+		
 		System.out.println(sb.toString());
 		System.exit(1);
 	}
@@ -66,6 +69,9 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+		
+		errorl.addError(sb.toString(), element.getPosition(), 1);
+		
 		System.exit(1);
 
 	}
@@ -80,6 +86,8 @@ public class ErrorHandler {
 		sb.append("Location: " + var.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+		
+		errorl.addError(sb.toString(), var.getPosition(), 2);
 		System.exit(2);
 	}
 	
@@ -95,6 +103,8 @@ public class ErrorHandler {
 		sb.append("Location: " + var.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+		
+		errorl.addError(sb.toString(), var.getPosition(), 2);
 		System.exit(2);
 	}
 	
@@ -108,6 +118,8 @@ public class ErrorHandler {
 		sb.append("Location: " + var.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+		
+		errorl.addError(sb.toString(), var.getPosition(), 2);
 		System.exit(2);
 	}
 
@@ -120,6 +132,7 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition() + "\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+		errorl.addError(sb.toString(), element.getPosition(), 2);
 		System.exit(2);
 
 	}
@@ -135,6 +148,7 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+		errorl.addError(sb.toString(), element.getPosition(), 1);
 		System.exit(1);
 	}
 
@@ -147,6 +161,7 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition() + "\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+		errorl.addError(sb.toString(), element.getPosition(), 1);
 		System.exit(1);
 		
 	}
@@ -160,6 +175,7 @@ public class ErrorHandler {
 		sb.append("______________________________________________________\n");
 		sb.append(sb.toString());
 		System.out.println(sb.toString());
+		errorl.addError(sb.toString(), element.getPosition(), 1);
 		System.exit(1);	
 	}
 
@@ -176,6 +192,7 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+		errorl.addError(sb.toString(), element.getPosition(), 2);
 		System.exit(2);
 		
 	}
@@ -189,6 +206,7 @@ public class ErrorHandler {
 		sb.append(ref+"\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
+//		errorl.addError(sb.toString(), var.getPosition());
 		System.exit(2);
 		
 	}
