@@ -46,7 +46,7 @@ public class ErrorHandler {
 		sb.append("Location: " + var.getPosition()+ "\n");
 		sb.append("______________________________________________________\n");
 		
-		errorl.addError(sb.toString(), var.getPosition(), 1);
+		errorl.addError(sb.toString(), var.getPosition(), 1, map);
 		
 		System.out.println(sb.toString());
 		System.exit(1);
@@ -70,7 +70,7 @@ public class ErrorHandler {
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
 		
-		errorl.addError(sb.toString(), element.getPosition(), 1);
+		errorl.addError(sb.toString(), element.getPosition(), 1, map);
 		
 		System.exit(1);
 
@@ -87,11 +87,12 @@ public class ErrorHandler {
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
 		
-		errorl.addError(sb.toString(), var.getPosition(), 2);
+		errorl.addError(sb.toString(), var.getPosition(), 2, map);
 		System.exit(2);
 	}
 	
-	public static <T> void printNotFound(CtElement var, Constraint constraint, Constraint constraint2, String msg, HashMap<String, PlacementInCode> map) {
+	public static <T> void printNotFound(CtElement var, Constraint constraint, Constraint constraint2, String msg, 
+			HashMap<String, PlacementInCode> map) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append(msg);
@@ -104,7 +105,7 @@ public class ErrorHandler {
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
 		
-		errorl.addError(sb.toString(), var.getPosition(), 2);
+		errorl.addError(sb.toString(), var.getPosition(), 2, map);
 		System.exit(2);
 	}
 	
@@ -119,7 +120,7 @@ public class ErrorHandler {
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
 		
-		errorl.addError(sb.toString(), var.getPosition(), 2);
+		errorl.addError(sb.toString(), var.getPosition(), 2, map);
 		System.exit(2);
 	}
 
@@ -132,7 +133,7 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition() + "\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
-		errorl.addError(sb.toString(), element.getPosition(), 2);
+		errorl.addError(sb.toString(), element.getPosition(), 2, map);
 		System.exit(2);
 
 	}
@@ -148,7 +149,7 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		System.out.println(sb.toString());
-		errorl.addError(sb.toString(), element.getPosition(), 1);
+		errorl.addError(sb.toString(), element.getPosition(), 1, map);
 		System.exit(1);
 	}
 

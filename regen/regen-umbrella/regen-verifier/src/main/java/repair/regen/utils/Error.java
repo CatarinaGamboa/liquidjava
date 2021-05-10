@@ -1,5 +1,8 @@
 package repair.regen.utils;
 
+import java.util.HashMap;
+
+import repair.regen.processor.context.PlacementInCode;
 import spoon.reflect.cu.SourcePosition;
 
 public class Error {
@@ -7,6 +10,7 @@ public class Error {
 	private String message;
 	private SourcePosition position;
 	private int errorStatus;
+	private HashMap<String, PlacementInCode> map;
 	private static Error instance;
 	
 	private Error() {}
@@ -16,6 +20,13 @@ public class Error {
 		if(instance == null)
 			return new Error();
 		return instance;
+	}
+	
+	public void addError(String msg, SourcePosition p, int errorStatus, HashMap<String, PlacementInCode> map) {
+		message = msg;
+		position = p;
+		this.errorStatus = errorStatus;
+		this.map = map;
 	}
 	
 	public void addError(String msg, SourcePosition p, int errorStatus) {
@@ -45,4 +56,7 @@ public class Error {
 		return errorStatus;
 	}
 
+	public HashMap<String, PlacementInCode> getVCMap(){
+		return map;
+	}
 }
