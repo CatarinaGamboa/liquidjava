@@ -5,22 +5,22 @@ import java.util.HashMap;
 import repair.regen.processor.context.PlacementInCode;
 import spoon.reflect.cu.SourcePosition;
 
-public class Error {
+public class ErrorEmitter {
 	
 	private String message;
 	private SourcePosition position;
 	private int errorStatus;
 	private HashMap<String, PlacementInCode> map;
-	private static Error instance;
+	private static ErrorEmitter instance;
 	
-	private Error() {}
+	public ErrorEmitter() {}
 	
 	
-	public static Error getInstance() {
-		if(instance == null)
-			return new Error();
-		return instance;
-	}
+//	public static ErrorEmitter getInstance() {
+//		if(instance == null)
+//			return new ErrorEmitter();
+//		return instance;
+//	}
 	
 	public void addError(String msg, SourcePosition p, int errorStatus, HashMap<String, PlacementInCode> map) {
 		message = msg;
@@ -35,6 +35,11 @@ public class Error {
 		this.errorStatus = errorStatus;
 	}
 	
+	public void addError(String msg, int errorStatus) {
+		message = msg;
+		this.errorStatus = errorStatus;
+	}
+	
 	public boolean foundError() {
 		return message != null && position != null;
 	}
@@ -42,6 +47,8 @@ public class Error {
 	public void reset() {
 		message = null;
 		position = null;
+		errorStatus = 0;
+		map = null;
 	}
 	
 	public String getMessage() {

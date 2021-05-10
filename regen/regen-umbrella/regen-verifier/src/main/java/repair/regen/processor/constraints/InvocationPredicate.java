@@ -5,20 +5,21 @@ import java.util.List;
 
 import repair.regen.ast.Expression;
 import repair.regen.ast.FunctionInvocation;
+import repair.regen.utils.ErrorEmitter;
 
 public class InvocationPredicate extends Predicate{
 
-	public InvocationPredicate(String name, String... params) {
+	public InvocationPredicate(ErrorEmitter ee, String name, String... params) {
 		List<Expression> le = new ArrayList<>();
 		for(String s: params) {
-			le.add(innerParse(s));
+			le.add(innerParse(s, ee));
 		}
 		exp = new FunctionInvocation(name, le);
 	}
 	
-	public InvocationPredicate(String name, String s) {
+	public InvocationPredicate(ErrorEmitter ee, String name, String s) {
 		List<Expression> le = new ArrayList<>();
-		le.add(innerParse(s));
+		le.add(innerParse(s, ee));
 		exp = new FunctionInvocation(name, le);
 	}
 

@@ -19,6 +19,7 @@ import repair.regen.processor.facade.AliasDTO;
 import repair.regen.processor.facade.GhostDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
+import repair.regen.utils.ErrorEmitter;
 import repair.regen.utils.ErrorHandler;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
@@ -46,11 +47,14 @@ public abstract class TypeChecker extends CtScanner{
 
 	Context context;
 	Factory factory;
-	VCChecker vcChecker = new VCChecker();
+	VCChecker vcChecker;
+	ErrorEmitter errorEmitter;
 
-	public TypeChecker(Context c, Factory fac) {
+	public TypeChecker(Context c, Factory fac, ErrorEmitter errorEmitter) {
 		this.context = c;
 		this.factory = fac;
+		this.errorEmitter = errorEmitter;
+		vcChecker = new VCChecker(errorEmitter);
 	}
 
 	public Context getContext() {
@@ -85,9 +89,11 @@ public abstract class TypeChecker extends CtScanner{
 			}
 
 		}
-		if(ref.isPresent()) 
-			constr = Optional.of(new Predicate(ref.get(), element));
-
+		if(ref.isPresent()) {
+			Predicate p = new Predicate(ref.get(), element, errorEmitter);
+			if(errorEmitter.foundError()) return Optional.empty();
+			constr = Optional.of(p);
+		}
 		return constr;
 	}
 
@@ -119,7 +125,7 @@ public abstract class TypeChecker extends CtScanner{
 
 
 		List<CtExpression<?>> ls = e.getElements();
-		InvocationPredicate ip = new InvocationPredicate(g.getName(), THIS);
+		InvocationPredicate ip = new InvocationPredicate(getErrorEmitter(), g.getName(), THIS);
 		int order = 0;
 		for(CtExpression<?> ce : ls) {
 			if(ce instanceof CtLiteral<?>) {
@@ -142,11 +148,11 @@ public abstract class TypeChecker extends CtScanner{
 		try {
 			gd = RefinementsParser.getGhostDeclaration(string);
 		} catch (ParsingException e) {
-			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
 		}
 		if(gd.getParam_types().size() > 0) {
 			ErrorHandler.printCostumeError(ann, "Ghost States have the class as parameter "
-					+ "by default, no other parameters are allowed in '"+string+"'");
+					+ "by default, no other parameters are allowed in '"+string+"'", errorEmitter);
 		}
 		//Set class as parameter of Ghost
 		String qn = getQualifiedClassName(element);
@@ -206,7 +212,7 @@ public abstract class TypeChecker extends CtScanner{
 				context.addGhostFunction(gh);
 			}
 		} catch (ParsingException e) {
-			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
 			//	e.printStackTrace();
 		} 
 	}
@@ -231,7 +237,7 @@ public abstract class TypeChecker extends CtScanner{
 				}	
 			}
 		} catch (ParsingException e) {
-			ErrorHandler.printCostumeError(element, e.getMessage());
+			ErrorHandler.printCostumeError(element, e.getMessage(), errorEmitter);
 //			e.printStackTrace();
 		}
 	}
@@ -289,7 +295,7 @@ public abstract class TypeChecker extends CtScanner{
 		element.putMetadata(REFINE_KEY, expectedType);	
 	}
 	
-	 public void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target, String string) {
+	public void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target, String string) {
 		vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), 
 				WILD_VAR, THIS, target, string, factory);
 	}
@@ -308,6 +314,10 @@ public abstract class TypeChecker extends CtScanner{
 	
 	public void createStateMismatchError(CtElement element, String method, Constraint c, String states) {
 		vcChecker.printStateMismatchError(element, method, c, states);
+	}
+
+	public ErrorEmitter getErrorEmitter() {
+		return errorEmitter;
 	}
 
 }

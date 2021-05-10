@@ -65,7 +65,7 @@ public class AuxStateHandler {
 				Map<String, CtExpression> m = a.getAllValues();
 				CtLiteral<String> from = (CtLiteral<String>)m.get("from");
 				if(from != null)
-					ErrorHandler.printErrorConstructorFromState(c, from);
+					ErrorHandler.printErrorConstructorFromState(c, from, tc.getErrorEmitter());
 			}
 			setFunctionStates(f, an, tc, c);//f.setState(an, context.getGhosts(), c);
 		}else {
@@ -85,7 +85,7 @@ public class AuxStateHandler {
 		for(GhostFunction sg: sets) {
 			if(sg.getReturnType().toString().equals("int")) {
 				Predicate p = new EqualsPredicate(
-						new InvocationPredicate(sg.getName(), s),
+						new InvocationPredicate(tc.getErrorEmitter(), sg.getName(), s),
 						LiteralPredicate.getIntPredicate(0));
 				c = Conjunction.createConjunction(c, p);
 			}else {
@@ -164,7 +164,7 @@ public class AuxStateHandler {
 
 
 	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e, boolean isTo) {
-		Predicate p = new Predicate(value, e);
+		Predicate p = new Predicate(value, e, tc.getErrorEmitter());
 		String t = f.getTargetClass();
 		CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
 
@@ -176,7 +176,7 @@ public class AuxStateHandler {
 
 		Constraint c1 = isTo? getMissingStates(t, tc, p): p;
 		Constraint c = c1.substituteVariable(tc.THIS, name);
-		c = c.changeOldMentions(nameOld, name);
+		c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
 		boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e);
 		if(b) tc.createSameStateError(e, p, t);	
 
@@ -197,17 +197,17 @@ public class AuxStateHandler {
 			else if(g.getParent() != null && sets.contains(g.getParent()))
 				sets.remove(g.getParent());
 		}
-		return addOldStates(p, tc.THIS, sets);
+		return addOldStates(p, tc.THIS, sets, tc);
 	}
 
 
-	private static Constraint addOldStates(Predicate p, String th, List<GhostFunction> sets) {
+	private static Constraint addOldStates(Predicate p, String th, List<GhostFunction> sets, TypeChecker tc) {
 		Constraint c = p;
 		for(GhostFunction gf: sets) {
 			Constraint eq = new EqualsPredicate(
-					new InvocationPredicate(gf.getName(), th),
+					new InvocationPredicate(tc.getErrorEmitter(), gf.getName(), th),
 					new InvocationPredicate(gf.getName(), 
-							new InvocationPredicate("old", th).getExpression()));
+							new InvocationPredicate(tc.getErrorEmitter(), "old", th).getExpression()));
 			c = Conjunction.createConjunction(c, eq);
 		}
 		return c;
@@ -313,7 +313,7 @@ public class AuxStateHandler {
 					prevCheck = prevCheck.substituteVariable(s, map.get(s));
 					expectState = expectState.substituteVariable(s, map.get(s));
 				}
-				expectState = expectState.changeOldMentions(vi.getName(), instanceName);
+				expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
 				
 				found = tc.checksStateSMT(prevCheck, expectState, invocation);
 				if(found && os.hasTo()) {
@@ -324,7 +324,7 @@ public class AuxStateHandler {
 					for(String s : map.keySet()) {
 						transitionedState = transitionedState.substituteVariable(s, map.get(s));
 					}
-					transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
+					transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
 					addInstanceWithState(tc, name, newInstanceName, vi, transitionedState, invocation);
 					return transitionedState;
 
@@ -349,8 +349,8 @@ public class AuxStateHandler {
 
 
 	private static Constraint checkOldMentions(Constraint transitionedState, String instanceName,
-			String newInstanceName) {
-		return transitionedState.changeOldMentions(instanceName, newInstanceName);
+			String newInstanceName, TypeChecker tc) {
+		return transitionedState.changeOldMentions(instanceName, newInstanceName, tc.getErrorEmitter());
 	}
 
 	/**

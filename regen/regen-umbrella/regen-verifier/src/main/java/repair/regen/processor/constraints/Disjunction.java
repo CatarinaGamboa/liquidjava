@@ -8,6 +8,7 @@ import repair.regen.ast.UnaryExpression;
 import repair.regen.ast.Expression;
 import repair.regen.ast.GroupExpression;
 import repair.regen.processor.context.GhostState;
+import repair.regen.utils.ErrorEmitter;
 
 public class Disjunction extends Constraint{
 	
@@ -66,16 +67,16 @@ public class Disjunction extends Constraint{
 	}
 
 	@Override
-	public Constraint changeOldMentions(String previousName, String newName) {
-		Constraint c1_ = c1.changeOldMentions(previousName, newName);
-		Constraint c2_ = c2.changeOldMentions(previousName, newName);
+	public Constraint changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
+		Constraint c1_ = c1.changeOldMentions(previousName, newName, ee);
+		Constraint c2_ = c2.changeOldMentions(previousName, newName, ee);
 		return new Disjunction(c1_, c2_);
 	}
 	
 	@Override
-	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls) {
-		return new Disjunction(c1.changeStatesToRefinements(ghostState, ls), 
-				c2.changeStatesToRefinements(ghostState, ls));
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls, ErrorEmitter ee) {
+		return new Disjunction(c1.changeStatesToRefinements(ghostState, ls, ee), 
+				c2.changeStatesToRefinements(ghostState, ls, ee));
 	}
 
 

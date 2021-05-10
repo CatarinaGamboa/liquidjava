@@ -5,6 +5,7 @@ import java.util.List;
 
 import repair.regen.processor.context.Context;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
+import repair.regen.utils.ErrorEmitter;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtInterface;
@@ -19,14 +20,16 @@ import spoon.reflect.reference.CtTypeReference;
 public class MethodsFirstChecker extends TypeChecker{
 	MethodsFunctionsChecker mfc;
 	List<String> visitedClasses;
-	public MethodsFirstChecker(Context c, Factory fac) {
-		super(c, fac);
+	public MethodsFirstChecker(Context c, Factory fac, ErrorEmitter errorEmitter) {
+		super(c, fac, errorEmitter);
 		mfc = new MethodsFunctionsChecker(this);
 		visitedClasses = new ArrayList<>();
 	}
 	
 	@Override
 	public <T> void visitCtClass(CtClass<T> ctClass) {
+		if(errorEmitter.foundError()) return;
+		
 		System.out.println("CTCLASS:"+ctClass.getSimpleName());
 		context.reinitializeContext();
 		if(visitedClasses.contains(ctClass.getQualifiedName()))
@@ -57,6 +60,8 @@ public class MethodsFirstChecker extends TypeChecker{
 
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
+		if(errorEmitter.foundError()) return;
+		
 		if(visitedClasses.contains(intrface.getQualifiedName()))
 			return;
 		else
@@ -71,6 +76,8 @@ public class MethodsFirstChecker extends TypeChecker{
 	
 	@Override
 	public <T> void visitCtConstructor(CtConstructor<T> c) {
+		if(errorEmitter.foundError()) return;
+		
 		context.enterContext();
 		getRefinementFromAnnotation(c);
 		mfc.getConstructorRefinements(c);
@@ -79,6 +86,8 @@ public class MethodsFirstChecker extends TypeChecker{
 	}
 	
 	public <R> void visitCtMethod(CtMethod<R> method) {
+		if(errorEmitter.foundError()) return;
+		
 		context.enterContext();
 		mfc.getMethodRefinements(method);
 		super.visitCtMethod(method);

@@ -12,6 +12,7 @@ import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.facade.AliasDTO;
+import repair.regen.utils.ErrorEmitter;
 import repair.regen.utils.Utils;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
@@ -64,8 +65,8 @@ public class AliasWrapper {
 	}
 	
 	
-	public Constraint getPremises(List<String> list, List<String> newNames, CtElement elem){
-		List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem);
+	public Constraint getPremises(List<String> list, List<String> newNames, CtElement elem, ErrorEmitter ee){
+		List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem, ee);
 		Constraint prem = new Predicate();
 		for (int i = 0; i < invocationPredicates.size(); i++) {
 			prem = Conjunction.createConjunction(prem, 
@@ -74,10 +75,10 @@ public class AliasWrapper {
 		return prem.clone();
 	}
 
-	private List<Predicate> getPredicatesFromExpression(List<String> list, CtElement elem) {
+	private List<Predicate> getPredicatesFromExpression(List<String> list, CtElement elem, ErrorEmitter ee) {
 		List<Predicate> lp = new ArrayList<>();
 		for(String e: list)
-			lp.add(new Predicate(e, elem));
+			lp.add(new Predicate(e, elem, ee));
 	
 		return lp;
 	}

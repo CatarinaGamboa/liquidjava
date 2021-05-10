@@ -12,6 +12,7 @@ import repair.regen.processor.context.GhostState;
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
+import repair.regen.utils.ErrorEmitter;
 import repair.regen.utils.ErrorHandler;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
@@ -24,8 +25,8 @@ public abstract class Constraint {
 	public abstract List<String> getVariableNames();
 	public abstract String toString();
 	public abstract boolean isBooleanTrue();
-	public abstract Constraint changeOldMentions(String previousName, String newName);
-	public abstract Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange);
+	public abstract Constraint changeOldMentions(String previousName, String newName, ErrorEmitter ee);
+	public abstract Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, ErrorEmitter ee);
 	public abstract Expression getExpression();
 	
 	
@@ -34,20 +35,20 @@ public abstract class Constraint {
 		return new Predicate(e);
 	}
 
-	protected Expression parse(String ref, CtElement element) {
+	protected Expression parse(String ref, CtElement element, ErrorEmitter e) {
 		try{
 			return RefinementsParser.createAST(ref);	 
 		} catch (ParsingException e1) {
-			ErrorHandler.printSyntaxError(e1.getMessage(), ref, element);
+			ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
 		}	
 		return null;
 	}
 	
-	protected Expression innerParse(String ref) {
+	protected Expression innerParse(String ref, ErrorEmitter e) {
 		try{
 			return RefinementsParser.createAST(ref);	 
 		} catch (ParsingException e1) {
-			ErrorHandler.printSyntaxError(e1.getMessage(), ref);
+			ErrorHandler.printSyntaxError(e1.getMessage(), ref, e);
 		}	
 		return null;
 	}

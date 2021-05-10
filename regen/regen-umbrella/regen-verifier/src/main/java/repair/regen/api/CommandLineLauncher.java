@@ -1,6 +1,7 @@
 package repair.regen.api;
 
 import repair.regen.processor.RefinementProcessor;
+import repair.regen.utils.ErrorEmitter;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
 import spoon.reflect.declaration.CtPackage;
@@ -13,10 +14,26 @@ public class CommandLineLauncher {
 		//In eclipse only needed this:"../regen-example/src/main/java/"
 		//In VSCode needs: "../regen/regen-umbrella/regen-example/src/main/java/regen/test/project";
 		String file = args.length == 0? allPath:args[0];
-		launch(file);
+		ErrorEmitter ee = launch(file);
+		if(ee.foundError()) {
+			System.out.println(ee.getMessage());
+			System.exit(ee.getErrorStatus());
+		}else {
+			System.out.println("Analysis complete!");
+		}
+	}
+	
+	public static void launchTest(String file) {
+		ErrorEmitter ee = launch(file);
+		if(ee.foundError()) {
+			System.out.println(ee.getMessage());
+			System.exit(ee.getErrorStatus());
+		}else {
+			System.out.println("Analysis complete!");
+		}
 	}
 
-	public static void launch(String file) {
+	public static ErrorEmitter launch(String file) {
 		Launcher launcher = new Launcher();
         launcher.addInputResource(file);
         launcher.getEnvironment().setNoClasspath(true);
@@ -28,7 +45,9 @@ public class CommandLineLauncher {
         
         final Factory factory = launcher.getFactory();
 		final ProcessingManager processingManager = new QueueProcessingManager(factory);
-		final RefinementProcessor processor = new RefinementProcessor(factory);
+		
+		ErrorEmitter ee = new ErrorEmitter();
+		final RefinementProcessor processor = new RefinementProcessor(factory, ee);
 		processingManager.addProcessor(processor);
 		
 		//To only search the last package - less time spent 
@@ -39,7 +58,9 @@ public class CommandLineLauncher {
 			processingManager.process(v);
 		//To search all previous packages
 		//processingManager.process(factory.Package().getRootPackage());
-
-        System.out.println("Analysis complete!");
+		
+		
+		return ee;
+		
 	}
 }

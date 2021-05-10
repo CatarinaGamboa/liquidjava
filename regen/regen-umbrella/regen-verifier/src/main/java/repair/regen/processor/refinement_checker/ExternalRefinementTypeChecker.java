@@ -12,6 +12,7 @@ import repair.regen.processor.facade.GhostDTO;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
+import repair.regen.utils.ErrorEmitter;
 import repair.regen.utils.ErrorHandler;
 import repair.regen.utils.Pair;
 import spoon.reflect.declaration.CtClass;
@@ -26,8 +27,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	String prefix;
 	MethodsFunctionsChecker m;
 	
-	public ExternalRefinementTypeChecker(Context context, Factory fac) {
-		super(context, fac);
+	public ExternalRefinementTypeChecker(Context context, Factory fac, ErrorEmitter errorEmitter) {
+		super(context, fac, errorEmitter);
 		System.out.println("ExternalRefinementTypeChecker");
 	}
 
@@ -38,6 +39,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
+		if(errorEmitter.foundError()) return;
+		
 		Optional<String> externalRefinements = getExternalRefinement(intrface);
 		if(externalRefinements.isPresent()) {
 			prefix = externalRefinements.get();
@@ -49,6 +52,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 
 	@Override
 	public <T> void visitCtField(CtField<T> f) {
+		if(errorEmitter.foundError()) return;
+		
 		Optional<Constraint> oc = getRefinementFromAnnotation(f);
 		Constraint c = oc.isPresent()?oc.get():new Predicate();
 		context.addGlobalVariableToContext(f.getSimpleName(), prefix, 
@@ -57,6 +62,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	}
 	
 	public <R> void visitCtMethod(CtMethod<R> method) {
+		if(errorEmitter.foundError()) return;
+		
 		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
 		mfc.getMethodRefinements(method, prefix);
 		super.visitCtMethod(method);
@@ -81,7 +88,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 			}
 
 		} catch (ParsingException e) {
-			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+			ErrorHandler.printCostumeError(element, 
+					"Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
 //			e.printStackTrace();
 		}
 	}

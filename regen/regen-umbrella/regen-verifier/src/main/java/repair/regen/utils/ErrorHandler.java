@@ -15,9 +15,6 @@ import spoon.reflect.declaration.CtElement;
 
 public class ErrorHandler {
 	
-	static Error errorl = Error.getInstance();
-
-
 	/**
 	 * Prints the error message
 	 * @param <T>
@@ -27,11 +24,11 @@ public class ErrorHandler {
 	 * @param cSMT
 	 */
 	public static <T> void printError(CtElement var, Constraint expectedType, Constraint cSMT, 
-			HashMap<String, PlacementInCode> map) {
-		printError(var, null, expectedType, cSMT, map);
+			HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+		printError(var, null, expectedType, cSMT, map, ee);
 	}
 	public static <T> void printError(CtElement var, String moreInfo, Constraint expectedType, 
-			Constraint cSMT, HashMap<String, PlacementInCode> map) {		
+			Constraint cSMT, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {		
 		StringBuilder sb = new StringBuilder();
 		
 		sb.append("______________________________________________________\n");
@@ -48,19 +45,16 @@ public class ErrorHandler {
 		
 		errorl.addError(sb.toString(), var.getPosition(), 1, map);
 		
-		System.out.println(sb.toString());
-		System.exit(1);
 	}
 	
 	public static void printStateMismatch(CtElement element, String method, VCImplication constraintForErrorMsg, 
-			String states, HashMap<String, PlacementInCode> map) {
+			String states, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append(" Failed to check state transitions when calling "+ method+" in:\n\n");
 		sb.append(element+"\n\n");
 		sb.append("Expected possible states:" + states + "\n");
 		sb.append("\nState found:\n");
-		//TODO SHOW
 		sb.append(printLine());
 		sb.append("\n"+constraintForErrorMsg/*.toConjunctions()*/.toString()+"\n");
 		sb.append(printLine());
@@ -68,16 +62,14 @@ public class ErrorHandler {
 		sb.append(printMap(map));
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
 		
 		errorl.addError(sb.toString(), element.getPosition(), 1, map);
 		
-		System.exit(1);
-
 	}
 	
 	
-	public static <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement, HashMap<String, PlacementInCode> map) {
+	public static <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement, 
+			HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append("Encountered unknown variable\n\n");
@@ -85,14 +77,12 @@ public class ErrorHandler {
 		sb.append(printMap(map));
 		sb.append("Location: " + var.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
 		
 		errorl.addError(sb.toString(), var.getPosition(), 2, map);
-		System.exit(2);
 	}
 	
 	public static <T> void printNotFound(CtElement var, Constraint constraint, Constraint constraint2, String msg, 
-			HashMap<String, PlacementInCode> map) {
+			HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append(msg);
@@ -103,14 +93,13 @@ public class ErrorHandler {
 		sb.append(printMap(map));
 		sb.append("Location: " + var.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
 		
 		errorl.addError(sb.toString(), var.getPosition(), 2, map);
-		System.exit(2);
 	}
 	
 	
-	public static <T> void printErrorArgs(CtElement var, Constraint expectedType, String msg, HashMap<String, PlacementInCode> map) {
+	public static <T> void printErrorArgs(CtElement var, Constraint expectedType, String msg, 
+			HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append("Error in ghost invocation: "+ msg+"\n");
@@ -118,13 +107,12 @@ public class ErrorHandler {
 		sb.append(printMap(map));
 		sb.append("Location: " + var.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
 		
 		errorl.addError(sb.toString(), var.getPosition(), 2, map);
-		System.exit(2);
 	}
 
-	public static void printErrorTypeMismatch(CtElement element, Constraint expectedType, String message, HashMap<String, PlacementInCode> map) {
+	public static void printErrorTypeMismatch(CtElement element, Constraint expectedType, String message, 
+			HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append(message+"\n\n");
@@ -132,13 +120,12 @@ public class ErrorHandler {
 		sb.append(printMap(map));
 		sb.append("Location: " + element.getPosition() + "\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
-		errorl.addError(sb.toString(), element.getPosition(), 2, map);
-		System.exit(2);
 
+		errorl.addError(sb.toString(), element.getPosition(), 2, map);
 	}
 
-	public static void printSameStateSetError(CtElement element, Constraint p,String name, HashMap<String, PlacementInCode> map) {
+	public static void printSameStateSetError(CtElement element, Constraint p,String name, 
+			HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append("Error found multiple disjoint states from a State Set in a refinement\n\n");
@@ -148,12 +135,12 @@ public class ErrorHandler {
 		sb.append(printMap(map));
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
+
 		errorl.addError(sb.toString(), element.getPosition(), 1, map);
-		System.exit(1);
+
 	}
 
-	public static void printErrorConstructorFromState(CtElement element, CtLiteral<String> from) {
+	public static void printErrorConstructorFromState(CtElement element, CtLiteral<String> from, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append(" Error found constructor with FROM state (Constructor's should only have a TO state)\n\n");
@@ -161,13 +148,11 @@ public class ErrorHandler {
 		sb.append("State found:" + from + "\n");
 		sb.append("Location: " + element.getPosition() + "\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
-		errorl.addError(sb.toString(), element.getPosition(), 1);
-		System.exit(1);
 		
+		errorl.addError(sb.toString(), element.getPosition(), 1);
 	}
 	
-	public static void printCostumeError(CtElement element, String msg) {
+	public static void printCostumeError(CtElement element, String msg, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append(" Found Error: "+msg+"\n\n");
@@ -175,13 +160,12 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		sb.append(sb.toString());
-		System.out.println(sb.toString());
+
 		errorl.addError(sb.toString(), element.getPosition(), 1);
-		System.exit(1);	
 	}
 
 	
-	public static void printSyntaxError(String msg, String ref, CtElement element) {
+	public static void printSyntaxError(String msg, String ref, CtElement element, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append("Syntax error with message\n");
@@ -192,13 +176,11 @@ public class ErrorHandler {
 		sb.append(element+"\n");
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
+
 		errorl.addError(sb.toString(), element.getPosition(), 2);
-		System.exit(2);
-		
 	}
 	
-	public static void printSyntaxError(String msg, String ref) {
+	public static void printSyntaxError(String msg, String ref, ErrorEmitter errorl) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append("Syntax error with message\n");
@@ -206,10 +188,8 @@ public class ErrorHandler {
 		sb.append("Found in refinement:\n");
 		sb.append(ref+"\n");
 		sb.append("______________________________________________________\n");
-		System.out.println(sb.toString());
-//		errorl.addError(sb.toString(), var.getPosition());
-		System.exit(2);
-		
+
+		errorl.addError(sb.toString(), 2);
 	}
 	
 	private static String printLine() {

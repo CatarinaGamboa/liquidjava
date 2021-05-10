@@ -6,6 +6,7 @@ import java.util.List;
 import repair.regen.ast.Expression;
 import repair.regen.ast.Ite;
 import repair.regen.processor.context.GhostState;
+import repair.regen.utils.ErrorEmitter;
 
 public class IfThenElse extends Constraint{
 	private Constraint ite;
@@ -54,13 +55,13 @@ public class IfThenElse extends Constraint{
 		return false;
 	}
 	@Override
-	public Constraint changeOldMentions(String previousName, String newName) {
-		return ite.changeOldMentions(previousName, newName);
+	public Constraint changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
+		return ite.changeOldMentions(previousName, newName, ee);
 	}
 	
 	@Override
-	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls) {
-		return ite.changeStatesToRefinements(ghostState, ls);
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls, ErrorEmitter ee) {
+		return ite.changeStatesToRefinements(ghostState, ls, ee);
 	}
 
 }

@@ -213,11 +213,11 @@ public class OperationsChecker {
 			a = a.substituteVariable(rtc.WILD_VAR, "");
 			String s = a.toString().replace("(", "").replace(")", "")
 					.replace("==", "").replace(" ", "");//TODO IMPROVE
-			return new Predicate(String.format("(%s)",s), element);
+			return new Predicate(String.format("(%s)",s), element, rtc.getErrorEmitter());
 			
 		}else if (element instanceof CtLiteral<?>) {
 			CtLiteral<?> l = (CtLiteral<?>) element;
-			return new Predicate(l.getValue().toString(), element);
+			return new Predicate(l.getValue().toString(), element, rtc.getErrorEmitter());
 
 		}else if(element instanceof CtInvocation<?>) {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
@@ -231,7 +231,7 @@ public class OperationsChecker {
 			
 			innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
 			RefinedVariable rv = rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
-			return new Predicate(newName, inv);//Return variable that represents the invocation
+			return new Predicate(newName, inv, rtc.getErrorEmitter());//Return variable that represents the invocation
 		}
 		return rtc.getRefinement(element);
 		//TODO Maybe add cases
@@ -304,6 +304,6 @@ public class OperationsChecker {
 		case POS: 	ret = "0 + "+ rtc.WILD_VAR;break;
 		case NEG: 	ret = "-" + rtc.WILD_VAR;
 		}
-		return new Predicate(ret, elem);
+		return new Predicate(ret, elem, rtc.getErrorEmitter());
 	}
 }

@@ -2,6 +2,7 @@ package repair.regen.processor.constraints;
 
 import repair.regen.ast.BinaryExpression;
 import repair.regen.ast.GroupExpression;
+import repair.regen.utils.ErrorEmitter;
 
 public class EqualsPredicate extends Predicate {
 	
@@ -12,10 +13,10 @@ public class EqualsPredicate extends Predicate {
 	}
 
 
-	public EqualsPredicate(Constraint c1, String c2) {
+	public EqualsPredicate(Constraint c1, String c2, ErrorEmitter ee) {
 		super();
 		exp = new GroupExpression(
-				new BinaryExpression(c1.getExpression(), "==", innerParse(c2)));
+				new BinaryExpression(c1.getExpression(), "==", innerParse(c2, ee)));
 	}
 	
 }
