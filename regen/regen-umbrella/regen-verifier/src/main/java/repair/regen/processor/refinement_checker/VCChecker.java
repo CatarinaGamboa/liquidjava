@@ -25,7 +25,7 @@ import repair.regen.smt.NotFoundError;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import repair.regen.smt.TypeMismatchError;
-import repair.regen.utils.ErrorPrinter;
+import repair.regen.utils.ErrorHandler;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
@@ -319,7 +319,7 @@ public class VCChecker {
 
 	public void printSameStateError(CtElement element, Constraint expectedType, String klass) {
 		HashMap<String, PlacementInCode> map = createMap(element, expectedType);
-		ErrorPrinter.printSameStateSetError(element, expectedType, klass, map);	
+		ErrorHandler.printSameStateSetError(element, expectedType, klass, map);	
 	}
 
 
@@ -340,15 +340,15 @@ public class VCChecker {
 		Constraint etMessageReady =  expectedType;//substituteByMap(expectedType, map);
 		Constraint cSMTMessageReady = premisesBeforeChange;//substituteByMap(premisesBeforeChange, map);
 		if ( e instanceof TypeCheckError) {
-			ErrorPrinter.printError(element, s, etMessageReady, cSMTMessageReady, map);
+			ErrorHandler.printError(element, s, etMessageReady, cSMTMessageReady, map);
 		}else if(e instanceof GhostFunctionError) {
-			ErrorPrinter.printErrorArgs(element, etMessageReady, e.getMessage(), map);
+			ErrorHandler.printErrorArgs(element, etMessageReady, e.getMessage(), map);
 		}else if(e instanceof TypeMismatchError) {
-			ErrorPrinter.printErrorTypeMismatch(element, etMessageReady, e.getMessage(), map);
+			ErrorHandler.printErrorTypeMismatch(element, etMessageReady, e.getMessage(), map);
 		}else if(e instanceof NotFoundError) {
-			ErrorPrinter.printNotFound(element, cSMTMessageReady, etMessageReady, e.getMessage(), map);
+			ErrorHandler.printNotFound(element, cSMTMessageReady, etMessageReady, e.getMessage(), map);
 		}else {
-			ErrorPrinter.printCostumeError(element, e.getMessage());
+			ErrorHandler.printCostumeError(element, e.getMessage());
 //			System.err.println("Unknown error:"+e.getMessage());
 //			e.printStackTrace();
 //			System.exit(7);
@@ -359,7 +359,7 @@ public class VCChecker {
 			HashMap<String, PlacementInCode> map, String s) {
 		Constraint etMessageReady =  expectedType;//substituteByMap(expectedType, map);
 		Constraint cSMTMessageReady = premises;//substituteByMap(premises, map);
-		ErrorPrinter.printError(element, s, etMessageReady, cSMTMessageReady, map);
+		ErrorHandler.printError(element, s, etMessageReady, cSMTMessageReady, map);
 	}
 
 	public void printStateMismatchError(CtElement element, String method, Constraint c, String states) {
@@ -368,7 +368,7 @@ public class VCChecker {
 		HashMap<String, PlacementInCode> map = new HashMap<>();
 		VCImplication constraintForErrorMsg = joinConstraints(c, element, mainVars, lrv, map);
 //		HashMap<String, PlacementInCode> map = createMap(element, c);
-		ErrorPrinter.printStateMismatch(element, method, constraintForErrorMsg, states, map);
+		ErrorHandler.printStateMismatch(element, method, constraintForErrorMsg, states, map);
 	}
 
 

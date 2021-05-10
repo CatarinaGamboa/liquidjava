@@ -111,7 +111,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
+	public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable){
 		super.visitCtLocalVariable(localVariable);
 		//only declaration, no assignment
 		if(localVariable.getAssignment() == null) {

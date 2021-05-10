@@ -19,7 +19,7 @@ import repair.regen.processor.facade.AliasDTO;
 import repair.regen.processor.facade.GhostDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
-import repair.regen.utils.ErrorPrinter;
+import repair.regen.utils.ErrorHandler;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtLocalVariable;
@@ -142,10 +142,10 @@ public abstract class TypeChecker extends CtScanner{
 		try {
 			gd = RefinementsParser.getGhostDeclaration(string);
 		} catch (ParsingException e) {
-			ErrorPrinter.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
 		}
 		if(gd.getParam_types().size() > 0) {
-			ErrorPrinter.printCostumeError(ann, "Ghost States have the class as parameter "
+			ErrorHandler.printCostumeError(ann, "Ghost States have the class as parameter "
 					+ "by default, no other parameters are allowed in '"+string+"'");
 		}
 		//Set class as parameter of Ghost
@@ -206,7 +206,7 @@ public abstract class TypeChecker extends CtScanner{
 				context.addGhostFunction(gh);
 			}
 		} catch (ParsingException e) {
-			ErrorPrinter.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
 			//	e.printStackTrace();
 		} 
 	}
@@ -231,7 +231,7 @@ public abstract class TypeChecker extends CtScanner{
 				}	
 			}
 		} catch (ParsingException e) {
-			ErrorPrinter.printCostumeError(element, e.getMessage());
+			ErrorHandler.printCostumeError(element, e.getMessage());
 //			e.printStackTrace();
 		}
 	}

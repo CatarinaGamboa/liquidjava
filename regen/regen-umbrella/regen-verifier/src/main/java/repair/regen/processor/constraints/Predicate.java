@@ -14,7 +14,7 @@ import repair.regen.ast.Var;
 import repair.regen.processor.context.GhostState;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
-import repair.regen.utils.ErrorPrinter;
+import repair.regen.utils.ErrorHandler;
 
 public class Predicate extends Constraint{
 	private final String OLD = "old";

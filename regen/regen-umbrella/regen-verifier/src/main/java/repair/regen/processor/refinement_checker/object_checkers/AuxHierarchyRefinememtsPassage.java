@@ -15,7 +15,7 @@ import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.refinement_checker.TypeChecker;
-import repair.regen.utils.ErrorPrinter;
+import repair.regen.utils.ErrorHandler;
 import repair.regen.utils.Utils;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;

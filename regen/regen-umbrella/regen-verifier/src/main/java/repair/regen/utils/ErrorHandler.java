@@ -11,7 +11,9 @@ import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 
-public class ErrorPrinter {
+public class ErrorHandler {
+	
+	ErrorListener el = ErrorListener.getInstance();
 
 
 	/**
@@ -27,7 +29,8 @@ public class ErrorPrinter {
 		printError(var, null, expectedType, cSMT, map);
 	}
 	public static <T> void printError(CtElement var, String moreInfo, Constraint expectedType, 
-			Constraint cSMT, HashMap<String, PlacementInCode> map) {
+			Constraint cSMT, HashMap<String, PlacementInCode> map) {		
+		
 		System.out.println("______________________________________________________");
 		System.err.println("Failed to check refinement at: ");
 		System.out.println();

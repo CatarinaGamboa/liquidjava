@@ -12,7 +12,7 @@ import repair.regen.processor.context.GhostState;
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
-import repair.regen.utils.ErrorPrinter;
+import repair.regen.utils.ErrorHandler;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 
@@ -38,7 +38,7 @@ public abstract class Constraint {
 		try{
 			return RefinementsParser.createAST(ref);	 
 		} catch (ParsingException e1) {
-			ErrorPrinter.printSyntaxError(e1.getMessage(), ref);
+			ErrorHandler.printSyntaxError(e1.getMessage(), ref);
 		}	
 		return null;
 	}

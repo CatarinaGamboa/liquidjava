@@ -12,7 +12,7 @@ import repair.regen.processor.facade.GhostDTO;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
-import repair.regen.utils.ErrorPrinter;
+import repair.regen.utils.ErrorHandler;
 import repair.regen.utils.Pair;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
@@ -81,7 +81,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 			}
 
 		} catch (ParsingException e) {
-			ErrorPrinter.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
+			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage());
 //			e.printStackTrace();
 		}
 	}

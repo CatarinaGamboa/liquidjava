@@ -28,7 +28,7 @@ import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
-import repair.regen.utils.ErrorPrinter;
+import repair.regen.utils.ErrorHandler;
 import repair.regen.utils.Utils;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
@@ -65,7 +65,7 @@ public class AuxStateHandler {
 				Map<String, CtExpression> m = a.getAllValues();
 				CtLiteral<String> from = (CtLiteral<String>)m.get("from");
 				if(from != null)
-					ErrorPrinter.printErrorConstructorFromState(c, from);
+					ErrorHandler.printErrorConstructorFromState(c, from);
 			}
 			setFunctionStates(f, an, tc, c);//f.setState(an, context.getGhosts(), c);
 		}else {
