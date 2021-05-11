@@ -8,7 +8,7 @@ import spoon.reflect.cu.SourcePosition;
 public class ErrorEmitter {
 	
 	private String message;
-	private SourcePosition position;
+	private ErrorPosition position;
 	private int errorStatus;
 	private HashMap<String, PlacementInCode> map;
 	private static ErrorEmitter instance;
@@ -24,14 +24,14 @@ public class ErrorEmitter {
 	
 	public void addError(String msg, SourcePosition p, int errorStatus, HashMap<String, PlacementInCode> map) {
 		message = msg;
-		position = p;
+		position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
 		this.errorStatus = errorStatus;
 		this.map = map;
 	}
 	
 	public void addError(String msg, SourcePosition p, int errorStatus) {
 		message = msg;
-		position = p;
+		position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
 		this.errorStatus = errorStatus;
 	}
 	
@@ -55,7 +55,7 @@ public class ErrorEmitter {
 		return message;
 	}
 	
-	public SourcePosition getPosition() {
+	public ErrorPosition getPosition() {
 		return position;
 	}
 	
