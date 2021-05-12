@@ -18,7 +18,7 @@ public class CommandLineLauncher {
 		String file = args.length == 0? allPath:args[0];
 		ErrorEmitter ee = launch(file);
 		if(ee.foundError()) {
-			System.out.println(ee.getMessage());
+			System.out.println(ee.getFullMessage());
 			System.exit(ee.getErrorStatus());
 		}else {
 			System.out.println("Analysis complete!");
@@ -28,7 +28,7 @@ public class CommandLineLauncher {
 	public static void launchTest(String file) {
 		ErrorEmitter ee = launch(file);
 		if(ee.foundError()) {
-			System.out.println(ee.getMessage());
+			System.out.println(ee.getFullMessage());
 			System.exit(ee.getErrorStatus());
 		}else {
 			System.out.println("Analysis complete!");

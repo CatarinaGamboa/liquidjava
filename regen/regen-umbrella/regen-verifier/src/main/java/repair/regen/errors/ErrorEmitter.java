@@ -1,5 +1,6 @@
 package repair.regen.errors;
 
+import java.net.URI;
 import java.util.HashMap;
 
 import repair.regen.processor.context.PlacementInCode;
@@ -9,6 +10,7 @@ public class ErrorEmitter {
 	
 	private String titleMessage;
 	private String fullMessage;
+	private URI filePath;
 	private ErrorPosition position;
 	private int errorStatus;
 	private HashMap<String, PlacementInCode> map;
@@ -27,14 +29,16 @@ public class ErrorEmitter {
 		this.titleMessage = titleMessage;
 		fullMessage = msg;
 		position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
+		filePath = p.getFile().toURI();
 		this.errorStatus = errorStatus;
 		this.map = map;
 	}
-	
+
 	public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus) {
 		this.titleMessage = titleMessage;
 		fullMessage = msg;
 		position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
+		filePath = p.getFile().toURI();
 		this.errorStatus = errorStatus;
 	}
 	
@@ -48,15 +52,27 @@ public class ErrorEmitter {
 		return fullMessage != null && position != null;
 	}
 	
+	
+	public String getTitleMessage() {
+		return titleMessage;
+	}
+
+
+	public String getFullMessage() {
+		return fullMessage;
+	}
+
+
+	public URI getFilePath() {
+		return filePath;
+	}
+
+	
 	public void reset() {
 		fullMessage = null;
 		position = null;
 		errorStatus = 0;
 		map = null;
-	}
-	
-	public String getMessage() {
-		return fullMessage;
 	}
 	
 	public ErrorPosition getPosition() {
