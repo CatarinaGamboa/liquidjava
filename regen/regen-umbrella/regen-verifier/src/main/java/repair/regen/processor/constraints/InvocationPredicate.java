@@ -5,7 +5,7 @@ import java.util.List;
 
 import repair.regen.ast.Expression;
 import repair.regen.ast.FunctionInvocation;
-import repair.regen.utils.ErrorEmitter;
+import repair.regen.errors.ErrorEmitter;
 
 public class InvocationPredicate extends Predicate{
 

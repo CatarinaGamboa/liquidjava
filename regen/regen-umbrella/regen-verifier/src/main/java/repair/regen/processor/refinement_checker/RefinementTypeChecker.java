@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
@@ -19,7 +20,6 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.processor.refinement_checker.general_checkers.OperationsChecker;
 import repair.regen.processor.refinement_checker.object_checkers.AuxStateHandler;
-import repair.regen.utils.ErrorEmitter;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;

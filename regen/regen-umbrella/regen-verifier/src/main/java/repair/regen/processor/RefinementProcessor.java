@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.refinement_checker.ExternalRefinementTypeChecker;
 import repair.regen.processor.refinement_checker.MethodsFirstChecker;
 import repair.regen.processor.refinement_checker.RefinementTypeChecker;
-import repair.regen.utils.ErrorEmitter;
 import spoon.processing.AbstractProcessor;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;

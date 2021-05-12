@@ -11,8 +11,8 @@ import repair.regen.ast.GroupExpression;
 import repair.regen.ast.LiteralBoolean;
 import repair.regen.ast.UnaryExpression;
 import repair.regen.ast.Var;
+import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
-import repair.regen.utils.ErrorEmitter;
 import spoon.reflect.declaration.CtElement;
 
 public class Predicate extends Constraint{

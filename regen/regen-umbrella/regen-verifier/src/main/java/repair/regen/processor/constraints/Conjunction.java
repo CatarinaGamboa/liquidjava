@@ -6,8 +6,8 @@ import repair.regen.ast.BinaryExpression;
 import repair.regen.ast.Expression;
 import repair.regen.ast.GroupExpression;
 import repair.regen.ast.UnaryExpression;
+import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
-import repair.regen.utils.ErrorEmitter;
 
 public class Conjunction extends Constraint{
 	private Constraint c1;

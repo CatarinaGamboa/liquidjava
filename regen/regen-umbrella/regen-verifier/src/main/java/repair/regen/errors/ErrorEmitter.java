@@ -1,4 +1,4 @@
-package repair.regen.utils;
+package repair.regen.errors;
 
 import java.util.HashMap;
 
@@ -7,7 +7,8 @@ import spoon.reflect.cu.SourcePosition;
 
 public class ErrorEmitter {
 	
-	private String message;
+	private String titleMessage;
+	private String fullMessage;
 	private ErrorPosition position;
 	private int errorStatus;
 	private HashMap<String, PlacementInCode> map;
@@ -22,37 +23,40 @@ public class ErrorEmitter {
 //		return instance;
 //	}
 	
-	public void addError(String msg, SourcePosition p, int errorStatus, HashMap<String, PlacementInCode> map) {
-		message = msg;
+	public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus, HashMap<String, PlacementInCode> map) {
+		this.titleMessage = titleMessage;
+		fullMessage = msg;
 		position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
 		this.errorStatus = errorStatus;
 		this.map = map;
 	}
 	
-	public void addError(String msg, SourcePosition p, int errorStatus) {
-		message = msg;
+	public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus) {
+		this.titleMessage = titleMessage;
+		fullMessage = msg;
 		position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
 		this.errorStatus = errorStatus;
 	}
 	
-	public void addError(String msg, int errorStatus) {
-		message = msg;
+	public void addError(String titleMessage, String msg, int errorStatus) {
+		this.titleMessage = titleMessage;
+		fullMessage = msg;
 		this.errorStatus = errorStatus;
 	}
 	
 	public boolean foundError() {
-		return message != null && position != null;
+		return fullMessage != null && position != null;
 	}
 	
 	public void reset() {
-		message = null;
+		fullMessage = null;
 		position = null;
 		errorStatus = 0;
 		map = null;
 	}
 	
 	public String getMessage() {
-		return message;
+		return fullMessage;
 	}
 	
 	public ErrorPosition getPosition() {

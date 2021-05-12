@@ -5,8 +5,8 @@ import java.util.List;
 
 import repair.regen.ast.Expression;
 import repair.regen.ast.Ite;
+import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
-import repair.regen.utils.ErrorEmitter;
 
 public class IfThenElse extends Constraint{
 	private Constraint ite;

@@ -6,14 +6,14 @@ import java.util.Map;
 
 import repair.regen.ast.Expression;
 import repair.regen.ast.UnaryExpression;
+import repair.regen.errors.ErrorEmitter;
+import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
-import repair.regen.utils.ErrorEmitter;
-import repair.regen.utils.ErrorHandler;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 

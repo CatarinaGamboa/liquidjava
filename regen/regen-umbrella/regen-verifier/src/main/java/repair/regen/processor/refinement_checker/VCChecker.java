@@ -9,6 +9,8 @@ import java.util.Stack;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import repair.regen.errors.ErrorEmitter;
+import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
@@ -22,8 +24,6 @@ import repair.regen.smt.NotFoundError;
 import repair.regen.smt.SMTEvaluator;
 import repair.regen.smt.TypeCheckError;
 import repair.regen.smt.TypeMismatchError;
-import repair.regen.utils.ErrorEmitter;
-import repair.regen.utils.ErrorHandler;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;

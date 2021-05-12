@@ -4,8 +4,8 @@ import java.util.List;
 
 import repair.regen.ast.BinaryExpression;
 import repair.regen.ast.Expression;
+import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
-import repair.regen.utils.ErrorEmitter;
 
 public class Implication extends Constraint{
 	

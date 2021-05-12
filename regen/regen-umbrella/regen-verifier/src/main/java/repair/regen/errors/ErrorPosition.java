@@ -1,4 +1,4 @@
-package repair.regen.utils;
+package repair.regen.errors;
 
 public class ErrorPosition {
 	

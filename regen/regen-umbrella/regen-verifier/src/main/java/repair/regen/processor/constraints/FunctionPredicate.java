@@ -1,6 +1,6 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.utils.ErrorEmitter;
+import repair.regen.errors.ErrorEmitter;
 import spoon.reflect.declaration.CtElement;
 
 public class FunctionPredicate extends Predicate{

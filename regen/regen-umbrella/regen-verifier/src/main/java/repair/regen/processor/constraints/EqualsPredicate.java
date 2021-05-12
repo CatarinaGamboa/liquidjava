@@ -2,7 +2,7 @@ package repair.regen.processor.constraints;
 
 import repair.regen.ast.BinaryExpression;
 import repair.regen.ast.GroupExpression;
-import repair.regen.utils.ErrorEmitter;
+import repair.regen.errors.ErrorEmitter;
 
 public class EqualsPredicate extends Predicate {
 	

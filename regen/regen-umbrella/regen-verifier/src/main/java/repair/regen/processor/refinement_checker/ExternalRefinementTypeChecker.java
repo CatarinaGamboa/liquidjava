@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import repair.regen.errors.ErrorEmitter;
+import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
@@ -12,8 +14,6 @@ import repair.regen.processor.facade.GhostDTO;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
-import repair.regen.utils.ErrorEmitter;
-import repair.regen.utils.ErrorHandler;
 import repair.regen.utils.Pair;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
