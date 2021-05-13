@@ -30,7 +30,7 @@ public class ErrorHandler {
 	public static <T> void printError(CtElement var, String moreInfo, Constraint expectedType, 
 			Constraint cSMT, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {	
 		
-		String resumeMessage = "Type expected:" + expectedType.toString() + "; " +"Refinement found:" + cSMT.toString();
+		String resumeMessage = "Type expected:" + expectedType.toString();// + "; " +"Refinement found:" + cSMT.toString();
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
@@ -56,7 +56,7 @@ public class ErrorHandler {
 			String states, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 		
 		String resumeMessage = "Failed to check state transitions. " + "Expected possible states:" + 
-								states + "; Found state:"+constraintForErrorMsg.toString() ;
+								states;// + "; Found state:"+constraintForErrorMsg.toString() ;
 		
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
