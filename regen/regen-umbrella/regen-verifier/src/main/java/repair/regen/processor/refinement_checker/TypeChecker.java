@@ -150,11 +150,13 @@ public abstract class TypeChecker extends CtScanner{
 		try {
 			gd = RefinementsParser.getGhostDeclaration(string);
 		} catch (ParsingException e) {
-			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
+			ErrorHandler.printCostumeError(ann, "Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
+			return;
 		}
 		if(gd.getParam_types().size() > 0) {
 			ErrorHandler.printCostumeError(ann, "Ghost States have the class as parameter "
 					+ "by default, no other parameters are allowed in '"+string+"'", errorEmitter);
+			return;
 		}
 		//Set class as parameter of Ghost
 		String qn = getQualifiedClassName(element);

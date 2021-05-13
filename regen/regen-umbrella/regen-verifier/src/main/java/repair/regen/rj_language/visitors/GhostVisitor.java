@@ -19,7 +19,9 @@ public class GhostVisitor {
 			String type = gc.type().getText();
 			String name = gc.ID().getText();
 			List<Pair<String,String>> args = getArgsDecl(gc.argDecl());
-			return new GhostDTO(name, args.stream().map(m->m.getFirst()).collect(Collectors.toList()), type);
+			List<String> ls = args.stream().map(m->m.getFirst()).collect(Collectors.toList());
+			if(ls == null) ls = new ArrayList<>();
+			return new GhostDTO(name, ls, type);
 //			return new Triple<String, String, List<Pair<String,String>>>(type, name, args);
 		}else if (rc.getChildCount() > 0) {
 			int i = rc.getChildCount();

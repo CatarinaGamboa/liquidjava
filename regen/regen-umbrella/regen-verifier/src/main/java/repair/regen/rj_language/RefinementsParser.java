@@ -32,7 +32,10 @@ public class RefinementsParser {
 	 */
 	public static GhostDTO getGhostDeclaration(String s) throws ParsingException{
 		ParseTree rc = compile(s);
-		return GhostVisitor.getGhostDecl(rc);
+		GhostDTO g = GhostVisitor.getGhostDecl(rc);
+		if(g == null)
+			throw new ParsingException(" The ghost should be in format <type> <name> (<parameters>)");
+		return g;
 	}
 
 	

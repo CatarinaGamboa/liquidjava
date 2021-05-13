@@ -1,31 +1,41 @@
 
 
-@repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "closed" })
+@repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "addGift" })
+@repair.regen.specification.Ghost("sum")
 public class Order {
-    @repair.regen.specification.RefinementPredicate("int priceNow(Order o)")
-    @repair.regen.specification.StateRefinement(to = "priceNow(this) == 0 && empty(this)")
+    private java.util.List<java.lang.String> products = new java.util.ArrayList();
+
+    private java.util.List<java.lang.Integer> prices = new java.util.ArrayList();
+
+    private boolean finish = false;
+
+    @repair.regen.specification.StateRefinement(to = "empty(this) && (sum(this) == 0s)")
     public Order() {
     }
 
-    // @StateRefinement(from="addingItems(this) || empty(this)",
-    // to="(priceNow(this) == (priceNow(old(this)) + price)) && addingItems(this)")
-    @repair.regen.specification.StateRefinement(from = "addingItems(this) || empty(this)", to = "addingItems(this)")
-    public Order addItem(java.lang.String itemName, int price) {
-        return this;
+    @repair.regen.specification.StateRefinement(from = "empty(this) || addingItems(this)", to = "addingItems(this) && (sum(this) == (sum(old(this)) + value))")
+    public void addItem(java.lang.String productName, @repair.regen.specification.Refinement("_ > 0")
+    int value) {
+        products.add(productName);
+        prices.add(value);
     }
 
     @repair.regen.specification.StateRefinement(from = "addingItems(this)", to = "checkout(this)")
-    public Order pay(int cardNumber) {
-        return this;
+    public void checkout() {
+        finish = true;
     }
 
-    // @StateRefinement(from="checkout(this) && priceNow(this) > 20", to = "checkout(this)")
-    // public Order addGift() {
-    // return this;
-    // }
-    @repair.regen.specification.StateRefinement(from = "checkout(this)", to = "closed(this)")
-    public Order sendToAddress(java.lang.String a) {
-        return this;
+    @repair.regen.specification.StateRefinement(from = "checkout(this) && sum(this) > 20")
+    public void addGift() {
+        products.add("gift");
+    }
+
+    public void pay(int cardNumber) {
+        makePayment(cardNumber);
+    }
+
+    private void makePayment(int cardNumber) {
+        // Invokes an external service to make the payment
     }
 }
 
