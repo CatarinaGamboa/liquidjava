@@ -35,13 +35,13 @@ public abstract class Constraint {
 		return new Predicate(e);
 	}
 
-	protected Expression parse(String ref, CtElement element, ErrorEmitter e) {
+	protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
 		try{
 			return RefinementsParser.createAST(ref);	 
 		} catch (ParsingException e1) {
 			ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
+			throw e1;
 		}	
-		return null;
 	}
 	
 	protected Expression innerParse(String ref, ErrorEmitter e) {

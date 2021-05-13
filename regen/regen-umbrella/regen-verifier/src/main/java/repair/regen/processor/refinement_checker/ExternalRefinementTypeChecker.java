@@ -44,7 +44,11 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		Optional<String> externalRefinements = getExternalRefinement(intrface);
 		if(externalRefinements.isPresent()) {
 			prefix = externalRefinements.get();
-			getRefinementFromAnnotation(intrface);
+			try {
+				getRefinementFromAnnotation(intrface);
+			} catch (ParsingException e) {
+				return;//error already in ErrorEmitter
+			}
 			handleStateSetsFromAnnotation(intrface);
 			super.visitCtInterface(intrface);
 		}
@@ -54,7 +58,12 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	public <T> void visitCtField(CtField<T> f) {
 		if(errorEmitter.foundError()) return;
 		
-		Optional<Constraint> oc = getRefinementFromAnnotation(f);
+		Optional<Constraint> oc;
+		try {
+			oc = getRefinementFromAnnotation(f);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 		Constraint c = oc.isPresent()?oc.get():new Predicate();
 		context.addGlobalVariableToContext(f.getSimpleName(), prefix, 
 				f.getType(), c);
@@ -65,7 +74,11 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 		if(errorEmitter.foundError()) return;
 		
 		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
-		mfc.getMethodRefinements(method, prefix);
+		try {
+			mfc.getMethodRefinements(method, prefix);
+		} catch (ParsingException e) {
+			return;
+		}
 		super.visitCtMethod(method);
 	
 //		

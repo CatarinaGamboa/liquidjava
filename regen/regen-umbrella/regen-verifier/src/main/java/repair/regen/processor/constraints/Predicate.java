@@ -13,6 +13,7 @@ import repair.regen.ast.UnaryExpression;
 import repair.regen.ast.Var;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
+import repair.regen.rj_language.ParsingException;
 import spoon.reflect.declaration.CtElement;
 
 public class Predicate extends Constraint{
@@ -30,7 +31,7 @@ public class Predicate extends Constraint{
 		exp = new LiteralBoolean(true);
 	}
 
-	public Predicate(String ref, CtElement element, ErrorEmitter e) {
+	public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
 		exp = parse(ref, element, e);
 		if(e.foundError()) return;
 		if(!(exp instanceof GroupExpression)) {

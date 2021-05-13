@@ -14,17 +14,9 @@ public class ErrorEmitter {
 	private ErrorPosition position;
 	private int errorStatus;
 	private HashMap<String, PlacementInCode> map;
-	private static ErrorEmitter instance;
 	
 	public ErrorEmitter() {}
-	
-	
-//	public static ErrorEmitter getInstance() {
-//		if(instance == null)
-//			return new ErrorEmitter();
-//		return instance;
-//	}
-	
+		
 	public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus, HashMap<String, PlacementInCode> map) {
 		this.titleMessage = titleMessage;
 		fullMessage = msg;
@@ -56,17 +48,14 @@ public class ErrorEmitter {
 	public String getTitleMessage() {
 		return titleMessage;
 	}
-
-
+	
 	public String getFullMessage() {
 		return fullMessage;
 	}
 
-
 	public URI getFilePath() {
 		return filePath;
 	}
-
 	
 	public void reset() {
 		fullMessage = null;

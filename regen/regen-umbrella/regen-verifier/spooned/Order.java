@@ -1,7 +1,7 @@
 
 
 @repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "addGift" })
-@repair.regen.specification.Ghost("sum")
+@repair.regen.specification.Ghost("int sum")
 public class Order {
     private java.util.List<java.lang.String> products = new java.util.ArrayList();
 

@@ -20,6 +20,7 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.processor.refinement_checker.general_checkers.OperationsChecker;
 import repair.regen.processor.refinement_checker.object_checkers.AuxStateHandler;
+import repair.regen.rj_language.ParsingException;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
@@ -127,7 +128,12 @@ public class RefinementTypeChecker extends TypeChecker {
 		super.visitCtLocalVariable(localVariable);
 		//only declaration, no assignment
 		if(localVariable.getAssignment() == null) {
-			Optional<Constraint> a = getRefinementFromAnnotation(localVariable);
+			Optional<Constraint> a;
+			try {
+				a = getRefinementFromAnnotation(localVariable);
+			} catch (ParsingException e) {
+				return;//error already in ErrorEmitter
+			}
 			context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), 
 					a.isPresent()? a.get() : new Predicate(), localVariable);
 		}else {
@@ -139,7 +145,11 @@ public class RefinementTypeChecker extends TypeChecker {
 				refinementFound = new Predicate();
 			context.addVarToContext(varName, localVariable.getType(), new Predicate(), e);
 
-			checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable, localVariable);
+			try {
+				checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable, localVariable);
+			} catch (ParsingException e1) {
+				return;//error already in ErrorEmitter
+			}
 
 			AuxStateHandler.addStateRefinements(this, varName, e);
 		}
@@ -153,15 +163,25 @@ public class RefinementTypeChecker extends TypeChecker {
 		List<CtExpression<Integer>> l = newArray.getDimensionExpressions();
 		//TODO only working for 1 dimension
 		for(CtExpression<?> exp:l) {
-			Constraint c = getExpressionRefinements(exp);
+			Constraint c;
+			try {
+				c = getExpressionRefinements(exp);
+			} catch (ParsingException e) {
+				return;//error already in ErrorEmitter
+			}
 			String name = String.format(freshFormat, context.getCounter());
 			if(c.getVariableNames().contains(WILD_VAR))
 				c = c.substituteVariable(WILD_VAR, name);
 			else
 				c = new EqualsPredicate(new VariablePredicate(name), c);
 			context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, exp);
-			EqualsPredicate ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR, newArray, getErrorEmitter()), 
-					new VariablePredicate(name));
+			EqualsPredicate ep;
+			try {
+				ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR, newArray, getErrorEmitter()), 
+						new VariablePredicate(name));
+			} catch (ParsingException e) {
+				return;//error already in ErrorEmitter
+			}
 			newArray.putMetadata(REFINE_KEY, ep);
 		}
 	}
@@ -241,7 +261,12 @@ public class RefinementTypeChecker extends TypeChecker {
 		if(errorEmitter.foundError()) return;
 		
 		super.visitCtField(f);
-		Optional<Constraint> c = getRefinementFromAnnotation(f);
+		Optional<Constraint> c;
+		try {
+			c = getRefinementFromAnnotation(f);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 		//		context.addVarToContext(f.getSimpleName(), f.getType(), 
 		//				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
 		//						      : new Predicate());
@@ -275,9 +300,13 @@ public class RefinementTypeChecker extends TypeChecker {
 
 		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
 			String targetName = fieldRead.getTarget().toString();
-			fieldRead.putMetadata(REFINE_KEY, 
-					new EqualsPredicate(new VariablePredicate(WILD_VAR), 
-							FunctionPredicate.builtin_length(targetName, fieldRead, getErrorEmitter())));
+			try {
+				fieldRead.putMetadata(REFINE_KEY, 
+						new EqualsPredicate(new VariablePredicate(WILD_VAR), 
+								FunctionPredicate.builtin_length(targetName, fieldRead, getErrorEmitter())));
+			} catch (ParsingException e) {
+				return;//error already in ErrorEmitter
+			}
 		}else{
 			fieldRead.putMetadata(REFINE_KEY, new Predicate());
 			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
@@ -304,7 +333,11 @@ public class RefinementTypeChecker extends TypeChecker {
 		if(errorEmitter.foundError()) return;
 		
 		super.visitCtBinaryOperator(operator);
-		otc.getBinaryOpRefinements(operator);
+		try {
+			otc.getBinaryOpRefinements(operator);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 
 	}
 
@@ -313,7 +346,11 @@ public class RefinementTypeChecker extends TypeChecker {
 		if(errorEmitter.foundError()) return;
 		
 		super.visitCtUnaryOperator(operator);
-		otc.getUnaryOpRefinements(operator);
+		try {
+			otc.getUnaryOpRefinements(operator);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 
 	}
 
@@ -340,7 +377,12 @@ public class RefinementTypeChecker extends TypeChecker {
 		
 		CtExpression<Boolean> exp = ifElement.getCondition();
 
-		Constraint expRefs = getExpressionRefinements(exp);
+		Constraint expRefs;
+		try {
+			expRefs = getExpressionRefinements(exp);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 		String freshVarName = String.format(freshFormat ,context.getCounter());
 		expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
 		Constraint lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
@@ -389,8 +431,13 @@ public class RefinementTypeChecker extends TypeChecker {
 		
 		super.visitCtArrayWrite(arrayWrite);
 		CtExpression<?> index = arrayWrite.getIndexExpression();
-		FunctionPredicate fp = FunctionPredicate.builtin_addToIndex(
-				arrayWrite.getTarget().toString(), index.toString(), WILD_VAR, arrayWrite, getErrorEmitter());
+		FunctionPredicate fp;
+		try {
+			fp = FunctionPredicate.builtin_addToIndex(
+					arrayWrite.getTarget().toString(), index.toString(), WILD_VAR, arrayWrite, getErrorEmitter());
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 		arrayWrite.putMetadata(REFINE_KEY, fp);
 		//TODO fazer mais...? faz sentido
 	}
@@ -442,10 +489,14 @@ public class RefinementTypeChecker extends TypeChecker {
 			vcChecker.removePathVariableThatIncludes(r.get().getName());//AQUI!!
 
 		vcChecker.removePathVariableThatIncludes(name);//AQUI!!
-		checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
+		try {
+			checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 
 	}
-	private Constraint getExpressionRefinements(CtExpression element) {
+	private Constraint getExpressionRefinements(CtExpression element) throws ParsingException {
 		if(element instanceof CtVariableRead<?>) {
 			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
 			return getRefinement(element);

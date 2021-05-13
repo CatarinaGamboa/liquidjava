@@ -11,6 +11,7 @@ import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.refinement_checker.TypeChecker;
+import repair.regen.rj_language.ParsingException;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -49,8 +50,9 @@ public class OperationsChecker {
 	 * Finds and adds refinement metadata to the binary operation
 	 * @param <T>
 	 * @param operator
+	 * @throws ParsingException 
 	 */
-	public <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) {
+	public <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) throws ParsingException {
 		CtExpression<?> right = operator.getRightHandOperand();
 		CtExpression<?> left = operator.getLeftHandOperand();
 		Constraint oper;
@@ -88,8 +90,9 @@ public class OperationsChecker {
 	 * Finds and adds refinement metadata to the unary operation
 	 * @param <T>
 	 * @param operator
+	 * @throws ParsingException 
 	 */
-	public <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) {
+	public <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) throws ParsingException {
 		CtExpression<T> ex = operator.getOperand();
 		String name = rtc.freshFormat;
 		Constraint all;
@@ -148,9 +151,10 @@ public class OperationsChecker {
 	 * @param operator
 	 * @param element
 	 * @return String with the operation refinements
+	 * @throws ParsingException 
 	 */
 	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, 
-			CtExpression<?> element) {
+			CtExpression<?> element) throws ParsingException {
 		return getOperationRefinements(operator, null, element);
 	}
 
@@ -160,9 +164,10 @@ public class OperationsChecker {
 	 * @param parentVar Parent of Binary Operator, usually a CtAssignment or CtLocalVariable
 	 * @param element CtExpression that represent an Binary Operation or one of the operands
 	 * @return String with the operation refinements
+	 * @throws ParsingException 
 	 */
 	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWrite<?> parentVar, 
-			CtExpression<?> element) {
+			CtExpression<?> element) throws ParsingException {
 		if(element instanceof CtFieldRead<?>) {
 			CtFieldRead<?> field = ((CtFieldRead<?>)element);
 			if(field.getVariable().getSimpleName().equals("length")) {
@@ -246,9 +251,10 @@ public class OperationsChecker {
 	 * @param w
 	 * @param name
 	 * @return String with the refinements
+	 * @throws ParsingException 
 	 */
 	private <T> Constraint getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator, CtVariableWrite w,
-			String name) {
+			String name) throws ParsingException {
 		String newName = String.format(rtc.instanceFormat, name, rtc.getContext().getCounter());
 		CtVariable<T> varDecl = w.getVariable().getDeclaration();
 
@@ -292,7 +298,7 @@ public class OperationsChecker {
 		}
 	}
 
-	private Constraint getOperatorFromKind(UnaryOperatorKind kind, CtElement elem) {
+	private Constraint getOperatorFromKind(UnaryOperatorKind kind, CtElement elem) throws ParsingException {
 		String ret = null;
 		switch(kind) {
 		case POSTINC:	ret = rtc.WILD_VAR+" + 1";break;

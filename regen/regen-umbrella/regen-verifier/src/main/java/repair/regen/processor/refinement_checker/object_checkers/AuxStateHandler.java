@@ -29,6 +29,7 @@ import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
+import repair.regen.rj_language.ParsingException;
 import repair.regen.utils.Utils;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
@@ -57,15 +58,18 @@ public class AuxStateHandler {
 	 * @param c
 	 * @param f
 	 * @param context
+	 * @throws ParsingException 
 	 */
-	public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, TypeChecker tc) {
+	public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, TypeChecker tc) throws ParsingException {
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
 		if(!an.isEmpty()) {
 			for(CtAnnotation<? extends Annotation> a: an) {
 				Map<String, CtExpression> m = a.getAllValues();
 				CtLiteral<String> from = (CtLiteral<String>)m.get("from");
-				if(from != null)
+				if(from != null) {
 					ErrorHandler.printErrorConstructorFromState(c, from, tc.getErrorEmitter());
+					return;
+				}
 			}
 			setFunctionStates(f, an, tc, c);//f.setState(an, context.getGhosts(), c);
 		}else {
@@ -119,8 +123,9 @@ public class AuxStateHandler {
 	 * @param method
 	 * @param context
 	 * @param f
+	 * @throws ParsingException 
 	 */
-	public static void handleMethodState(CtMethod<?> method, RefinedFunction f, TypeChecker tc) {
+	public static void handleMethodState(CtMethod<?> method, RefinedFunction f, TypeChecker tc) throws ParsingException {
 		List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
 		if(!an.isEmpty())
 			setFunctionStates(f, an, tc, method);
@@ -134,9 +139,10 @@ public class AuxStateHandler {
 	 * @param anns
 	 * @param tc
 	 * @param element
+	 * @throws ParsingException 
 	 */
 	private static void setFunctionStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
-			TypeChecker tc, CtElement element) {
+			TypeChecker tc, CtElement element) throws ParsingException {
 		List<ObjectState> l = new ArrayList<>();
 		for(CtAnnotation<? extends Annotation> an: anns) {
 			l.add(getStates(an, f, tc, element));
@@ -145,7 +151,7 @@ public class AuxStateHandler {
 	}
 
 	private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, 
-			RefinedFunction f, TypeChecker tc, CtElement e) {
+			RefinedFunction f, TypeChecker tc, CtElement e) throws ParsingException {
 		Map<String, CtExpression> m = ctAnnotation.getAllValues();
 		CtLiteral<String> from = (CtLiteral<String>)m.get("from");
 		CtLiteral<String> to = (CtLiteral<String>)m.get("to");
@@ -163,7 +169,7 @@ public class AuxStateHandler {
 	}
 
 
-	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e, boolean isTo) {
+	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e, boolean isTo) throws ParsingException {
 		Predicate p = new Predicate(value, e, tc.getErrorEmitter());
 		String t = f.getTargetClass();
 		CtTypeReference<?> r = tc.getFactory().Type().createReference(t);

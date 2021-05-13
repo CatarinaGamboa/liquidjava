@@ -71,7 +71,7 @@ public abstract class TypeChecker extends CtScanner{
 	}
 
 
-	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
+	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) throws ParsingException {
 		Optional<Constraint> constr = Optional.empty();
 		Optional<String> ref = Optional.empty();
 		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
@@ -218,6 +218,7 @@ public abstract class TypeChecker extends CtScanner{
 		} catch (ParsingException e) {
 			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
 			//	e.printStackTrace();
+			return;
 		} 
 	}
 
@@ -242,6 +243,7 @@ public abstract class TypeChecker extends CtScanner{
 			}
 		} catch (ParsingException e) {
 			ErrorHandler.printCostumeError(element, e.getMessage(), errorEmitter);
+			return;
 //			e.printStackTrace();
 		}
 	}
@@ -258,7 +260,7 @@ public abstract class TypeChecker extends CtScanner{
 	}
 
 	public void checkVariableRefinements(Constraint refinementFound, String simpleName, 
-			CtTypeReference type, CtElement usage, CtElement variable) {
+			CtTypeReference type, CtElement usage, CtElement variable) throws ParsingException {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
 		Constraint cEt;
 		RefinedVariable mainRV = null;

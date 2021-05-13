@@ -28,9 +28,11 @@ public class ErrorHandler {
 		printError(var, null, expectedType, cSMT, map, ee);
 	}
 	public static <T> void printError(CtElement var, String moreInfo, Constraint expectedType, 
-			Constraint cSMT, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {		
-		StringBuilder sb = new StringBuilder();
+			Constraint cSMT, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {	
 		
+		String resumeMessage = "Type expected:" + expectedType.toString() + "; " +"Refinement found:" + cSMT.toString();
+		
+		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		//title
 		StringBuilder sbtitle = new StringBuilder();
@@ -46,12 +48,16 @@ public class ErrorHandler {
 		sb.append("Location: " + var.getPosition()+ "\n");
 		sb.append("______________________________________________________\n");
 		
-		errorl.addError(sbtitle.toString(), sb.toString(), var.getPosition(), 1, map);
+		errorl.addError(resumeMessage, sb.toString(), var.getPosition(), 1, map);
 		
 	}
 	
 	public static void printStateMismatch(CtElement element, String method, VCImplication constraintForErrorMsg, 
 			String states, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+		
+		String resumeMessage = "Failed to check state transitions. " + "Expected possible states:" + 
+								states + "; Found state:"+constraintForErrorMsg.toString() ;
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		
@@ -70,13 +76,16 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		
-		errorl.addError(sbtitle.toString(), sb.toString(), element.getPosition(), 1, map);
+		errorl.addError(resumeMessage, sb.toString(), element.getPosition(), 1, map);
 		
 	}
 	
 	
 	public static <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement, 
 			HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+		
+		String resumeMessage = "Encountered unknown variable";
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		StringBuilder sbtitle = new StringBuilder();
@@ -88,11 +97,13 @@ public class ErrorHandler {
 		sb.append("Location: " + var.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 		
-		errorl.addError(sbtitle.toString(), sb.toString(), var.getPosition(), 2, map);
+		errorl.addError(resumeMessage, sb.toString(), var.getPosition(), 2, map);
 	}
 	
 	public static <T> void printNotFound(CtElement var, Constraint constraint, Constraint constraint2, String msg, 
 			HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+		String resumeMessage = msg;
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		sb.append(msg);
@@ -137,6 +148,8 @@ public class ErrorHandler {
 
 	public static void printSameStateSetError(CtElement element, Constraint p,String name, 
 			HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+		String resume = "Error found multiple disjoint states from a State Set in a refinement";
+		
 		StringBuilder sb = new StringBuilder();
 		sb.append("______________________________________________________\n");
 		StringBuilder sbtitle = new StringBuilder();
@@ -149,7 +162,7 @@ public class ErrorHandler {
 		sb.append("Location: " + element.getPosition()+"\n");
 		sb.append("______________________________________________________\n");
 
-		errorl.addError(sbtitle.toString(), sb.toString(), element.getPosition(), 1, map);
+		errorl.addError(resume, sb.toString(), element.getPosition(), 1, map);
 
 	}
 

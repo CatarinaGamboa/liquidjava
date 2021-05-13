@@ -6,6 +6,7 @@ import java.util.List;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
+import repair.regen.rj_language.ParsingException;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtInterface;
@@ -53,7 +54,11 @@ public class MethodsFirstChecker extends TypeChecker{
 			if(ct instanceof CtClass)				
 				visitCtClass((CtClass<?>) ct);
 		}
-		getRefinementFromAnnotation(ctClass);
+		try {
+			getRefinementFromAnnotation(ctClass);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 		handleStateSetsFromAnnotation(ctClass);
 		super.visitCtClass(ctClass);
 	}
@@ -68,7 +73,12 @@ public class MethodsFirstChecker extends TypeChecker{
 			visitedClasses.add(intrface.getQualifiedName());
 		if(getExternalRefinement(intrface).isPresent())
 			return;
-		getRefinementFromAnnotation(intrface);
+		
+		try {
+			getRefinementFromAnnotation(intrface);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 		handleStateSetsFromAnnotation(intrface);
 		super.visitCtInterface(intrface);
 	}
@@ -79,8 +89,12 @@ public class MethodsFirstChecker extends TypeChecker{
 		if(errorEmitter.foundError()) return;
 		
 		context.enterContext();
-		getRefinementFromAnnotation(c);
-		mfc.getConstructorRefinements(c);
+		try {
+			getRefinementFromAnnotation(c);
+			mfc.getConstructorRefinements(c);
+		} catch (ParsingException e) {
+			return;
+		}
 		super.visitCtConstructor(c);
 		context.exitContext();
 	}
@@ -89,7 +103,11 @@ public class MethodsFirstChecker extends TypeChecker{
 		if(errorEmitter.foundError()) return;
 		
 		context.enterContext();
-		mfc.getMethodRefinements(method);
+		try {
+			mfc.getMethodRefinements(method);
+		} catch (ParsingException e) {
+			return;
+		}
 		super.visitCtMethod(method);
 		context.exitContext();
 

@@ -22,6 +22,7 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.processor.refinement_checker.object_checkers.AuxHierarchyRefinememtsPassage;
 import repair.regen.processor.refinement_checker.object_checkers.AuxStateHandler;
+import repair.regen.rj_language.ParsingException;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
@@ -51,7 +52,7 @@ public class MethodsFunctionsChecker {
 
 	}
 
-	public void getConstructorRefinements(CtConstructor<?> c) {	
+	public void getConstructorRefinements(CtConstructor<?> c) throws ParsingException {	
 		RefinedFunction f = new RefinedFunction();
 		f.setName(c.getSimpleName());
 		f.setType(c.getType());
@@ -82,7 +83,7 @@ public class MethodsFunctionsChecker {
 
 
 	//################### VISIT METHOD ##############################
-	public <R> void getMethodRefinements(CtMethod<R> method) {
+	public <R> void getMethodRefinements(CtMethod<R> method) throws ParsingException {
 		RefinedFunction f = new RefinedFunction();
 		f.setName(method.getSimpleName());
 		f.setType(method.getType());
@@ -111,7 +112,7 @@ public class MethodsFunctionsChecker {
 
 
 
-	public <R> void getMethodRefinements(CtMethod<R> method, String prefix) {
+	public <R> void getMethodRefinements(CtMethod<R> method, String prefix) throws ParsingException {
 		String constructorName = "<init>";
 		String[] pac = prefix.split("\\.");
 		String k = pac[pac.length-1]; 
@@ -135,7 +136,7 @@ public class MethodsFunctionsChecker {
 		}
 	}
 
-	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) {
+	private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) throws ParsingException {
 		//main cannot have refinement - for now
 		if(method.getSignature().equals("main(java.lang.String[])"))
 			return;	
@@ -151,9 +152,10 @@ public class MethodsFunctionsChecker {
 	 * @param methodRef
 	 * @param params
 	 * @return Conjunction of all 
+	 * @throws ParsingException 
 	 */
 	private Constraint handleFunctionRefinements(RefinedFunction f, CtElement method, 
-			List<CtParameter<?>> params) {
+			List<CtParameter<?>> params) throws ParsingException {
 		Constraint joint = new Predicate();
 
 		for(CtParameter<?> param:params) {
