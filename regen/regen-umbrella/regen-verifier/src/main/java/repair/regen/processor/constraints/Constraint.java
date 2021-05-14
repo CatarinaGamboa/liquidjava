@@ -61,22 +61,7 @@ public abstract class Constraint {
 		for(AliasWrapper aw : context.getAlias()) {
 			alias.put(aw.getName(), aw.createAliasDTO());
 		}
-		
-		//      name         refinement             type    variable
-//		HashMap<String, Pair<Expression, List<Pair<String, Expression>>>> mapAlias = new HashMap();
-//		for(AliasWrapper aw : context.getAlias()) {
-//			List<Expression> argumentsExpressions = aw.getVarNames().stream().map(p->parse(p)).collect(Collectors.toList());
-//			List<String> argumentsTypes = aw.getTypes().stream().map(p->p.getQualifiedName()).collect(Collectors.toList());
-//			
-//			List<Pair<String, Expression>> l = new ArrayList<>();
-//			//zip
-//			for (int i = 0; i < argumentsExpressions.size(); i++)
-//				l.add(new Pair<>(argumentsTypes.get(i), argumentsExpressions.get(i)));
-//			
-//			Pair<Expression, List<Pair<String, Expression>>> p = 
-//					new Pair<>(aw.getClonedConstraint().getExpression(), l);
-//			mapAlias.put(aw.getName(), p);
-//		}
+
 		ref = ref.changeAlias(alias, context, f);
 		return new Predicate(ref);
 	}

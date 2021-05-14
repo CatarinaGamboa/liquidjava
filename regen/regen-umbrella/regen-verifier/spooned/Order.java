@@ -1,6 +1,6 @@
 
 
-@repair.regen.specification.StateSet({ "empty", "addingItems", "checkout", "addGift" })
+@repair.regen.specification.StateSet({ "empty", "addingItems", "checkout" })
 @repair.regen.specification.Ghost("int sum")
 public class Order {
     private java.util.List<java.lang.String> products = new java.util.ArrayList();
@@ -9,7 +9,7 @@ public class Order {
 
     private boolean finish = false;
 
-    @repair.regen.specification.StateRefinement(to = "empty(this) && (sum(this) == 0s)")
+    // @StateRefinement(to ="empty(this) && (sum(this) == 0)") //default
     public Order() {
     }
 
@@ -30,6 +30,7 @@ public class Order {
         products.add("gift");
     }
 
+    @repair.regen.specification.StateRefinement(from = "checkout(this)")
     public void pay(int cardNumber) {
         makePayment(cardNumber);
     }

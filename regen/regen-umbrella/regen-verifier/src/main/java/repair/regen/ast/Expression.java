@@ -168,6 +168,8 @@ public abstract class Expression {
 			for (int i = 0; i < children.size(); i++) {
 				if(children.get(i) instanceof AliasInvocation) {
 					AliasInvocation ai = (AliasInvocation)children.get(i);
+					if(!alias.containsKey(ai.name))
+						throw new Exception("Alias '"+ai.getName()+"' not found");
 					AliasDTO dto = alias.get(ai.name);
 					Expression sub = dto.getExpression().clone();
 					if(ai.hasChildren())

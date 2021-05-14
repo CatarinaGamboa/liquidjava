@@ -5,19 +5,15 @@ import java.io.IOException;
 import bufferedreader.TrafficLight;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
-
-public class SimpleTest {
+@RefinementAlias("Nat(int x) { x >= 0}")
+class SimpleTest {
 		
 		
 
 	public static void main(String[] args) throws IOException{
 		
-		@Refinement("a > 4")
+		@Refinement("Nat1(a)")
 		int a = 10;
-		
-		for (int i = 0; i < args.length; i++) {
-			a  = 4;//Erro, 5 certo
-		}
 		
 	}
 	

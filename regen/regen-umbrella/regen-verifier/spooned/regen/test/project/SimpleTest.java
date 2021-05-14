@@ -1,14 +1,11 @@
 package regen.test.project;
 
 
-public class SimpleTest {
+@repair.regen.specification.RefinementAlias("Nat(int x) { x >= 0}")
+class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        @repair.regen.specification.Refinement("a > 4")
+        @repair.regen.specification.Refinement("Nat1(a)")
         int a = 10;
-        for (int i = 0; i < (args.length); i++) {
-            a = 4;// Erro, 5 certo
-
-        }
     }
 }
 

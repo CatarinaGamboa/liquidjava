@@ -65,6 +65,7 @@ public class VCChecker {
 					.changeAliasToRefinement(context, element, f);
 		} catch (Exception e1) {
 			printError(premises, expectedType, element, map, e1.getMessage());
+			return;
 		}
 
 //		System.out.println(premises.toString() + "\n"+et.toString());
