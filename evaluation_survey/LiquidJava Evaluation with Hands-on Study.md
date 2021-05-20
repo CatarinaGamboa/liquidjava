@@ -15,7 +15,7 @@
 
 <Unsynchronous>
 
-#### Part 0 - Registration and getting demographic data
+#### [Part 0](part-0-:-registration-in-the-study) - Registration and getting demographic data
 
 <Synchronous>
 
@@ -45,7 +45,7 @@ For each write the line with the error, the error and how to fix it
 - Incorrect return with recursion
 - Incorrect class order invocation (with external libs)
 
-##### Part 4 - Write the Refinements
+#### Part 4 - Write the Refinements
 
 3 exercises
 
@@ -59,7 +59,7 @@ For each write the line with the error, the error and how to fix it
 
 ## Details
 
-### PART 0 - Registration in the study
+### PART 0 : Registration in the study
 
 Share registration survey
 
@@ -71,7 +71,7 @@ Share registration survey
 
 
 
-### PART 1 - Understand the refinement
+### PART 1 : Understand the refinement
 
 With no prior knowledge on LiquidJava can you understand what are the specifications of the method?
 
@@ -163,7 +163,7 @@ For each example:
 
 
 
-### PART 2 - Introduction
+### PART 2 : Overview
 
 Brief introduction to LiquidJava and how to use Refinements in Java.
 
@@ -172,7 +172,7 @@ Brief introduction to LiquidJava and how to use Refinements in Java.
 
 
 
-### PART 3 - Find the Bug
+### PART 3 : Find the Bug
 
 #### 2.1 Plain Java Code
 
