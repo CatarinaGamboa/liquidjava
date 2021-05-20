@@ -8,18 +8,15 @@
 - Would people that use Java add this type of verification when creating critical software? *(Final evaluation)*
 
 
-
-
-
 ## **Study Configuration**
 
 <Unsynchronous>
 
-#### [Part 0](part-0-:-registration-in-the-study) - Registration and getting demographic data
+### [Part 0](part-0-:-registration-in-the-study) - Registration and getting demographic data
 
 <Synchronous>
 
-#### Part 1 - Understand the refinements without prior explanation
+### Part 1 - Understand the refinements without prior explanation
 
 3 exercises to explain what the code "means" *(maybe it is hard to evaluate that part)* and select the correct and incorrect uses of the code.
 
@@ -27,25 +24,24 @@
 - Method refinement
 - Class: Parameters and State Refinement
 
-#### Part 2 - Overview
+### Part 2 - Overview
 
 Small explanation of the refinements using the examples of the first part. Inquiring doubts
 
-#### Part 3 - Find the Bug
+### Part 3 - Find the Bug
 
 *Add time limit? Maybe only 2 - and merge both returns...?*
 
-3 exercises in Plain Java to find the bug.
+2 exercises in Plain Java to find the bug.
 
-3 exercises in LiquidJava to find the bug.
+2 exercises in LiquidJava to find the bug.
 
 For each write the line with the error, the error and how to fix it
 
-- Incorrect return with ifs
-- Incorrect return with recursion
+- Incorrect method return
 - Incorrect class order invocation (with external libs)
 
-#### Part 4 - Write the Refinements
+### Part 4 - Write the Refinements
 
 3 exercises
 
@@ -53,48 +49,47 @@ For each write the line with the error, the error and how to fix it
 - Method refinement - ?
 - Class: Parameters and State Refinement - trafficlight
 
-
+### Part 5 - Final overview
+- Final questions
 
 
 
 ## Details
 
-### PART 0 : Registration in the study
+## PART 0 : Registration in the study
 
 Share registration survey
 
-- Demographic data ~~ to 1st survey 
+- Background data ~~ to 1st survey 
   - only accept people familiar/very familiar with Java
   - How long have you been programming in Java???
-- State available date and time for 1h of synchronized study session, via zoom
+  - Did you contact with LiquidJava before?
+  - Did you participate in the "Refinements in Java - Syntax Survey"?
+- Send available date and time for 1h of synchronized study-session, via zoom
 - For the zoom session: vscode installed
 
 
 
-### PART 1 : Understand the refinement
+## PART 1 : Understand the refinement
 
 With no prior knowledge on LiquidJava can you understand what are the specifications of the method?
+(Only for the ones that answered as not having previous contact with LiquidJava)
 
 For each example:
-
-1) Explain in simple words what you get from the written code. (What are the parameters and what is returned)
-
-2) Which of the invocations would be valid and which would produce an error
+Make a correct and an incorrect use of the annotated code.
 
 - Variable Refinement *(Earth surface temperature according to Nasa https://earthobservatory.nasa.gov/global-maps/MOD_LSTD_M)*
+  Assign a correct value and an incorrect value to x.
 
   ```java
   @Refinement("-25 <= x && x <= 45")
   int x;
-  
-  x = 0;     //Correct
-  x = 50;    //Incorrect
-  x = 10-16; //Correct
   ```
 
   
 
 - Method annotated - parameters and return. *(Average with parameters dependency)* 
+  Write a correct and an incorrect invocation of function1.
 
   ```java
   @Refinement("_ >= 0")
@@ -103,76 +98,47 @@ For each example:
   	@Refinement("b >= a") double b){
   	return (a + b)/2;
   }
-  
-  function1(10, 52); 		   //Correct
-  function1(50, -5);         //Incorrect
-  function1(8*-5, 60);       //Incorrect
   ```
   
-- Object State - Email *(example used in https://blog.sigplan.org/2021/03/02/fluent-api-practice-and-theory/)*
-
-  *To hard on the beginning?*
+- Object State - Vending Machine idea: showing products -> product selected -> pay -> show products
+Write a correct and incorrect sequence of invocations on the object MyObj
   
   ```java
-  @StateSet({"empty", "senderSet", "receiverSet", "bodySet", "sent"})
-  public class Email {
-    @StateRefinement(to="empty(this)")
-  	public Email() {...}
-  	
-  	@StateRefinement(from="empty(this)", to="senderSet(this)")
-    public void from(String contact) {...}
-  	
-  	@StateRefinement(from="(senderSet(this) || receiverSet(this))", 
-                     to="receiverSet(this)")
-  	public void to(String contact) {...}
-  	
-  	public void subject(String sub) {...}
-      
-    @StateRefinement(from="receiverSet(this)", to="bodySet(this)")
-  	public void body(String s) {...}
-      
-    @StateRefinement(from="bodySet(this)", to="sent(this)")
-    public void send(){...}
+  @StateSet({"stateX", "stateY", "stateZ"})
+  public class MyObj {
+  
+   	@StateRefinement(to="stateY(this)")
+		public MyObj() {}
+		
+		@StateRefinement(from="stateY(this)", to="stateX(this)")
+		public void select(int number) {}
+		
+		@StateRefinement(from="stateX(this)", to="stateZ(this)")
+		public void pay(int account) {	}
+		
+		@StateRefinement(from="stateY(this)", to="stateX(this)")
+		@StateRefinement(from="stateZ(this)", to="stateX(this)")
+		public void show() { }
   }
-  
-  //Incorrect
-  Email e = new Email();
-  e.to("Bob");
-  e.from("Alice");
-  e.subject("Welcome!");
-  e.body("Welcome to this survey!");
-  e.send();
-  
-  //Incorrect
-  Email e = new Email();
-  e.from("Alice");
-  e.to("Bob");
-  e.subject("Welcome!");
-  e.send();
-  
-  //Correct
-  Email e = new Email();
-  e.from("Alice");
-  e.to("Bob");
-  e.to("Carol");
-  e.body("Welcome to this survey!");
-  e.send();
   
   ```
 
   
-### PART 2 : Overview
+## PART 2 : Overview
 
 Brief introduction to LiquidJava and how to use Refinements in Java.
-
+Video of 3-5 minutes:
 - Motivation
-- Explaining the examples above and ask for doubts
+- Explaining the examples above
+
+Off-video:
+- Doubts
+- Give Cheat Sheet 
 
 
+## PART 3 : Find the Bug
 
-### PART 3 : Find the Bug
-
-#### 2.1 Plain Java Code
+### 3.1 Plain Java Code
 
 Open project without liquid Java. 
 
@@ -184,7 +150,7 @@ For each file answer:
 - What produced the bug
 - How can you fix it
 
-#### 2.2 Liquid Java Code
+### 3.2 Liquid Java Code
 
 Open project that contains the liquid-java-api jar and the files already annotated. 
 
@@ -195,7 +161,7 @@ For each file answer:
 - Where was the bug (line)
 - What produced the bug
 - How can you fix it
-- Time spent handling the error (maybe the interviewer can measure it)
+- Time spent handling the error (measured by the interviewer)
 
 
 
@@ -204,51 +170,7 @@ For each file answer:
 This exercises will be grouped in pairs. For each participant, one of the exercises will be used in part of 2.1 and the other in 2.2, changing the order with each participant. This gives us a baseline to compare the time spent handling the error on the annotated program versus the non-annotated program.
 
 
-
-* **1** - Inside Method, Return incorrect, ifs
-
-  * Pair 1/2 - *Absolute*
-
-  ```java
-  public class Test1 {
-      	/**
-      	Absolute value
-      	@param n the value for which the absolute is computed
-      	@return the absolute value of n
-      	*/
-         @Refinement("(n < 0) ? (_ == -n) : (_ == n)")
-         public static int absolute(int n) {
-              if(0 <= n)
-                  return -n;//correct: remove signal
-              else
-                  return 0 - n;
-         }
-  }
-  ```
-
-  * Pair 2/2 - *Maximum*
-
-    ```java
-    public class Test1 {
-        /**
-        Maximum value
-        @param a first value
-        @param b second value
-        @return the maximum between a and b
-        */
-    	  @Refinement("(a < b)? (_ == b) : (_ == a)")
-        public static int max(int a, int b){
-            if(a > b) //correct: change signal
-                return b;
-            else
-                return a; 
-        }
-    }
-    ```
-
-    
-
-* **2** - Return incorrect - recursion + Alias
+* **1** - Method Return incorrect
 
   * Pair 1/2 *Sum (in tutorial refinement types)*
 
@@ -262,13 +184,13 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
         */
         @Refinement("Nat(_) && _ >= n")
     	  public static int sum(int n) {
-    		  if(n <= 0)//1
+    		  if(n <= 1)//correct: 0
     		  	return 0;
     		  else {
     			  int t1 = sum(n-1);
     			  return n + t1;
     		  }
-    	}
+      	}
         
     }
     ```
@@ -379,7 +301,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
 
 
 
-### PART 4 - Annotate a Java Program with Refinement Types
+## PART 4 - Annotate a Java Program with Refinement Types
 
 Open the project with Java code already implemented but not annotated.
 
@@ -395,15 +317,12 @@ Each package contains a program to annotate and 2 files with tests (one that sho
   currentMonth = 5;
   ```
 
-  
+- Method annotation
 
-- Annotate a method parameters and return
-
-  ```
+  ```java
   
   ```
-
-  
+    
 
 - Annotate the class TrafficLight that uses rgb values (between 0 and 255) to define the color of the light and follows the protocol defined by the following image
 
@@ -435,14 +354,16 @@ Each package contains a program to annotate and 2 files with tests (one that sho
   }
   ```
 
-  ### Part 5 - Final Overview
+## Part 5 - Final Overview
         
   - [Optional] What did you enjoy the most while using LiquidJava?
   - [Optional] What did you dislike the most while using LiquidJava?
   - Would you use LiquidJava in your projects?
 
-
-EXTRA - NOT USED
+        
+        
+        
+## EXTRA METHODS - NOT USED
 
 * **1** - Incorrect Invocation Simple Arithmetics
 
@@ -482,10 +403,52 @@ EXTRA - NOT USED
     		b = averagePrice(10, 5);
     		b = averagePrice(50, -10+15);
     		b = averagePrice(800, 2*30-60);
-            b = averagePrice(1952*-2, 20-10);
+        b = averagePrice(1952*-2, 20-10);
     		b = averagePrice(5*5*5, -5*-1);	
     	}
     }
     ```
+  
+  
+  * Pair 1/2 - *Absolute*
+
+  ```java
+  public class Test1 {
+      	/**
+      	Absolute value
+      	@param n the value for which the absolute is computed
+      	@return the absolute value of n
+      	*/
+         @Refinement("(n < 0) ? (_ == -n) : (_ == n)")
+         public static int absolute(int n) {
+              if(0 <= n)
+                  return -n;//correct: remove signal
+              else
+                  return 0 - n;
+         }
+  }
+  ```
+
+  * Pair 2/2 - *Maximum*
+
+    ```java
+    public class Test1 {
+        /**
+        Maximum value
+        @param a first value
+        @param b second value
+        @return the maximum between a and b
+        */
+    	  @Refinement("(a < b)? (_ == b) : (_ == a)")
+        public static int max(int a, int b){
+            if(a > b) //correct: change signal
+                return b;
+            else
+                return a; 
+        }
+    }
+    ```
+
+    
 
     
