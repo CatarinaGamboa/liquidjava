@@ -406,7 +406,7 @@ Each package contains a program to annotate and 2 files with tests (one that sho
 
 - Annotate the class TrafficLight that uses rgb values (between 0 and 255) to define the color of the light and follows the protocol defined by the following image
 
-  ![image-20210520135153606](C:\Users\Catarina Gamboa\AppData\Roaming\Typora\typora-user-images\image-20210520135153606.png)
+  ![traffic light protocol](https://github.com/pcanelas/regen/blob/antlr/evaluation_survey/trafficLight.png)
 
   ```java
   public class TrafficLight {
