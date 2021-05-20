@@ -157,12 +157,9 @@ For each example:
   e.body("Welcome to this survey!");
   e.send();
   
-```
+  ```
+
   
-  
-
-
-
 ### PART 2 : Overview
 
 Brief introduction to LiquidJava and how to use Refinements in Java.
@@ -445,7 +442,7 @@ Each package contains a program to annotate and 2 files with tests (one that sho
 
 
 
-EXTRA
+EXTRA - NOT USED
 
 * **1** - Incorrect Invocation Simple Arithmetics
 
