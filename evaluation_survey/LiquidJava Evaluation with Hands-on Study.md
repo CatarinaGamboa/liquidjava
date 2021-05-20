@@ -116,22 +116,23 @@ For each example:
   ```java
   @StateSet({"empty", "senderSet", "receiverSet", "bodySet", "sent"})
   public class Email {
-      @StateRefinement(to="empty(this)")
+    @StateRefinement(to="empty(this)")
   	public Email() {...}
   	
   	@StateRefinement(from="empty(this)", to="senderSet(this)")
-      public void from(String contact) {...}
+    public void from(String contact) {...}
   	
-  	@StateRefinement(from="(senderSet(this) || receiverSet(this))", 					                 to="receiverSet(this)")
+  	@StateRefinement(from="(senderSet(this) || receiverSet(this))", 
+                     to="receiverSet(this)")
   	public void to(String contact) {...}
   	
   	public void subject(String sub) {...}
       
-      @StateRefinement(from="receiverSet(this)", to="bodySet(this)")
+    @StateRefinement(from="receiverSet(this)", to="bodySet(this)")
   	public void body(String s) {...}
       
-      @StateRefinement(from="bodySet(this)", to="sent(this)")
-      public void send(){...}
+    @StateRefinement(from="bodySet(this)", to="sent(this)")
+    public void send(){...}
   }
   
   //Incorrect
@@ -215,13 +216,13 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
       	@param n the value for which the absolute is computed
       	@return the absolute value of n
       	*/
-          @Refinement("(n < 0) ? (_ == -n) : (_ == n)")
-          public static int absolute(int n) {
+         @Refinement("(n < 0) ? (_ == -n) : (_ == n)")
+         public static int absolute(int n) {
               if(0 <= n)
                   return -n;//correct: remove signal
               else
                   return 0 - n;
-          }
+         }
   }
   ```
 
@@ -235,7 +236,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
         @param b second value
         @return the maximum between a and b
         */
-    	@Refinement("(a < b)? (_ == b) : (_ == a)")
+    	  @Refinement("(a < b)? (_ == b) : (_ == a)")
         public static int max(int a, int b){
             if(a > b) //correct: change signal
                 return b;
@@ -260,13 +261,13 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
         * @return a positive value that represents the sum of all numbers between 0 and n
         */
         @Refinement("Nat(_) && _ >= n")
-    	public static int sum(int n) {
-    		if(n <= 0)//1
-    			return 0;
-    		else {
-    			int t1 = sum(n-1);
-    			return n + t1;
-    		}
+    	  public static int sum(int n) {
+    		  if(n <= 0)//1
+    		  	return 0;
+    		  else {
+    			  int t1 = sum(n-1);
+    			  return n + t1;
+    		  }
     	}
         
     }
@@ -303,13 +304,13 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     ```java
     class Test3 {
     
-  	public static void main(String[] args) throws IOException{
-            InputStreamReader is = new InputStreamReader(System.in);
-  		is.read();
-    		is.read();
-  		is.close();
-    		is.read();//error here
-        }
+  	  public static void main(String[] args) throws IOException{
+        InputStreamReader is = new InputStreamReader(System.in);
+  		  is.read();
+        is.read();
+  		  is.close();
+        is.read();//error here
+      }
     }
     ```
   
@@ -343,7 +344,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     		
     		Socket socket = new Socket();
     		socket.bind(new InetSocketAddress(inetAddress, port));
-    //		socket.connect(new InetSocketAddress(inetAddress, port));
+        //socket.connect(new InetSocketAddress(inetAddress, port)); //error missing this line
     		socket.sendUrgentData(90);
     		socket.close();
     	}
@@ -434,12 +435,11 @@ Each package contains a program to annotate and 2 files with tests (one that sho
   }
   ```
 
-  
-
-
-
-
-
+  ### Part 5 - Final Overview
+        
+  - [Optional] What did you enjoy the most while using LiquidJava?
+  - [Optional] What did you dislike the most while using LiquidJava?
+  - Would you use LiquidJava in your projects?
 
 
 EXTRA - NOT USED
