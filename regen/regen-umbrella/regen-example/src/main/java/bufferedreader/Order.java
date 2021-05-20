@@ -1,19 +1,16 @@
 package bufferedreader;
 
-
-
 import repair.regen.specification.Ghost;
 import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
 import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 
 @StateSet({"empty","addingItems", "checkout", "closed"})
-@Ghost   ("int totalPrice")
+@Ghost("int totalPrice")
 public class Order {
 	
-
+	@StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
 	public Order() {}
 	
 	@StateRefinement(from = "(empty(this) || addingItems(this))", 
@@ -36,12 +33,6 @@ public class Order {
 		return this;
 	}
 	
-	@StateRefinement(from = "checkout(this)", to = "totalPrice(this) == (totalPrice(old(this)) + 3)")
-	@Refinement("_ == this")
-	public Order addTransportCosts() {
-		return this;
-	}
-	
 	@StateRefinement(from="checkout(this)", to = "closed(this)")
 	@Refinement("_ == this")
 	public Order sendToAddress(String a) {
@@ -55,3 +46,4 @@ public class Order {
 	}
 	
 }
+

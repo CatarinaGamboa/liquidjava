@@ -1,24 +1,31 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.language.Expression;
-import repair.regen.language.Variable;
-import repair.regen.language.function.Argument;
-import repair.regen.language.function.FunctionInvocationExpression;
+import java.util.ArrayList;
+import java.util.List;
+
+import repair.regen.ast.Expression;
+import repair.regen.ast.FunctionInvocation;
+import repair.regen.errors.ErrorEmitter;
 
 public class InvocationPredicate extends Predicate{
 
-	public InvocationPredicate(String name, String... params) {
-		Expression e;
-		if(params.length == 1) {
-			Argument a = new Argument(new Variable(params[0]));
-			FunctionInvocationExpression fie = new FunctionInvocationExpression(name, a);
-			setExpression(fie);
+	public InvocationPredicate(ErrorEmitter ee, String name, String... params) {
+		List<Expression> le = new ArrayList<>();
+		for(String s: params) {
+			le.add(innerParse(s, ee));
 		}
+		exp = new FunctionInvocation(name, le);
 	}
-	public InvocationPredicate(String name, Expression e) {
-		Argument a = new Argument(e);
-		FunctionInvocationExpression fie = new FunctionInvocationExpression(name, a);
-		setExpression(fie);
+	
+	public InvocationPredicate(ErrorEmitter ee, String name, String s) {
+		List<Expression> le = new ArrayList<>();
+		le.add(innerParse(s, ee));
+		exp = new FunctionInvocation(name, le);
+	}
 
+	public InvocationPredicate(String name, Expression expression) {
+		List<Expression> le = new ArrayList<>();
+		le.add(expression);
+		exp = new FunctionInvocation(name, le);
 	}
 }

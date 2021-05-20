@@ -3,20 +3,19 @@ package repair.regen.processor.constraints;
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.language.Expression;
-import repair.regen.language.ExpressionGroup;
-import repair.regen.language.IfElseExpression;
-import repair.regen.language.UnaryExpression;
-import repair.regen.language.operators.NotOperator;
+import repair.regen.ast.Expression;
+import repair.regen.ast.Ite;
+import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
 
 public class IfThenElse extends Constraint{
 	private Constraint ite;
 	
 	public IfThenElse(Constraint a, Constraint b, Constraint c) {
-		ite = new Predicate(new ExpressionGroup(new IfElseExpression(a.getExpression(), 
-				b.getExpression(), c.getExpression())));
+		Expression e = new Ite(a.getExpression(), b.getExpression(), c.getExpression());
+		ite = new Predicate(e);
 	}
+	
 	public IfThenElse(Constraint e) {
 		ite = e;
 	}
@@ -27,10 +26,6 @@ public class IfThenElse extends Constraint{
 		return new IfThenElse(i);
 	}
 
-	@Override
-	public Constraint negate() {
-		return new Predicate(new UnaryExpression(new NotOperator(), ite.getExpression()));
-	}
 
 	@Override
 	public Constraint clone() {
@@ -60,13 +55,13 @@ public class IfThenElse extends Constraint{
 		return false;
 	}
 	@Override
-	public Constraint changeOldMentions(String previousName, String newName) {
-		return ite.changeOldMentions(previousName, newName);
+	public Constraint changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
+		return ite.changeOldMentions(previousName, newName, ee);
 	}
 	
 	@Override
-	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
-		return ite.changeStatesToRefinements(ghostState);
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls, ErrorEmitter ee) {
+		return ite.changeStatesToRefinements(ghostState, ls, ee);
 	}
 
 }

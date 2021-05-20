@@ -2,13 +2,12 @@ package repair.regen.processor.constraints;
 
 import java.util.List;
 
-import repair.regen.language.BinaryExpression;
-import repair.regen.language.Expression;
-import repair.regen.language.ExpressionGroup;
-import repair.regen.language.UnaryExpression;
-import repair.regen.language.operators.AndOperator;
-import repair.regen.language.operators.NotOperator;
-import repair.regen.language.operators.OrOperator;
+
+import repair.regen.ast.BinaryExpression;
+import repair.regen.ast.UnaryExpression;
+import repair.regen.errors.ErrorEmitter;
+import repair.regen.ast.Expression;
+import repair.regen.ast.GroupExpression;
 import repair.regen.processor.context.GhostState;
 
 public class Disjunction extends Constraint{
@@ -41,11 +40,6 @@ public class Disjunction extends Constraint{
 	}
 
 	@Override
-	public Constraint negate() {
-		return new Predicate(new UnaryExpression(new NotOperator(), getExpression()));
-	}
-
-	@Override
 	public Constraint clone() {
 		return new Disjunction(c1.clone(), c2.clone());
 	}
@@ -64,7 +58,7 @@ public class Disjunction extends Constraint{
 	
 	@Override
 	public Expression getExpression() {
-		return new ExpressionGroup(new BinaryExpression(c1.getExpression(), new OrOperator(), c2.getExpression()));
+		return new GroupExpression(new BinaryExpression(c1.getExpression(), "||", c2.getExpression()));
 	}
 
 	@Override
@@ -73,15 +67,16 @@ public class Disjunction extends Constraint{
 	}
 
 	@Override
-	public Constraint changeOldMentions(String previousName, String newName) {
-		Constraint c1_ = c1.changeOldMentions(previousName, newName);
-		Constraint c2_ = c2.changeOldMentions(previousName, newName);
+	public Constraint changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
+		Constraint c1_ = c1.changeOldMentions(previousName, newName, ee);
+		Constraint c2_ = c2.changeOldMentions(previousName, newName, ee);
 		return new Disjunction(c1_, c2_);
 	}
 	
 	@Override
-	public Constraint changeStatesToRefinements(List<GhostState> ghostState) {
-		return new Disjunction(c1.changeStatesToRefinements(ghostState), c2.changeStatesToRefinements(ghostState));
+	public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] ls, ErrorEmitter ee) {
+		return new Disjunction(c1.changeStatesToRefinements(ghostState, ls, ee), 
+				c2.changeStatesToRefinements(ghostState, ls, ee));
 	}
 
 

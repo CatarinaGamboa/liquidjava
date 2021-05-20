@@ -44,12 +44,12 @@ public class TrafficLight {
 	
 
 	
-	@StateRefinement(to="green(this)")
-	@Refinement("_ >= 0")
-	public int getTotalChangesReset() {
-		return 0;//count
-	}
-	
+//	@StateRefinement(to="green(this)")
+//	@Refinement("_ >= 0")
+//	public int getTotalChangesReset() {
+//		return 0;//count
+//	}
+//	
 	
 //	@StateRefinement(from="red(this)")
 //	public void passagersCross() {}

@@ -2,40 +2,43 @@ package repair.regen.processor.context;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import repair.regen.language.Expression;
-import repair.regen.language.alias.Alias;
+import repair.regen.ast.Expression;
+import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.Disjunction;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
+import repair.regen.processor.facade.AliasDTO;
+import repair.regen.rj_language.ParsingException;
+import repair.regen.utils.Utils;
+import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
-import spoon.reflect.visitor.filter.CatchVariableScopeFunction;
 
 public class AliasWrapper {
 	private String name;
 	private List<CtTypeReference<?>> varTypes;
 	private List<String> varNames;
 	private Predicate expression;
-	private Context context;
+//	private Context context;
 	
 	private String newAliasFormat = "#alias_%s_%d";
 
-	public AliasWrapper(Alias alias, Factory factory, String wildvar, Context c, String klass, String path) {
-		name = alias.getName();
-		this.varNames = alias.getVariableNames();
-		this.varTypes = new ArrayList<>();
-		for(String t:alias.getTypesNames())
-			this.varTypes.add(Utils.getType(t.toString().equals(klass)? path: t.toString(), factory));
-//			this.varTypes.add(Utils.getType(t, factory));
-		this.expression = new Predicate(alias.getExpression());
-		context= c;
+	public AliasWrapper(AliasDTO a, Factory factory, String wILD_VAR,
+			Context context2, String klass, String path) {
+		name = a.getName();
+		expression = new Predicate(a.getExpression());
+		
+		varTypes = new ArrayList<>();
+		varNames = a.getVarNames();
+		for(String s: a.getVarTypes()) {
+			CtTypeReference<?> r = Utils.getType(s.equals(klass)? path: s, factory);
+			varTypes.add(r);
+		}			
 	}
 
 	public String getName() {
@@ -59,29 +62,29 @@ public class AliasWrapper {
 		for (int i = 0; i < newNames.size(); i++) {
 			expr = expr.substituteVariable(varNames.get(i), newNames.get(i));
 		}
-		return (new Predicate(expr.toString())).getExpression();		
+		return expr.getExpression().clone();		
 	}
 	
 	
-	public Expression getPremises(List<Expression> list, List<String> newNames){
-		List<Predicate> invocationPredicates = getPredicatesFromExpression(list);
+	public Constraint getPremises(List<String> list, List<String> newNames, CtElement elem, ErrorEmitter ee) throws ParsingException{
+		List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem, ee);
 		Constraint prem = new Predicate();
 		for (int i = 0; i < invocationPredicates.size(); i++) {
 			prem = Conjunction.createConjunction(prem, 
 					new EqualsPredicate(new VariablePredicate(newNames.get(i)) , invocationPredicates.get(i)));
 		}
-		return prem.getExpression();
+		return prem.clone();
 	}
 
-	private List<Predicate> getPredicatesFromExpression(List<Expression> list) {
+	private List<Predicate> getPredicatesFromExpression(List<String> list, CtElement elem, ErrorEmitter ee) throws ParsingException {
 		List<Predicate> lp = new ArrayList<>();
-		for(Expression e: list)
-			lp.add(new Predicate(e));
+		for(String e: list)
+			lp.add(new Predicate(e, elem, ee));
 	
 		return lp;
 	}
 
-	public List<String> getNewVariables() {
+	public List<String> getNewVariables(Context context) {
 		List<String> n = new ArrayList<>();
 		for(int i=0; i < varNames.size(); i++) 
 			n.add(String.format(newAliasFormat, varNames.get(i), context.getCounter()));
@@ -94,6 +97,10 @@ public class AliasWrapper {
 			m.put(names.get(i), varTypes.get(i));
 		}
 		return m;
+	}
+
+	public AliasDTO createAliasDTO() {
+		return new AliasDTO(name, varTypes, varNames, expression.getExpression());		
 	}
 	
 

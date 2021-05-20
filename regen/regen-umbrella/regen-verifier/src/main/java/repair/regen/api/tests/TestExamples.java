@@ -308,7 +308,10 @@ public class TestExamples extends TestAbstract{
 	public void errorAliasArgumentSize() {
 		testWrong(testPath+"ErrorAliasArgumentSize.java");
 	}
-
-
+	
+	@Test
+	public void errorTypeInRefinements() {
+		testWrong(testPath+"ErrorTypeInRefinements.java");
+	}
 
 }

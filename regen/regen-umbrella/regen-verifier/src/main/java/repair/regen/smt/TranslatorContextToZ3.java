@@ -11,7 +11,6 @@ import com.microsoft.z3.FPExpr;
 import com.microsoft.z3.FuncDecl;
 import com.microsoft.z3.Sort;
 
-import repair.regen.language.Expression;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
@@ -119,7 +118,7 @@ public class TranslatorContextToZ3 {
 	}
 
 
-	public static void addGhostStates(Context z3, List<GhostState> ghostState, List<Expression> premisesToAdd,
+	public static void addGhostStates(Context z3, List<GhostState> ghostState,
 			Map<String, FuncDecl> funcTranslation) {
 		for(GhostState g: ghostState) {
 			addGhostFunction(z3, g,  funcTranslation);

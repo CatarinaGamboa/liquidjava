@@ -1,23 +1,18 @@
 package repair.regen.smt;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
+import com.martiansoftware.jsap.SyntaxException;
 import com.microsoft.z3.ArithExpr;
 import com.microsoft.z3.ArrayExpr;
 import com.microsoft.z3.BoolExpr;
-
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.FPExpr;
 import com.microsoft.z3.FuncDecl;
-import com.microsoft.z3.FuncDecl.Parameter;
 import com.microsoft.z3.IntExpr;
 import com.microsoft.z3.IntNum;
 import com.microsoft.z3.RealExpr;
@@ -25,13 +20,7 @@ import com.microsoft.z3.Solver;
 import com.microsoft.z3.Sort;
 import com.microsoft.z3.Status;
 
-import repair.regen.language.Expression;
-import repair.regen.language.Variable;
-import repair.regen.language.alias.Alias;
-import repair.regen.language.alias.AliasName;
-import repair.regen.language.parser.SyntaxException;
 import repair.regen.processor.context.AliasWrapper;
-import repair.regen.processor.context.GhostFunction;
 import spoon.reflect.reference.CtTypeReference;
 
 public class TranslatorToZ3 {
@@ -41,24 +30,23 @@ public class TranslatorToZ3 {
 	private Map<String, List<Expr>> varSuperTypes = new HashMap<>();
 	private Map<String, AliasWrapper> aliasTranslation = new HashMap<>();
 	private Map<String, FuncDecl> funcTranslation = new HashMap<>();
-	private List<Expression> premisesToAdd = new ArrayList<>();
 
 	public TranslatorToZ3(repair.regen.processor.context.Context c) {
 		TranslatorContextToZ3.translateVariables(z3, c.getContext(), varTranslation);
 		TranslatorContextToZ3.storeVariablesSubtypes(z3, c.getAllVariablesWithSupertypes(), varSuperTypes);
 		TranslatorContextToZ3.addAlias(z3, c.getAlias(), aliasTranslation);
 		TranslatorContextToZ3.addGhostFunctions(z3, c.getGhosts(), funcTranslation);
-		TranslatorContextToZ3.addGhostStates(z3, c.getGhostState(), premisesToAdd, funcTranslation);
+		TranslatorContextToZ3.addGhostStates(z3, c.getGhostState(), funcTranslation);
 		System.out.println();
 	}
 
-
-	public Status verifyExpression(Expression e) throws Exception {
+	
+	public Status verifyExpression(Expr e) throws Exception {
 		Solver s = z3.mkSolver();
-		s.add((BoolExpr) e.eval(this));
-		for(Expression ex: premisesToAdd)
-			s.add((BoolExpr) ex.eval(this));
-		
+//		s.add((BoolExpr) e.eval(this));
+//		for(Expression ex: premisesToAdd)
+//			s.add((BoolExpr) ex.eval(this));
+		s.add((BoolExpr)e);
 		Status st = s.check();
 		if (st.equals(Status.SATISFIABLE)) {
 			// Example of values
@@ -66,6 +54,8 @@ public class TranslatorToZ3 {
 		}
 		return st;
 	}
+	
+	
 
 	//#####################Literals and Variables#####################
 	public Expr makeIntegerLiteral(int value) {
@@ -79,6 +69,10 @@ public class TranslatorToZ3 {
 	public Expr makeDoubleLiteral(double value) {
 		return z3.mkFP(value, z3.mkFPSort64());
 	}
+	
+	public Expr makeString(String s) {
+		return z3.mkString(s);
+	}
 
 
 	public Expr makeBooleanLiteral(boolean value) {
@@ -87,6 +81,8 @@ public class TranslatorToZ3 {
 	
 	
 	private Expr getVariableTranslation(String name) throws Exception {
+		if(!varTranslation.containsKey(name))
+			throw new NotFoundError("Variable '"+ name.toString() + "' not found");
 		Expr e= varTranslation.get(name);
 		if(e == null)
 			e = varTranslation.get(String.format("this#%s", name));
@@ -100,11 +96,14 @@ public class TranslatorToZ3 {
 		return getVariableTranslation(name);//int[] not in varTranslation
 	}
 
-	public Expr makeFunctionInvocation(String name, Expr[] params) {
+	public Expr makeFunctionInvocation(String name, Expr[] params) throws Exception{
 		if(name.equals("addToIndex"))
 			return makeStore(name, params);
 		if(name.equals("getFromIndex"))
 			return makeSelect(name, params);
+		
+		if(!funcTranslation.containsKey(name))
+			throw new NotFoundError("Function '"+ name + "' not found");
 
 		FuncDecl fd = funcTranslation.get(name);
 		Sort[] s  =fd.getDomain();
@@ -273,33 +272,5 @@ public class TranslatorToZ3 {
 
 
 
-	public Expression makeAlias(AliasName name, List<Expression> list) throws TypeMismatchError, Exception {
-		AliasWrapper al = aliasTranslation.get(name.toString());
-		if(al.getVarNames().size() != list.size())
-			throw new TypeMismatchError("Arguments do not match: invocation size "+
-		list.size()+", expected size:"+al.getVarNames().size());
-		List<String> newNames = al.getNewVariables();
-		TranslatorContextToZ3.translateVariables(z3, al.getTypes(newNames), varTranslation);
-		
-		checkTypes(list, al.getTypes());
-		
-		Expression e = al.getNewExpression(newNames);
-		Expression add = al.getPremises(list, newNames);
-		premisesToAdd.add(add);
-
-//		System.out.println("Make Alias:" + e.toString());
-		return e;
-	}
-
-	private void checkTypes(List<Expression> list, List<CtTypeReference<?>> types) throws Exception {
-		for (int i = 0; i < list.size(); i++) {
-			Sort se = (list.get(i).eval(this)).getSort();
-			Sort st = TranslatorContextToZ3.getSort(z3,types.get(i).getQualifiedName());
-			if(!se.equals(st))
-				throw new TypeMismatchError("Types of arguments do not match. Got "+
-						list.get(i)+":"+se.toString()+" but expected "+st.toString());
-		}
-		
-	}
 
 }

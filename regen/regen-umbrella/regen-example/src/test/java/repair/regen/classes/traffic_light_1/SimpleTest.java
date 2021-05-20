@@ -1,22 +1,15 @@
 package repair.regen.classes.traffic_light_1;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.spi.FileSystemProvider;
-import java.util.ArrayList;
-
-import bufferedreader.Order;
-import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.RefinementPredicate;
-import repair.regen.specification.StateSet;
 
 public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{
 
-		TrafficLight tl = new TrafficLight();	
+		TrafficLight tl = new TrafficLight();
+		tl.transitionToAmber(); //correct
+		tl.transitionToRed();   //correct
+		tl.transitionToFlashingAmber();
 		
 		TrafficLight tl2 = tl.getTrafficLightStartingRed();
 		tl2.transitionToFlashingAmber();

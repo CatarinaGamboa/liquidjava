@@ -1,18 +1,22 @@
 package repair.regen.processor.constraints;
 
+import repair.regen.errors.ErrorEmitter;
+import repair.regen.rj_language.ParsingException;
+import spoon.reflect.declaration.CtElement;
+
 public class FunctionPredicate extends Predicate{
 	
-	public FunctionPredicate(String functionName, String... params) {
-		super(functionName+"("+getFormattedParams(params)+")");
+	public FunctionPredicate(ErrorEmitter ee, CtElement elem, String functionName, String... params) throws ParsingException {
+		super(functionName+"("+getFormattedParams(params)+")", elem, ee);
 	}
 
 
-	public static FunctionPredicate builtin_length(String param) {
-		return new FunctionPredicate("length", param);
+	public static FunctionPredicate builtin_length(String param, CtElement elem, ErrorEmitter ee) throws ParsingException {
+		return new FunctionPredicate(ee, elem, "length", param);
 	}
 	
-	public static FunctionPredicate builtin_addToIndex(String array, String index, String value) {
-		return new FunctionPredicate("addToIndex", index, value);
+	public static FunctionPredicate builtin_addToIndex(String array, String index, String value, CtElement elem, ErrorEmitter ee) throws ParsingException {
+		return new FunctionPredicate(ee, elem, "addToIndex", index, value);
 	}
 	
 	

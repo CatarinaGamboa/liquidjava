@@ -1,37 +1,37 @@
 package repair.regen.processor.refinement_checker;
 
+import static org.junit.Assert.fail;
+
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import javax.lang.model.element.Element;
-
-import repair.regen.language.alias.Alias;
-import repair.regen.language.function.FunctionDeclaration;
-import repair.regen.language.parser.RefinementParser;
-import repair.regen.language.parser.SyntaxException;
+import repair.regen.errors.ErrorEmitter;
+import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
-import repair.regen.processor.constraints.Implication;
 import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.LiteralPredicate;
-import repair.regen.processor.constraints.OperationPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.facade.AliasDTO;
+import repair.regen.processor.facade.GhostDTO;
+import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.RefinementsParser;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
+import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtNewArray;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtInterface;
+import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
@@ -45,24 +45,33 @@ public abstract class TypeChecker extends CtScanner{
 	public final String freshFormat = "#fresh_%d";
 	public final String instanceFormat = "#%s_%d";
 	public final String thisFormat = "this#%s";
-	String[] implementedTypes = {"boolean", "int", "short", "long", "float","double", "int[]"}; //TODO add types
+	public String[] implementedTypes = {"boolean", "int", "short", "long", "float","double", "int[]"}; //TODO add types
 
 	Context context;
 	Factory factory;
-	VCChecker vcChecker = new VCChecker();
+	VCChecker vcChecker;
+	ErrorEmitter errorEmitter;
 
-	public TypeChecker(Context c, Factory fac) {
+	public TypeChecker(Context c, Factory fac, ErrorEmitter errorEmitter) {
 		this.context = c;
 		this.factory = fac;
+		this.errorEmitter = errorEmitter;
+		vcChecker = new VCChecker(errorEmitter);
 	}
 
+	public Context getContext() {
+		return context;
+	}
+	public Factory getFactory() {
+		return factory;
+	}
 
-	Constraint getRefinement(CtElement elem) {
+	public Constraint getRefinement(CtElement elem) {
 		return (Constraint)elem.getMetadata(REFINE_KEY);
 	}
 
 
-	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) {
+	public Optional<Constraint> getRefinementFromAnnotation(CtElement element) throws ParsingException {
 		Optional<Constraint> constr = Optional.empty();
 		Optional<String> ref = Optional.empty();
 		for(CtAnnotation<? extends Annotation> ann :element.getAnnotations()) { 
@@ -82,9 +91,11 @@ public abstract class TypeChecker extends CtScanner{
 			}
 
 		}
-		if(ref.isPresent()) 
-			constr = Optional.of(new Predicate(ref.get()));
-
+		if(ref.isPresent()) {
+			Predicate p = new Predicate(ref.get(), element, errorEmitter);
+			if(errorEmitter.foundError()) return Optional.empty();
+			constr = Optional.of(p);
+		}
 		return constr;
 	}
 
@@ -98,7 +109,7 @@ public abstract class TypeChecker extends CtScanner{
 			}
 			if(an.contentEquals("repair.regen.specification.Ghost")) {
 				CtLiteral<String> s = (CtLiteral<String>)ann.getAllValues().get("value"); 
-				createStateGhost(s.getValue(), an, element);
+				createStateGhost(s.getValue(), ann, an, element);
 			}	
 		}
 	}
@@ -107,16 +118,16 @@ public abstract class TypeChecker extends CtScanner{
 	private void createStateSet(CtNewArray<String> e,  int set, CtElement element) {
 		Optional<GhostFunction> og = createStateGhost(set, element);
 		if(!og.isPresent()) {
-			System.out.println("Error in creation of GhostFunction");
-			System.exit(8);
+			System.out.println("Error in creation of GhostFunction");	
+			fail();
 		}
 		GhostFunction g = og.get();
 		context.addGhostFunction(g);
 		context.addGhostClass(g.getParentClassName());
-		
-		
+
+
 		List<CtExpression<?>> ls = e.getElements();
-		InvocationPredicate ip = new InvocationPredicate(g.getName(), THIS);
+		InvocationPredicate ip = new InvocationPredicate(getErrorEmitter(), g.getName(), THIS);
 		int order = 0;
 		for(CtExpression<?> ce : ls) {
 			if(ce instanceof CtLiteral<?>) {
@@ -131,22 +142,33 @@ public abstract class TypeChecker extends CtScanner{
 			}
 			order++;
 		}
-		
+
 	}
 
-	private void createStateGhost(String string, String an, CtElement element) {
-		String[] s = string.split(" ");
+	private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, String an, CtElement element) {
+		GhostDTO gd = null;
+		try {
+			gd = RefinementsParser.getGhostDeclaration(string);
+		} catch (ParsingException e) {
+			ErrorHandler.printCostumeError(ann, "Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
+			return;
+		}
+		if(gd.getParam_types().size() > 0) {
+			ErrorHandler.printCostumeError(ann, "Ghost States have the class as parameter "
+					+ "by default, no other parameters are allowed in '"+string+"'", errorEmitter);
+			return;
+		}
+		//Set class as parameter of Ghost
 		String qn = getQualifiedClassName(element);
 		String sn = getSimpleClassName(element);
 		context.addGhostClass(sn);
-		if(s.length < 2)
-			ErrorPrinter.printCostumeError(element, "Syntax error in defining ghost "+string);
 		List<CtTypeReference<?>> param = Arrays.asList(factory.Type().createReference(qn));
-		CtTypeReference r = factory.Type().createReference(s[0]);
-		GhostState gs = new GhostState(s[1], param, r, qn);
+		
+		CtTypeReference r = factory.Type().createReference(gd.getReturn_type());
+		GhostState gs = new GhostState(gd.getName(), param, r, qn);
 		context.addToGhostClass(sn, gs);
 	}
-	
+
 	protected String getQualifiedClassName(CtElement element) {
 		if(element.getParent() instanceof CtClass<?>) {
 			return ((CtClass<?>) element.getParent()).getQualifiedName();
@@ -155,7 +177,7 @@ public abstract class TypeChecker extends CtScanner{
 		}
 		return null;
 	}
-	
+
 	protected String getSimpleClassName(CtElement element) {
 		if(element.getParent() instanceof CtClass<?>) {
 			return ((CtClass<?>) element.getParent()).getSimpleName();
@@ -166,7 +188,7 @@ public abstract class TypeChecker extends CtScanner{
 
 	}
 
-	
+
 	protected Optional<GhostFunction> createStateGhost(int order, CtElement element){
 		CtClass<?> klass = null; 
 		if(element.getParent() instanceof CtClass<?>) {
@@ -180,7 +202,6 @@ public abstract class TypeChecker extends CtScanner{
 			GhostFunction gh = new GhostFunction(String.format("%s_state%d", klass.getSimpleName().toLowerCase(), order), 
 					params, ret , factory, 
 					klass.getQualifiedName(), klass.getSimpleName()); 
-			System.out.println(gh.toString());
 			return Optional.of(gh);
 		}
 		return Optional.empty();
@@ -188,24 +209,24 @@ public abstract class TypeChecker extends CtScanner{
 
 	protected void getGhostFunction(String value, CtElement element) {
 		try {
-			Optional<FunctionDeclaration> ofd = 
-					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent() && element.getParent() instanceof CtClass<?>) {
+			GhostDTO f = RefinementsParser.getGhostDeclaration(value);
+			if(f != null && element.getParent() instanceof CtClass<?>) {
 				CtClass<?> klass =(CtClass<?>) element.getParent(); 
-				GhostFunction gh = new GhostFunction(ofd.get(), factory, klass.getQualifiedName(), klass.getSimpleName()); 
+				GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName(), klass.getSimpleName()); 
 				context.addGhostFunction(gh);
-				System.out.println(gh.toString());
 			}
-		} catch (SyntaxException e) {
-			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
-			e.printStackTrace();
-		}
+		} catch (ParsingException e) {
+			ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
+			//	e.printStackTrace();
+			return;
+		} 
 	}
 
-	protected void handleAlias(String value, CtElement element) {
-		try {
-			Optional<Alias> oa = RefinementParser.parseAlias(value);
-			if(oa.isPresent()) {
+	protected void handleAlias(String value, CtElement element) {	
+		try {		
+			AliasDTO a = RefinementsParser.getAliasDeclaration(value);
+			
+			if(a != null) {
 				String klass = null;
 				String path = null;
 				if(element instanceof CtClass) {
@@ -216,12 +237,14 @@ public abstract class TypeChecker extends CtScanner{
 					path = ((CtInterface<?>) element).getQualifiedName();
 				}
 				if(klass != null && path != null) {
-					AliasWrapper a = new AliasWrapper(oa.get(), factory, WILD_VAR, context, klass, path);
-					context.addAlias(a);
+					AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
+					context.addAlias(aw);
 				}	
 			}
-		} catch (SyntaxException e) {
-			e.printStackTrace();
+		} catch (ParsingException e) {
+			ErrorHandler.printCostumeError(element, e.getMessage(), errorEmitter);
+			return;
+//			e.printStackTrace();
 		}
 	}
 
@@ -236,19 +259,8 @@ public abstract class TypeChecker extends CtScanner{
 		return ref;
 	}
 
-
-
-	void checkSMT(Constraint expectedType, CtElement element) {
-		vcChecker.processSubtyping(expectedType, context.getGhostState(), element);
-		element.putMetadata(REFINE_KEY, expectedType);	
-	}
-
-	protected boolean checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
-		return vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), target);
-	}
-
-	void checkVariableRefinements(Constraint refinementFound, String simpleName, 
-			CtTypeReference type, CtElement usage, CtElement variable) {
+	public void checkVariableRefinements(Constraint refinementFound, String simpleName, 
+			CtTypeReference type, CtElement usage, CtElement variable) throws ParsingException {
 		Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
 		Constraint cEt;
 		RefinedVariable mainRV = null;
@@ -271,13 +283,47 @@ public abstract class TypeChecker extends CtScanner{
 		correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
 		cEt = cEt.substituteVariable(simpleName, newName);
 
+		
 		//Substitute variable in verification
-		RefinedVariable rv= context.addInstanceToContext(newName, type, correctNewRefinement);
+		RefinedVariable rv= context.addInstanceToContext(newName, type, 
+				correctNewRefinement, usage);
 		for(CtTypeReference t: mainRV.getSuperTypes())
 			rv.addSuperType(t);
 		context.addRefinementInstanceToVariable(simpleName, newName);
 		//smt check
 		checkSMT(cEt, usage);//TODO CHANGE
-		context.addRefinementToVariableInContext(simpleName,type , cet);
+		context.addRefinementToVariableInContext(simpleName,type , cet, usage);
 	}
+	
+	public void checkSMT(Constraint expectedType, CtElement element) {
+		vcChecker.processSubtyping(expectedType, context.getGhostState(), 
+				WILD_VAR, THIS, element, factory);
+		element.putMetadata(REFINE_KEY, expectedType);	
+	}
+	
+	public void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target, String string) {
+		vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), 
+				WILD_VAR, THIS, target, string, factory);
+	}
+
+	public boolean checksStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
+		return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), 
+				WILD_VAR, THIS, target, factory);
+	}
+	
+	public void createError(CtElement element, Constraint expectedType, Constraint foundType, String customeMessage) {
+		 vcChecker.printSubtypingError(element, expectedType, foundType,customeMessage); 
+	}
+	public void createSameStateError(CtElement element, Constraint expectedType, String klass) {
+		 vcChecker.printSameStateError(element, expectedType,klass); 
+	}
+	
+	public void createStateMismatchError(CtElement element, String method, Constraint c, String states) {
+		vcChecker.printStateMismatchError(element, method, c, states);
+	}
+
+	public ErrorEmitter getErrorEmitter() {
+		return errorEmitter;
+	}
+
 }

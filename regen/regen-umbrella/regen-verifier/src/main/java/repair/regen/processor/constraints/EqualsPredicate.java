@@ -1,37 +1,22 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.language.BinaryExpression;
-import repair.regen.language.Expression;
-import repair.regen.language.ExpressionGroup;
-import repair.regen.language.operators.EqualsOperator;
+import repair.regen.ast.BinaryExpression;
+import repair.regen.ast.GroupExpression;
+import repair.regen.errors.ErrorEmitter;
 
 public class EqualsPredicate extends Predicate {
 	
 	public EqualsPredicate(Constraint c1, Constraint c2) {
 		super();
-		setExpression(getEqualsExpressionGroup(c1.getExpression(),c2.getExpression()));		
+		exp = new GroupExpression(
+				new BinaryExpression(c1.getExpression(), "==", c2.getExpression()));
 	}
 
 
-	public EqualsPredicate(Constraint c1, String c2) {
+	public EqualsPredicate(Constraint c1, String c2, ErrorEmitter ee) {
 		super();
-		setExpression(getEqualsExpressionGroup(c1.getExpression(),parse(c2)));
+		exp = new GroupExpression(
+				new BinaryExpression(c1.getExpression(), "==", innerParse(c2, ee)));
 	}
 	
-//	public EqualsPredicate(String variable, Constraint c) {
-//		super();
-//		setExpression(getEqualsExpressionGroup(parse(variable),c.getExpression()));
-//	}
-//
-//	public EqualsPredicate(String variable, String assignment) {
-//		super();
-//		setExpression(getEqualsExpressionGroup(parse(variable), parse(assignment)));
-//	}
-	
-	
-	private Expression getEqualsExpressionGroup(Expression expression,
-			Expression expression2) {
-		return new ExpressionGroup(new BinaryExpression(expression, new EqualsOperator(), expression2));
-	}
-
 }

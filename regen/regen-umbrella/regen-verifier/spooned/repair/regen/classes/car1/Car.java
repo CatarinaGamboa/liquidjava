@@ -1,6 +1,10 @@
 package repair.regen.classes.car1;
 
 
+// @Refinement("_ == GreaterThan(year, y)")
+// public boolean isOlderThan(int y) {
+// return this.year > y;
+// }
 @repair.regen.specification.RefinementAlias("Positive(int x) { x > 0}")
 @repair.regen.specification.RefinementAlias("type CarAcceptableYears(int x) { x > 1800 && x < 2050}")
 @repair.regen.specification.RefinementAlias("GreaterThan(int x, int y) {x > y}")
@@ -19,11 +23,6 @@ public class Car {
     @repair.regen.specification.Refinement("CarAcceptableYears(_)")
     public int getYear() {
         return year;
-    }
-
-    @repair.regen.specification.Refinement("_ == GreaterThan(year, y)")
-    public boolean isOlderThan(int y) {
-        return (this.year) > y;
     }
 }
 

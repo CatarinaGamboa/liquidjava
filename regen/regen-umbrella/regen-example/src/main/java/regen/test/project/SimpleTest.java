@@ -1,25 +1,94 @@
 package regen.test.project;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.spi.FileSystemProvider;
-import java.util.ArrayList;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
-import bufferedreader.Order;
-import bufferedreader.OrderSimple;
-import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.RefinementPredicate;
-import repair.regen.specification.StateSet;
 
-public class SimpleTest {
-	
-	public static void main(String[] args) throws IOException{
+class SimpleTest {
 		
-		@Refinement("sum(_) > 30")
-		Account a = new Account(50);
-		a.deposit(60);
+		
+
+	public static void main(String[] args) throws IOException{
+		    
+
+
+	}
+	
+}
+
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+		
+		
+
+
+		
+//@RefinementAlias("Percentage(int x) { 0 <= x && x <= 100 }")
+//@Refinement("Percentage(_)")
+//public static int addBonus(
+//                  @Refinement("Percentage(grade)") int grade, 
+//                  @Refinement("Percentage(bonus) && (bonus < grade)") 
+//                  int bonus) {
+//
+//    if((grade + bonus) > 100)
+//        return 100;
+//
+//    else
+//        return grade+bonus;
+//}		
+//	
+		
+		
+	
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+//		@Refinement("_ > 10")
+//		int i = 10;
+
+		
+//		@Refinement("sum(_) > 30")
+//		Account a = new Account(50);
+//		a.deposit(60);
 
 //		Account b = new Account(138);
 //		b = a.transferTo(b, 10);
@@ -70,7 +139,6 @@ public class SimpleTest {
 //		 .addItem("h", 20)
 //		 .addItem("h", 6);
 
-	}
 	
 	
 	
@@ -112,8 +180,3 @@ public class SimpleTest {
 	//		@Refinement("_ > 5")
 	//		double c = b;
 
-
-
-
-
-}

@@ -1,11 +1,11 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.language.Variable;
+import repair.regen.ast.Var;
 
 public class VariablePredicate extends Predicate{
 	public VariablePredicate(String name) {
 		super();
-		setExpression(new Variable(name));
+		exp = new Var(name);
 	}
 
 }

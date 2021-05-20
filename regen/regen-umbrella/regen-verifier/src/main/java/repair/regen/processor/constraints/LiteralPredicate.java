@@ -1,11 +1,12 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.language.IntegerLiteral;
+import repair.regen.ast.LiteralInt;
 
 public class LiteralPredicate {
 	
 	public static Constraint getIntPredicate(int i) {
-		return new Predicate(new IntegerLiteral(i));
+		LiteralInt li = new LiteralInt(i);
+		return new Predicate(li);
 	}
 
 	//TODO COMPLETE

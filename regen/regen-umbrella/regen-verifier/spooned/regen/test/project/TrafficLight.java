@@ -1,6 +1,28 @@
 package regen.test.project;
 
 
+// @StateRefinement(from="red(this)", to="flashingAmber(this)")
+// public void transitionToFlashingAmber() {}
+// 
+// @Refinement("red(_)")
+// public TrafficLight getTrafficLightStartingRed() {
+// TrafficLight t = new TrafficLight();
+// t.transitionToAmber();
+// t.transitionToRed();
+// return t;
+// }
+// @StateRefinement(from="green(this)", to="solidAmber(this)")
+// @Refinement("this == _")
+// public TrafficLight transitionToAmber2() {
+// //...
+// return this;
+// }
+// 
+// @StateRefinement(to="green(this)")
+// @Refinement("_ >= 0")
+// public int getTotalChangesReset() {
+// return 0;//count
+// }
 // @StateRefinement(from="red(this)")
 // public void passagersCross() {}
 // 
@@ -16,49 +38,21 @@ package regen.test.project;
 // public boolean carsPass() {
 // return true;
 // }
-@repair.regen.specification.StateSet({ "solidAmber", "green", "red", "flashingAmber" })
-@repair.regen.specification.StateSet({ "buttonTouched", "buttonNotTouched" })
+@repair.regen.specification.StateSet({ "red", "amber", "green" })
 public class TrafficLight {
-    // StateRefinement -> refines the state of the present object
-    // independently of the arguments or the return of the method
     public TrafficLight() {
     }
 
-    @repair.regen.specification.StateRefinement(from = "green(this)", to = "solidAmber(this)")
-    public void transitionToAmber() {
-    }
-
-    @repair.regen.specification.StateRefinement(from = "solidAmber(this)", to = "red(this)")
-    public void transitionToRed() {
-    }
-
-    @repair.regen.specification.StateRefinement(from = "red(this)", to = "flashingAmber(this)")
-    public void transitionToFlashingAmber() {
-    }
-
-    @repair.regen.specification.StateRefinement(from = "flashingAmber(this)", to = "green(this)")
+    @repair.regen.specification.StateRefinement(from = "red(this)", to = "green(this)")
     public void transitionToGreen() {
     }
 
-    @repair.regen.specification.Refinement("red(_)")
-    public regen.test.project.TrafficLight getTrafficLightStartingRed() {
-        regen.test.project.TrafficLight t = new regen.test.project.TrafficLight();
-        t.transitionToAmber();
-        t.transitionToRed();
-        return t;
+    @repair.regen.specification.StateRefinement(from = "green(this)", to = "amber(this)")
+    public void transitionToAmber() {
     }
 
-    // @StateRefinement(from="green(this)", to="solidAmber(this)")
-    // @Refinement("this == _")
-    // public TrafficLight transitionToAmber2() {
-    // //...
-    // return this;
-    // }
-    @repair.regen.specification.StateRefinement(to = "green(this)")
-    @repair.regen.specification.Refinement("_ >= 0")
-    public int getTotalChangesReset() {
-        return 0;// count
-
+    @repair.regen.specification.StateRefinement(from = "amber(this)", to = "red(this)")
+    public void transitionToRed() {
     }
 }
 

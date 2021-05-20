@@ -6,9 +6,9 @@ import spoon.reflect.reference.CtTypeReference;
 
 public abstract class Refined {
 	
-	private String name;
-	private CtTypeReference<?> type;
-	private Constraint refinement;
+	private String name;//y
+	private CtTypeReference<?> type;//int
+	private Constraint refinement; // 9 <= y && y <= 100
 	
 	public Refined() {}
 	

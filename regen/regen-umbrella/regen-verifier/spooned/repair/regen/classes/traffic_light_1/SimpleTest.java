@@ -27,6 +27,11 @@ package repair.regen.classes.traffic_light_1;
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         repair.regen.classes.traffic_light_1.TrafficLight tl = new repair.regen.classes.traffic_light_1.TrafficLight();
+        tl.transitionToAmber();// correct
+
+        tl.transitionToRed();// correct
+
+        tl.transitionToFlashingAmber();
         repair.regen.classes.traffic_light_1.TrafficLight tl2 = tl.getTrafficLightStartingRed();
         tl2.transitionToFlashingAmber();
     }

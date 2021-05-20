@@ -46,6 +46,7 @@ public class TestClasses extends TestAbstract{
 	public void correctOrderGift() {
 		testCorrect(testPath+"/classes/order_gift_correct");
 	}
+
 	
 //	@Test
 //	public void correctInputReaderCharArrayLongerNameEve() {
@@ -81,7 +82,7 @@ public class TestClasses extends TestAbstract{
 	}
 	
 	@Test
-	public void correctEmail3() {
+	public void errorEmail3() {
 		testWrong(testPath+"/classes/email3");
 	}
 	
@@ -101,6 +102,15 @@ public class TestClasses extends TestAbstract{
 		testWrong(testPath+"/classes/order_gift_error");
 	}
 
+	@Test
+	public void errorGhostState() {
+		testWrong(testPath+"/classes/ErrorGhostState.java");
+	}
 
+	
+	@Test
+	public void errorSocket() {
+		testWrong(testPath+"/classes/socket_error");
+	}
 
 }

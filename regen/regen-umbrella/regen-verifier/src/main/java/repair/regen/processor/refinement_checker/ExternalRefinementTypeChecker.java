@@ -1,38 +1,34 @@
 package repair.regen.processor.refinement_checker;
 
-import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.language.function.FunctionDeclaration;
-import repair.regen.language.parser.RefinementParser;
-import repair.regen.language.parser.SyntaxException;
+import repair.regen.errors.ErrorEmitter;
+import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
-import repair.regen.processor.context.RefinedFunction;
-import spoon.reflect.code.CtExpression;
-import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtLiteral;
-import spoon.reflect.declaration.CtAnnotation;
+import repair.regen.processor.facade.GhostDTO;
+import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
+import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.RefinementsParser;
+import repair.regen.utils.Pair;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
-import spoon.reflect.visitor.CtScanner;
 
 public class ExternalRefinementTypeChecker extends TypeChecker{
 	String prefix;
 	MethodsFunctionsChecker m;
 	
-	public ExternalRefinementTypeChecker(Context context, Factory fac) {
-		super(context, fac);
+	public ExternalRefinementTypeChecker(Context context, Factory fac, ErrorEmitter errorEmitter) {
+		super(context, fac, errorEmitter);
 		System.out.println("ExternalRefinementTypeChecker");
 	}
 
@@ -43,10 +39,16 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 
 	@Override
 	public <T> void visitCtInterface(CtInterface<T> intrface) {
+		if(errorEmitter.foundError()) return;
+		
 		Optional<String> externalRefinements = getExternalRefinement(intrface);
 		if(externalRefinements.isPresent()) {
 			prefix = externalRefinements.get();
-			getRefinementFromAnnotation(intrface);
+			try {
+				getRefinementFromAnnotation(intrface);
+			} catch (ParsingException e) {
+				return;//error already in ErrorEmitter
+			}
 			handleStateSetsFromAnnotation(intrface);
 			super.visitCtInterface(intrface);
 		}
@@ -54,7 +56,14 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 
 	@Override
 	public <T> void visitCtField(CtField<T> f) {
-		Optional<Constraint> oc = getRefinementFromAnnotation(f);
+		if(errorEmitter.foundError()) return;
+		
+		Optional<Constraint> oc;
+		try {
+			oc = getRefinementFromAnnotation(f);
+		} catch (ParsingException e) {
+			return;//error already in ErrorEmitter
+		}
 		Constraint c = oc.isPresent()?oc.get():new Predicate();
 		context.addGlobalVariableToContext(f.getSimpleName(), prefix, 
 				f.getType(), c);
@@ -62,8 +71,14 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 	}
 	
 	public <R> void visitCtMethod(CtMethod<R> method) {
+		if(errorEmitter.foundError()) return;
+		
 		MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
-		mfc.getMethodRefinements(method, prefix);
+		try {
+			mfc.getMethodRefinements(method, prefix);
+		} catch (ParsingException e) {
+			return;
+		}
 		super.visitCtMethod(method);
 	
 //		
@@ -74,37 +89,25 @@ public class ExternalRefinementTypeChecker extends TypeChecker{
 
 	protected void getGhostFunction(String value, CtElement element) {
 		try {
-			Optional<FunctionDeclaration> ofd = 
-					RefinementParser.parseFunctionDecl(value);
-			if(ofd.isPresent() && element.getParent() instanceof CtInterface<?>) {
+//			Optional<FunctionDeclaration> ofd = 
+//					RefinementParser.parseFunctionDecl(value);
+			GhostDTO f = RefinementsParser.getGhostDeclaration(value);
+			if(f != null && element.getParent() instanceof CtInterface<?>) {
 				String[] a = prefix.split("\\.");
 				String d =  a[a.length-1];
-				GhostFunction gh = new GhostFunction(ofd.get(), factory,prefix,a[a.length-1]); 
+				GhostFunction gh = new GhostFunction(f, factory,prefix,a[a.length-1]); 
 				context.addGhostFunction(gh);
 				System.out.println(gh.toString());
 			}
 
-		} catch (SyntaxException e) {
-			System.out.println("Ghost Function not well written");//TODO REVIEW MESSAGE
-			e.printStackTrace();
+		} catch (ParsingException e) {
+			ErrorHandler.printCostumeError(element, 
+					"Could not parse the Ghost Function"+e.getMessage(), errorEmitter);
+//			e.printStackTrace();
 		}
 	}
 	
-//TODO CHANGE
-//	@Override
-//	protected Optional<GhostFunction> createGhostFunction(String value, int set, int order, CtElement element)  {
-//		if(element instanceof CtInterface<?>) {
-//			String[] a = prefix.split("\\.");
-//			String klass =  a[a.length-1];
-//			CtTypeReference<?> ret = factory.Type().BOOLEAN_PRIMITIVE;
-//			List<String> params = Arrays.asList(klass);
-//			GhostFunction gh = new GhostFunction(value, params, ret ,factory, prefix, klass); 
-////			context.addGhostFunction(gh);
-//			System.out.println(gh.toString());
-//			return Optional.of(gh);
-//		}		
-//		return Optional.empty();
-//	}
+
 	@Override
 	protected Optional<GhostFunction> createStateGhost(int order, CtElement element){
 		String[] a = prefix.split("\\.");

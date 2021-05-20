@@ -1,38 +1,36 @@
 package repair.regen.smt;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
+import com.martiansoftware.jsap.SyntaxException;
+import com.microsoft.z3.Expr;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
-import repair.regen.language.Expression;
-import repair.regen.language.parser.RefinementParser;
-import repair.regen.language.parser.SyntaxException;
+import repair.regen.ast.Expression;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
-import repair.regen.processor.context.GhostFunction;
-import spoon.reflect.reference.CtTypeReference;
+import repair.regen.rj_language.RefinementsParser;
 
 public class SMTEvaluator {
 
 	public void verifySubtype(Constraint subRef, Constraint supRef, Context c) throws TypeCheckError, GhostFunctionError, Exception {
-		// TODO: create a parser for our SMT-ready refinement language
-		// TODO: discharge the verification to z3 
+		// Creates a parser for our SMT-ready refinement language
+		// Discharges the verification to z3 
 
 		Constraint toVerify = Conjunction.createConjunction(subRef, supRef.negate());
-		System.out.println(toVerify.toString()); //TODO remover
+		System.out.println(toVerify.toString()); //TODO remove
+		
+		
 		try {
-			Expression e = toVerify.getExpression();
+			Expression exp = toVerify.getExpression();
 			TranslatorToZ3 tz3 = new TranslatorToZ3(c);
+			//com.microsoft.z3.Expr
+			Expr e = exp.eval(tz3);
 			Status s = tz3.verifyExpression(e);
 			if (s.equals(Status.SATISFIABLE)) {
 				throw new TypeCheckError(subRef + " not a subtype of " + supRef);
 			}
-
+			
 		} catch (SyntaxException e1) {
 			System.out.println("Could not parse: " + toVerify);
 			e1.printStackTrace();
@@ -41,7 +39,7 @@ public class SMTEvaluator {
 					e.getLocalizedMessage().substring(0, 13).equals("Sort mismatch"))
 				throw new GhostFunctionError(e.getLocalizedMessage());
 			else
-				e.printStackTrace();
+				throw new Z3Exception(e.getLocalizedMessage());
 		}
 
 	}
