@@ -1,20 +1,19 @@
 package regen.test.project;
 
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
-import bufferedreader.TrafficLight;
-import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
-@RefinementAlias("Nat(int x) { x >= 0}")
+
 class SimpleTest {
 		
 		
 
 	public static void main(String[] args) throws IOException{
-		
-		@Refinement("Nat1(a)")
-		int a = 10;
-		
+		    
+
+
 	}
 	
 }

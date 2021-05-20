@@ -1,11 +1,15 @@
 package regen.test.project;
 
 
-@repair.regen.specification.RefinementAlias("Nat(int x) { x >= 0}")
 class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
-        @repair.regen.specification.Refinement("Nat1(a)")
-        int a = 10;
+        int port = 5000;
+        java.net.InetAddress inetAddress = java.net.InetAddress.getByName("localhost");
+        java.net.Socket socket = new java.net.Socket();
+        socket.bind(new java.net.InetSocketAddress(inetAddress, port));
+        // socket.connect(new InetSocketAddress(inetAddress, port));
+        socket.sendUrgentData(90);
+        socket.close();
     }
 }
 

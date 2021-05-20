@@ -2,7 +2,7 @@
 
 Study questions:
 
-- Are refinements easy to understand if there is no previous explanation about them? *(Part 1)*
+- Are refinements easy to understand without a previous explanation about them? *(Part 1)*
 - Is it faster to find semantic errors in LiquidJava programs than in plain Java programs? *(Part 3)*
 - How hard is it to annotate a program with refinements? *(Part 4)*
 - Would people that use Java add this type of verification when creating critical software? *(Final evaluation)*
@@ -23,15 +23,28 @@ Share registration survey
 
 ### PART 1 - Understand the refinement
 
-With no prior knowledge on LiquidJava can you understand what are the specifications of the method.
+With no prior knowledge on LiquidJava can you understand what are the specifications of the method?
 
-For each example
+For each example:
 
-1) Explain in simple words what the method does. (What are the parameters and what is returned)
+1) Explain in simple words what you get from the written code. (What are the parameters and what is returned)
 
-2) Which of the invocations would be valid and not valid
+2) Which of the invocations would be valid and which would produce an error
 
-- Method annotated - parameters and return. 
+- Variable Refinement *(Earth surface temperature according to Nasa https://earthobservatory.nasa.gov/global-maps/MOD_LSTD_M)*
+
+  ```java
+  @Refinement("-25 <= x && x <= 45")
+  int x;
+  
+  x = 0;     //Correct
+  x = 50;    //Incorrect
+  x = 10-16; //Correct
+  ```
+
+  
+
+- Method annotated - parameters and return. (Average with parameters dependency) 
 
   ```java
   @Refinement("_ >= 0")
@@ -42,14 +55,14 @@ For each example
   }
   
   function1(10, 52); 		   //Correct
-  function1(50, -10+5);      //Incorrect
+  function1(50, -5);         //Incorrect
   function1(8*-5, 60);       //Incorrect
-  function1(7, 20-10); 	   //Correct
-  function1(5*5, -5*-20);    //Correct
   ```
-
+  
 - Object State - Email *(example used in https://blog.sigplan.org/2021/03/02/fluent-api-practice-and-theory/)*
 
+  *To hard on the beginning?*
+  
   ```java
   @StateSet({"empty", "senderSet", "receiverSet", "bodySet", "sent"})
   public class Email {
@@ -59,7 +72,7 @@ For each example
   	@StateRefinement(from="empty(this)", to="senderSet(this)")
       public void from(String contact) {...}
   	
-  	@StateRefinement(from="(senderSet(this) || receiverSet(this))", to="receiverSet(this)")
+  	@StateRefinement(from="(senderSet(this) || receiverSet(this))", 					                 to="receiverSet(this)")
   	public void to(String contact) {...}
   	
   	public void subject(String sub) {...}
@@ -74,7 +87,6 @@ For each example
   //Incorrect
   Email e = new Email();
   e.to("Bob");
-  e.to("Carol");
   e.from("Alice");
   e.subject("Welcome!");
   e.body("Welcome to this survey!");
@@ -95,8 +107,8 @@ For each example
   e.body("Welcome to this survey!");
   e.send();
   
-  ```
-
+```
+  
   
 
 
@@ -106,11 +118,7 @@ For each example
 Brief introduction to LiquidJava and how to use Refinements in Java.
 
 - Motivation
-- Simple Example - *Positive value*
-- Example of method refinements and invocation - *maybe Percentage and addBonus (poster)*
-- Example of object state refinement - *Traffic Lights*
-
-~~***Idea:*** Create a small 5 min video and ask participants to watch the video before the session. In the beginning of the session they can watch the video if they couldn't do it before and ask questions/doubts.~~
+- Explaining the examples above and ask for doubts
 
 
 
@@ -145,7 +153,7 @@ For each file answer:
 
 #### Exercises
 
-This exercises will be grouped in pairs. For each participant, one of the exercises will be used as part of 2.1 and the other in 2.2, changing the order with each participant. This gives us a baseline to compare the time spent handling the error on the annotated program versus the non-annotated program.
+This exercises will be grouped in pairs. For each participant, one of the exercises will be used in part of 2.1 and the other in 2.2, changing the order with each participant. This gives us a baseline to compare the time spent handling the error on the annotated program versus the non-annotated program.
 
 
 
@@ -163,7 +171,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
           @Refinement("(n < 0) ? (_ == -n) : (_ == n)")
           public static int absolute(int n) {
               if(0 <= n)
-                  return -n;//corrext: remove signal
+                  return -n;//correct: remove signal
               else
                   return 0 - n;
           }
@@ -246,13 +254,79 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
   * Pair 1/2 - InputStreamReader, closing and trying to read again  https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
 
     ```java
+    class Test3 {
     
+  	public static void main(String[] args) throws IOException{
+            InputStreamReader is = new InputStreamReader(System.in);
+  		is.read();
+    		is.read();
+  		is.close();
+    		is.read();//error here
+        }
+    }
     ```
-
+  
+    ```java
+    @ExternalRefinementsFor("java.io.InputStreamReader")
+    public interface InputStreamReaderRefs {
+    	
+    	@RefinementPredicate("boolean open(InputStreamReader i)")
+    	@StateRefinement(to="open(this)")
+    	public void InputStreamReader(InputStream in);
     
-
+    	@StateRefinement(from="open(this)", to="open(this)")
+    	@Refinement("(_ >= -1) && (_ <= 127)")
+    	public int read();
+    	
+    	@StateRefinement(from="open(this)", to="!open(this)")
+    	public void close();
+    }
+    ```
+  
+    
+  
   * Pair 2/2 - Socket, creating object but not connecting/bind https://docs.oracle.com/javase/7/docs/api/java/net/Socket.html
-
+  
+    ```java
+    class Test3 {
+    
+    	public static void main(String[] args) throws IOException{
+    		int port = 5000;
+    		InetAddress inetAddress = InetAddress.getByName("localhost");    
+    		
+    		Socket socket = new Socket();
+    		socket.bind(new InetSocketAddress(inetAddress, port));
+    //		socket.connect(new InetSocketAddress(inetAddress, port));
+    		socket.sendUrgentData(90);
+    		socket.close();
+    	}
+    }
+    ```
+  
+    ```java
+    @ExternalRefinementsFor("java.net.Socket")
+    @StateSet({"unconnected", "binded", "connected", "closed"})
+    public interface SocketRefinements {
+        
+    	@StateRefinement(to="unconnected(this)")
+    	public void Socket();
+    	
+    	@StateRefinement(from="unconnected(this)",to="binded(this)")
+    	public void bind(SocketAddress add);
+    	
+    	@StateRefinement(from="binded(this)", to="connected(this)")
+    	public void connect(SocketAddress add);
+    	
+    	@StateRefinement(from="connected(this)")
+    	public void sendUrgentData(int n);
+    	
+    	@StateRefinement(to="closed(this)")
+    	public void close();
+    
+    }
+    ```
+  
+    
   
 
 
@@ -263,8 +337,27 @@ Open the project with Java code already implemented but not annotated.
 
 Each package contains a program to annotate and 2 files with tests (one that should be correct and one that should produce an error)
 
-- Annotate a method parameters and return - 
-- Annotate a class following a protocol - example Vending Machine??
+- Simple variable annotation
+
+  ```java
+  /* The visible light spectrum has wavelengths from 380 to 700 nanometers. */
+  int visibleWaveLength;
+  
+  visibleWaveLength = 456; //Correct
+  visibleWaveLength = 371; //Error
+  ```
+
+  
+
+- Annotate a method parameters and return
+
+  ```
+  
+  ```
+
+  
+
+- Annotate a class following a protocol - example Traffic Lights
 
 
 
