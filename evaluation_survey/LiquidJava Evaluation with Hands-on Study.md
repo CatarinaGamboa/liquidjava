@@ -1,6 +1,6 @@
 # LiquidJava Evaluation with Hands-on Study
 
-Study questions:
+## Study questions:
 
 - Are refinements easy to understand without a previous explanation about them? *(Part 1)*
 - Is it faster to find semantic errors in LiquidJava programs than in plain Java programs? *(Part 3)*
@@ -8,6 +8,56 @@ Study questions:
 - Would people that use Java add this type of verification when creating critical software? *(Final evaluation)*
 
 
+
+
+
+## **Study Configuration**
+
+<Unsynchronous>
+
+#### Part 0 - Registration and getting demographic data
+
+<Synchronous>
+
+#### Part 1 - Understand the refinements without prior explanation
+
+3 exercises to explain what the code "means" *(maybe it is hard to evaluate that part)* and select the correct and incorrect uses of the code.
+
+- Simple variable refinement
+- Method refinement
+- Class: Parameters and State Refinement
+
+#### Part 2 - Overview
+
+Small explanation of the refinements using the examples of the first part. Inquiring doubts
+
+#### Part 3 - Find the Bug
+
+*Add time limit? Maybe only 2 - and merge both returns...?*
+
+3 exercises in Plain Java to find the bug.
+
+3 exercises in LiquidJava to find the bug.
+
+For each write the line with the error, the error and how to fix it
+
+- Incorrect return with ifs
+- Incorrect return with recursion
+- Incorrect class order invocation (with external libs)
+
+##### Part 4 - Write the Refinements
+
+3 exercises
+
+- Simple variable refinement  - months
+- Method refinement - ?
+- Class: Parameters and State Refinement - trafficlight
+
+
+
+
+
+## Details
 
 ### PART 0 - Registration in the study
 
@@ -44,7 +94,7 @@ For each example:
 
   
 
-- Method annotated - parameters and return. (Average with parameters dependency) 
+- Method annotated - parameters and return. *(Average with parameters dependency)* 
 
   ```java
   @Refinement("_ >= 0")
@@ -340,11 +390,11 @@ Each package contains a program to annotate and 2 files with tests (one that sho
 - Simple variable annotation
 
   ```java
-  /* The visible light spectrum has wavelengths from 380 to 700 nanometers. */
-  int visibleWaveLength;
+  /* A month needs to have a value between 1 and 12*/
+  int currentMonth;
   
-  visibleWaveLength = 456; //Correct
-  visibleWaveLength = 371; //Error
+  currentMonth = 13;
+  currentMonth = 5;
   ```
 
   
@@ -357,9 +407,37 @@ Each package contains a program to annotate and 2 files with tests (one that sho
 
   
 
-- Annotate a class following a protocol - example Traffic Lights
+- Annotate the class TrafficLight that uses rgb values (between 0 and 255) to define the color of the light and follows the protocol defined by the following image
 
+  ![image-20210520135153606](C:\Users\Catarina Gamboa\AppData\Roaming\Typora\typora-user-images\image-20210520135153606.png)
 
+  ```java
+  public class TrafficLight {
+  	
+  	int r; 	
+  	int g; 	
+  	int b;
+  	
+  	public TrafficLight() {
+  		r = 255; g = 0; b = 0; 
+  	}
+  	
+  	public void transitionToAmber() {
+  		r = 255; g = 120; b = 0;
+  	}
+  	
+  	public void transitionToGreen() {
+  		r = 76; g = 187; b = 23; 
+  	}
+  	
+  	public void transitionToRed() {
+  		r = 230; g = 0; b = -1; 
+  	}
+  
+  }
+  ```
+
+  
 
 
 
