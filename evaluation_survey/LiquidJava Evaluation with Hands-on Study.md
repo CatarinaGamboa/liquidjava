@@ -226,11 +226,11 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     ```java
     class Test3 {
     
-  	  public static void main(String[] args) throws IOException{
+  	public static void main(String[] args) throws IOException{
         InputStreamReader is = new InputStreamReader(System.in);
-  		  is.read();
         is.read();
-  		  is.close();
+        is.read();        
+        is.close();
         is.read();//error here
       }
     }
@@ -266,7 +266,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     		
     		Socket socket = new Socket();
     		socket.bind(new InetSocketAddress(inetAddress, port));
-        //socket.connect(new InetSocketAddress(inetAddress, port)); //error missing this line
+                //socket.connect(new InetSocketAddress(inetAddress, port)); //error missing this line
     		socket.sendUrgentData(90);
     		socket.close();
     	}
@@ -294,6 +294,52 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     	public void close();
     
     }
+    ```
+		
+   * Pair 3/2 - ArrayDeque - To use ghost field size to model the object state (https://docs.oracle.com/javase/7/docs/api/java/util/ArrayDeque.html)
+  
+    ```java
+    class Test3 {
+    
+    	public static void main(String[] args) throws IOException{
+                ArrayDeque<Integer> p = new ArrayDeque<>();
+                p.add(2);
+                p.remove();
+                p.offerFirst(6);
+                p.getLast();
+                p.remove();
+                p.getLast();
+    	}
+    }
+    ```
+  
+    ```java
+    @ExternalRefinementsFor("java.util.ArrayDeque")
+    @Ghost("int size")
+    public interface ArrayDequeRefinements<E> {
+
+	public void ArrayDeque();
+	
+	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
+	public boolean add(E elem);
+	
+	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
+	public boolean offerFirst(E elem);
+	
+	@StateRefinement(from="size(this) > 0", to = "size(this) == (size(old(this)))")
+	public E getFirst();
+	
+	@StateRefinement(from="size(this) > 0", to = "size(this) == (size(old(this)))")
+	public E getLast();
+	
+	@StateRefinement(from="size(this)> 0", to="size(this) == (size(old(this)) - 1)")
+	public void remove();
+	
+	@StateRefinement(from="size(this)> 0", to="size(this) == (size(old(this)) - 1)")
+	public E pop();
+
+    }
+
     ```
   
     
