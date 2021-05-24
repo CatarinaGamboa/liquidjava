@@ -11,6 +11,9 @@ public class Test {
 		p.getLast();
 		p.remove();
 		p.getLast();
+		p.add(78);
+		p.add(8);
+		p.getFirst();
 	}
 	
 }
