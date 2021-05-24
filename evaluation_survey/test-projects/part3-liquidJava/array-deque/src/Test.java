@@ -14,6 +14,7 @@ public class Test {
 		p.add(78);
 		p.add(8);
 		p.getFirst();
+		
 	}
 	
 }
