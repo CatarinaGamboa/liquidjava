@@ -1,4 +1,4 @@
-package part3_plainJava.arrayDeque;
+package part3_liquidJava.arrayDeque;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -13,7 +13,8 @@ public class Test3 {
 		
 		Socket socket = new Socket();
 		socket.bind(new InetSocketAddress(inetAddress, port));
-        socket.sendUrgentData(90);
+            //socket.connect(new InetSocketAddress(inetAddress, port)); //error missing this line
+		socket.sendUrgentData(90);
 		socket.close();
 	}
 }

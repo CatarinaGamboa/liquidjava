@@ -1,4 +1,4 @@
-package part3_plainJava.socket;
+package part3_liquidJava.socket;
 
 import java.util.ArrayDeque;
 
