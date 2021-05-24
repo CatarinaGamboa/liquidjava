@@ -1,4 +1,4 @@
-package part3_liquidJava.socket;
+package socket;
 
 import java.net.SocketAddress;
 

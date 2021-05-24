@@ -1,7 +1,7 @@
-package part3_plainJava;
+package sum;
 
-public class Sum {
-
+public class Test2 {
+	
 	/**
 	 * The sum of all numbers between 0 and n
 	 * @param n
@@ -15,5 +15,6 @@ public class Sum {
 			return n + t1;
 		}
 	}
+
 
 }
