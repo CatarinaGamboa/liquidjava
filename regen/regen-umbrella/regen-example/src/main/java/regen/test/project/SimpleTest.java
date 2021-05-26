@@ -4,31 +4,29 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayDeque;
+import java.util.PriorityQueue;
 
+import repair.regen.specification.Refinement;
+import repair.regen.specification.RefinementAlias;
+import repair.regen.specification.StateRefinement;
+import repair.regen.specification.StateSet;
 
 class SimpleTest {
-		
-		
+	public static void main(String[] args) {
 
-	public static void main(String[] args) throws IOException{
-		    
-
-
+		ArrayDeque<Integer> p = new ArrayDeque<>();
+		p.add(2);
+		p.remove();
+		p.offerFirst(6);
+		p.getLast();
+		p.remove();
+		p.getLast();
 	}
-	
+
+
 }
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
 
 
 
@@ -49,12 +47,23 @@ class SimpleTest {
 
 
 
-		
-		
-		
 
 
-		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //@RefinementAlias("Percentage(int x) { 0 <= x && x <= 100 }")
 //@Refinement("Percentage(_)")
 //public static int addBonus(
@@ -69,23 +78,23 @@ class SimpleTest {
 //        return grade+bonus;
 //}		
 //	
-		
-		
-	
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
+
+
+
+
+
+
+
+
+
+
+
+
+
 //		@Refinement("_ > 10")
 //		int i = 10;
 
-		
+
 //		@Refinement("sum(_) > 30")
 //		Account a = new Account(50);
 //		a.deposit(60);
@@ -95,8 +104,8 @@ class SimpleTest {
 //		
 //		@Refinement("sum(_) == 148")
 //		Account c = b;
-		
-		
+
+
 //		Order o = new Order();
 //		
 //		Order f = o.addItem("shirt", 60).addGift();
@@ -104,21 +113,21 @@ class SimpleTest {
 //		o.addGift();
 //		f.addItem("l", 1).pay(000).addGift().pay(000);//.addTransportCosts().sendToAddress("home");
 
-		
+
 //		TrafficLight tl = new TrafficLight();
 //		tl.transitionToAmber();
 //		
-		
+
 //		TrafficLight tl2 = tl.getTrafficLightStartingRed();
 //		tl2.transitionToFlashingAmber();
-		
-		
+
+
 //		tl.transitionToAmber();
 //		tl.transitionToAmber();
-		
+
 //		tl.passagersCross();
 //		tl.intermitentMalfunction();
-		
+
 //		tl.transitionToFlashingAmber();
 
 //		@Refinement("size(al) < 4")
@@ -126,12 +135,12 @@ class SimpleTest {
 //		al.add(1);
 //		al.add(1);
 //		al.get(2);
-		
-		
+
+
 //		@Refinement("size(t) == 3")
 //		ArrayList<Integer> t = al;
-		
-		
+
+
 //		
 //		Order o = new Order();
 //		o.addItem("shirt", 5)
@@ -139,11 +148,11 @@ class SimpleTest {
 //		 .addItem("h", 20)
 //		 .addItem("h", 6);
 
-	
-	
-	
-	
-	
+
+
+
+
+
 //	InputStreamReader isr = new InputStreamReader(System.in);
 //	isr.read();
 //	isr.read();
@@ -153,30 +162,30 @@ class SimpleTest {
 //	//...
 //	isr.read();
 
-	
 
 
 
 
-	//	@Refinement("_ > 0")
-	//	public int fun (int[] arr) {
-	//		return max(arr[0], 1);
-	//	}
-	//	
+
+//	@Refinement("_ > 0")
+//	public int fun (int[] arr) {
+//		return max(arr[0], 1);
+//	}
+//	
 
 
 
-	//		//@Refinement("_.length(x) >= 0") ==
-	////	@Refinement("length(_, x) >= 0")
-	////	int[] a1 = new int[5];
-	//K(.., ..)
+//		//@Refinement("_.length(x) >= 0") ==
+////	@Refinement("length(_, x) >= 0")
+////	int[] a1 = new int[5];
+//K(.., ..)
 
-	//	}
+//	}
 
 
-	//See error NaN
-	//		@Refinement("true")
-	//		double b = 0/0;
-	//		@Refinement("_ > 5")
-	//		double c = b;
+//See error NaN
+//		@Refinement("true")
+//		double b = 0/0;
+//		@Refinement("_ > 5")
+//		double c = b;
 
