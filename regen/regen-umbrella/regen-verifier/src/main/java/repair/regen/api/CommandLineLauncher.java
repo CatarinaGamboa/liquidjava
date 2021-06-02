@@ -37,6 +37,7 @@ public class CommandLineLauncher {
 
 	public static ErrorEmitter launch(String file) {
 		Launcher launcher = new Launcher();
+		
         launcher.addInputResource(file);
         launcher.getEnvironment().setNoClasspath(true);
         // optional

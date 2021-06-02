@@ -2,14 +2,14 @@ package regen.test.project;
 
 
 class SimpleTest {
-    public static void main(java.lang.String[] args) throws java.io.IOException {
-        int port = 5000;
-        java.net.InetAddress inetAddress = java.net.InetAddress.getByName("localhost");
-        java.net.Socket socket = new java.net.Socket();
-        socket.bind(new java.net.InetSocketAddress(inetAddress, port));
-        // socket.connect(new InetSocketAddress(inetAddress, port));
-        socket.sendUrgentData(90);
-        socket.close();
+    public static void main(java.lang.String[] args) {
+        java.util.ArrayDeque<java.lang.Integer> p = new java.util.ArrayDeque<>();
+        p.add(2);
+        p.remove();
+        p.offerFirst(6);
+        p.getLast();
+        p.remove();
+        p.getLast();
     }
 }
 

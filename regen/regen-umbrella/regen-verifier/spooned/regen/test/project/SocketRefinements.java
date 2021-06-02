@@ -4,11 +4,6 @@ package regen.test.project;
 @repair.regen.specification.ExternalRefinementsFor("java.net.Socket")
 @repair.regen.specification.StateSet({ "unconnected", "binded", "connected", "closed" })
 public interface SocketRefinements {
-    // Socket socket = new Socket();
-    // socket.bind(new InetSocketAddress(inetAddress, port));
-    // socket.connect(new InetSocketAddress(inetAddress, port), 50);
-    // socket.sendUrgentData(90);
-    // socket.close();
     @repair.regen.specification.StateRefinement(to = "unconnected(this)")
     public void Socket();
 

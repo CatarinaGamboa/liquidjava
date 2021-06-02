@@ -53,8 +53,8 @@ public class VCChecker {
 		String[] s = {wild_var, this_var};
 		Constraint premisesBeforeChange = joinConstraints(expectedType, element, mainVars, lrv, map)
 				.toConjunctions();
-		Constraint premises = null;
-		Constraint et = null;
+		Constraint premises = new Predicate();
+		Constraint et = new Predicate();
 		try {
 			premises = premisesBeforeChange 
 					.changeStatesToRefinements(list, s, errorEmitter)
@@ -98,8 +98,8 @@ public class VCChecker {
 		HashMap<String, PlacementInCode> map = new HashMap<>();
 		String[] s = {wild_var, this_var};
 
-		Constraint premises = null; 
-		Constraint et = null;
+		Constraint premises = new Predicate(); 
+		Constraint et = new Predicate();
 		try {
 			premises = joinConstraints(expectedType, element, mainVars, lrv, map).toConjunctions();
 			premises = Conjunction.createConjunction(premises, type)
@@ -230,16 +230,18 @@ public class VCChecker {
 	}
 
 
-	public boolean smtChecks(Constraint cSMT, Constraint expectedType, CtElement element) {
+	public boolean smtChecks(Constraint cSMT, Constraint expectedType, CtElement elem) {
 		try {
 			new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
-		}catch (TypeCheckError e) { 
+		}
+		catch (TypeCheckError e) { 
 			return false;
 		}catch(Exception e) {
-			System.err.println("Unknown error:"+e.getMessage());
-			e.printStackTrace();
+//			System.err.println("Unknown error:"+e.getMessage());
+//			e.printStackTrace();
 //			System.exit(7);
-			fail();
+//			fail();
+			errorEmitter.addError("Unknown Error", e.getMessage(), elem.getPosition(), 7);
 		}
 		return true;
 	}

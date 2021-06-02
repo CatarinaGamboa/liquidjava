@@ -88,9 +88,11 @@ public class AuxHierarchyRefinememtsPassage {
 				arg.setRefinement(superArgRef.substituteVariable(newName, arg.getName()));
 			} else {
 				boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i));
-				if(!f)
+				if(!f) {
 //					ErrorPrinter.printError(method, argRef, superArgRef);
-					tc.createError(method, argRef, superArgRef, "");
+					if(!tc.getErrorEmitter().foundError())
+						tc.createError(method, argRef, superArgRef, "");
+				}
 			}
 		}
 
