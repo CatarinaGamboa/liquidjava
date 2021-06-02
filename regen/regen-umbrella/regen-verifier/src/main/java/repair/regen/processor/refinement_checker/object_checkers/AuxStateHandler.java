@@ -184,7 +184,7 @@ public class AuxStateHandler {
 		Constraint c = c1.substituteVariable(tc.THIS, name);
 		c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
 		boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e);
-		if(b) tc.createSameStateError(e, p, t);	
+		if(b && !tc.getErrorEmitter().foundError()) tc.createSameStateError(e, p, t);	
 
 		return c1;
 
@@ -337,7 +337,7 @@ public class AuxStateHandler {
 				}
 			}
 		}
-		if(!found) {//Reaches the end of stateChange no matching states
+		if(!found && !tc.getErrorEmitter().foundError()) {//Reaches the end of stateChange no matching states
 			String states = los.stream().filter(p->p.hasFrom())
 					.map(p->p.getFrom().toString())
 					.collect(Collectors.joining(","));
