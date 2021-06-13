@@ -1,16 +1,9 @@
 package repair.regen.classes.arraylist_correct;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.spi.FileSystemProvider;
 import java.util.ArrayList;
 
-import bufferedreader.Order;
 import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.RefinementPredicate;
-import repair.regen.specification.StateSet;
 
 public class SimpleTest {
 	

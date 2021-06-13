@@ -2,6 +2,7 @@ package repair.regen.processor.refinement_checker.general_checkers;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
@@ -10,6 +11,8 @@ import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.processor.context.Variable;
+import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.rj_language.ParsingException;
 import spoon.reflect.code.BinaryOperatorKind;
@@ -31,6 +34,7 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.declaration.ParentNotInitializedException;
+import spoon.reflect.reference.CtVariableReference;
 import spoon.support.reflect.code.CtIfImpl;
 /**
  * Auxiliar class for handling the type checking of Unary and Binary
@@ -163,7 +167,7 @@ public class OperationsChecker {
 	 * @param operator Binary Operator that started the operation
 	 * @param parentVar Parent of Binary Operator, usually a CtAssignment or CtLocalVariable
 	 * @param element CtExpression that represent an Binary Operation or one of the operands
-	 * @return String with the operation refinements
+	 * @return Predicate with the operation refinements
 	 * @throws ParsingException 
 	 */
 	private Constraint getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWrite<?> parentVar, 
@@ -227,6 +231,10 @@ public class OperationsChecker {
 		}else if(element instanceof CtInvocation<?>) {
 			CtInvocation<?> inv = (CtInvocation<?>) element;
 			CtExecutable<?> method = inv.getExecutable().getDeclaration();
+			
+			if(method == null)
+				return getOperationRefinementFromExternalLib(inv, operator);
+			
 			//Get function refinements with non_used variables
 			String met = ((CtClass)method.getParent()).getQualifiedName();//TODO check
 			RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(), met);
@@ -242,6 +250,42 @@ public class OperationsChecker {
 		//TODO Maybe add cases
 	}
 	
+	private Constraint getOperationRefinementFromExternalLib(CtInvocation<?> inv,
+			CtBinaryOperator<?> operator) throws ParsingException {
+		
+		CtExpression<?> t = inv.getTarget();
+		if(t instanceof CtVariableRead) {
+			CtVariableReference v = ((CtVariableRead) t).getVariable();
+			String c = v.getType().toString();
+			String simpleName = inv.getExecutable().getSimpleName();
+		
+			//Find Function in Context
+			int i = c.indexOf("<");
+			String typeNotParametrized = (i > 0)? c.substring(0, i) : c;
+			String methodInClassName = typeNotParametrized+"."+simpleName; 
+			RefinedFunction fi = rtc.getContext().getFunction(methodInClassName, typeNotParametrized);
+			Constraint innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv);//TODO REVER!!
+			
+			//Substitute _ by the variable that we send
+			String newName = String.format(rtc.freshFormat, rtc.getContext().getCounter());	
+			innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
+			//change this for the current instance
+			RefinedVariable r = rtc.getContext().getVariableByName(v.getSimpleName());
+			if(r instanceof Variable) {
+				Optional<VariableInstance> ovi = ((Variable)r).getLastInstance();
+				if(ovi.isPresent())
+					innerRefs = innerRefs.substituteVariable(rtc.THIS, ovi.get().getName());
+			}
+			
+			
+			RefinedVariable rv = rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
+			return new Predicate(newName, inv, rtc.getErrorEmitter());//Return variable that represents the invocation
+			
+		}
+		return new Predicate();
+		
+	}
+
 	/**
 	 * Retrieves the refinements for the a variable write inside
 	 * unary operation

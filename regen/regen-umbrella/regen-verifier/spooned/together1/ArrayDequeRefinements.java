@@ -23,5 +23,11 @@ public interface ArrayDequeRefinements<E> {
 
     @repair.regen.specification.StateRefinement(from = "size(this)> 0", to = "size(this) == (size(old(this)) - 1)")
     public E pop();
+
+    @repair.regen.specification.Refinement("_ == size(this)")
+    public int size();
+
+    @repair.regen.specification.Refinement("_ == (size(this) <= 0)")
+    public boolean isEmpty();
 }
 

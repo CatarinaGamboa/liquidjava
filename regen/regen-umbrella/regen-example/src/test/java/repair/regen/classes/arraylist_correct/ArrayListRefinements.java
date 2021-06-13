@@ -1,6 +1,5 @@
 package repair.regen.classes.arraylist_correct;
 import repair.regen.specification.ExternalRefinementsFor;
-import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 
