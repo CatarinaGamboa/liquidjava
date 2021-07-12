@@ -213,9 +213,9 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
         @Refinement( "_ >= 1 && GreaterEqualThan(_, n)")
         public static int fibonacci(@Refinement("Nat(n)") int n){
             if(n <= 1)
-                return n;//correct: change to 1
+                return 0;//correct: change to 1
             else
-                return n *  fibonacci(n-1);
+                return fibonacci(n-1) + fibonacci(n-2);
         }
     }
     ```
@@ -229,7 +229,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     ```java
     class Test3 {
     
-    	public void createSocket(InetSocketAddress addr) throws IOException{
+      public void createSocket(InetSocketAddress addr) throws IOException{
             int port = 5000;
             InetAddress inetAddress = InetAddress.getByName("localhost");    
     		
@@ -238,7 +238,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
             //missing socket.connect(addr);
             socket.sendUrgentData(90);
             socket.close();
-        }
+      }
     }
     ```
 
@@ -270,7 +270,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     ```java
     class Test3 {
     
-    	public static void main(String[] args) throws IOException{
+      public static void main(String[] args) throws IOException{
           ArrayDeque<Integer> p = new ArrayDeque<>();
           p.add(2);
           p.remove();
@@ -281,7 +281,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
           p.add(78);
           p.add(8);
           p.getFirst();
-    	}
+      }
     }
     ```
 
@@ -400,8 +400,8 @@ Each package contains a program to annotate and 2 files with tests (one that sho
   - Would you use LiquidJava in your projects?
 
     
-    ​    
-    ​    
+        
+        
 ## EXTRA METHODS - NOT USED
 
 * **1** - Incorrect Invocation Simple Arithmetics
