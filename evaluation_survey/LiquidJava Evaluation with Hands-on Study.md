@@ -16,23 +16,28 @@
 
 <Synchronous>
 
-### Part 1 - Understand the refinements without prior explanation
+### Part 1 - Find the Error in Plain Java
 
-3 exercises to explain what the code "means" *(maybe it is hard to evaluate that part)* and select the correct and incorrect uses of the code.
+2 programs in Plain Java with an error. (Use as baseline for LiquidJava results)
+
+For each write the line with the error and how to fix it
+
+- Incorrect method return
+- Incorrect class order invocation (with external libs)
+
+### Part 2 - Understand the refinements without prior explanation
+
+3 exercises to implement code that use the refinements correctly and incorrectly
 
 - Simple variable refinement
 - Method refinement
-- Class: Parameters and State Refinement
+- Class: State Refinement
 
-### Part 2 - Overview
+### Part 3 - Overview
 
-Small explanation of the refinements using the examples of the first part. Inquiring doubts
+Video and website - Small explanation of the refinements using the examples of the first part. Inquiring doubts.
 
-### Part 3 - Find the Bug
-
-*Add time limit? Maybe only 2 - and merge both returns...?*
-
-2 exercises in Plain Java to find the bug.
+### Part 4 - Find the Error in LiquidJava
 
 2 exercises in LiquidJava to find the bug.
 
@@ -41,7 +46,7 @@ For each write the line with the error, the error and how to fix it
 - Incorrect method return
 - Incorrect class order invocation (with external libs)
 
-### Part 4 - Write the Refinements
+### Part 5 - Write the Refinements
 
 3 exercises
 
@@ -49,7 +54,7 @@ For each write the line with the error, the error and how to fix it
 - Method refinement - ?
 - Class: Parameters and State Refinement - trafficlight
 
-### Part 5 - Final overview
+### Part 6 - Final overview
 - Final questions
 
 
@@ -62,9 +67,7 @@ Share registration survey
 
 - Background data ~~ to 1st survey 
   - only accept people familiar/very familiar with Java
-  - How long have you been programming in Java???
   - Did you contact with LiquidJava before?
-  - Did you participate in the "Refinements in Java - Syntax Survey"?
 - Send available date and time for 1h of synchronized study-session, via zoom
 - For the zoom session: vscode installed
 
@@ -104,20 +107,20 @@ Make a correct and an incorrect use of the annotated code.
 Write a correct and incorrect sequence of invocations on the object MyObj
   
   ```java
-  @StateSet({"stateX", "stateY", "stateZ"})
+  @StateSet({"sX", "sY", "sZ"})
   public class MyObj {
   
-   	@StateRefinement(to="stateY(this)")
+   	@StateRefinement(to="sY(this)")
 		public MyObj() {}
 		
-		@StateRefinement(from="stateY(this)", to="stateX(this)")
+		@StateRefinement(from="sY(this)", to="sX(this)")
 		public void select(int number) {}
 		
-		@StateRefinement(from="stateX(this)", to="stateZ(this)")
+		@StateRefinement(from="sX(this)", to="sZ(this)")
 		public void pay(int account) {	}
 		
-		@StateRefinement(from="stateY(this)", to="stateX(this)")
-		@StateRefinement(from="stateZ(this)", to="stateX(this)")
+		@StateRefinement(from="sY(this)", to="sX(this)")
+		@StateRefinement(from="sZ(this)", to="sX(this)")
 		public void show() { }
   }
   
@@ -127,13 +130,13 @@ Write a correct and incorrect sequence of invocations on the object MyObj
 ## PART 2 : Overview
 
 Brief introduction to LiquidJava and how to use Refinements in Java.
-Video of 3-5 minutes:
+Video of 4 minutes:
 - Motivation
 - Explaining the examples above
 
 Off-video:
 - Doubts
-- Give Cheat Sheet 
+- Website
 
 
 ## PART 3 : Find the Bug
@@ -221,58 +224,24 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
 
 * **3** - State error (using external libs annotated)
 
-  * Pair 1/2 - InputStreamReader, closing and trying to read again  https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
+  * Pair 1/2 - Socket, creating object but not connecting/bind https://docs.oracle.com/javase/7/docs/api/java/net/Socket.html
 
     ```java
     class Test3 {
     
-  	public static void main(String[] args) throws IOException{
-        InputStreamReader is = new InputStreamReader(System.in);
-        is.read();
-        is.read();        
-        is.close();
-        is.read();//error here
-      }
-    }
-    ```
-  
-    ```java
-    @ExternalRefinementsFor("java.io.InputStreamReader")
-    public interface InputStreamReaderRefs {
-    	
-    	@RefinementPredicate("boolean open(InputStreamReader i)")
-    	@StateRefinement(to="open(this)")
-    	public void InputStreamReader(InputStream in);
-    
-    	@StateRefinement(from="open(this)", to="open(this)")
-    	@Refinement("(_ >= -1) && (_ <= 127)")
-    	public int read();
-    	
-    	@StateRefinement(from="open(this)", to="!open(this)")
-    	public void close();
-    }
-    ```
-  
-    
-  
-  * Pair 2/2 - Socket, creating object but not connecting/bind https://docs.oracle.com/javase/7/docs/api/java/net/Socket.html
-  
-    ```java
-    class Test3 {
-    
-    	public static void main(String[] args) throws IOException{
-    		int port = 5000;
-    		InetAddress inetAddress = InetAddress.getByName("localhost");    
+    	public void createSocket(InetSocketAddress addr) throws IOException{
+            int port = 5000;
+            InetAddress inetAddress = InetAddress.getByName("localhost");    
     		
-    		Socket socket = new Socket();
-    		socket.bind(new InetSocketAddress(inetAddress, port));
-                //socket.connect(new InetSocketAddress(inetAddress, port)); //error missing this line
-    		socket.sendUrgentData(90);
-    		socket.close();
-    	}
+            Socket socket = new Socket();
+            socket.bind(new InetSocketAddress(inetAddress, port));
+            //missing socket.connect(addr);
+            socket.sendUrgentData(90);
+            socket.close();
+        }
     }
     ```
-  
+
     ```java
     @ExternalRefinementsFor("java.net.Socket")
     @StateSet({"unconnected", "binded", "connected", "closed"})
@@ -295,55 +264,65 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     
     }
     ```
-		
-   * Pair 3/2 - ArrayDeque - To use ghost field size to model the object state (https://docs.oracle.com/javase/7/docs/api/java/util/ArrayDeque.html)
-  
+  	
+   * Pair 2/2 - ArrayDeque - To use ghost field size to model the object state (https://docs.oracle.com/javase/7/docs/api/java/util/ArrayDeque.html)
+
     ```java
     class Test3 {
     
     	public static void main(String[] args) throws IOException{
-                ArrayDeque<Integer> p = new ArrayDeque<>();
-                p.add(2);
-                p.remove();
-                p.offerFirst(6);
-                p.getLast();
-                p.remove();
-                p.getLast();
+          ArrayDeque<Integer> p = new ArrayDeque<>();
+          p.add(2);
+          p.remove();
+          p.offerFirst(6);
+          p.getLast();
+          p.remove();
+          p.getLast();
+          p.add(78);
+          p.add(8);
+          p.getFirst();
     	}
     }
     ```
-  
+
     ```java
-    @ExternalRefinementsFor("java.util.ArrayDeque")
-    @Ghost("int size")
-    public interface ArrayDequeRefinements<E> {
-
-	public void ArrayDeque();
-	
-	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
-	public boolean add(E elem);
-	
-	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
-	public boolean offerFirst(E elem);
-	
-	@StateRefinement(from="size(this) > 0", to = "size(this) == (size(old(this)))")
-	public E getFirst();
-	
-	@StateRefinement(from="size(this) > 0", to = "size(this) == (size(old(this)))")
-	public E getLast();
-	
-	@StateRefinement(from="size(this)> 0", to="size(this) == (size(old(this)) - 1)")
-	public void remove();
-	
-	@StateRefinement(from="size(this)> 0", to="size(this) == (size(old(this)) - 1)")
-	public E pop();
-
-    }
-
+  
+  @ExternalRefinementsFor("java.util.ArrayDeque")
+  @Ghost("int size")
+  public interface ArrayDequeRefinements<E> {
+  
+  	public void ArrayDeque();
+  
+  	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
+  	public boolean add(E elem);
+  
+  	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
+  	public boolean offerFirst(E elem);
+  
+  	@StateRefinement(from="size(this) > 0", to = "size(this) == (size(old(this)))")
+  	public E getFirst();
+  
+  	@StateRefinement(from="size(this) > 0", to = "size(this) == (size(old(this)))")
+  	public E getLast();
+  
+  	@StateRefinement(from="size(this)> 0", to="size(this) == (size(old(this)) - 1)")
+  	public void remove();
+  
+  	@StateRefinement(from="size(this)> 0", to="size(this) == (size(old(this)) - 1)")
+  	public E pop();
+  
+  	@Refinement("_ == size(this)")
+  	public int size();
+  
+  	@Refinement("_ == (size(this) <= 0)")
+  	public boolean isEmpty();
+  
+  }
+  
     ```
-  
+
     
-  
+
 
 
 
@@ -366,9 +345,23 @@ Each package contains a program to annotate and 2 files with tests (one that sho
 - Method annotation
 
   ```java
+  public class Method {
+      /**
+       * Returns a value within the range
+       * @param a The minimum border
+       * @param b The maximum border, greater than a
+       * @return A value in the interval [a, b] (including the border values)
+       */
+      public static int inRange(int a, int b){
+          return a + 1;
+      }
   
+      public static void main(String[] args) {
+          inRange(10, 11); //Correct
+          inRange(10, 9); //Error
+      }
+  }
   ```
-    
 
 - Annotate the class TrafficLight that uses rgb values (between 0 and 255) to define the color of the light and follows the protocol defined by the following image
 
@@ -401,14 +394,14 @@ Each package contains a program to annotate and 2 files with tests (one that sho
   ```
 
 ## Part 5 - Final Overview
-        
+
   - [Optional] What did you enjoy the most while using LiquidJava?
   - [Optional] What did you dislike the most while using LiquidJava?
   - Would you use LiquidJava in your projects?
 
-        
-        
-        
+    
+    ​    
+    ​    
 ## EXTRA METHODS - NOT USED
 
 * **1** - Incorrect Invocation Simple Arithmetics
