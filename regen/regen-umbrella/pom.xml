@@ -12,7 +12,6 @@
 	 	<module>regen-api</module>
 	 	<module>regen-verifier</module>
 	 	<module>regen-example</module>
-	 	<module>regen-verifier</module>
 	 </modules>
 	 
 	<properties>
