@@ -1,28 +1,16 @@
 package regen.test.project;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
-import java.net.Socket;
-import java.util.ArrayDeque;
-import java.util.PriorityQueue;
-
-import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.StateRefinement;
-import repair.regen.specification.StateSet;
-
 class SimpleTest {
 	public static void main(String[] args) {
 
-		ArrayDeque<Integer> p = new ArrayDeque<>();
-		p.add(2);
-		p.remove();
-		p.offerFirst(6);
-		p.getLast();
-		p.remove();
-		p.getLast();
+		AccountClient ac = new AccountClient();
+		Account a = new Account();
+		Account b = new Account();
+		a.add(10);
+		ac.transfer(a, b, 50);
 	}
+	
+	
 
 
 }

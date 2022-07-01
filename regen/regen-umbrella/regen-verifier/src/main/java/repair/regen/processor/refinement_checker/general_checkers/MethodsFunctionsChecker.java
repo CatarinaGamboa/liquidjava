@@ -385,7 +385,7 @@ public class MethodsFunctionsChecker {
 		List<Variable> functionParams = f.getArguments();
 		for (int i = 0; i < invocationParams.size(); i++) {
 			Variable fArg = functionParams.get(i);
-			Constraint c = fArg.getRefinement();
+			Constraint c = fArg.getMainRefinement();
 			c = c.substituteVariable(fArg.getName(), map.get(fArg.getName()));
 			List<String> vars = c.getVariableNames();
 			for(String s: vars)

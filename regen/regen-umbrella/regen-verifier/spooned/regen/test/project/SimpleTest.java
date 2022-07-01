@@ -3,13 +3,11 @@ package regen.test.project;
 
 class SimpleTest {
     public static void main(java.lang.String[] args) {
-        java.util.ArrayDeque<java.lang.Integer> p = new java.util.ArrayDeque<>();
-        p.add(2);
-        p.remove();
-        p.offerFirst(6);
-        p.getLast();
-        p.remove();
-        p.getLast();
+        regen.test.project.AccountClient ac = new regen.test.project.AccountClient();
+        regen.test.project.Account a = new regen.test.project.Account();
+        regen.test.project.Account b = new regen.test.project.Account();
+        a.add(10);
+        ac.transfer(a, b, 50);
     }
 }
 
