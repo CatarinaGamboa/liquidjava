@@ -7,7 +7,8 @@ class SimpleTest {
         regen.test.project.Account a = new regen.test.project.Account();
         regen.test.project.Account b = new regen.test.project.Account();
         a.add(10);
-        ac.transfer(a, b, 50);
+        ac.transfer(a, b, 5);
+        ac.transfer(a, b, 9);
     }
 }
 

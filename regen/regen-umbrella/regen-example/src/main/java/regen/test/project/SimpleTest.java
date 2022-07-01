@@ -7,7 +7,8 @@ class SimpleTest {
 		Account a = new Account();
 		Account b = new Account();
 		a.add(10);
-		ac.transfer(a, b, 50);
+		ac.transfer(a, b, 5);
+		ac.transfer(a, b, 9);
 	}
 	
 	

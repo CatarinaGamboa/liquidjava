@@ -15,6 +15,7 @@ import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
+import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
@@ -37,9 +38,7 @@ import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
-import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtExecutableReference;
-import spoon.reflect.reference.CtVariableReference;
 
 public class MethodsFunctionsChecker {
 
@@ -292,6 +291,7 @@ public class MethodsFunctionsChecker {
 
 	private Map<String,String>  checkInvocationRefinements(CtElement element, List<CtExpression<?>> arguments, CtExpression<?> target,
 			String methodName, String className) {
+		//-- Part 1: Check if the invocation is possible
 		int si = arguments.size();
 		RefinedFunction f = rtc.getContext().getFunction(methodName, className, si);
 		Map<String,String> map = mapInvocation(arguments, f);
@@ -306,6 +306,8 @@ public class MethodsFunctionsChecker {
 		
 		checkParameters(element, arguments, f, map);
 
+		//-- Part 2: Apply changes
+//		applyRefinementsToArguments(element, arguments, f, map);
 		Constraint methodRef = f.getRefReturn(); 
 		
 		if(methodRef != null) {
@@ -395,6 +397,44 @@ public class MethodsFunctionsChecker {
 		}
 
 	}
+	
+	//IN CONSTRUCTION _ NOT USED
+	private void applyRefinementsToArguments(CtElement element, List<CtExpression<?>> arguments, RefinedFunction f,
+			Map<String, String> map) {
+		Context context = rtc.getContext();
+		List<CtExpression<?>> invocationParams = arguments;
+		List<Variable> functionParams = f.getArguments();
+		
+		for (int i = 0; i < invocationParams.size(); i++) {
+			Variable fArg = functionParams.get(i);
+			Constraint inferredRefinement = fArg.getRefinement();
+			
+			CtExpression<?> e = invocationParams.get(i);
+			if(e instanceof CtVariableRead<?>) {
+				CtVariableRead<?> v = (CtVariableRead<?>) e;
+				String varName = v.getVariable().getSimpleName(); //TODO CHANGE
+				RefinedVariable rv = context.getVariableByName(varName);
+				String instanceName = String.format(rtc.instanceFormat, varName, context.getCounter());
+				
+				inferredRefinement = inferredRefinement.substituteVariable(fArg.getName(), instanceName);
+				context.addInstanceToContext(instanceName, rv.getType(), inferredRefinement, element);
+				context.addRefinementInstanceToVariable(varName, instanceName);
+				
+			}//TODO else's?
+				
+			
+
+//			c = c.substituteVariable(fArg.getName(), map.get(fArg.getName()));
+//			List<String> vars = c.getVariableNames();
+//			for(String s: vars)
+//				if(map.containsKey(s))
+//					c = c.substituteVariable(s, map.get(s));
+//			rtc.checkSMT(c, invocation);
+		}
+		
+		
+	}
+
 
 	public void loadFunctionInfo(CtExecutable<?> method) {
 		String className = null;
