@@ -67,7 +67,8 @@ public abstract class TypeChecker extends CtScanner{
 	}
 
 	public Constraint getRefinement(CtElement elem) {
-		return (Constraint)elem.getMetadata(REFINE_KEY);
+		Constraint c = (Constraint)elem.getMetadata(REFINE_KEY);
+		return c == null? new Predicate() : c;
 	}
 
 
