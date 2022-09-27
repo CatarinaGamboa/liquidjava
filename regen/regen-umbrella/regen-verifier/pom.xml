@@ -104,9 +104,9 @@
 			<version>${version.spoon}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.github.tudo-aqua</groupId>
+			<groupId>tools.aqua</groupId>
 			<artifactId>z3-turnkey</artifactId>
-			<version>4.8.7.1</version>
+			<version>4.8.17</version>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

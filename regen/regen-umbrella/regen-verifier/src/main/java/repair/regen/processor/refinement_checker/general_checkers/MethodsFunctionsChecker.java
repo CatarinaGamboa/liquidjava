@@ -58,7 +58,7 @@ public class MethodsFunctionsChecker {
 		handleFunctionRefinements(f, c, c.getParameters());
 		f.setRefReturn(new Predicate());
 		if(c.getParent() instanceof CtClass) {
-			CtClass klass = (CtClass)c.getParent();
+			CtClass<?> klass = (CtClass<?>) c.getParent();
 			f.setClass(klass.getQualifiedName());
 		}
 		rtc.getContext().addFunctionToContext(f);

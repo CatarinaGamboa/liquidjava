@@ -1,6 +1,5 @@
 package bufferedreader;
 
-import repair.regen.specification.ExternalRefinementsFor;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;

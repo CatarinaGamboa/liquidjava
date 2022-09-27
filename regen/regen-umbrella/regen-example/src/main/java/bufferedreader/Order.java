@@ -2,7 +2,6 @@ package bufferedreader;
 
 import repair.regen.specification.Ghost;
 import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 

@@ -1,10 +1,5 @@
-
-
-
-import repair.regen.specification.StateRefinement;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.RefinementPredicate;
 
 @RefinementAlias("IntBetween(int val, int lo, int hi) { lo <= val && val <= hi}")
 public class Car{
