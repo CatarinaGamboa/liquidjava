@@ -169,7 +169,7 @@ public class MethodsFunctionsChecker {
         }
 
         Optional<Constraint> oret = rtc.getRefinementFromAnnotation(method);
-        Constraint ret = oret.isPresent() ? oret.get() : new Predicate();
+        Constraint ret = oret.orElse(new Predicate());
         f.setRefReturn(ret);
         // rtc.context.addFunctionToContext(f);
         return Conjunction.createConjunction(joint, ret);
@@ -345,7 +345,7 @@ public class MethodsFunctionsChecker {
                 CtVariableRead<?> vr = (CtVariableRead<?>) iArg;
                 Optional<VariableInstance> ovi = rtc.getContext()
                         .getLastVariableInstance(vr.getVariable().getSimpleName());
-                invStr = (ovi.isPresent()) ? ovi.get().getName() : vr.toString();
+				invStr = ovi.map(o -> o.getName()).orElse(vr.toString());
             } else // create new variable with the argument refinement
                 invStr = createVariableRepresentingArgument(iArg, fArg);
 

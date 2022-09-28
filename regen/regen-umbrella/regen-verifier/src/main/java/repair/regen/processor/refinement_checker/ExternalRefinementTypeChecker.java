@@ -66,7 +66,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         } catch (ParsingException e) {
             return;// error already in ErrorEmitter
         }
-        Constraint c = oc.isPresent() ? oc.get() : new Predicate();
+        Constraint c = oc.orElse(new Predicate());
         context.addGlobalVariableToContext(f.getSimpleName(), prefix, f.getType(), c);
         super.visitCtField(f);
     }

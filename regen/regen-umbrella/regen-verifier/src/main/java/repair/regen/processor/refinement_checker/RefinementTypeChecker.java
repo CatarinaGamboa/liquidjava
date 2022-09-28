@@ -140,8 +140,7 @@ public class RefinementTypeChecker extends TypeChecker {
             } catch (ParsingException e) {
                 return;// error already in ErrorEmitter
             }
-            context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(),
-                    a.isPresent() ? a.get() : new Predicate(), localVariable);
+            context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), a.orElse(new Predicate()), localVariable);
         } else {
             String varName = localVariable.getSimpleName();
             CtExpression<?> e = localVariable.getAssignment();
@@ -279,8 +278,7 @@ public class RefinementTypeChecker extends TypeChecker {
             return;// error already in ErrorEmitter
         }
         // context.addVarToContext(f.getSimpleName(), f.getType(),
-        // c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName())
-        // : new Predicate());
+        // c.map( i -> i.substituteVariable(WILD_VAR, f.getSimpleName()).orElse(new Predicate()) );
         String nname = String.format(thisFormat, f.getSimpleName());
         Constraint ret = new Predicate();
         if (c.isPresent())

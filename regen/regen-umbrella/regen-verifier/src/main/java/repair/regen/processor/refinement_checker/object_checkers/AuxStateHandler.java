@@ -449,8 +449,7 @@ public class AuxStateHandler {
             VariableInstance vi = (VariableInstance) elem.getMetadata(tc.TARGET_KEY);
             Optional<Variable> v = vi.getParent();
             invocation.putMetadata(tc.TARGET_KEY, vi);
-            return v.isPresent() ? v.get().getName() : vi.getName();
-
+            return v.map( i -> i.getName()).orElse(vi.getName());
         }
         return null;
     }
@@ -462,7 +461,7 @@ public class AuxStateHandler {
     }
 
     private static List<CtAnnotation<? extends Annotation>> getStateAnnotation(CtElement element) {
-        List<CtAnnotation<? extends Annotation>> l = new ArrayList();
+        List<CtAnnotation<? extends Annotation>> l = new ArrayList<CtAnnotation<? extends Annotation>>();
         for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
             String an = ann.getActualAnnotation().annotationType().getCanonicalName();
             if (an.contentEquals("repair.regen.specification.StateRefinement")) {

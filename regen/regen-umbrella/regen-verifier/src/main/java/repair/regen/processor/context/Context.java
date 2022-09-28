@@ -419,9 +419,7 @@ public class Context {
     }
 
     public Variable getVariableFromInstance(VariableInstance vi) {
-        if (vi.getParent().isPresent())
-            return vi.getParent().get();
-        return null;
+        return vi.getParent().orElse(null);
         // for(List<RefinedVariable> lv: ctxVars)
         // for(RefinedVariable v: lv)
         // if(v instanceof Variable && ((Variable)v).hasInstance(vi))
