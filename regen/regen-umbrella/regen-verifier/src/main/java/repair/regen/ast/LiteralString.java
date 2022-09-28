@@ -14,7 +14,7 @@ public class LiteralString extends Expression {
     }
 
     @Override
-    public Expr eval(TranslatorToZ3 ctx) {
+    public Expr<?> eval(TranslatorToZ3 ctx) {
         return ctx.makeString(value);
     }
 

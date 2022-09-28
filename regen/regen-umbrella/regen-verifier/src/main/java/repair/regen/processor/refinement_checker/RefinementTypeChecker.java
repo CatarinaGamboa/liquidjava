@@ -125,7 +125,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
         if (errorEmitter.foundError())
@@ -199,7 +198,7 @@ public class RefinementTypeChecker extends TypeChecker {
             return;
 
         super.visitCtThisAccess(thisAccess);
-        CtClass c = thisAccess.getParent(CtClass.class);
+        CtClass<?> c = thisAccess.getParent(CtClass.class);
         String s = c.getSimpleName();
         if (thisAccess.getParent() instanceof CtReturn) {
             String thisName = String.format(thisFormat, s);
@@ -209,6 +208,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignement) {
         if (errorEmitter.foundError())
@@ -514,9 +514,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
     }
 
-    private Constraint getExpressionRefinements(CtExpression element) throws ParsingException {
+    private Constraint getExpressionRefinements(CtExpression<?> element) throws ParsingException {
         if (element instanceof CtVariableRead<?>) {
-            CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
+            // CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
             return getRefinement(element);
         } else if (element instanceof CtBinaryOperator<?>) {
             CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;

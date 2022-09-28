@@ -87,9 +87,9 @@ public class MethodsFunctionsChecker {
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
 
-        CtClass klass = null;
+        CtClass<?> klass = null;
         if (method.getParent() instanceof CtClass) {
-            klass = (CtClass) method.getParent();
+            klass = (CtClass<?>) method.getParent();
             f.setClass(klass.getQualifiedName());
         }
         if (method.getParent() instanceof CtInterface<?>) {
@@ -176,7 +176,7 @@ public class MethodsFunctionsChecker {
     }
 
     public List<CtAnnotation<? extends Annotation>> getStateAnnotation(CtElement element) {
-        List<CtAnnotation<? extends Annotation>> l = new ArrayList();
+        List<CtAnnotation<? extends Annotation>> l = new ArrayList<>();
         for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
             String an = ann.getActualAnnotation().annotationType().getCanonicalName();
             if (an.contentEquals("repair.regen.specification.StateRefinement")) {
@@ -187,19 +187,19 @@ public class MethodsFunctionsChecker {
     }
 
     public <R> void getReturnRefinements(CtReturn<R> ret) {
-        CtClass c = ret.getParent(CtClass.class);
+        CtClass<?> c = ret.getParent(CtClass.class);
         String className = c.getSimpleName();
         if (ret.getReturnedExpression() != null) {
             // check if there are refinements
             if (rtc.getRefinement(ret.getReturnedExpression()) == null)
                 ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, new Predicate());
-            CtMethod method = ret.getParent(CtMethod.class);
+            CtMethod<?> method = ret.getParent(CtMethod.class);
             // check if method has refinements
             if (rtc.getRefinement(method) == null)
                 return;
             if (method.getParent() instanceof CtClass) {
                 RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(),
-                        ((CtClass) method.getParent()).getQualifiedName());
+                        ((CtClass<?>) method.getParent()).getQualifiedName());
 
                 List<Variable> lv = fi.getArguments();
                 for (Variable v : lv) {
@@ -216,7 +216,7 @@ public class MethodsFunctionsChecker {
                 Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName)
                         .substituteVariable(rtc.THIS, returnVarName);
 
-                RefinedVariable rv = rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
+                rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
                 rtc.checkSMT(cexpectedType, ret);
                 rtc.getContext().newRefinementToVariableInContext(returnVarName, cexpectedType);
             }
@@ -233,14 +233,14 @@ public class MethodsFunctionsChecker {
                 searchMethodInLibrary(m, invocation);
 
         } else if (method.getParent() instanceof CtClass) {
-            String ctype = ((CtClass) method.getParent()).getQualifiedName();
+            String ctype = ((CtClass<?>) method.getParent()).getQualifiedName();
             RefinedFunction f = rtc.getContext().getFunction(method.getSimpleName(), ctype);
             if (f != null) {// inside rtc.context
                 checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(),
                         method.getSimpleName(), ctype);
 
             } else {
-                CtExecutable cet = invocation.getExecutable().getDeclaration();
+                CtExecutable<?> cet = invocation.getExecutable().getDeclaration();
                 if (cet instanceof CtMethod) {
                     // CtMethod met = (CtMethod) cet;
                     // rtc.visitCtMethod(met);
@@ -383,6 +383,7 @@ public class MethodsFunctionsChecker {
     }
 
     // IN CONSTRUCTION _ NOT USED
+    @SuppressWarnings("unused")
     private void applyRefinementsToArguments(CtElement element, List<CtExpression<?>> arguments, RefinedFunction f,
             Map<String, String> map) {
         Context context = rtc.getContext();
@@ -419,7 +420,7 @@ public class MethodsFunctionsChecker {
     public void loadFunctionInfo(CtExecutable<?> method) {
         String className = null;
         if (method.getParent() instanceof CtClass) {
-            className = ((CtClass) method.getParent()).getQualifiedName();
+            className = ((CtClass<?>) method.getParent()).getQualifiedName();
         } else if (method.getParent() instanceof CtInterface<?>) {
             className = ((CtInterface<?>) method.getParent()).getQualifiedName();
         }

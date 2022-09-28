@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorSpecificValuesIf {
 	
 	public static void addZ(@Refinement("a > 0")int a) {

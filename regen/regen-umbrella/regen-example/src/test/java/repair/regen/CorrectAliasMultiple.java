@@ -3,6 +3,7 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 
+@SuppressWarnings("unused")
 @RefinementAlias("type Positive(double x) { x > 0}")
 @RefinementAlias("type PtGrade(double x) { x >= 0 && x <= 20}")
 public class CorrectAliasMultiple {

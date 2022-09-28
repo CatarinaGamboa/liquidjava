@@ -5,12 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.Stack;
 
 import repair.regen.processor.constraints.Constraint;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.reference.CtTypeReference;
 
 public class Context {
@@ -374,7 +372,7 @@ public class Context {
     }
 
     public List<GhostState> getGhostState() {
-        List<GhostState> lgs = new ArrayList();
+        List<GhostState> lgs = new ArrayList<>();
         for (List<GhostState> l : classStates.values())
             for (GhostState g : l)
                 lgs.add(g);

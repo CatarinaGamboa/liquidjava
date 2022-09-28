@@ -1,7 +1,5 @@
 package repair.regen.processor.refinement_checker;
 
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -265,6 +263,7 @@ public class VCChecker {
      *
      * @return
      */
+    @SuppressWarnings("unused")
     private Constraint substituteByMap(Constraint c, HashMap<String, String> map) {
         Constraint c1 = c;
         for (String s : map.keySet())
@@ -327,7 +326,7 @@ public class VCChecker {
             HashMap<String, PlacementInCode> map) {
         String s = null;
         if (element instanceof CtInvocation) {
-            CtInvocation ci = (CtInvocation) element;
+            CtInvocation<?> ci = (CtInvocation<?>) element;
             String totalS = ci.getExecutable().toString();
             if (ci.getTarget() != null) {
                 int targetL = ci.getTarget().toString().length();

@@ -17,7 +17,7 @@ public class GroupExpression extends Expression {
     }
 
     @Override
-    public Expr eval(TranslatorToZ3 ctx) throws Exception {
+    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
         return getExpression().eval(ctx);
     }
 

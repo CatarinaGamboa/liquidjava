@@ -19,7 +19,7 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class TranslatorContextToZ3 {
 
-    static void translateVariables(Context z3, Map<String, CtTypeReference<?>> ctx, Map<String, Expr> varTranslation) {
+    static void translateVariables(Context z3, Map<String, CtTypeReference<?>> ctx, Map<String, Expr<?>> varTranslation) {
 
         for (String name : ctx.keySet())
             varTranslation.put(name, getExpr(z3, name, ctx.get(name)));
@@ -30,10 +30,10 @@ public class TranslatorContextToZ3 {
     }
 
     public static void storeVariablesSubtypes(Context z3, List<RefinedVariable> variables,
-            Map<String, List<Expr>> varSuperTypes) {
+            Map<String, List<Expr<?>>> varSuperTypes) {
         for (RefinedVariable v : variables) {
             if (!v.getSuperTypes().isEmpty()) {
-                ArrayList<Expr> a = new ArrayList<>();
+                ArrayList<Expr<?>> a = new ArrayList<>();
                 for (CtTypeReference<?> ctr : v.getSuperTypes())
                     a.add(getExpr(z3, v.getName(), ctr));
                 varSuperTypes.put(v.getName(), a);
@@ -42,7 +42,7 @@ public class TranslatorContextToZ3 {
 
     }
 
-    private static Expr getExpr(Context z3, String name, CtTypeReference<?> type) {
+    private static Expr<?> getExpr(Context z3, String name, CtTypeReference<?> type) {
         String typeName = type.getQualifiedName();
         if (typeName.contentEquals("int"))
             return z3.mkIntConst(name);
@@ -73,7 +73,7 @@ public class TranslatorContextToZ3 {
     }
 
     public static void addGhostFunctions(Context z3, List<GhostFunction> ghosts,
-            Map<String, FuncDecl> funcTranslation) {
+            Map<String, FuncDecl<?>> funcTranslation) {
         addBuiltinFunctions(z3, funcTranslation);
         if (!ghosts.isEmpty()) {
             for (GhostFunction gh : ghosts) {
@@ -82,7 +82,7 @@ public class TranslatorContextToZ3 {
         }
     }
 
-    private static void addBuiltinFunctions(Context z3, Map<String, FuncDecl> funcTranslation) {
+    private static void addBuiltinFunctions(Context z3, Map<String, FuncDecl<?>> funcTranslation) {
         funcTranslation.put("length", z3.mkFuncDecl("length", getSort(z3, "int[]"), getSort(z3, "int")));// ERRRRRRRRRRRRO!!!!!!!!!!!!!
         System.out.println("Error only working for int[] now - Change");
         // TODO add built-in function
@@ -119,7 +119,7 @@ public class TranslatorContextToZ3 {
         }
     }
 
-    public static void addGhostStates(Context z3, List<GhostState> ghostState, Map<String, FuncDecl> funcTranslation) {
+    public static void addGhostStates(Context z3, List<GhostState> ghostState, Map<String, FuncDecl<?>> funcTranslation) {
         for (GhostState g : ghostState) {
             addGhostFunction(z3, g, funcTranslation);
             // if(g.getRefinement() != null)
@@ -128,7 +128,7 @@ public class TranslatorContextToZ3 {
 
     }
 
-    private static void addGhostFunction(Context z3, GhostFunction gh, Map<String, FuncDecl> funcTranslation) {
+    private static void addGhostFunction(Context z3, GhostFunction gh, Map<String, FuncDecl<?>> funcTranslation) {
         List<CtTypeReference<?>> paramTypes = gh.getParametersTypes();
         Sort ret = getSort(z3, gh.getReturnType().toString());
         Sort[] d = paramTypes.stream().map(t -> t.toString()).map(t -> getSort(z3, t)).toArray(Sort[]::new);

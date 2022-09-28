@@ -43,7 +43,7 @@ public class MethodsFirstChecker extends TypeChecker {
         if (!ctClass.getSuperInterfaces().isEmpty())
             for (CtTypeReference<?> t : ctClass.getSuperInterfaces()) {
                 if (t.isInterface()) {
-                    CtType ct = t.getDeclaration();
+                    CtType<?> ct = t.getDeclaration();
                     if (ct instanceof CtInterface)
                         visitCtInterface((CtInterface<?>) ct);
                 }
@@ -52,7 +52,7 @@ public class MethodsFirstChecker extends TypeChecker {
         // visitSubclasses
         CtTypeReference<?> sup = ctClass.getSuperclass();
         if (sup != null && sup.isClass()) {
-            CtType ct = sup.getDeclaration();
+            CtType<?> ct = sup.getDeclaration();
             if (ct instanceof CtClass)
                 visitCtClass((CtClass<?>) ct);
         }

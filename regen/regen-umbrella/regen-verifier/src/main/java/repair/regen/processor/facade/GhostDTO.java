@@ -2,8 +2,6 @@ package repair.regen.processor.facade;
 
 import java.util.List;
 
-import spoon.reflect.reference.CtTypeReference;
-
 public class GhostDTO {
 
     private String name;

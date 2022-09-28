@@ -11,6 +11,7 @@ import repair.regen.specification.StateRefinement;
 //https://blog.sigplan.org/2021/03/02/fluent-api-practice-and-theory/
 //Suppose there is only one acceptable order to construct the email
 //add sender -> add multiple receivers -> add subject <optional> -> add body -> build()
+@SuppressWarnings("unused")
 public class Email {
 	private String sender;
 	private List<String> receiver;

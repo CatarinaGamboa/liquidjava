@@ -14,7 +14,6 @@ import repair.regen.processor.facade.GhostDTO;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
-import repair.regen.utils.Pair;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
@@ -95,7 +94,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             if (f != null && element.getParent() instanceof CtInterface<?>) {
                 String[] a = prefix.split("\\.");
                 String d = a[a.length - 1];
-                GhostFunction gh = new GhostFunction(f, factory, prefix, a[a.length - 1]);
+                GhostFunction gh = new GhostFunction(f, factory, prefix, d);
                 context.addGhostFunction(gh);
                 System.out.println(gh.toString());
             }

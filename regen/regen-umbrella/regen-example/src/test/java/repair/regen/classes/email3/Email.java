@@ -3,13 +3,13 @@ package repair.regen.classes.email3;
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
 
 //https://blog.sigplan.org/2021/03/02/fluent-api-practice-and-theory/
 //Suppose there is only one acceptable order to construct the email
 //add sender -> add multiple receivers -> add subject <optional> -> add body -> build()
+@SuppressWarnings("unused")
 @StateSet({"emptyEmail", "senderSet", "receiverSet", "bodySet"})
 public class Email {
 	private String sender;

@@ -44,13 +44,13 @@ public class BinaryExpression extends Expression {
     }
 
     @Override
-    public Expr eval(TranslatorToZ3 ctx) throws Exception {
-        Expr ee1 = getFirstOperand().eval(ctx);
-        Expr ee2 = getSecondOperand().eval(ctx);
+    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
+        Expr<?> ee1 = getFirstOperand().eval(ctx);
+        Expr<?> ee2 = getSecondOperand().eval(ctx);
         return evalBinaryOp(ctx, ee1, ee2);
     }
 
-    private Expr evalBinaryOp(TranslatorToZ3 ctx, Expr e1, Expr e2) {
+    private Expr<?> evalBinaryOp(TranslatorToZ3 ctx, Expr<?> e1, Expr<?> e2) {
         switch (op) {
         case "&&":
             return ctx.makeAnd(e1, e2);

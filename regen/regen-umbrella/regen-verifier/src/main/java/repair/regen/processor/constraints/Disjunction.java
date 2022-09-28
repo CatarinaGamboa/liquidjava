@@ -3,7 +3,6 @@ package repair.regen.processor.constraints;
 import java.util.List;
 
 import repair.regen.ast.BinaryExpression;
-import repair.regen.ast.UnaryExpression;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.ast.Expression;
 import repair.regen.ast.GroupExpression;

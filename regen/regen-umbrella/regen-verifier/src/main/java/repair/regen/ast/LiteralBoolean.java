@@ -18,7 +18,7 @@ public class LiteralBoolean extends Expression {
         this.value = Boolean.parseBoolean(value);
     }
 
-    public Expr eval(TranslatorToZ3 ctx) {
+    public Expr<?> eval(TranslatorToZ3 ctx) {
         return ctx.makeBooleanLiteral(value);
     }
 

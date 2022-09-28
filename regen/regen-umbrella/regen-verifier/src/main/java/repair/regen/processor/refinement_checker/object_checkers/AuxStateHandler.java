@@ -3,11 +3,8 @@ package repair.regen.processor.refinement_checker.object_checkers;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
-import java.awt.Container;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -20,7 +17,6 @@ import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.LiteralPredicate;
 import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.ObjectState;
@@ -30,23 +26,16 @@ import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.rj_language.ParsingException;
-import repair.regen.utils.Utils;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtAnnotation;
-import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtExecutable;
-import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
-import spoon.reflect.reference.CtExecutableReference;
 import spoon.reflect.reference.CtTypeReference;
-import spoon.support.reflect.reference.CtExecutableReferenceImpl;
-import spoon.support.sniper.internal.ElementSourceFragment;
 
 public class AuxStateHandler {
 
@@ -61,6 +50,7 @@ public class AuxStateHandler {
      *
      * @throws ParsingException
      */
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, TypeChecker tc)
             throws ParsingException {
         List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
@@ -154,6 +144,7 @@ public class AuxStateHandler {
         f.setAllStates(l);
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, RefinedFunction f,
             TypeChecker tc, CtElement e) throws ParsingException {
         Map<String, CtExpression> m = ctAnnotation.getAllValues();
@@ -281,11 +272,10 @@ public class AuxStateHandler {
         String parentTargetName = searchFistVariableTarget(tc, target2, invocation);
         VariableInstance target = getTarget(tc, invocation);
         if (target != null) {
-            Constraint ref = new Predicate();
             if (f.hasStateChange() && f.getFromStates().size() > 0)
-                ref = changeState(tc, target, f, parentTargetName, map, invocation);
+                changeState(tc, target, f, parentTargetName, map, invocation);
             if (!f.hasStateChange())
-                ref = sameState(tc, target, parentTargetName, invocation);
+                sameState(tc, target, parentTargetName, invocation);
         }
 
     }
@@ -346,7 +336,7 @@ public class AuxStateHandler {
                     .collect(Collectors.joining(","));
             String simpleInvocation = f.getName();
             if (invocation instanceof CtInvocation) {
-                CtInvocation i = (CtInvocation) invocation;
+                CtInvocation<?> i = (CtInvocation<?>) invocation;
                 simpleInvocation = i.getExecutable().toString();
             }
 

@@ -27,7 +27,7 @@ public class Ite extends Expression {
     }
 
     @Override
-    public Expr eval(TranslatorToZ3 ctx) throws Exception {
+    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
         return ctx.makeIte(getCondition().eval(ctx), getThen().eval(ctx), getElse().eval(ctx));
     }
 

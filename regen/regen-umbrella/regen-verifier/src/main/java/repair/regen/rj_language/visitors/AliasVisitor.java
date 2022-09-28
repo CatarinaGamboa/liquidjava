@@ -46,8 +46,8 @@ public class AliasVisitor {
 
         } else if (rc.getChildCount() > 0) {
             int i = rc.getChildCount();
-            for (int j = 0; j < i; j++) {
-                return getAlias(rc.getChild(j));
+            if (i > 0) {
+                return getAlias(rc.getChild(0));
             }
         }
         return null;

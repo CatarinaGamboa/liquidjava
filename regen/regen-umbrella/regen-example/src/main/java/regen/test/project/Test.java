@@ -2,6 +2,7 @@ package regen.test.project;
 
 public class Test {
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		Iterator i = new Iterator();
 		boolean hn = true;

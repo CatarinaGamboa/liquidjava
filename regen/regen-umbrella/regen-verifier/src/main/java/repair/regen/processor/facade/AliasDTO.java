@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import repair.regen.ast.Expression;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import spoon.reflect.reference.CtTypeReference;

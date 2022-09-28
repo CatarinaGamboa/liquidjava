@@ -8,7 +8,7 @@ public class VCImplication {
     Constraint refinement;
     VCImplication next;
 
-    public VCImplication(String name, CtTypeReference type, Constraint ref) {
+    public VCImplication(String name, CtTypeReference<?> type, Constraint ref) {
         this.name = name;
         this.type = type;
         this.refinement = ref;

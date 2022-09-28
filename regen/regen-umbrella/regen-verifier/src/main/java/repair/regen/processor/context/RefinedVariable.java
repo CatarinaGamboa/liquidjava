@@ -2,12 +2,9 @@ package repair.regen.processor.context;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.Stack;
 
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public abstract class RefinedVariable extends Refined {

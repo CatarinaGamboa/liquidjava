@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorAssignementAfterDeclaration {
 	public static void main(String[] args) {
 		@Refinement("(z > 0) && (z < 50)")

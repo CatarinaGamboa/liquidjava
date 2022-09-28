@@ -24,7 +24,7 @@ public class UnaryExpression extends Expression {
     }
 
     @Override
-    public Expr eval(TranslatorToZ3 ctx) throws Exception {
+    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
         switch (op) {
         case "-":
             return ctx.makeMinus(getExpression().eval(ctx));

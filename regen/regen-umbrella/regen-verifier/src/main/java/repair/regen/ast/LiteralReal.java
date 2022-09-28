@@ -19,7 +19,7 @@ public class LiteralReal extends Expression {
     }
 
     @Override
-    public Expr eval(TranslatorToZ3 ctx) {
+    public Expr<?> eval(TranslatorToZ3 ctx) {
         return ctx.makeDoubleLiteral(value);
     }
 

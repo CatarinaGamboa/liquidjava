@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorBooleanFunInvocation {
 
 	@Refinement("_ == (n > 10)")

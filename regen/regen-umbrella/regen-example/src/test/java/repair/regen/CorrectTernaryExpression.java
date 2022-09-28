@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class CorrectTernaryExpression {
 	@Refinement("_ == 3")
 	public static int three() {

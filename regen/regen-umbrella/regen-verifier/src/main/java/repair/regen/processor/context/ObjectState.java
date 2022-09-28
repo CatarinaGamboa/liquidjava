@@ -1,7 +1,5 @@
 package repair.regen.processor.context;
 
-import java.util.Optional;
-
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 

@@ -1,19 +1,12 @@
 package repair.regen.processor.context;
 
-import java.lang.annotation.Annotation;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
-import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
-import spoon.reflect.code.CtExpression;
-import spoon.reflect.code.CtLiteral;
-import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 

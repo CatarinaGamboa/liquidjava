@@ -2,7 +2,6 @@ package repair.regen.processor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.Context;

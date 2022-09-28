@@ -1,6 +1,7 @@
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 
+@SuppressWarnings("unused")
 @RefinementAlias("IntBetween(int val, int lo, int hi) { lo <= val && val <= hi}")
 public class Car{
 	

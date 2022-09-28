@@ -26,8 +26,8 @@ public class AliasInvocation extends Expression {
     }
 
     @Override
-    public Expr eval(TranslatorToZ3 ctx) throws Exception {
-        Expr[] argsExpr = new Expr[getArgs().size()];
+    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
+        Expr<?>[] argsExpr = new Expr[getArgs().size()];
         for (int i = 0; i < argsExpr.length; i++) {
             argsExpr[i] = getArgs().get(i).eval(ctx);
         }

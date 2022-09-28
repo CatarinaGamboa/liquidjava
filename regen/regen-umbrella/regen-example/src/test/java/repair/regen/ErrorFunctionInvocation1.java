@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorFunctionInvocation1 {
 	@Refinement("_ == 2")
 	private static int getTwo() {

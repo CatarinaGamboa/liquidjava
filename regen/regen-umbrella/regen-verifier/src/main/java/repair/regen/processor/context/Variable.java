@@ -174,7 +174,6 @@ public class Variable extends RefinedVariable {
     }
 
     private boolean has(int index) {
-        Object[] l = ifCombiner.peek();
         Object o = ifCombiner.peek()[index];
         boolean b = o != null && (o instanceof VariableInstance);
         return b;

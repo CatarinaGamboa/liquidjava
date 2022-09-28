@@ -65,8 +65,8 @@ public class OperationsChecker {
         Constraint oper;
         CtElement parent = operator.getParent();
         if (parent instanceof CtAssignment<?, ?>
-                && ((CtAssignment) parent).getAssigned() instanceof CtVariableWrite<?>) {
-            CtVariableWrite<?> parentVar = (CtVariableWrite<?>) ((CtAssignment) parent).getAssigned();
+                && ((CtAssignment<?,?>) parent).getAssigned() instanceof CtVariableWrite<?>) {
+            CtVariableWrite<?> parentVar = (CtVariableWrite<?>) ((CtAssignment<?,?>) parent).getAssigned();
             oper = getOperationRefinements(operator, parentVar, operator);
 
         } else {
@@ -118,7 +118,8 @@ public class OperationsChecker {
             try {
                 CtAssignment<?, ?> assign = operator.getParent(CtAssignment.class);
                 if (assign != null && assign.getAssigned() instanceof CtVariableWrite<?>) {
-                    CtVariableWrite<?> w = (CtVariableWrite<?>) assign.getAssigned();
+                    @SuppressWarnings("unchecked")
+                    CtVariableWrite<T> w = (CtVariableWrite<T>) assign.getAssigned();
                     String parentName = w.getVariable().getSimpleName();
                     if (name.equals(parentName)) {
                         all = getRefinementUnaryVariableWrite(ex, operator, w, name);
@@ -218,7 +219,7 @@ public class OperationsChecker {
             }
 
             Constraint e = elem_ref.substituteVariable(rtc.WILD_VAR, elemName);
-            RefinedVariable rv = rtc.getContext().addVarToContext(elemName, elemVar.getType(), e, elemVar);
+            rtc.getContext().addVarToContext(elemName, elemVar.getType(), e, elemVar);
             return new VariablePredicate(returnName);
         }
 
@@ -248,14 +249,14 @@ public class OperationsChecker {
                 return getOperationRefinementFromExternalLib(inv, operator);
 
             // Get function refinements with non_used variables
-            String met = ((CtClass) method.getParent()).getQualifiedName();// TODO check
+            String met = ((CtClass<?>) method.getParent()).getQualifiedName();// TODO check
             RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(), met);
             Constraint innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv);// TODO REVER!!
             // Substitute _ by the variable that we send
             String newName = String.format(rtc.freshFormat, rtc.getContext().getCounter());
 
             innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
-            RefinedVariable rv = rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
+            rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
             return new Predicate(newName, inv, rtc.getErrorEmitter());// Return variable that represents the invocation
         }
         return rtc.getRefinement(element);
@@ -267,7 +268,7 @@ public class OperationsChecker {
 
         CtExpression<?> t = inv.getTarget();
         if (t instanceof CtVariableRead) {
-            CtVariableReference v = ((CtVariableRead) t).getVariable();
+            CtVariableReference<?> v = ((CtVariableRead<?>) t).getVariable();
             String c = v.getType().toString();
             String simpleName = inv.getExecutable().getSimpleName();
 
@@ -289,7 +290,7 @@ public class OperationsChecker {
                     innerRefs = innerRefs.substituteVariable(rtc.THIS, ovi.get().getName());
             }
 
-            RefinedVariable rv = rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
+            rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
             return new Predicate(newName, inv, rtc.getErrorEmitter());// Return variable that represents the invocation
 
         }
@@ -310,8 +311,8 @@ public class OperationsChecker {
      *
      * @throws ParsingException
      */
-    private <T> Constraint getRefinementUnaryVariableWrite(CtExpression ex, CtUnaryOperator<T> operator,
-            CtVariableWrite w, String name) throws ParsingException {
+    private <T> Constraint getRefinementUnaryVariableWrite(CtExpression<T> ex, CtUnaryOperator<T> operator,
+            CtVariableWrite<T> w, String name) throws ParsingException {
         String newName = String.format(rtc.instanceFormat, name, rtc.getContext().getCounter());
         CtVariable<T> varDecl = w.getVariable().getDeclaration();
 
@@ -321,7 +322,7 @@ public class OperationsChecker {
 
         Constraint c = getOperatorFromKind(operator.getKind(), ex).substituteVariable(rtc.WILD_VAR, newName);
 
-        RefinedVariable rv = rtc.getContext().addVarToContext(newName, w.getType(), metadada, w);
+        rtc.getContext().addVarToContext(newName, w.getType(), metadada, w);
         return new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), c);
     }
 
@@ -373,6 +374,7 @@ public class OperationsChecker {
     private Constraint getOperatorFromKind(UnaryOperatorKind kind, CtElement elem) throws ParsingException {
         String ret = null;
         switch (kind) {
+
         case POSTINC:
             ret = rtc.WILD_VAR + " + 1";
             break;
@@ -385,7 +387,9 @@ public class OperationsChecker {
         case PREDEC:
             ret = rtc.WILD_VAR + " - 1";
             break;
-        // TODO COMPLETE WITH MORE OPERATIONS
+        case COMPL:
+            ret = "(32 & " + rtc.WILD_VAR + ")";
+            break;
         case NOT:
             ret = "!" + rtc.WILD_VAR;
             break;
@@ -394,6 +398,9 @@ public class OperationsChecker {
             break;
         case NEG:
             ret = "-" + rtc.WILD_VAR;
+            break;
+        default:
+            throw new ParsingException(kind + "operation not supported");
         }
         return new Predicate(ret, elem, rtc.getErrorEmitter());
     }

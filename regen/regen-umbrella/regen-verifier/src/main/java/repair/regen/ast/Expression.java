@@ -14,7 +14,7 @@ import spoon.reflect.factory.Factory;
 
 public abstract class Expression {
 
-    public abstract Expr eval(TranslatorToZ3 ctx) throws Exception;
+    public abstract Expr<?> eval(TranslatorToZ3 ctx) throws Exception;
 
     public abstract void getVariableNames(List<String> toAdd);
 

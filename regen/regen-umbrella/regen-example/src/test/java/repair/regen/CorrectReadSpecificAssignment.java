@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class CorrectReadSpecificAssignment {
 	public void testAssignements() {
 		@Refinement("_ > 10")

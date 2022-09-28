@@ -2,15 +2,12 @@ package repair.regen.errors;
 
 import java.util.Formatter;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VCImplication;
 import repair.regen.processor.context.PlacementInCode;
 import spoon.reflect.code.CtLiteral;
-import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
 
 public class ErrorHandler {
@@ -106,7 +103,6 @@ public class ErrorHandler {
 
     public static <T> void printNotFound(CtElement var, Constraint constraint, Constraint constraint2, String msg,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
-        String resumeMessage = msg;
 
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
@@ -236,8 +232,10 @@ public class ErrorHandler {
     private static String printMap(HashMap<String, PlacementInCode> map) {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb, Locale.US);
-        if (map.isEmpty())
+        if (map.isEmpty()) {
+            formatter.close();
             return "";
+        }
         formatter.format("\nInstance translation table:\n");
         formatter.format(printLine());
         // title
@@ -248,6 +246,7 @@ public class ErrorHandler {
             formatter.format("| %-32s | %-60s | %-1s \n", s, map.get(s).getText(), map.get(s).getSimplePosition());
         // end
         formatter.format(printLine() + "\n\n");
+        formatter.close();
         return formatter.toString();
     }
 }

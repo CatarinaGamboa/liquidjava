@@ -25,13 +25,11 @@ import repair.regen.rj_language.ParsingException;
 import repair.regen.rj_language.RefinementsParser;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
-import spoon.reflect.code.CtLocalVariable;
 import spoon.reflect.code.CtNewArray;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtInterface;
-import spoon.reflect.declaration.CtVariable;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
@@ -73,6 +71,7 @@ public abstract class TypeChecker extends CtScanner {
         return c == null ? new Predicate() : c;
     }
 
+    @SuppressWarnings("unchecked")
     public Optional<Constraint> getRefinementFromAnnotation(CtElement element) throws ParsingException {
         Optional<Constraint> constr = Optional.empty();
         Optional<String> ref = Optional.empty();
@@ -102,6 +101,7 @@ public abstract class TypeChecker extends CtScanner {
         return constr;
     }
 
+    @SuppressWarnings("unchecked")
     public void handleStateSetsFromAnnotation(CtElement element) {
         int set = 0;
         for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
@@ -132,6 +132,7 @@ public abstract class TypeChecker extends CtScanner {
         int order = 0;
         for (CtExpression<?> ce : ls) {
             if (ce instanceof CtLiteral<?>) {
+                @SuppressWarnings("unchecked")                
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 GhostState gs = new GhostState(f, g.getParametersTypes(), factory.Type().BOOLEAN_PRIMITIVE,
@@ -166,7 +167,7 @@ public abstract class TypeChecker extends CtScanner {
         context.addGhostClass(sn);
         List<CtTypeReference<?>> param = Arrays.asList(factory.Type().createReference(qn));
 
-        CtTypeReference r = factory.Type().createReference(gd.getReturn_type());
+        CtTypeReference<?> r = factory.Type().createReference(gd.getReturn_type());
         GhostState gs = new GhostState(gd.getName(), param, r, qn);
         context.addToGhostClass(sn, gs);
     }
@@ -255,13 +256,14 @@ public abstract class TypeChecker extends CtScanner {
         for (CtAnnotation<? extends Annotation> ann : intrface.getAnnotations())
             if (ann.getActualAnnotation().annotationType().getCanonicalName()
                     .contentEquals("repair.regen.specification.ExternalRefinementsFor")) {
+                @SuppressWarnings("unchecked")
                 CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
                 ref = Optional.of(s.getValue());
             }
         return ref;
     }
 
-    public void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference type,
+    public void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference<?> type,
             CtElement usage, CtElement variable) throws ParsingException {
         Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
         Constraint cEt;
@@ -286,7 +288,7 @@ public abstract class TypeChecker extends CtScanner {
 
         // Substitute variable in verification
         RefinedVariable rv = context.addInstanceToContext(newName, type, correctNewRefinement, usage);
-        for (CtTypeReference t : mainRV.getSuperTypes())
+        for (CtTypeReference<?> t : mainRV.getSuperTypes())
             rv.addSuperType(t);
         context.addRefinementInstanceToVariable(simpleName, newName);
         // smt check
