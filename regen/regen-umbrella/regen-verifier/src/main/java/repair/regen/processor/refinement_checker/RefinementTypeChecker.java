@@ -56,496 +56,518 @@ import spoon.reflect.reference.CtVariableReference;
 import spoon.support.reflect.code.CtVariableWriteImpl;
 
 public class RefinementTypeChecker extends TypeChecker {
-	// This class should do the following:
+    // This class should do the following:
 
-	// 1. Keep track of the context variable types
-	// 2. Do type checking and inference
-	
-	//Auxiliary TypeCheckers
-	OperationsChecker otc;
-	MethodsFunctionsChecker mfc;
+    // 1. Keep track of the context variable types
+    // 2. Do type checking and inference
 
-	public RefinementTypeChecker(Context context,Factory factory, ErrorEmitter errorEmitter) {
-		super(context, factory, errorEmitter);
-		otc = new OperationsChecker(this);
-		mfc = new MethodsFunctionsChecker(this);
-		System.out.println("In RefinementTypeChecker");
-	}
+    // Auxiliary TypeCheckers
+    OperationsChecker otc;
+    MethodsFunctionsChecker mfc;
 
-	//--------------------- Visitors -----------------------------------
+    public RefinementTypeChecker(Context context, Factory factory, ErrorEmitter errorEmitter) {
+        super(context, factory, errorEmitter);
+        otc = new OperationsChecker(this);
+        mfc = new MethodsFunctionsChecker(this);
+        System.out.println("In RefinementTypeChecker");
+    }
 
-	@Override
-	public <T> void visitCtClass(CtClass<T> ctClass) {
-		if(errorEmitter.foundError()) return;
-		
-//		System.out.println("CTCLASS:"+ctClass.getSimpleName());
-		context.reinitializeContext();
-		super.visitCtClass(ctClass);
-	}
+    // --------------------- Visitors -----------------------------------
 
-	@Override
-	public <T> void visitCtInterface(CtInterface<T> intrface) {
-		if(errorEmitter.foundError()) return;
-		
-//		System.out.println("CT INTERFACE: " +intrface.getSimpleName());
-		if(getExternalRefinement(intrface).isPresent())
-			return;
-		super.visitCtInterface(intrface);
-	}
+    @Override
+    public <T> void visitCtClass(CtClass<T> ctClass) {
+        if (errorEmitter.foundError())
+            return;
 
-	@Override
-	public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
-			if(errorEmitter.foundError()) return;
-			super.visitCtAnnotationType(annotationType);
-	}
+        // System.out.println("CTCLASS:"+ctClass.getSimpleName());
+        context.reinitializeContext();
+        super.visitCtClass(ctClass);
+    }
 
-	@Override
-	public <T> void visitCtConstructor(CtConstructor<T> c) {
-		if(errorEmitter.foundError()) return;
-		
-		context.enterContext();
-		mfc.loadFunctionInfo(c);
-		super.visitCtConstructor(c);
-		context.exitContext();
-	}
+    @Override
+    public <T> void visitCtInterface(CtInterface<T> intrface) {
+        if (errorEmitter.foundError())
+            return;
 
-	public <R> void visitCtMethod(CtMethod<R> method) {
-		if(errorEmitter.foundError()) return;
-		
-		context.enterContext();
-		if(!method.getSignature().equals("main(java.lang.String[])"))
-			mfc.loadFunctionInfo(method);
-		super.visitCtMethod(method);
-		context.exitContext();
+        // System.out.println("CT INTERFACE: " +intrface.getSimpleName());
+        if (getExternalRefinement(intrface).isPresent())
+            return;
+        super.visitCtInterface(intrface);
+    }
 
-	}
+    @Override
+    public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
+        if (errorEmitter.foundError())
+            return;
+        super.visitCtAnnotationType(annotationType);
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable){
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtLocalVariable(localVariable);
-		//only declaration, no assignment
-		if(localVariable.getAssignment() == null) {
-			Optional<Constraint> a;
-			try {
-				a = getRefinementFromAnnotation(localVariable);
-			} catch (ParsingException e) {
-				return;//error already in ErrorEmitter
-			}
-			context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), 
-					a.isPresent()? a.get() : new Predicate(), localVariable);
-		}else {
-			String varName = localVariable.getSimpleName();
-			CtExpression<?> e = localVariable.getAssignment();
+    @Override
+    public <T> void visitCtConstructor(CtConstructor<T> c) {
+        if (errorEmitter.foundError())
+            return;
 
-			Constraint refinementFound = getRefinement(e);
-			if (refinementFound == null)
-				refinementFound = new Predicate();
-			context.addVarToContext(varName, localVariable.getType(), new Predicate(), e);
+        context.enterContext();
+        mfc.loadFunctionInfo(c);
+        super.visitCtConstructor(c);
+        context.exitContext();
+    }
 
-			try {
-				checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable, localVariable);
-			} catch (ParsingException e1) {
-				return;//error already in ErrorEmitter
-			}
+    public <R> void visitCtMethod(CtMethod<R> method) {
+        if (errorEmitter.foundError())
+            return;
 
-			AuxStateHandler.addStateRefinements(this, varName, e);
-		}
-	}
+        context.enterContext();
+        if (!method.getSignature().equals("main(java.lang.String[])"))
+            mfc.loadFunctionInfo(method);
+        super.visitCtMethod(method);
+        context.exitContext();
 
-	@Override
-	public <T> void visitCtNewArray(CtNewArray<T> newArray) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtNewArray(newArray);
-		List<CtExpression<Integer>> l = newArray.getDimensionExpressions();
-		//TODO only working for 1 dimension
-		for(CtExpression<?> exp:l) {
-			Constraint c;
-			try {
-				c = getExpressionRefinements(exp);
-			} catch (ParsingException e) {
-				return;//error already in ErrorEmitter
-			}
-			String name = String.format(freshFormat, context.getCounter());
-			if(c.getVariableNames().contains(WILD_VAR))
-				c = c.substituteVariable(WILD_VAR, name);
-			else
-				c = new EqualsPredicate(new VariablePredicate(name), c);
-			context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, exp);
-			EqualsPredicate ep;
-			try {
-				ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR, newArray, getErrorEmitter()), 
-						new VariablePredicate(name));
-			} catch (ParsingException e) {
-				return;//error already in ErrorEmitter
-			}
-			newArray.putMetadata(REFINE_KEY, ep);
-		}
-	}
+    }
 
-	@Override
-	public <T> void visitCtThisAccess(CtThisAccess<T> thisAccess) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtThisAccess(thisAccess);
-		CtClass c = thisAccess.getParent(CtClass.class);
-		String s = c.getSimpleName();
-		if(thisAccess.getParent() instanceof CtReturn) {
-			String thisName = String.format(thisFormat, s);
-			thisAccess.putMetadata(REFINE_KEY, new EqualsPredicate(new VariablePredicate(WILD_VAR), 
-											   new VariablePredicate(thisName)));
-		}
-			
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
+        if (errorEmitter.foundError())
+            return;
 
-	@Override
-	public <T,A extends T> void visitCtAssignment(CtAssignment<T,A> assignement) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtAssignment(assignement);
-		CtExpression<T> ex =  assignement.getAssigned();
+        super.visitCtLocalVariable(localVariable);
+        // only declaration, no assignment
+        if (localVariable.getAssignment() == null) {
+            Optional<Constraint> a;
+            try {
+                a = getRefinementFromAnnotation(localVariable);
+            } catch (ParsingException e) {
+                return;// error already in ErrorEmitter
+            }
+            context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(),
+                    a.isPresent() ? a.get() : new Predicate(), localVariable);
+        } else {
+            String varName = localVariable.getSimpleName();
+            CtExpression<?> e = localVariable.getAssignment();
 
-		if (ex instanceof CtVariableWriteImpl) {
-			CtVariableReference<?> var = ((CtVariableAccess<?>) ex).getVariable();
-			CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
-			String name = var.getSimpleName();
-			checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), assignement, varDecl);
+            Constraint refinementFound = getRefinement(e);
+            if (refinementFound == null)
+                refinementFound = new Predicate();
+            context.addVarToContext(varName, localVariable.getType(), new Predicate(), e);
 
+            try {
+                checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable,
+                        localVariable);
+            } catch (ParsingException e1) {
+                return;// error already in ErrorEmitter
+            }
 
-		}else if(ex instanceof CtFieldWrite) {
-			CtFieldReference<?> cr = ((CtFieldWrite<?>) ex).getVariable();
-			CtField<?> f= ((CtFieldWrite<?>) ex).getVariable().getDeclaration();
-			String name = String.format(thisFormat, cr.getSimpleName());
-			checkAssignment(name, cr.getType(), ex, assignement.getAssignment(), assignement, f);
+            AuxStateHandler.addStateRefinements(this, varName, e);
+        }
+    }
 
-		}
-		if(ex instanceof CtArrayWrite) {
-			//Constraint c = getRefinement(ex);
-			//TODO continue
-			//c.substituteVariable(WILD_VAR, );
-		}
-	}
+    @Override
+    public <T> void visitCtNewArray(CtNewArray<T> newArray) {
+        if (errorEmitter.foundError())
+            return;
 
-	@Override
-	public <T> void visitCtArrayRead(CtArrayRead<T> arrayRead) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtArrayRead(arrayRead);
-		String name = String.format(instanceFormat, "arrayAccess", context.getCounter());
-		context.addVarToContext(name, arrayRead.getType(), new Predicate(), arrayRead);
-		arrayRead.putMetadata(REFINE_KEY, new VariablePredicate(name));
-		//TODO predicate for now is always TRUE
-	}
+        super.visitCtNewArray(newArray);
+        List<CtExpression<Integer>> l = newArray.getDimensionExpressions();
+        // TODO only working for 1 dimension
+        for (CtExpression<?> exp : l) {
+            Constraint c;
+            try {
+                c = getExpressionRefinements(exp);
+            } catch (ParsingException e) {
+                return;// error already in ErrorEmitter
+            }
+            String name = String.format(freshFormat, context.getCounter());
+            if (c.getVariableNames().contains(WILD_VAR))
+                c = c.substituteVariable(WILD_VAR, name);
+            else
+                c = new EqualsPredicate(new VariablePredicate(name), c);
+            context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, exp);
+            EqualsPredicate ep;
+            try {
+                ep = new EqualsPredicate(FunctionPredicate.builtin_length(WILD_VAR, newArray, getErrorEmitter()),
+                        new VariablePredicate(name));
+            } catch (ParsingException e) {
+                return;// error already in ErrorEmitter
+            }
+            newArray.putMetadata(REFINE_KEY, ep);
+        }
+    }
 
-	@Override
-	public <T> void visitCtLiteral(CtLiteral<T> lit) {
-		if(errorEmitter.foundError()) return;
-		
-		List<String> types = Arrays.asList(implementedTypes);
-		if (types.contains(lit.getType().getQualifiedName())) {
-			lit.putMetadata(REFINE_KEY, 
-					new EqualsPredicate(new VariablePredicate(WILD_VAR), lit.getValue().toString(), getErrorEmitter()));
-		}else if(lit.getType().getQualifiedName().contentEquals("java.lang.String")){
-			//Only taking care of strings inside refinements
-		}else {
-			System.out.println(String.format("Literal of type %s not implemented:",
-					lit.getType().getQualifiedName()));
-		}
-	}	
+    @Override
+    public <T> void visitCtThisAccess(CtThisAccess<T> thisAccess) {
+        if (errorEmitter.foundError())
+            return;
 
-	@Override
-	public <T> void visitCtField(CtField<T> f) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtField(f);
-		Optional<Constraint> c;
-		try {
-			c = getRefinementFromAnnotation(f);
-		} catch (ParsingException e) {
-			return;//error already in ErrorEmitter
-		}
-		//		context.addVarToContext(f.getSimpleName(), f.getType(), 
-		//				c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName()) 
-		//						      : new Predicate());
-		String nname = String.format(thisFormat, f.getSimpleName());
-		Constraint ret = new Predicate();
-		if(c.isPresent())
-			ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
-		RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, f);
-		if(v instanceof Variable)
-			((Variable)v).setLocation("this");
+        super.visitCtThisAccess(thisAccess);
+        CtClass c = thisAccess.getParent(CtClass.class);
+        String s = c.getSimpleName();
+        if (thisAccess.getParent() instanceof CtReturn) {
+            String thisName = String.format(thisFormat, s);
+            thisAccess.putMetadata(REFINE_KEY,
+                    new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(thisName)));
+        }
 
-	}
+    }
 
-	@Override
-	public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
-		if(errorEmitter.foundError()) return;
-		
-		String fieldName =  fieldRead.getVariable().getSimpleName();
-		if(context.hasVariable(fieldName)) {
-			RefinedVariable rv = context.getVariableByName(fieldName);
-			if(rv instanceof Variable && ((Variable)rv).getLocation().isPresent() &&
-					((Variable)rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
-				fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
-			}else
-				fieldRead.putMetadata(REFINE_KEY, 	new EqualsPredicate(new VariablePredicate(WILD_VAR), 
-						new VariablePredicate(fieldName)));
+    @Override
+    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignement) {
+        if (errorEmitter.foundError())
+            return;
 
-		}else if(context.hasVariable(String.format(thisFormat, fieldName))){
-			String thisName = String.format(thisFormat, fieldName);
-			fieldRead.putMetadata(REFINE_KEY, new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(thisName)));
+        super.visitCtAssignment(assignement);
+        CtExpression<T> ex = assignement.getAssigned();
 
-		} else if(fieldRead.getVariable().getSimpleName().equals("length")) {
-			String targetName = fieldRead.getTarget().toString();
-			try {
-				fieldRead.putMetadata(REFINE_KEY, 
-						new EqualsPredicate(new VariablePredicate(WILD_VAR), 
-								FunctionPredicate.builtin_length(targetName, fieldRead, getErrorEmitter())));
-			} catch (ParsingException e) {
-				return;//error already in ErrorEmitter
-			}
-		}else{
-			fieldRead.putMetadata(REFINE_KEY, new Predicate());
-			//TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
-		}
+        if (ex instanceof CtVariableWriteImpl) {
+            CtVariableReference<?> var = ((CtVariableAccess<?>) ex).getVariable();
+            CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
+            String name = var.getSimpleName();
+            checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), assignement, varDecl);
 
-		super.visitCtFieldRead(fieldRead);
-	}
+        } else if (ex instanceof CtFieldWrite) {
+            CtFieldReference<?> cr = ((CtFieldWrite<?>) ex).getVariable();
+            CtField<?> f = ((CtFieldWrite<?>) ex).getVariable().getDeclaration();
+            String name = String.format(thisFormat, cr.getSimpleName());
+            checkAssignment(name, cr.getType(), ex, assignement.getAssignment(), assignement, f);
 
-	@Override
-	public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtVariableRead(variableRead);
-		CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
-		getPutVariableMetadada(variableRead, varDecl.getSimpleName());
-	}
+        }
+        if (ex instanceof CtArrayWrite) {
+            // Constraint c = getRefinement(ex);
+            // TODO continue
+            // c.substituteVariable(WILD_VAR, );
+        }
+    }
 
-	/**
-	 * Visitor for binary operations
-	 * Adds metadata to the binary operations from the operands
-	 */
-	@Override
-	public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtBinaryOperator(operator);
-		try {
-			otc.getBinaryOpRefinements(operator);
-		} catch (ParsingException e) {
-			return;//error already in ErrorEmitter
-		}
+    @Override
+    public <T> void visitCtArrayRead(CtArrayRead<T> arrayRead) {
+        if (errorEmitter.foundError())
+            return;
 
-	}
+        super.visitCtArrayRead(arrayRead);
+        String name = String.format(instanceFormat, "arrayAccess", context.getCounter());
+        context.addVarToContext(name, arrayRead.getType(), new Predicate(), arrayRead);
+        arrayRead.putMetadata(REFINE_KEY, new VariablePredicate(name));
+        // TODO predicate for now is always TRUE
+    }
 
-	@Override
-	public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtUnaryOperator(operator);
-		try {
-			otc.getUnaryOpRefinements(operator);
-		} catch (ParsingException e) {
-			return;//error already in ErrorEmitter
-		}
+    @Override
+    public <T> void visitCtLiteral(CtLiteral<T> lit) {
+        if (errorEmitter.foundError())
+            return;
 
-	}
+        List<String> types = Arrays.asList(implementedTypes);
+        if (types.contains(lit.getType().getQualifiedName())) {
+            lit.putMetadata(REFINE_KEY,
+                    new EqualsPredicate(new VariablePredicate(WILD_VAR), lit.getValue().toString(), getErrorEmitter()));
+        } else if (lit.getType().getQualifiedName().contentEquals("java.lang.String")) {
+            // Only taking care of strings inside refinements
+        } else {
+            System.out.println(String.format("Literal of type %s not implemented:", lit.getType().getQualifiedName()));
+        }
+    }
 
-	public <R> void visitCtInvocation(CtInvocation<R> invocation) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtInvocation(invocation);
-		mfc.getInvocationRefinements(invocation);
-		System.out.println();
-	}
+    @Override
+    public <T> void visitCtField(CtField<T> f) {
+        if (errorEmitter.foundError())
+            return;
 
-	@Override
-	public <R> void visitCtReturn(CtReturn<R> ret) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtReturn(ret);
-		mfc.getReturnRefinements(ret);
+        super.visitCtField(f);
+        Optional<Constraint> c;
+        try {
+            c = getRefinementFromAnnotation(f);
+        } catch (ParsingException e) {
+            return;// error already in ErrorEmitter
+        }
+        // context.addVarToContext(f.getSimpleName(), f.getType(),
+        // c.isPresent() ? c.get().substituteVariable(WILD_VAR, f.getSimpleName())
+        // : new Predicate());
+        String nname = String.format(thisFormat, f.getSimpleName());
+        Constraint ret = new Predicate();
+        if (c.isPresent())
+            ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
+        RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, f);
+        if (v instanceof Variable)
+            ((Variable) v).setLocation("this");
 
-	}
+    }
 
-	@Override
-	public void visitCtIf(CtIf ifElement) {
-		if(errorEmitter.foundError()) return;
-		
-		CtExpression<Boolean> exp = ifElement.getCondition();
+    @Override
+    public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
+        if (errorEmitter.foundError())
+            return;
 
-		Constraint expRefs;
-		try {
-			expRefs = getExpressionRefinements(exp);
-		} catch (ParsingException e) {
-			return;//error already in ErrorEmitter
-		}
-		String freshVarName = String.format(freshFormat ,context.getCounter());
-		expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
-		Constraint lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
-		expRefs = Conjunction.createConjunction(expRefs, lastExpRefs);
+        String fieldName = fieldRead.getVariable().getSimpleName();
+        if (context.hasVariable(fieldName)) {
+            RefinedVariable rv = context.getVariableByName(fieldName);
+            if (rv instanceof Variable && ((Variable) rv).getLocation().isPresent()
+                    && ((Variable) rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
+                fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
+            } else
+                fieldRead.putMetadata(REFINE_KEY,
+                        new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(fieldName)));
 
-		//TODO Change in future
-		if(expRefs.getVariableNames().contains("null"))
-			expRefs = new Predicate();
-		
-		RefinedVariable freshRV = context.addInstanceToContext(freshVarName, 
-				factory.Type().INTEGER_PRIMITIVE, expRefs, exp);
-		vcChecker.addPathVariable(freshRV);
-		
-		context.variablesNewIfCombination();
-		context.variablesSetBeforeIf();
-		context.enterContext();
+        } else if (context.hasVariable(String.format(thisFormat, fieldName))) {
+            String thisName = String.format(thisFormat, fieldName);
+            fieldRead.putMetadata(REFINE_KEY,
+                    new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(thisName)));
 
-		//VISIT THEN
-		context.enterContext();
-		visitCtBlock(ifElement.getThenStatement());
-		context.variablesSetThenIf();
-		context.exitContext();
+        } else if (fieldRead.getVariable().getSimpleName().equals("length")) {
+            String targetName = fieldRead.getTarget().toString();
+            try {
+                fieldRead.putMetadata(REFINE_KEY, new EqualsPredicate(new VariablePredicate(WILD_VAR),
+                        FunctionPredicate.builtin_length(targetName, fieldRead, getErrorEmitter())));
+            } catch (ParsingException e) {
+                return;// error already in ErrorEmitter
+            }
+        } else {
+            fieldRead.putMetadata(REFINE_KEY, new Predicate());
+            // TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
+        }
 
+        super.visitCtFieldRead(fieldRead);
+    }
 
-		//VISIT ELSE
-		if(ifElement.getElseStatement() != null) {
-			context.getVariableByName(freshVarName);
-			//expRefs = expRefs.negate();
-			context.newRefinementToVariableInContext(freshVarName, expRefs.negate());
+    @Override
+    public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
+        if (errorEmitter.foundError())
+            return;
 
-			context.enterContext();
-			visitCtBlock(ifElement.getElseStatement());		
-			context.variablesSetElseIf();
-			context.exitContext();
-		}
-		//end
-		vcChecker.removePathVariable(freshRV);
-		context.exitContext();
-		context.variablesCombineFromIf(expRefs);
-		context.variablesFinishIfCombination();
-	}
+        super.visitCtVariableRead(variableRead);
+        CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
+        getPutVariableMetadada(variableRead, varDecl.getSimpleName());
+    }
 
-	@Override
-	public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtArrayWrite(arrayWrite);
-		CtExpression<?> index = arrayWrite.getIndexExpression();
-		FunctionPredicate fp;
-		try {
-			fp = FunctionPredicate.builtin_addToIndex(
-					arrayWrite.getTarget().toString(), index.toString(), WILD_VAR, arrayWrite, getErrorEmitter());
-		} catch (ParsingException e) {
-			return;//error already in ErrorEmitter
-		}
-		arrayWrite.putMetadata(REFINE_KEY, fp);
-		//TODO fazer mais...? faz sentido
-	}
+    /**
+     * Visitor for binary operations Adds metadata to the binary operations from the operands
+     */
+    @Override
+    public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
+        if (errorEmitter.foundError())
+            return;
 
-	@Override
-	public <T> void visitCtConditional(CtConditional<T> conditional) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtConditional(conditional);
-		Constraint cond = getRefinement(conditional.getCondition());
-		Constraint c= new IfThenElse(cond, getRefinement(conditional.getThenExpression()), 
-				getRefinement(conditional.getElseExpression()));
-		conditional.putMetadata(REFINE_KEY, c);
+        super.visitCtBinaryOperator(operator);
+        try {
+            otc.getBinaryOpRefinements(operator);
+        } catch (ParsingException e) {
+            return;// error already in ErrorEmitter
+        }
 
-	}
+    }
 
-	@Override
-	public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtConstructorCall(ctConstructorCall);
-		mfc.getConstructorInvocationRefinements(ctConstructorCall);
-	}
-	
-	@Override
-	public <T> void visitCtNewClass(CtNewClass<T> newClass) {
-		if(errorEmitter.foundError()) return;
-		
-		super.visitCtNewClass(newClass);
-		System.out.println("new class");
-	}
+    @Override
+    public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
+        if (errorEmitter.foundError())
+            return;
 
+        super.visitCtUnaryOperator(operator);
+        try {
+            otc.getUnaryOpRefinements(operator);
+        } catch (ParsingException e) {
+            return;// error already in ErrorEmitter
+        }
 
-	//############################### Inner Visitors  ##########################################
-	private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, 
-			CtExpression<?> assignment, CtElement parentElem, CtElement varDecl) {
-		getPutVariableMetadada(ex, name);
+    }
 
-		Constraint refinementFound = getRefinement(assignment);
-		if (refinementFound == null) {
-			RefinedVariable rv =context.getVariableByName(name);
-			if(rv instanceof Variable)
-				refinementFound = rv.getMainRefinement();
-			else
-				refinementFound = new Predicate();
-		}
-		Optional<VariableInstance> r = context.getLastVariableInstance(name);
-		if(r.isPresent())
-			vcChecker.removePathVariableThatIncludes(r.get().getName());//AQUI!!
+    public <R> void visitCtInvocation(CtInvocation<R> invocation) {
+        if (errorEmitter.foundError())
+            return;
 
-		vcChecker.removePathVariableThatIncludes(name);//AQUI!!
-		try {
-			checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
-		} catch (ParsingException e) {
-			return;//error already in ErrorEmitter
-		}
+        super.visitCtInvocation(invocation);
+        mfc.getInvocationRefinements(invocation);
+        System.out.println();
+    }
 
-	}
-	private Constraint getExpressionRefinements(CtExpression element) throws ParsingException {
-		if(element instanceof CtVariableRead<?>) {
-			CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
-			return getRefinement(element);
-		}else if(element instanceof CtBinaryOperator<?>) {
-			CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
-			visitCtBinaryOperator(binop);
-			return getRefinement(binop);
-		}else if(element instanceof CtUnaryOperator<?>) {
-			CtUnaryOperator<?> op = (CtUnaryOperator<?>) element;
-			visitCtUnaryOperator(op);
-			return getRefinement(op);
-		}else if (element instanceof CtLiteral<?>) {
-			CtLiteral<?> l = (CtLiteral<?>) element;
-			return new Predicate(l.getValue().toString(), l, errorEmitter);
-		}else if(element instanceof CtInvocation<?>) {
-			CtInvocation<?> inv = (CtInvocation<?>) element;
-			visitCtInvocation(inv);
-			return getRefinement(inv);
-		}
-		return getRefinement(element);
-	}
-	private Constraint substituteAllVariablesForLastInstance(Constraint c) {
-		Constraint ret = c;
-		List<String> ls = c.getVariableNames();
-		for(String s:ls) {
-			Optional<VariableInstance> rv = context.getLastVariableInstance(s);
-			if(rv.isPresent()) {
-				VariableInstance vi = rv.get();
-				ret = ret.substituteVariable(s, vi.getName());
-			}
-		}
-		return ret;
-	}
+    @Override
+    public <R> void visitCtReturn(CtReturn<R> ret) {
+        if (errorEmitter.foundError())
+            return;
 
-	//############################### Get Metadata ##########################################
+        super.visitCtReturn(ret);
+        mfc.getReturnRefinements(ret);
 
-	/**
-	 * 
-	 * @param <T>
-	 * @param elem
-	 * @param varDecl Cannot be null
-	 */
-	private <T> void getPutVariableMetadada(CtElement elem, String name) {
-		Constraint cref = new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(name));
-		Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
-		if(ovi.isPresent())
-			cref = new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(ovi.get().getName()));
+    }
 
-		elem.putMetadata(REFINE_KEY, cref);
-	}
+    @Override
+    public void visitCtIf(CtIf ifElement) {
+        if (errorEmitter.foundError())
+            return;
+
+        CtExpression<Boolean> exp = ifElement.getCondition();
+
+        Constraint expRefs;
+        try {
+            expRefs = getExpressionRefinements(exp);
+        } catch (ParsingException e) {
+            return;// error already in ErrorEmitter
+        }
+        String freshVarName = String.format(freshFormat, context.getCounter());
+        expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
+        Constraint lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
+        expRefs = Conjunction.createConjunction(expRefs, lastExpRefs);
+
+        // TODO Change in future
+        if (expRefs.getVariableNames().contains("null"))
+            expRefs = new Predicate();
+
+        RefinedVariable freshRV = context.addInstanceToContext(freshVarName, factory.Type().INTEGER_PRIMITIVE, expRefs,
+                exp);
+        vcChecker.addPathVariable(freshRV);
+
+        context.variablesNewIfCombination();
+        context.variablesSetBeforeIf();
+        context.enterContext();
+
+        // VISIT THEN
+        context.enterContext();
+        visitCtBlock(ifElement.getThenStatement());
+        context.variablesSetThenIf();
+        context.exitContext();
+
+        // VISIT ELSE
+        if (ifElement.getElseStatement() != null) {
+            context.getVariableByName(freshVarName);
+            // expRefs = expRefs.negate();
+            context.newRefinementToVariableInContext(freshVarName, expRefs.negate());
+
+            context.enterContext();
+            visitCtBlock(ifElement.getElseStatement());
+            context.variablesSetElseIf();
+            context.exitContext();
+        }
+        // end
+        vcChecker.removePathVariable(freshRV);
+        context.exitContext();
+        context.variablesCombineFromIf(expRefs);
+        context.variablesFinishIfCombination();
+    }
+
+    @Override
+    public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
+        if (errorEmitter.foundError())
+            return;
+
+        super.visitCtArrayWrite(arrayWrite);
+        CtExpression<?> index = arrayWrite.getIndexExpression();
+        FunctionPredicate fp;
+        try {
+            fp = FunctionPredicate.builtin_addToIndex(arrayWrite.getTarget().toString(), index.toString(), WILD_VAR,
+                    arrayWrite, getErrorEmitter());
+        } catch (ParsingException e) {
+            return;// error already in ErrorEmitter
+        }
+        arrayWrite.putMetadata(REFINE_KEY, fp);
+        // TODO fazer mais...? faz sentido
+    }
+
+    @Override
+    public <T> void visitCtConditional(CtConditional<T> conditional) {
+        if (errorEmitter.foundError())
+            return;
+
+        super.visitCtConditional(conditional);
+        Constraint cond = getRefinement(conditional.getCondition());
+        Constraint c = new IfThenElse(cond, getRefinement(conditional.getThenExpression()),
+                getRefinement(conditional.getElseExpression()));
+        conditional.putMetadata(REFINE_KEY, c);
+
+    }
+
+    @Override
+    public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
+        if (errorEmitter.foundError())
+            return;
+
+        super.visitCtConstructorCall(ctConstructorCall);
+        mfc.getConstructorInvocationRefinements(ctConstructorCall);
+    }
+
+    @Override
+    public <T> void visitCtNewClass(CtNewClass<T> newClass) {
+        if (errorEmitter.foundError())
+            return;
+
+        super.visitCtNewClass(newClass);
+        System.out.println("new class");
+    }
+
+    // ############################### Inner Visitors ##########################################
+    private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, CtExpression<?> assignment,
+            CtElement parentElem, CtElement varDecl) {
+        getPutVariableMetadada(ex, name);
+
+        Constraint refinementFound = getRefinement(assignment);
+        if (refinementFound == null) {
+            RefinedVariable rv = context.getVariableByName(name);
+            if (rv instanceof Variable)
+                refinementFound = rv.getMainRefinement();
+            else
+                refinementFound = new Predicate();
+        }
+        Optional<VariableInstance> r = context.getLastVariableInstance(name);
+        if (r.isPresent())
+            vcChecker.removePathVariableThatIncludes(r.get().getName());// AQUI!!
+
+        vcChecker.removePathVariableThatIncludes(name);// AQUI!!
+        try {
+            checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
+        } catch (ParsingException e) {
+            return;// error already in ErrorEmitter
+        }
+
+    }
+
+    private Constraint getExpressionRefinements(CtExpression element) throws ParsingException {
+        if (element instanceof CtVariableRead<?>) {
+            CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
+            return getRefinement(element);
+        } else if (element instanceof CtBinaryOperator<?>) {
+            CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
+            visitCtBinaryOperator(binop);
+            return getRefinement(binop);
+        } else if (element instanceof CtUnaryOperator<?>) {
+            CtUnaryOperator<?> op = (CtUnaryOperator<?>) element;
+            visitCtUnaryOperator(op);
+            return getRefinement(op);
+        } else if (element instanceof CtLiteral<?>) {
+            CtLiteral<?> l = (CtLiteral<?>) element;
+            return new Predicate(l.getValue().toString(), l, errorEmitter);
+        } else if (element instanceof CtInvocation<?>) {
+            CtInvocation<?> inv = (CtInvocation<?>) element;
+            visitCtInvocation(inv);
+            return getRefinement(inv);
+        }
+        return getRefinement(element);
+    }
+
+    private Constraint substituteAllVariablesForLastInstance(Constraint c) {
+        Constraint ret = c;
+        List<String> ls = c.getVariableNames();
+        for (String s : ls) {
+            Optional<VariableInstance> rv = context.getLastVariableInstance(s);
+            if (rv.isPresent()) {
+                VariableInstance vi = rv.get();
+                ret = ret.substituteVariable(s, vi.getName());
+            }
+        }
+        return ret;
+    }
+
+    // ############################### Get Metadata ##########################################
+
+    /**
+     *
+     * @param <T>
+     * @param elem
+     * @param varDecl
+     *            Cannot be null
+     */
+    private <T> void getPutVariableMetadada(CtElement elem, String name) {
+        Constraint cref = new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(name));
+        Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
+        if (ovi.isPresent())
+            cref = new EqualsPredicate(new VariablePredicate(WILD_VAR), new VariablePredicate(ovi.get().getName()));
+
+        elem.putMetadata(REFINE_KEY, cref);
+    }
 
 }

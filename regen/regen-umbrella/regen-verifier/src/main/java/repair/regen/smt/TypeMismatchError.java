@@ -2,25 +2,25 @@ package repair.regen.smt;
 
 import spoon.reflect.declaration.CtElement;
 
-public class TypeMismatchError extends Exception{
-	
-	private CtElement location;
+public class TypeMismatchError extends Exception {
 
-	public TypeMismatchError(String message) {
-		super(message);
-	}
+    private CtElement location;
 
-	public CtElement getLocation() {
-		return location;
-	}
+    public TypeMismatchError(String message) {
+        super(message);
+    }
 
-	public void setLocation(CtElement location) {
-		this.location = location;
-	}
+    public CtElement getLocation() {
+        return location;
+    }
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+    public void setLocation(CtElement location) {
+        this.location = location;
+    }
+
+    /**
+     *
+     */
+    private static final long serialVersionUID = 1L;
 
 }
