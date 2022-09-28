@@ -44,6 +44,12 @@ public class TestClasses extends TestAbstract {
         testCorrect(testPath + "/classes/order_gift_correct");
     }
 
+    
+    @Test
+    public void correctIterator() {
+        testCorrect(testPath + "/classes/iterator_correct");
+    }
+
     // @Test
     // public void correctInputReaderCharArrayLongerNameEve() {
     // testCorrect(testPath+"/classes/input_reader_correct");
@@ -103,6 +109,11 @@ public class TestClasses extends TestAbstract {
     @Test
     public void errorSocket() {
         testWrong(testPath + "/classes/socket_error");
+    }
+    
+    @Test
+    public void errorIterator() {
+        testWrong(testPath + "/classes/iterator_error");
     }
 
 }
