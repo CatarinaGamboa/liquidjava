@@ -7,6 +7,7 @@ package repair.regen.classes.refs_from_superclasses_correct;
 // seats = k;
 // }
 // 
+@java.lang.SuppressWarnings("unused")
 public class Bus extends repair.regen.classes.refs_from_superclasses_correct.Car {
     private int year;
 

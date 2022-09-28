@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 @repair.regen.specification.RefinementAlias("InRange(int val, int low, int up) {low < val && val < up}")
 public class ErrorAlias {
     @repair.regen.specification.Refinement("InRange( _, 10, 16)")

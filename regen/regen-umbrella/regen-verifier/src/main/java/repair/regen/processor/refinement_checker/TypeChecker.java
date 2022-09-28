@@ -132,7 +132,7 @@ public abstract class TypeChecker extends CtScanner {
         int order = 0;
         for (CtExpression<?> ce : ls) {
             if (ce instanceof CtLiteral<?>) {
-                @SuppressWarnings("unchecked")                
+                @SuppressWarnings("unchecked")
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 GhostState gs = new GhostState(f, g.getParametersTypes(), factory.Type().BOOLEAN_PRIMITIVE,

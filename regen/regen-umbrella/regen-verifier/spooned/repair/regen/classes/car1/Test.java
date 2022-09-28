@@ -1,6 +1,7 @@
 package repair.regen.classes.car1;
 
 
+@java.lang.SuppressWarnings("unused")
 public class Test {
     @repair.regen.specification.Refinement("_ < 10")
     public static int getYear() {

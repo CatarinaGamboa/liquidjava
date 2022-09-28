@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectImplies {
     @repair.regen.specification.Refinement("((arg0 < 0) --> (_ == (-arg0*2))) && ((arg0 >= 0) --> (_ == arg0*2))")
     private static int getPositiveDouble(int arg0) {

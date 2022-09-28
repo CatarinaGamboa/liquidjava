@@ -8,6 +8,7 @@ public class CorrectAliasExpressions {
         return 15;
     }
 
+    @java.lang.SuppressWarnings("unused")
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("InRange( _, 10, 122+5)")
         int j = repair.regen.CorrectAliasExpressions.getNum();

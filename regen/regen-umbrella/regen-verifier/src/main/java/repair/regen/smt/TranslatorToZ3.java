@@ -116,14 +116,14 @@ public class TranslatorToZ3 {
         return z3.mkApp(fd, params);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private Expr<?> makeSelect(String name, Expr<?>[] params) {
         if (params.length == 2 && params[0] instanceof ArrayExpr)
             return z3.mkSelect((ArrayExpr) params[0], params[1]);
         return null;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private Expr<?> makeStore(String name, Expr<?>[] params) {
         if (params.length == 3 && params[0] instanceof ArrayExpr)
             return z3.mkStore((ArrayExpr) params[0], params[1], params[2]);
@@ -138,7 +138,7 @@ public class TranslatorToZ3 {
         return z3.mkEq(e1, e2);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeLt(Expr<?> e1, Expr<?> e2) {
         if (e1 instanceof FPExpr || e2 instanceof FPExpr)
             return z3.mkFPLt(toFP(e1), toFP(e2));
@@ -146,7 +146,7 @@ public class TranslatorToZ3 {
         return z3.mkLt((ArithExpr) e1, (ArithExpr) e2);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeLtEq(Expr<?> e1, Expr<?> e2) {
         if (e1 instanceof FPExpr || e2 instanceof FPExpr)
             return z3.mkFPLEq(toFP(e1), toFP(e2));
@@ -154,7 +154,7 @@ public class TranslatorToZ3 {
         return z3.mkLe((ArithExpr) e1, (ArithExpr) e2);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeGt(Expr<?> e1, Expr<?> e2) {
         if (e1 instanceof FPExpr || e2 instanceof FPExpr)
             return z3.mkFPGt(toFP(e1), toFP(e2));
@@ -162,7 +162,7 @@ public class TranslatorToZ3 {
         return z3.mkGt((ArithExpr) e1, (ArithExpr) e2);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeGtEq(Expr<?> e1, Expr<?> e2) {
         if (e1 instanceof FPExpr || e2 instanceof FPExpr)
             return z3.mkFPGEq(toFP(e1), toFP(e2));
@@ -196,7 +196,7 @@ public class TranslatorToZ3 {
     // }
 
     // ##################### Unary Operations #####################
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeMinus(Expr<?> eval) {
         if (eval instanceof FPExpr)
             return z3.mkFPNeg((FPExpr) eval);
@@ -204,7 +204,7 @@ public class TranslatorToZ3 {
     }
 
     // #####################Arithmetic Operations#####################
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeAdd(Expr<?> eval, Expr<?> eval2) {
         if (eval instanceof FPExpr || eval2 instanceof FPExpr)
             return z3.mkFPAdd(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
@@ -213,7 +213,7 @@ public class TranslatorToZ3 {
 
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeSub(Expr<?> eval, Expr<?> eval2) {
         if (eval instanceof FPExpr || eval2 instanceof FPExpr)
             return z3.mkFPSub(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
@@ -221,7 +221,7 @@ public class TranslatorToZ3 {
         return z3.mkSub((ArithExpr) eval, (ArithExpr) eval2);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeMul(Expr<?> eval, Expr<?> eval2) {
         if (eval instanceof FPExpr || eval2 instanceof FPExpr)
             return z3.mkFPMul(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
@@ -229,7 +229,7 @@ public class TranslatorToZ3 {
         return z3.mkMul((ArithExpr) eval, (ArithExpr) eval2);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeDiv(Expr<?> eval, Expr<?> eval2) {
         if (eval instanceof FPExpr || eval2 instanceof FPExpr)
             return z3.mkFPDiv(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));

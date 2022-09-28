@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectIfThen {
     public void have2(int a, int b) {
         @repair.regen.specification.Refinement("pos > 0")

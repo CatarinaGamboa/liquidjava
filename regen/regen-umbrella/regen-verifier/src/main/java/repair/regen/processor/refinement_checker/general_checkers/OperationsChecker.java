@@ -65,8 +65,8 @@ public class OperationsChecker {
         Constraint oper;
         CtElement parent = operator.getParent();
         if (parent instanceof CtAssignment<?, ?>
-                && ((CtAssignment<?,?>) parent).getAssigned() instanceof CtVariableWrite<?>) {
-            CtVariableWrite<?> parentVar = (CtVariableWrite<?>) ((CtAssignment<?,?>) parent).getAssigned();
+                && ((CtAssignment<?, ?>) parent).getAssigned() instanceof CtVariableWrite<?>) {
+            CtVariableWrite<?> parentVar = (CtVariableWrite<?>) ((CtAssignment<?, ?>) parent).getAssigned();
             oper = getOperationRefinements(operator, parentVar, operator);
 
         } else {

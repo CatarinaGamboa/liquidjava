@@ -139,7 +139,8 @@ public class RefinementTypeChecker extends TypeChecker {
             } catch (ParsingException e) {
                 return;// error already in ErrorEmitter
             }
-            context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), a.orElse(new Predicate()), localVariable);
+            context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), a.orElse(new Predicate()),
+                    localVariable);
         } else {
             String varName = localVariable.getSimpleName();
             CtExpression<?> e = localVariable.getAssignment();

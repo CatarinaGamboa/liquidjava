@@ -50,7 +50,7 @@ public class AuxStateHandler {
      *
      * @throws ParsingException
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, TypeChecker tc)
             throws ParsingException {
         List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
@@ -144,7 +144,7 @@ public class AuxStateHandler {
         f.setAllStates(l);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, RefinedFunction f,
             TypeChecker tc, CtElement e) throws ParsingException {
         Map<String, CtExpression> m = ctAnnotation.getAllValues();
@@ -439,7 +439,7 @@ public class AuxStateHandler {
             VariableInstance vi = (VariableInstance) elem.getMetadata(tc.TARGET_KEY);
             Optional<Variable> v = vi.getParent();
             invocation.putMetadata(tc.TARGET_KEY, vi);
-            return v.map( i -> i.getName()).orElse(vi.getName());
+            return v.map(i -> i.getName()).orElse(vi.getName());
         }
         return null;
     }

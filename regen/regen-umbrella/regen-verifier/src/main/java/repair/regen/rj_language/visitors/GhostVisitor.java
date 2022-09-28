@@ -26,7 +26,7 @@ public class GhostVisitor {
             // return new Triple<String, String, List<Pair<String,String>>>(type, name, args);
         } else if (rc.getChildCount() > 0) {
             int i = rc.getChildCount();
-            if ( i > 0)
+            if (i > 0)
                 return getGhostDecl(rc.getChild(0));
         }
         return null;

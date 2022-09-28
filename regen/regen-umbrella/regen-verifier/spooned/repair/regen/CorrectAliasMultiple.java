@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 @repair.regen.specification.RefinementAlias("type Positive(double x) { x > 0}")
 @repair.regen.specification.RefinementAlias("type PtGrade(double x) { x >= 0 && x <= 20}")
 public class CorrectAliasMultiple {

@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class ErrorBooleanFunInvocation {
     @repair.regen.specification.Refinement("_ == (n > 10)")
     public static boolean greaterThanTen(int n) {

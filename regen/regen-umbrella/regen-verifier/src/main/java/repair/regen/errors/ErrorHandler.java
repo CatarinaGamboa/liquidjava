@@ -246,7 +246,8 @@ public class ErrorHandler {
             formatter.format("| %-32s | %-60s | %-1s \n", s, map.get(s).getText(), map.get(s).getSimplePosition());
         // end
         formatter.format(printLine() + "\n\n");
+        String s = formatter.toString();
         formatter.close();
-        return formatter.toString();
+        return s;
     }
 }

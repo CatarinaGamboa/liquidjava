@@ -1,6 +1,7 @@
 package repair.regen.math.errorMultiplyExact;
 
 
+@java.lang.SuppressWarnings("unused")
 public class ErrorMathMultiplyExact {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("_ == 40")

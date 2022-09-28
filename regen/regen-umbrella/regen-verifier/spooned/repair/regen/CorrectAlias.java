@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 @repair.regen.specification.RefinementAlias("type PtGrade(int x) { x >= 0 && x <= 20}")
 public class CorrectAlias {
     public static void main(java.lang.String[] args) {

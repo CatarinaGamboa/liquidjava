@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectPrimitiveNumbersTypes {
     @repair.regen.specification.Refinement("_ < i && _ > 0")
     private static double fromType(@repair.regen.specification.Refinement("_ > 0")

@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class ErrorFunctionInvocationParams {
     @repair.regen.specification.Refinement("_ >= a")
     public static int posMult(@repair.regen.specification.Refinement("a == 10")

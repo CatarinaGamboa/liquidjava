@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectNoRefinements {
     private static int addOne(int i) {
         return i + 1;

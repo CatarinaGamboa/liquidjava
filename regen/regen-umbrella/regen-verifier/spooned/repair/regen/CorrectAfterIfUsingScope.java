@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectAfterIfUsingScope {
     public static void main(java.lang.String[] args) {
         // Example 1

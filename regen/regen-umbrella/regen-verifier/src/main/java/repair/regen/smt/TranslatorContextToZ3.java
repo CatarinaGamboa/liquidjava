@@ -19,7 +19,8 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class TranslatorContextToZ3 {
 
-    static void translateVariables(Context z3, Map<String, CtTypeReference<?>> ctx, Map<String, Expr<?>> varTranslation) {
+    static void translateVariables(Context z3, Map<String, CtTypeReference<?>> ctx,
+            Map<String, Expr<?>> varTranslation) {
 
         for (String name : ctx.keySet())
             varTranslation.put(name, getExpr(z3, name, ctx.get(name)));
@@ -119,7 +120,8 @@ public class TranslatorContextToZ3 {
         }
     }
 
-    public static void addGhostStates(Context z3, List<GhostState> ghostState, Map<String, FuncDecl<?>> funcTranslation) {
+    public static void addGhostStates(Context z3, List<GhostState> ghostState,
+            Map<String, FuncDecl<?>> funcTranslation) {
         for (GhostState g : ghostState) {
             addGhostFunction(z3, g, funcTranslation);
             // if(g.getRefinement() != null)

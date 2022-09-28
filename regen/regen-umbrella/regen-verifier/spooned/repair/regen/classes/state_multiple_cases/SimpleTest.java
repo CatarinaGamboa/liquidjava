@@ -24,6 +24,7 @@ package repair.regen.classes.state_multiple_cases;
 // double b = 0/0;
 // @Refinement("_ > 5")
 // double c = b;
+@java.lang.SuppressWarnings("unused")
 public class SimpleTest {
     public static void main(java.lang.String[] args) throws java.io.IOException {
         java.io.InputStreamReader isr = new java.io.InputStreamReader(java.lang.System.in);
