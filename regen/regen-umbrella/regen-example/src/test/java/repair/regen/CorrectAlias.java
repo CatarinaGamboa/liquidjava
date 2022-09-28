@@ -3,6 +3,7 @@ package repair.regen;
 import repair.regen.specification.Refinement;
 import repair.regen.specification.RefinementAlias;
 
+@SuppressWarnings("unused")
 @RefinementAlias("type PtGrade(int x) { x >= 0 && x <= 20}")
 public class CorrectAlias {
 	

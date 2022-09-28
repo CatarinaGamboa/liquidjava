@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class CorrectFPArithmetic {
 	public static void main(String[] args) {
 		@Refinement("_ > 5.0")

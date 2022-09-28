@@ -5,6 +5,7 @@ package repair.regen.classes.email2;
 // Suppose there is only one acceptable order to construct the email
 // add sender -> add multiple receivers -> add subject <optional> -> add body -> build()
 // @RefinementAlias("EmptyEmail(Email e) { state(e) == 1}")
+@java.lang.SuppressWarnings("unused")
 public class Email {
     private java.lang.String sender;
 

@@ -1,13 +1,6 @@
 package repair.regen.classes.state_from_superclass_correct;
 
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.file.spi.FileSystemProvider;
-
-import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.RefinementPredicate;
 
 public class SimpleTest {
 	

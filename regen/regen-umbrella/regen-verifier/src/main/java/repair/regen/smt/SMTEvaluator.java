@@ -9,40 +9,38 @@ import repair.regen.ast.Expression;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.context.Context;
-import repair.regen.rj_language.RefinementsParser;
 
 public class SMTEvaluator {
 
-	public void verifySubtype(Constraint subRef, Constraint supRef, Context c) throws TypeCheckError, GhostFunctionError, Exception {
-		// Creates a parser for our SMT-ready refinement language
-		// Discharges the verification to z3 
+    public void verifySubtype(Constraint subRef, Constraint supRef, Context c)
+            throws TypeCheckError, GhostFunctionError, Exception {
+        // Creates a parser for our SMT-ready refinement language
+        // Discharges the verification to z3
 
-		Constraint toVerify = Conjunction.createConjunction(subRef, supRef.negate());
-		System.out.println(toVerify.toString()); //TODO remove
-		
-		
-		try {
-			Expression exp = toVerify.getExpression();
-			TranslatorToZ3 tz3 = new TranslatorToZ3(c);
-			//com.microsoft.z3.Expr
-			Expr e = exp.eval(tz3);
-			Status s = tz3.verifyExpression(e);
-			if (s.equals(Status.SATISFIABLE)) {
-				throw new TypeCheckError(subRef + " not a subtype of " + supRef);
-			}
-			
-		} catch (SyntaxException e1) {
-			System.out.println("Could not parse: " + toVerify);
-			e1.printStackTrace();
-		} catch(Z3Exception e) {
-			if(e.getLocalizedMessage().substring(0, 24).equals("Wrong number of argument") ||
-					e.getLocalizedMessage().substring(0, 13).equals("Sort mismatch"))
-				throw new GhostFunctionError(e.getLocalizedMessage());
-			else
-				throw new Z3Exception(e.getLocalizedMessage());
-		}
+        Constraint toVerify = Conjunction.createConjunction(subRef, supRef.negate());
+        System.out.println(toVerify.toString()); // TODO remove
 
-	}
+        try {
+            Expression exp = toVerify.getExpression();
+            TranslatorToZ3 tz3 = new TranslatorToZ3(c);
+            // com.microsoft.z3.Expr
+            Expr<?> e = exp.eval(tz3);
+            Status s = tz3.verifyExpression(e);
+            if (s.equals(Status.SATISFIABLE)) {
+                throw new TypeCheckError(subRef + " not a subtype of " + supRef);
+            }
 
+        } catch (SyntaxException e1) {
+            System.out.println("Could not parse: " + toVerify);
+            e1.printStackTrace();
+        } catch (Z3Exception e) {
+            if (e.getLocalizedMessage().substring(0, 24).equals("Wrong number of argument")
+                    || e.getLocalizedMessage().substring(0, 13).equals("Sort mismatch"))
+                throw new GhostFunctionError(e.getLocalizedMessage());
+            else
+                throw new Z3Exception(e.getLocalizedMessage());
+        }
+
+    }
 
 }

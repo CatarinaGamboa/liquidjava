@@ -1,6 +1,7 @@
 package repair.regen.math.correctInvocation;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectInvocationFromMathLibrary {
     public static void main(java.lang.String[] args) {
         // Math.abs(...)

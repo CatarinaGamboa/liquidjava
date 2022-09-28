@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class CorrectPrimitiveNumbersTypes {
 	@Refinement("_ < i && _ > 0")
 	private static double fromType(@Refinement("_ > 0")int i) {

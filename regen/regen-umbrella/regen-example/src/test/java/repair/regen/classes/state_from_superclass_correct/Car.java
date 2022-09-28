@@ -1,10 +1,8 @@
 package repair.regen.classes.state_from_superclass_correct;
 
-import repair.regen.specification.Refinement;
-import repair.regen.specification.RefinementAlias;
-import repair.regen.specification.RefinementPredicate;
 import repair.regen.specification.StateRefinement;
 import repair.regen.specification.StateSet;
+
 @StateSet({"open", "close"})
 public abstract class Car {
 
@@ -15,5 +13,4 @@ public abstract class Car {
 	@StateRefinement(from = "open(this)", to="close(this)")
 	public abstract void close(); 
 	
-
 }

@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class ErrorFunctionInvocation1 {
     @repair.regen.specification.Refinement("_ == 2")
     private static int getTwo() {

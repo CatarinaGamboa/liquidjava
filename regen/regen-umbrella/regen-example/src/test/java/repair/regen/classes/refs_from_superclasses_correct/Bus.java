@@ -2,7 +2,9 @@ package repair.regen.classes.refs_from_superclasses_correct;
 
 import repair.regen.specification.Refinement;
 
-public class Bus extends Car{
+@SuppressWarnings("unused")
+public class Bus extends Car {
+
 	private int year;
 	@Refinement("_ > 20")
 	private int seats;

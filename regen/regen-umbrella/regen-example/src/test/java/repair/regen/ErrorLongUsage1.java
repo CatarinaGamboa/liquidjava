@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorLongUsage1 {
 	public static void main(String[] args) {
 		@Refinement("a > 5")

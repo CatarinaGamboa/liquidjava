@@ -2,6 +2,7 @@ package repair.regen.math.errorAbs;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorMathAbs {
 	public static void main(String[] args) {
 		@Refinement("true")

@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class CorrectUsingAfterIf {
 	public void have2(int a, int b) {
 		@Refinement("pos > 0")

@@ -20,107 +20,105 @@ import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
 public class AliasWrapper {
-	private String name;
-	private List<CtTypeReference<?>> varTypes;
-	private List<String> varNames;
-	private Predicate expression;
-//	private Context context;
-	
-	private String newAliasFormat = "#alias_%s_%d";
+    private String name;
+    private List<CtTypeReference<?>> varTypes;
+    private List<String> varNames;
+    private Predicate expression;
+    // private Context context;
 
-	public AliasWrapper(AliasDTO a, Factory factory, String wILD_VAR,
-			Context context2, String klass, String path) {
-		name = a.getName();
-		expression = new Predicate(a.getExpression());
-		
-		varTypes = new ArrayList<>();
-		varNames = a.getVarNames();
-		for(String s: a.getVarTypes()) {
-			CtTypeReference<?> r = Utils.getType(s.equals(klass)? path: s, factory);
-			varTypes.add(r);
-		}			
-	}
+    private String newAliasFormat = "#alias_%s_%d";
 
-	public String getName() {
-		return name;
-	}
-	
-	public List<CtTypeReference<?>> getTypes() {
-		return varTypes;
-	}
-	
-	
-	public List<String> getVarNames() {
-		return varNames;
-	}
-	public Predicate getClonedConstraint() {
-		return (Predicate) expression.clone();
-	}
+    public AliasWrapper(AliasDTO a, Factory factory, String wILD_VAR, Context context2, String klass, String path) {
+        name = a.getName();
+        expression = new Predicate(a.getExpression());
 
-	public Expression getNewExpression(List<String> newNames) {
-		Constraint expr = getClonedConstraint();
-		for (int i = 0; i < newNames.size(); i++) {
-			expr = expr.substituteVariable(varNames.get(i), newNames.get(i));
-		}
-		return expr.getExpression().clone();		
-	}
-	
-	
-	public Constraint getPremises(List<String> list, List<String> newNames, CtElement elem, ErrorEmitter ee) throws ParsingException{
-		List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem, ee);
-		Constraint prem = new Predicate();
-		for (int i = 0; i < invocationPredicates.size(); i++) {
-			prem = Conjunction.createConjunction(prem, 
-					new EqualsPredicate(new VariablePredicate(newNames.get(i)) , invocationPredicates.get(i)));
-		}
-		return prem.clone();
-	}
+        varTypes = new ArrayList<>();
+        varNames = a.getVarNames();
+        for (String s : a.getVarTypes()) {
+            CtTypeReference<?> r = Utils.getType(s.equals(klass) ? path : s, factory);
+            varTypes.add(r);
+        }
+    }
 
-	private List<Predicate> getPredicatesFromExpression(List<String> list, CtElement elem, ErrorEmitter ee) throws ParsingException {
-		List<Predicate> lp = new ArrayList<>();
-		for(String e: list)
-			lp.add(new Predicate(e, elem, ee));
-	
-		return lp;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public List<String> getNewVariables(Context context) {
-		List<String> n = new ArrayList<>();
-		for(int i=0; i < varNames.size(); i++) 
-			n.add(String.format(newAliasFormat, varNames.get(i), context.getCounter()));
-		return n;
-	}
-	
-	public Map<String, CtTypeReference<?>> getTypes(List<String> names){
-		Map<String, CtTypeReference<?>> m = new HashMap<>();
-		for (int i = 0; i < names.size(); i++) {
-			m.put(names.get(i), varTypes.get(i));
-		}
-		return m;
-	}
+    public List<CtTypeReference<?>> getTypes() {
+        return varTypes;
+    }
 
-	public AliasDTO createAliasDTO() {
-		return new AliasDTO(name, varTypes, varNames, expression.getExpression());		
-	}
-	
+    public List<String> getVarNames() {
+        return varNames;
+    }
 
-//	public Expression getSubstitutedExpression(List<String> newNames) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-//	
-	
-	
-//	TypeKeyword tk;
-//	AliasName name;
-//	
-//	ParenthesisLeft pl;
-//	Type type;
-//	Var var;
-//	ParenthesisRight rl;
-//	
-//	BraceLeft bl;
-//	Expression e;
-//	BraceRight br;
+    public Predicate getClonedConstraint() {
+        return (Predicate) expression.clone();
+    }
+
+    public Expression getNewExpression(List<String> newNames) {
+        Constraint expr = getClonedConstraint();
+        for (int i = 0; i < newNames.size(); i++) {
+            expr = expr.substituteVariable(varNames.get(i), newNames.get(i));
+        }
+        return expr.getExpression().clone();
+    }
+
+    public Constraint getPremises(List<String> list, List<String> newNames, CtElement elem, ErrorEmitter ee)
+            throws ParsingException {
+        List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem, ee);
+        Constraint prem = new Predicate();
+        for (int i = 0; i < invocationPredicates.size(); i++) {
+            prem = Conjunction.createConjunction(prem,
+                    new EqualsPredicate(new VariablePredicate(newNames.get(i)), invocationPredicates.get(i)));
+        }
+        return prem.clone();
+    }
+
+    private List<Predicate> getPredicatesFromExpression(List<String> list, CtElement elem, ErrorEmitter ee)
+            throws ParsingException {
+        List<Predicate> lp = new ArrayList<>();
+        for (String e : list)
+            lp.add(new Predicate(e, elem, ee));
+
+        return lp;
+    }
+
+    public List<String> getNewVariables(Context context) {
+        List<String> n = new ArrayList<>();
+        for (int i = 0; i < varNames.size(); i++)
+            n.add(String.format(newAliasFormat, varNames.get(i), context.getCounter()));
+        return n;
+    }
+
+    public Map<String, CtTypeReference<?>> getTypes(List<String> names) {
+        Map<String, CtTypeReference<?>> m = new HashMap<>();
+        for (int i = 0; i < names.size(); i++) {
+            m.put(names.get(i), varTypes.get(i));
+        }
+        return m;
+    }
+
+    public AliasDTO createAliasDTO() {
+        return new AliasDTO(name, varTypes, varNames, expression.getExpression());
+    }
+
+    // public Expression getSubstitutedExpression(List<String> newNames) {
+    // // TODO Auto-generated method stub
+    // return null;
+    // }
+    //
+
+    // TypeKeyword tk;
+    // AliasName name;
+    //
+    // ParenthesisLeft pl;
+    // Type type;
+    // Var var;
+    // ParenthesisRight rl;
+    //
+    // BraceLeft bl;
+    // Expression e;
+    // BraceRight br;
 
 }

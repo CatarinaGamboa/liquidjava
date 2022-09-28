@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorSpecificArithmetic {
 	public static void main(String[] args) {
 		@Refinement("_ > 5")

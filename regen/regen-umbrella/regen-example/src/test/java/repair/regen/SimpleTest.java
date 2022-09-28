@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class SimpleTest {
 	public static void main(String[] args) {
 	//Arithmetic Binary Operations

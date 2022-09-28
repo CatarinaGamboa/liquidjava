@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class ErrorSpecificValuesIf {
     public static void addZ(@repair.regen.specification.Refinement("a > 0")
     int a) {

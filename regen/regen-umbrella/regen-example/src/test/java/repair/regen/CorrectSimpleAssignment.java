@@ -2,6 +2,8 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+
+@SuppressWarnings("unused")
 public class CorrectSimpleAssignment {
 	public static void main(String[] args) {
 		@Refinement("a > 0")

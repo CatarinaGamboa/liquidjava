@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectArithmeticBinaryOperations {
     public static void main(java.lang.String[] args) {
         // Arithmetic Binary Operations

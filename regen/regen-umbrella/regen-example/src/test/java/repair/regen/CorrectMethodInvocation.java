@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class CorrectMethodInvocation {
 
 	@Refinement("_ == 2")

@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectFunctionCallSameVariableName {
     @repair.regen.specification.Refinement(" _ == a + 1")
     private static int addOnes(@repair.regen.specification.Refinement("a > 20")

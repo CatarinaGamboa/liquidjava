@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorLongUsage2 {
 	
 	@Refinement(" _ > 40")

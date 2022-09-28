@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class ErrorIfAssignment {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("_ < 10")

@@ -11,6 +11,7 @@ public class CorrectAliasExpressions {
 		return 15;
 	}
 	
+	@SuppressWarnings("unused")
 	public static void main(String[] args) {
 		
 		@Refinement("InRange( _, 10, 122+5)")

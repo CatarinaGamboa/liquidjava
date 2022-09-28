@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorAfterIf2 {
 	public static void main(String[] args) {
 		@Refinement("k > 0 && k < 100")

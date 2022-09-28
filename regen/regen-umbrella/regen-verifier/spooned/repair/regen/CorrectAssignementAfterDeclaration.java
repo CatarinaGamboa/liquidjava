@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectAssignementAfterDeclaration {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("(z > 0) && (z < 50)")

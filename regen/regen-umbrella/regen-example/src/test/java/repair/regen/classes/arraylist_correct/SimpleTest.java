@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class SimpleTest {
 	
 	public static void main(String[] args) throws IOException{

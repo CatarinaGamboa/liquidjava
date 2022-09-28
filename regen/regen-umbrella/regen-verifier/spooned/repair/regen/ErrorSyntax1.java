@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class ErrorSyntax1 {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("_ < 100 +")

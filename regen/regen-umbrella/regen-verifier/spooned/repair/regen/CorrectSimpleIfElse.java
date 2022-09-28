@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectSimpleIfElse {
     @repair.regen.specification.Refinement("_ > 0")
     public static int toPositive(@repair.regen.specification.Refinement("a < 0")

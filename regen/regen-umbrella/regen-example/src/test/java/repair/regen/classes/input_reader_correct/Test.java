@@ -1,11 +1,11 @@
 package repair.regen.classes.input_reader_correct;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.InputStreamReader;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class Test {
 	public static void main(String[] args) throws Exception {
 		InputStreamReader isr = new InputStreamReader(new FileInputStream("test1.txt"));
@@ -14,5 +14,6 @@ public class Test {
 		char[] arr = new char[20];		
 		int b = isr.read(arr, 10, 5);
 		System.out.println(arr);
+		isr.close();
 	}
 }

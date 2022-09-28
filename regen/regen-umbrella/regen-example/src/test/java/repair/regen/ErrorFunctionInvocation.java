@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class ErrorFunctionInvocation {
 	@Refinement(" _ >= a")
     public static int posMult(@Refinement("a == 10") int a, 

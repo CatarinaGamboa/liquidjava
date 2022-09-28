@@ -1,6 +1,7 @@
 package repair.regen.classes.car1;
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class Test {
 
 	@Refinement("_ < 10")

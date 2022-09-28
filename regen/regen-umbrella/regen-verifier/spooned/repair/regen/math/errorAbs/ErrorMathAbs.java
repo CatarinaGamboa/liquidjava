@@ -1,6 +1,7 @@
 package repair.regen.math.errorAbs;
 
 
+@java.lang.SuppressWarnings("unused")
 public class ErrorMathAbs {
     public static void main(java.lang.String[] args) {
         @repair.regen.specification.Refinement("true")

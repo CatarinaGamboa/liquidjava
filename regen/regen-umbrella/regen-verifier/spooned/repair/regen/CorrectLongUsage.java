@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectLongUsage {
     @repair.regen.specification.Refinement("_ > 10")
     public static long doubleBiggerThanTen(@repair.regen.specification.Refinement("a > 10")

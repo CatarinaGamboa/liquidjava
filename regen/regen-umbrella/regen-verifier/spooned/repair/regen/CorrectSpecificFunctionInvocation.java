@@ -1,6 +1,7 @@
 package repair.regen;
 
 
+@java.lang.SuppressWarnings("unused")
 public class CorrectSpecificFunctionInvocation {
     @repair.regen.specification.Refinement(" _ > 0")
     public static int doubleBiggerThanTen(@repair.regen.specification.Refinement("a > 10")

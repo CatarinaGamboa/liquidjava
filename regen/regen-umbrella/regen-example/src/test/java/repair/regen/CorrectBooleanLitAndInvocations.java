@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class CorrectBooleanLitAndInvocations {	
 	@Refinement("_ == (n > 10)")
 	public static boolean greaterThanTen(int n) {

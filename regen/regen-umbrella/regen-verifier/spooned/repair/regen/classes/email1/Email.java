@@ -4,6 +4,7 @@ package repair.regen.classes.email1;
 // https://blog.sigplan.org/2021/03/02/fluent-api-practice-and-theory/
 // Suppose there is only one acceptable order to construct the email
 // add sender -> add multiple receivers -> add subject <optional> -> add body -> build()
+@java.lang.SuppressWarnings("unused")
 @repair.regen.specification.RefinementAlias("EmptyEmail (Email e) { state(e) == 1}")
 @repair.regen.specification.RefinementAlias("SenderSet  (Email e) { state(e) == 2}")
 @repair.regen.specification.RefinementAlias("ReceiverSet(Email e) { state(e) == 3}")

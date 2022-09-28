@@ -2,6 +2,7 @@ package repair.regen;
 
 import repair.regen.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class CorrectAfterIfUsingScope {
 	public static void main(String[] args) {
 		//Example 1
