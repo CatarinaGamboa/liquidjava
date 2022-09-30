@@ -3,11 +3,13 @@ package regen.test.project;
 
 class SimpleTest {
     public static void main(java.lang.String[] args) {
-        regen.test.project.AccountClient ac = new regen.test.project.AccountClient();
-        regen.test.project.Account a = new regen.test.project.Account();
-        a.add(100);
-        a.withdraw(100);
-        a.withdraw(1);
+        // AccountClient ac = new AccountClient();
+        // Account a = new Account();
+        // a.add(100);
+        // a.withdraw(100);
+        // a.withdraw(1);
+        @repair.regen.specification.Refinement("x > 0 &&" + "x < 100")
+        int x = 10;
         // Account b = new Account();
         // a.add(10);
         // ac.transfer(a, b, 5);

@@ -78,16 +78,17 @@ public abstract class TypeChecker extends CtScanner {
         for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
             String an = ann.getActualAnnotation().annotationType().getCanonicalName();
             if (an.contentEquals("repair.regen.specification.Refinement")) {
-                CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-                ref = Optional.of(s.getValue());
+            	String st = TypeCheckingUtils.getStringFromAnnotation(ann.getValue("value"));
+                //CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
+                ref = Optional.of(st);
 
             } else if (an.contentEquals("repair.regen.specification.RefinementPredicate")) {
-                CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-                getGhostFunction(s.getValue(), element);
+            	String st = TypeCheckingUtils.getStringFromAnnotation(ann.getValue("value"));
+                getGhostFunction(st, element);
 
             } else if (an.contentEquals("repair.regen.specification.RefinementAlias")) {
-                CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-                handleAlias(s.getValue(), element);
+                String st = TypeCheckingUtils.getStringFromAnnotation(ann.getValue("value"));
+                handleAlias(st, element);
 
             }
 

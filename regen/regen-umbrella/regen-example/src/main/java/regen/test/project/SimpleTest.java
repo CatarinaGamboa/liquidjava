@@ -1,14 +1,19 @@
 package regen.test.project;
 
+import repair.regen.specification.Refinement;
+
 class SimpleTest {
 	public static void main(String[] args) {
 
-		AccountClient ac = new AccountClient();
-		Account a = new Account();
-		a.add(100);
-		a.withdraw(100);
-		a.withdraw(1);
-		
+//		AccountClient ac = new AccountClient();
+//		Account a = new Account();
+//		a.add(100);
+//		a.withdraw(100);
+//		a.withdraw(1);
+
+		@Refinement("x > 0 &&"
+				+ "x < 100")
+		int x = 10;
 //		Account b = new Account();
 //		a.add(10);
 //		ac.transfer(a, b, 5);
