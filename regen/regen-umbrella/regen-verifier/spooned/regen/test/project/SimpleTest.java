@@ -5,10 +5,13 @@ class SimpleTest {
     public static void main(java.lang.String[] args) {
         regen.test.project.AccountClient ac = new regen.test.project.AccountClient();
         regen.test.project.Account a = new regen.test.project.Account();
-        regen.test.project.Account b = new regen.test.project.Account();
-        a.add(10);
-        ac.transfer(a, b, 5);
-        ac.transfer(a, b, 9);
+        a.add(100);
+        a.withdraw(100);
+        a.withdraw(1);
+        // Account b = new Account();
+        // a.add(10);
+        // ac.transfer(a, b, 5);
+        // ac.transfer(a, b, 9);
     }
 }
 

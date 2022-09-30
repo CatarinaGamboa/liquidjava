@@ -5,10 +5,14 @@ class SimpleTest {
 
 		AccountClient ac = new AccountClient();
 		Account a = new Account();
-		Account b = new Account();
-		a.add(10);
-		ac.transfer(a, b, 5);
-		ac.transfer(a, b, 9);
+		a.add(100);
+		a.withdraw(100);
+		a.withdraw(1);
+		
+//		Account b = new Account();
+//		a.add(10);
+//		ac.transfer(a, b, 5);
+//		ac.transfer(a, b, 9);
 	}
 	
 	

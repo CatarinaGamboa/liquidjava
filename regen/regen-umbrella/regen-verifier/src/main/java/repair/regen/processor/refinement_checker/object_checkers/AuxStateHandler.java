@@ -25,7 +25,9 @@ import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
+import repair.regen.processor.refinement_checker.TypeCheckingUtils;
 import repair.regen.rj_language.ParsingException;
+import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
@@ -148,22 +150,23 @@ public class AuxStateHandler {
     private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, RefinedFunction f,
             TypeChecker tc, CtElement e) throws ParsingException {
         Map<String, CtExpression> m = ctAnnotation.getAllValues();
-        CtLiteral<String> from = (CtLiteral<String>) m.get("from");
-        CtLiteral<String> to = (CtLiteral<String>) m.get("to");
+        String from = TypeCheckingUtils.getStringFromAnnotation(m.get("from"));
+        String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
         ObjectState state = new ObjectState();
         if (from != null) // has From
-            state.setFrom(createStateConstraint(from.getValue(), f, tc, e, false));
+            state.setFrom(createStateConstraint(from, f, tc, e, false));
         if (to != null) // has To
-            state.setTo(createStateConstraint(to.getValue(), f, tc, e, true));
+            state.setTo(createStateConstraint(to, f, tc, e, true));
 
         if (from != null && to == null) // has From but not To -> the state remains the same
-            state.setTo(createStateConstraint(from.getValue(), f, tc, e, true));
+            state.setTo(createStateConstraint(from, f, tc, e, true));
         if (from == null && to != null) // has To but not From -> enters with true and exists with a specific state
             state.setFrom(new Predicate());
         return state;
     }
 
-    private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e,
+
+	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e,
             boolean isTo) throws ParsingException {
         Predicate p = new Predicate(value, e, tc.getErrorEmitter());
         String t = f.getTargetClass();
@@ -173,7 +176,7 @@ public class AuxStateHandler {
         String name = String.format(tc.instanceFormat, tc.THIS, tc.getContext().getCounter());
         tc.getContext().addVarToContext(name, r, new Predicate(), e);
         tc.getContext().addVarToContext(nameOld, r, new Predicate(), e);
-        // TODO REVER!!
+        // TODO REVIEW!!
 
         Constraint c1 = isTo ? getMissingStates(t, tc, p) : p;
         Constraint c = c1.substituteVariable(tc.THIS, name);

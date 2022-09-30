@@ -14,6 +14,7 @@ import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
+import repair.regen.processor.refinement_checker.TypeCheckingUtils;
 import repair.regen.rj_language.ParsingException;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
@@ -29,6 +30,7 @@ import spoon.reflect.code.CtUnaryOperator;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.code.CtVariableWrite;
 import spoon.reflect.code.UnaryOperatorKind;
+import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtExecutable;
@@ -64,14 +66,17 @@ public class OperationsChecker {
         CtExpression<?> left = operator.getLeftHandOperand();
         Constraint oper;
         CtElement parent = operator.getParent();
+        
+        if(parent instanceof CtAnnotation) return; //Operations in annotations are not handled here
+        
         if (parent instanceof CtAssignment<?, ?>
                 && ((CtAssignment<?, ?>) parent).getAssigned() instanceof CtVariableWrite<?>) {
             CtVariableWrite<?> parentVar = (CtVariableWrite<?>) ((CtAssignment<?, ?>) parent).getAssigned();
             oper = getOperationRefinements(operator, parentVar, operator);
 
         } else {
-            Constraint varRight = getOperationRefinements(operator, right);
             Constraint varLeft = getOperationRefinements(operator, left);
+            Constraint varRight = getOperationRefinements(operator, right);
             oper = new OperationPredicate(varLeft, getOperatorFromKind(operator.getKind()), varRight);
             // new Predicate(String.format("(%s %s %s)",
             // varLeft,,varRight));

@@ -26,6 +26,7 @@ public class MethodsFirstChecker extends TypeChecker {
         super(c, fac, errorEmitter);
         mfc = new MethodsFunctionsChecker(this);
         visitedClasses = new ArrayList<>();
+        System.out.println("In Methids First Checker");
     }
 
     @Override
