@@ -179,5 +179,8 @@ public class Predicate extends Constraint {
     	return new Predicate(new BinaryExpression(c1.getExpression(), op, c2.getExpression()));
     }
 
+    public static Predicate createVar(String name) {
+    	return new Predicate(new Var(name));
+    }
 
 }

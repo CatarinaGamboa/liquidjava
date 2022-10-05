@@ -8,7 +8,6 @@ import java.util.Map;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ast.Expression;
 import repair.regen.rj_language.parsing.ParsingException;
@@ -68,7 +67,7 @@ public class AliasWrapper {
         Constraint prem = new Predicate();
         for (int i = 0; i < invocationPredicates.size(); i++) {
             prem = Predicate.createConjunction(prem,
-                    Predicate.createEquals(new VariablePredicate(newNames.get(i)), invocationPredicates.get(i)));
+                    Predicate.createEquals(Predicate.createVar(newNames.get(i)), invocationPredicates.get(i)));
         }
         return prem.clone();
     }

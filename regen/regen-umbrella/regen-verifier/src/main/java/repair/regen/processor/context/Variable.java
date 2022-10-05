@@ -7,7 +7,6 @@ import java.util.Stack;
 
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.VariablePredicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public class Variable extends RefinedVariable {
@@ -45,8 +44,8 @@ public class Variable extends RefinedVariable {
         Optional<VariableInstance> ovi = getLastInstance();
         if (ovi.isPresent()) {
             VariableInstance vi = ovi.get();
-            Constraint n = new VariablePredicate(this.getName());
-            Constraint n2 = new VariablePredicate(vi.getName());
+            Constraint n = Predicate.createVar(this.getName());
+            Constraint n2 = Predicate.createVar(vi.getName());
             c = Predicate.createConjunction(Predicate.createEquals(n, n2), c);
         }
         return c;

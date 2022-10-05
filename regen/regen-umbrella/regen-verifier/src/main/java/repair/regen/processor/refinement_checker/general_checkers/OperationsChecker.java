@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
@@ -86,9 +85,11 @@ public class OperationsChecker {
             operator.putMetadata(rtc.REFINE_KEY, oper);
             if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?>
                     || parent instanceof CtReturn<?>)
-                operator.putMetadata(rtc.REFINE_KEY, Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), oper));
+                operator.putMetadata(rtc.REFINE_KEY, 
+                		Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), oper));
         } else if (types.contains(type)) {
-            operator.putMetadata(rtc.REFINE_KEY, Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), oper));
+            operator.putMetadata(rtc.REFINE_KEY, Predicate.createEquals(
+            		Predicate.createVar(rtc.WILD_VAR), oper));
         } else {
             System.out.println("Literal type not implemented");
         }
@@ -150,7 +151,7 @@ public class OperationsChecker {
         if (p instanceof CtIf)
             all = opS;
         else
-            all = Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), opS);// TODO SEE IF () IN OPS IS NEEDED
+            all = Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), opS);// TODO SEE IF () IN OPS IS NEEDED
 
         rtc.getContext().addInstanceToContext(newName, ex.getType(), newMeta, operator);
         operator.putMetadata(rtc.REFINE_KEY, all);
@@ -195,7 +196,7 @@ public class OperationsChecker {
                 String name = String.format(rtc.freshFormat, rtc.getContext().getCounter());
                 rtc.getContext().addVarToContext(name, element.getType(),
                         rtc.getRefinement(element).substituteVariable(rtc.WILD_VAR, name), field);
-                return new VariablePredicate(name);
+                return Predicate.createVar(name);
             }
         }
 
@@ -223,7 +224,7 @@ public class OperationsChecker {
 
             Constraint e = elem_ref.substituteVariable(rtc.WILD_VAR, elemName);
             rtc.getContext().addVarToContext(elemName, elemVar.getType(), e, elemVar);
-            return new VariablePredicate(returnName);
+            return Predicate.createVar(returnName);
         }
 
         else if (element instanceof CtBinaryOperator<?>) {
@@ -326,7 +327,7 @@ public class OperationsChecker {
         Constraint c = getOperatorFromKind(operator.getKind(), ex).substituteVariable(rtc.WILD_VAR, newName);
 
         rtc.getContext().addVarToContext(newName, w.getType(), metadada, w);
-        return Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), c);
+        return Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), c);
     }
 
     // ############################### Operations Auxiliaries ##########################################
