@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.InvocationPredicate;
-import repair.regen.processor.constraints.LiteralPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
@@ -25,6 +24,7 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.processor.refinement_checker.TypeCheckingUtils;
 import repair.regen.rj_language.parsing.ParsingException;
+import repair.regen.utils.Utils;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
@@ -79,7 +79,7 @@ public class AuxStateHandler {
         for (GhostFunction sg : sets) {
             if (sg.getReturnType().toString().equals("int")) {
                 Predicate p = Predicate.createEquals(new InvocationPredicate(tc.getErrorEmitter(), sg.getName(), s),
-                        LiteralPredicate.getIntPredicate(0));
+                        Predicate.createLit("0", Utils.INT));
                 c = Predicate.createConjunction(c, p);
             } else {
                 fail("Ghost Functions not implemented for other types than int -> implement in AuxStateHandler defaultState");
