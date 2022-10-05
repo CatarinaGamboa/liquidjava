@@ -1,4 +1,4 @@
-package repair.regen.processor.constraints;
+package repair.regen.rj_language;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -28,12 +28,17 @@ import repair.regen.utils.Utils;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 
+/**
+ * Acts as a wrapper for Expression AST
+ * @author cgamboa
+ *
+ */
 public class Predicate {
-    
-	private final String OLD = "old";
 
     protected Expression exp;
 
+    
+    
     /**
      * Create a predicate with the expression true
      */
@@ -134,14 +139,15 @@ public class Predicate {
      */
     public Predicate changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
         Expression e = exp.clone();
-        Expression prev = innerParse(previousName, ee);
+        Expression prev = createVar(previousName).getExpression();
         List<Expression> le = new ArrayList<>();
-        le.add(innerParse(newName, ee));
-        e.substituteFunction(OLD, le, prev);
+        le.add(createVar(newName).getExpression());
+        e.substituteFunction(Utils.OLD, le, prev);
         return new Predicate(e);
     }
 
-    public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, ErrorEmitter ee) {
+    public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, 
+    		ErrorEmitter ee) {
         Map<String, Expression> nameRefinementMap = new HashMap<>();
         for (GhostState gs : ghostState)
             if (gs.getRefinement() != null) // is a state and not a ghost state

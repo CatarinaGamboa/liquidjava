@@ -1,6 +1,6 @@
 package repair.regen.processor.context;
 
-import repair.regen.processor.constraints.Predicate;
+import repair.regen.rj_language.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public abstract class Refined {

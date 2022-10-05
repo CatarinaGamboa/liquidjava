@@ -1,5 +1,6 @@
-package repair.regen.processor.constraints;
+package repair.regen.processor;
 
+import repair.regen.rj_language.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 /**

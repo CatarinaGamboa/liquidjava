@@ -6,12 +6,11 @@ import java.util.Optional;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.facade.GhostDTO;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
+import repair.regen.rj_language.Predicate;
 import repair.regen.rj_language.parsing.ParsingException;
 import repair.regen.rj_language.parsing.RefinementsParser;
 import spoon.reflect.declaration.CtClass;

@@ -9,8 +9,6 @@ import java.util.Optional;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
@@ -18,6 +16,7 @@ import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.processor.facade.GhostDTO;
+import repair.regen.rj_language.Predicate;
 import repair.regen.rj_language.parsing.ParsingException;
 import repair.regen.rj_language.parsing.RefinementsParser;
 import repair.regen.utils.Utils;

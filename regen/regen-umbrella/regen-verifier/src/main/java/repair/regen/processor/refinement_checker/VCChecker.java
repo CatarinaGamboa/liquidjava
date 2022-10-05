@@ -9,13 +9,12 @@ import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.VCImplication;
+import repair.regen.processor.VCImplication;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.PlacementInCode;
 import repair.regen.processor.context.RefinedVariable;
+import repair.regen.rj_language.Predicate;
 import repair.regen.smt.GhostFunctionError;
 import repair.regen.smt.NotFoundError;
 import repair.regen.smt.SMTEvaluator;

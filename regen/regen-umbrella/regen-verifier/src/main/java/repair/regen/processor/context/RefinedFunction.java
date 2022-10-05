@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
+import repair.regen.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 

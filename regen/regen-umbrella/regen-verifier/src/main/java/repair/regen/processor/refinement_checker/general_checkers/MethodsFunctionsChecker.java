@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
@@ -20,6 +18,7 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.processor.refinement_checker.object_checkers.AuxHierarchyRefinememtsPassage;
 import repair.regen.processor.refinement_checker.object_checkers.AuxStateHandler;
+import repair.regen.rj_language.Predicate;
 import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;

@@ -11,8 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
 import repair.regen.processor.context.ObjectState;
@@ -22,6 +20,7 @@ import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.processor.refinement_checker.TypeCheckingUtils;
+import repair.regen.rj_language.Predicate;
 import repair.regen.rj_language.parsing.ParsingException;
 import repair.regen.utils.Utils;
 import spoon.reflect.code.CtConstructorCall;

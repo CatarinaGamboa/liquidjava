@@ -2,7 +2,7 @@ package repair.regen.processor.context;
 
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Predicate;
+import repair.regen.rj_language.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public class VariableInstance extends RefinedVariable {

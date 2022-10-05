@@ -6,8 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.errors.ErrorEmitter;
-import repair.regen.processor.constraints.BuiltinFunctionPredicate;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
@@ -15,6 +13,8 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.processor.refinement_checker.general_checkers.OperationsChecker;
 import repair.regen.processor.refinement_checker.object_checkers.AuxStateHandler;
+import repair.regen.rj_language.BuiltinFunctionPredicate;
+import repair.regen.rj_language.Predicate;
 import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;

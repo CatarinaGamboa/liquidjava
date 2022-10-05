@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 
-import repair.regen.processor.constraints.Predicate;
+import repair.regen.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 

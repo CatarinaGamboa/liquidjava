@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 
 import repair.regen.errors.ErrorEmitter;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.facade.AliasDTO;
+import repair.regen.rj_language.Predicate;
 import repair.regen.rj_language.ast.Expression;
 import repair.regen.rj_language.parsing.ParsingException;
 import repair.regen.utils.Utils;

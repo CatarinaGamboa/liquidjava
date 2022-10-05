@@ -1,7 +1,6 @@
 package repair.regen.processor.context;
 
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
+import repair.regen.rj_language.Predicate;
 
 public class ObjectState {
 

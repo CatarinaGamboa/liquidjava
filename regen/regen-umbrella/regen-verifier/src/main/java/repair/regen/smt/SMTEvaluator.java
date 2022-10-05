@@ -5,8 +5,8 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
+import repair.regen.rj_language.Predicate;
 import repair.regen.rj_language.ast.Expression;
 
 public class SMTEvaluator {

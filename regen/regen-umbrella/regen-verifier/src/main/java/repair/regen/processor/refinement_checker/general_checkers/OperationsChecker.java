@@ -4,13 +4,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
+import repair.regen.rj_language.Predicate;
 import repair.regen.rj_language.parsing.ParsingException;
 import repair.regen.utils.Utils;
 import spoon.reflect.code.BinaryOperatorKind;

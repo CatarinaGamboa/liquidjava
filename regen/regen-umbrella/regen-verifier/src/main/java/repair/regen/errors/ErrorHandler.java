@@ -4,9 +4,9 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Locale;
 
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.VCImplication;
+import repair.regen.processor.VCImplication;
 import repair.regen.processor.context.PlacementInCode;
+import repair.regen.rj_language.Predicate;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtElement;
 

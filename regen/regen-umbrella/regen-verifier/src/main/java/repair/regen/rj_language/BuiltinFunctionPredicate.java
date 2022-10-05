@@ -1,4 +1,4 @@
-package repair.regen.processor.constraints;
+package repair.regen.rj_language;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.rj_language.parsing.ParsingException;

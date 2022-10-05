@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
-import repair.regen.processor.constraints.Predicate;
+import repair.regen.rj_language.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public class Variable extends RefinedVariable {

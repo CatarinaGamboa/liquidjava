@@ -5,13 +5,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import repair.regen.processor.constraints.Predicate;
-import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
 import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.refinement_checker.TypeChecker;
+import repair.regen.rj_language.Predicate;
 import repair.regen.utils.Utils;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
