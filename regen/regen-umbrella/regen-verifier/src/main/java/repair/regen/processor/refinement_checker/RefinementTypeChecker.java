@@ -20,7 +20,7 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import repair.regen.processor.refinement_checker.general_checkers.OperationsChecker;
 import repair.regen.processor.refinement_checker.object_checkers.AuxStateHandler;
-import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;

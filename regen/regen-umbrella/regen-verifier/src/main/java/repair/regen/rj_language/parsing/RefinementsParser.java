@@ -1,4 +1,4 @@
-package repair.regen.rj_language;
+package repair.regen.rj_language.parsing;
 
 import java.util.Optional;
 
@@ -8,9 +8,9 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import repair.regen.ast.Expression;
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.processor.facade.GhostDTO;
+import repair.regen.rj_language.ast.Expression;
 import repair.regen.rj_language.visitors.AliasVisitor;
 import repair.regen.rj_language.visitors.CreateASTVisitor;
 import repair.regen.rj_language.visitors.GhostVisitor;

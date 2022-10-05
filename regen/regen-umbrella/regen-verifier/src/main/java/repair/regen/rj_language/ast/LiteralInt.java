@@ -1,4 +1,4 @@
-package repair.regen.ast;
+package repair.regen.rj_language.ast;
 
 import java.util.List;
 
@@ -6,41 +6,42 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-public class Var extends Expression {
+public class LiteralInt extends Expression {
 
-    private String name;
+    private int value;
 
-    public Var(String name) {
-        this.name = name;
+    public LiteralInt(int v) {
+        value = v;
     }
 
-    public String getName() {
-        return name;
+    public LiteralInt(String v) {
+        value = Integer.parseInt(v);
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        return ctx.makeVariable(name);
+    public Expr<?> eval(TranslatorToZ3 ctx) {
+        return ctx.makeIntegerLiteral(value);
     }
 
     public String toString() {
-        return name;
+        return Integer.toString(value);
     }
 
     @Override
     public void getVariableNames(List<String> toAdd) {
-        if (!toAdd.contains(name))
-            toAdd.add(name);
+        // end leaf
+
     }
 
     @Override
     public void getStateInvocations(List<String> toAdd, List<String> all) {
         // end leaf
+
     }
 
     @Override
     public Expression clone() {
-        return new Var(name);
+        return new LiteralInt(value);
     }
 
     @Override
@@ -52,7 +53,7 @@ public class Var extends Expression {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((name == null) ? 0 : name.hashCode());
+        result = prime * result + value;
         return result;
     }
 
@@ -64,11 +65,8 @@ public class Var extends Expression {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Var other = (Var) obj;
-        if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
+        LiteralInt other = (LiteralInt) obj;
+        if (value != other.value)
             return false;
         return true;
     }

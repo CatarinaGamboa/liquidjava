@@ -1,4 +1,4 @@
-package repair.regen.ast;
+package repair.regen.rj_language.ast;
 
 import java.util.List;
 
@@ -6,52 +6,53 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-public class LiteralBoolean extends Expression {
+public class Var extends Expression {
 
-    boolean value;
+    private String name;
 
-    public LiteralBoolean(boolean value) {
-        this.value = value;
+    public Var(String name) {
+        this.name = name;
     }
 
-    public LiteralBoolean(String value) {
-        this.value = Boolean.parseBoolean(value);
+    public String getName() {
+        return name;
     }
 
-    public Expr<?> eval(TranslatorToZ3 ctx) {
-        return ctx.makeBooleanLiteral(value);
+    @Override
+    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
+        return ctx.makeVariable(name);
     }
 
     public String toString() {
-        return Boolean.toString(value);
+        return name;
     }
 
     @Override
     public void getVariableNames(List<String> toAdd) {
-        // end leaf
+        if (!toAdd.contains(name))
+            toAdd.add(name);
     }
 
     @Override
     public void getStateInvocations(List<String> toAdd, List<String> all) {
         // end leaf
-
     }
 
     @Override
     public Expression clone() {
-        return new LiteralBoolean(value);
+        return new Var(name);
     }
 
     @Override
     public boolean isBooleanTrue() {
-        return value;
+        return false;
     }
 
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + (value ? 1231 : 1237);
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
 
@@ -63,8 +64,11 @@ public class LiteralBoolean extends Expression {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        LiteralBoolean other = (LiteralBoolean) obj;
-        if (value != other.value)
+        Var other = (Var) obj;
+        if (name == null) {
+            if (other.name != null)
+                return false;
+        } else if (!name.equals(other.name))
             return false;
         return true;
     }

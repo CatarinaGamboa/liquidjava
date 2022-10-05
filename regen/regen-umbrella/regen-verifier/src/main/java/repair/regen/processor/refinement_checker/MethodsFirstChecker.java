@@ -6,7 +6,7 @@ import java.util.List;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
-import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtInterface;

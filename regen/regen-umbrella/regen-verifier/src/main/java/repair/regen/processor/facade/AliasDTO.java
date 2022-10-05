@@ -3,9 +3,9 @@ package repair.regen.processor.facade;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import repair.regen.ast.Expression;
-import repair.regen.rj_language.ParsingException;
-import repair.regen.rj_language.RefinementsParser;
+import repair.regen.rj_language.ast.Expression;
+import repair.regen.rj_language.parsing.ParsingException;
+import repair.regen.rj_language.parsing.RefinementsParser;
 import spoon.reflect.reference.CtTypeReference;
 
 public class AliasDTO {

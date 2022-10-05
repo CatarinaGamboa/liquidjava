@@ -2,7 +2,7 @@ package repair.regen.processor.constraints;
 
 import static org.junit.Assert.fail;
 
-import repair.regen.ast.BinaryExpression;
+import repair.regen.rj_language.ast.BinaryExpression;
 
 public class OperationPredicate extends Predicate {
 

@@ -1,4 +1,4 @@
-package repair.regen.ast;
+package repair.regen.rj_language.ast;
 
 import java.util.List;
 

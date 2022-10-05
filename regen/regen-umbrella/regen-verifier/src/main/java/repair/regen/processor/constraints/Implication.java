@@ -2,10 +2,10 @@ package repair.regen.processor.constraints;
 
 import java.util.List;
 
-import repair.regen.ast.BinaryExpression;
-import repair.regen.ast.Expression;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
+import repair.regen.rj_language.ast.BinaryExpression;
+import repair.regen.rj_language.ast.Expression;
 
 public class Implication extends Constraint {
 

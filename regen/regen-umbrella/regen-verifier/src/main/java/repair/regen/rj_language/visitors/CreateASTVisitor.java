@@ -7,18 +7,18 @@ import java.util.List;
 
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import repair.regen.ast.AliasInvocation;
-import repair.regen.ast.BinaryExpression;
-import repair.regen.ast.Expression;
-import repair.regen.ast.FunctionInvocation;
-import repair.regen.ast.GroupExpression;
-import repair.regen.ast.Ite;
-import repair.regen.ast.LiteralBoolean;
-import repair.regen.ast.LiteralInt;
-import repair.regen.ast.LiteralReal;
-import repair.regen.ast.LiteralString;
-import repair.regen.ast.UnaryExpression;
-import repair.regen.ast.Var;
+import repair.regen.rj_language.ast.AliasInvocation;
+import repair.regen.rj_language.ast.BinaryExpression;
+import repair.regen.rj_language.ast.Expression;
+import repair.regen.rj_language.ast.FunctionInvocation;
+import repair.regen.rj_language.ast.GroupExpression;
+import repair.regen.rj_language.ast.Ite;
+import repair.regen.rj_language.ast.LiteralBoolean;
+import repair.regen.rj_language.ast.LiteralInt;
+import repair.regen.rj_language.ast.LiteralReal;
+import repair.regen.rj_language.ast.LiteralString;
+import repair.regen.rj_language.ast.UnaryExpression;
+import repair.regen.rj_language.ast.Var;
 import rj.grammar.RJParser.AliasCallContext;
 import rj.grammar.RJParser.ArgsContext;
 import rj.grammar.RJParser.ExpBoolContext;
@@ -51,6 +51,11 @@ import rj.grammar.RJParser.StartPredContext;
 import rj.grammar.RJParser.TargetInvocationContext;
 import rj.grammar.RJParser.VarContext;
 
+/**
+ * Create refinements language AST using antlr
+ * @author cgamboa
+ *
+ */
 public class CreateASTVisitor {
 
     public static Expression create(ParseTree rc) {

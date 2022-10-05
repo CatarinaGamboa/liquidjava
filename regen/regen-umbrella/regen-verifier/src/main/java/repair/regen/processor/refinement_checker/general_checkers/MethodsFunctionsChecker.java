@@ -23,7 +23,7 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.processor.refinement_checker.object_checkers.AuxHierarchyRefinememtsPassage;
 import repair.regen.processor.refinement_checker.object_checkers.AuxStateHandler;
-import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;

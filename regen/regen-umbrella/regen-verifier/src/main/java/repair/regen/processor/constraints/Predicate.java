@@ -6,14 +6,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import repair.regen.ast.Expression;
-import repair.regen.ast.GroupExpression;
-import repair.regen.ast.LiteralBoolean;
-import repair.regen.ast.UnaryExpression;
-import repair.regen.ast.Var;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
-import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.ast.Expression;
+import repair.regen.rj_language.ast.GroupExpression;
+import repair.regen.rj_language.ast.LiteralBoolean;
+import repair.regen.rj_language.ast.UnaryExpression;
+import repair.regen.rj_language.ast.Var;
+import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtElement;
 
 public class Predicate extends Constraint {

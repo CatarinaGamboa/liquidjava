@@ -1,4 +1,4 @@
-package repair.regen.rj_language;
+package repair.regen.rj_language.parsing;
 
 import java.util.ArrayList;
 import java.util.BitSet;

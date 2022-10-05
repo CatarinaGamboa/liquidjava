@@ -1,4 +1,4 @@
-package repair.regen.rj_language;
+package repair.regen.rj_language.parsing;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;

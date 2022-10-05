@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import repair.regen.ast.Expression;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
@@ -13,7 +12,8 @@ import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.facade.AliasDTO;
-import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.ast.Expression;
+import repair.regen.rj_language.parsing.ParsingException;
 import repair.regen.utils.Utils;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;

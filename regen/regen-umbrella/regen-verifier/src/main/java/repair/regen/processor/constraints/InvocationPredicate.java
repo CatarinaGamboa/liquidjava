@@ -3,9 +3,9 @@ package repair.regen.processor.constraints;
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.ast.Expression;
-import repair.regen.ast.FunctionInvocation;
 import repair.regen.errors.ErrorEmitter;
+import repair.regen.rj_language.ast.Expression;
+import repair.regen.rj_language.ast.FunctionInvocation;
 
 public class InvocationPredicate extends Predicate {
 

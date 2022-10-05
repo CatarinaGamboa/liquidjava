@@ -2,11 +2,11 @@ package repair.regen.processor.constraints;
 
 import java.util.List;
 
-import repair.regen.ast.BinaryExpression;
 import repair.regen.errors.ErrorEmitter;
-import repair.regen.ast.Expression;
-import repair.regen.ast.GroupExpression;
 import repair.regen.processor.context.GhostState;
+import repair.regen.rj_language.ast.BinaryExpression;
+import repair.regen.rj_language.ast.Expression;
+import repair.regen.rj_language.ast.GroupExpression;
 
 public class Disjunction extends Constraint {
 

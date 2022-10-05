@@ -1,4 +1,4 @@
-package repair.regen.ast;
+package repair.regen.rj_language.ast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,9 +6,9 @@ import java.util.Map;
 
 import com.microsoft.z3.Expr;
 
-import repair.regen.ast.typing.TypeInfer;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.facade.AliasDTO;
+import repair.regen.rj_language.ast.typing.TypeInfer;
 import repair.regen.smt.TranslatorToZ3;
 import spoon.reflect.factory.Factory;
 

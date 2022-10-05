@@ -1,4 +1,4 @@
-package repair.regen.ast;
+package repair.regen.rj_language.ast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +8,10 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-public class AliasInvocation extends Expression {
+public class FunctionInvocation extends Expression {
     String name;
 
-    public AliasInvocation(String name, List<Expression> args) {
+    public FunctionInvocation(String name, List<Expression> args) {
         this.name = name;
         for (Expression e : args)
             addChild(e);
@@ -25,6 +25,11 @@ public class AliasInvocation extends Expression {
         return children;
     }
 
+    public void setChild(int index, Expression element) {
+        super.setChild(index, element);
+        getArgs().set(index, element);
+    }
+
     @Override
     public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
         Expr<?>[] argsExpr = new Expr[getArgs().size()];
@@ -36,7 +41,7 @@ public class AliasInvocation extends Expression {
 
     @Override
     public String toString() {
-        return name + "(" + getArgs().stream().map(p -> p.toString()).collect(Collectors.joining(", ")) + ")";
+        return name + "(" + getArgs().stream().map(p -> p.toString()).collect(Collectors.joining(",")) + ")";
     }
 
     @Override
@@ -48,9 +53,10 @@ public class AliasInvocation extends Expression {
 
     @Override
     public void getStateInvocations(List<String> toAdd, List<String> all) {
+        if (!toAdd.contains(name) && all.contains(name))
+            toAdd.add(name);
         for (Expression e : getArgs())
             e.getStateInvocations(toAdd, all);
-
     }
 
     @Override
@@ -58,12 +64,22 @@ public class AliasInvocation extends Expression {
         List<Expression> le = new ArrayList<>();
         for (Expression e : getArgs())
             le.add(e.clone());
-        return new AliasInvocation(name, le);
+        return new FunctionInvocation(name, le);
     }
 
     @Override
     public boolean isBooleanTrue() {
         return false;
+    }
+
+    public boolean argumentsEqual(List<Expression> parameters) {
+        if (parameters.size() != getArgs().size())
+            return false;
+        for (int i = 0; i < getArgs().size(); i++) {
+            if (!parameters.get(i).equals(getArgs().get(i)))
+                return false;
+        }
+        return true;
     }
 
     @Override
@@ -83,7 +99,7 @@ public class AliasInvocation extends Expression {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        AliasInvocation other = (AliasInvocation) obj;
+        FunctionInvocation other = (FunctionInvocation) obj;
         if (getArgs() == null) {
             if (other.getArgs() != null)
                 return false;
@@ -96,4 +112,5 @@ public class AliasInvocation extends Expression {
             return false;
         return true;
     }
+
 }

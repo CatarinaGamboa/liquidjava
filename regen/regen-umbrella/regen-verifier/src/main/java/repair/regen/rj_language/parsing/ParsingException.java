@@ -1,4 +1,4 @@
-package repair.regen.rj_language;
+package repair.regen.rj_language.parsing;
 
 public class ParsingException extends Exception {
 

@@ -1,4 +1,4 @@
-package repair.regen.ast;
+package repair.regen.rj_language.ast;
 
 import java.util.List;
 
@@ -6,25 +6,25 @@ import com.microsoft.z3.Expr;
 
 import repair.regen.smt.TranslatorToZ3;
 
-public class LiteralInt extends Expression {
+public class LiteralReal extends Expression {
 
-    private int value;
+    private double value;
 
-    public LiteralInt(int v) {
+    public LiteralReal(double v) {
         value = v;
     }
 
-    public LiteralInt(String v) {
-        value = Integer.parseInt(v);
+    public LiteralReal(String v) {
+        value = Double.parseDouble(v);
     }
 
     @Override
     public Expr<?> eval(TranslatorToZ3 ctx) {
-        return ctx.makeIntegerLiteral(value);
+        return ctx.makeDoubleLiteral(value);
     }
 
     public String toString() {
-        return Integer.toString(value);
+        return Double.toString(value);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class LiteralInt extends Expression {
 
     @Override
     public Expression clone() {
-        return new LiteralInt(value);
+        return new LiteralReal(value);
     }
 
     @Override
@@ -53,7 +53,9 @@ public class LiteralInt extends Expression {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + value;
+        long temp;
+        temp = Double.doubleToLongBits(value);
+        result = prime * result + (int) (temp ^ (temp >>> 32));
         return result;
     }
 
@@ -65,10 +67,9 @@ public class LiteralInt extends Expression {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        LiteralInt other = (LiteralInt) obj;
-        if (value != other.value)
+        LiteralReal other = (LiteralReal) obj;
+        if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value))
             return false;
         return true;
     }
-
 }

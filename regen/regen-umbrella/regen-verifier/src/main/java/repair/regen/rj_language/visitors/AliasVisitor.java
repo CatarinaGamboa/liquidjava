@@ -10,7 +10,7 @@ import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import repair.regen.processor.facade.AliasDTO;
-import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.parsing.ParsingException;
 import repair.regen.utils.Pair;
 import rj.grammar.RJParser.AliasContext;
 import rj.grammar.RJParser.ArgDeclIDContext;

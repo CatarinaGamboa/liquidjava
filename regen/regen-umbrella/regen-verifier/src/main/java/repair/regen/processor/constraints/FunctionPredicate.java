@@ -1,7 +1,7 @@
 package repair.regen.processor.constraints;
 
 import repair.regen.errors.ErrorEmitter;
-import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtElement;
 
 public class FunctionPredicate extends Predicate {

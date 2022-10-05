@@ -3,10 +3,10 @@ package repair.regen.processor.constraints;
 import java.util.ArrayList;
 import java.util.List;
 
-import repair.regen.ast.Expression;
-import repair.regen.ast.Ite;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
+import repair.regen.rj_language.ast.Expression;
+import repair.regen.rj_language.ast.Ite;
 
 public class IfThenElse extends Constraint {
     private Constraint ite;

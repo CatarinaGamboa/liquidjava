@@ -1,6 +1,6 @@
 package repair.regen.processor.constraints;
 
-import repair.regen.ast.LiteralInt;
+import repair.regen.rj_language.ast.LiteralInt;
 
 public class LiteralPredicate {
 

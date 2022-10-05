@@ -26,7 +26,7 @@ import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.processor.refinement_checker.TypeCheckingUtils;
-import repair.regen.rj_language.ParsingException;
+import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
