@@ -10,7 +10,6 @@ import java.util.Optional;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
@@ -128,7 +127,7 @@ public abstract class TypeChecker extends CtScanner {
         context.addGhostClass(g.getParentClassName());
 
         List<CtExpression<?>> ls = e.getElements();
-        InvocationPredicate ip = new InvocationPredicate(getErrorEmitter(), g.getName(), THIS);
+        Predicate ip = Predicate.createInvocation(g.getName(), Predicate.createVar(THIS));
         int order = 0;
         for (CtExpression<?> ce : ls) {
             if (ce instanceof CtLiteral<?>) {

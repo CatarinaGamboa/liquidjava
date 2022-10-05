@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
@@ -73,12 +72,13 @@ public class AuxStateHandler {
         String[] path = f.getTargetClass().split("\\.");
         String klass = path[path.length - 1];
 
-        String[] s = { tc.THIS };
+        Constraint[] s = { Predicate.createVar(tc.THIS) };
         Constraint c = new Predicate();
         List<GhostFunction> sets = getDifferentSets(tc, klass);
         for (GhostFunction sg : sets) {
             if (sg.getReturnType().toString().equals("int")) {
-                Predicate p = Predicate.createEquals(new InvocationPredicate(tc.getErrorEmitter(), sg.getName(), s),
+                Predicate p = Predicate.createEquals(
+                		Predicate.createInvocation(sg.getName(), s),
                         Predicate.createLit("0", Utils.INT));
                 c = Predicate.createConjunction(c, p);
             } else {
@@ -197,15 +197,25 @@ public class AuxStateHandler {
             else if (g.getParent() != null && sets.contains(g.getParent()))
                 sets.remove(g.getParent());
         }
-        return addOldStates(p, tc.THIS, sets, tc);
+        return addOldStates(p, Predicate.createVar(tc.THIS), sets, tc);
     }
 
-    private static Constraint addOldStates(Predicate p, String th, List<GhostFunction> sets, TypeChecker tc) {
+    /**
+     * Create predicate with the equalities with previous versions of the object
+     * e.g., ghostfunction1(this) == ghostfunction1(old(this)) 
+     * @param p
+     * @param th
+     * @param sets
+     * @param tc
+     * @return
+     */
+    private static Constraint addOldStates(Predicate p, Predicate th, List<GhostFunction> sets, TypeChecker tc) {
         Constraint c = p;
         for (GhostFunction gf : sets) {
-            Constraint eq = Predicate.createEquals(new InvocationPredicate(tc.getErrorEmitter(), gf.getName(), th),
-                    new InvocationPredicate(gf.getName(),
-                            new InvocationPredicate(tc.getErrorEmitter(), "old", th).getExpression()));
+            Constraint eq = Predicate.createEquals( // gf.name == old(gf.name(this))
+            		Predicate.createInvocation(gf.getName(), th),
+            		Predicate.createInvocation(gf.getName(), 
+            				Predicate.createInvocation(Utils.OLD, th)));
             c = Predicate.createConjunction(c, eq);
         }
         return c;

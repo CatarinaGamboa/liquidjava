@@ -10,12 +10,12 @@ import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
 import repair.regen.rj_language.ast.BinaryExpression;
 import repair.regen.rj_language.ast.Expression;
+import repair.regen.rj_language.ast.FunctionInvocation;
 import repair.regen.rj_language.ast.GroupExpression;
 import repair.regen.rj_language.ast.Ite;
 import repair.regen.rj_language.ast.LiteralBoolean;
 import repair.regen.rj_language.ast.LiteralInt;
 import repair.regen.rj_language.ast.LiteralReal;
-import repair.regen.rj_language.ast.LiteralString;
 import repair.regen.rj_language.ast.UnaryExpression;
 import repair.regen.rj_language.ast.Var;
 import repair.regen.rj_language.parsing.ParsingException;
@@ -181,6 +181,12 @@ public class Predicate extends Constraint {
 
     public static Predicate createVar(String name) {
     	return new Predicate(new Var(name));
+    }
+    
+    public static Predicate createInvocation(String name, Constraint... constraints) {
+    	List<Expression> le = new ArrayList<>();
+    	for(Constraint c: constraints) le.add(c.getExpression());
+    	return new Predicate(new FunctionInvocation(name, le));
     }
 
 }
