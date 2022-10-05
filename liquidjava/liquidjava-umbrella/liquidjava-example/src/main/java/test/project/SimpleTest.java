@@ -7,7 +7,7 @@ class SimpleTest {
 
 		@Refinement("x > 0 &&"
 				+ "x < 100")
-		int x = 101;
+		int x = 10;
 	}
 	
 	

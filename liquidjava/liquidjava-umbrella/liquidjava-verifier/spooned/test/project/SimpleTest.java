@@ -4,7 +4,7 @@ package test.project;
 class SimpleTest {
     public static void main(java.lang.String[] args) {
         @liquidjava.specification.Refinement("x > 0 &&" + "x < 100")
-        int x = 101;
+        int x = 10;
     }
 }
 
