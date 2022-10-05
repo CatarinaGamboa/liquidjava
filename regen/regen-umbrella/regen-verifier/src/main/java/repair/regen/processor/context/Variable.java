@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.Stack;
 
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
 import spoon.reflect.reference.CtTypeReference;
@@ -192,16 +191,15 @@ public class Variable extends RefinedVariable {
      */
     private Constraint createITEConstraint(String nName, Constraint cond, VariableInstance then) {
         Constraint ref1 = then.getRenamedRefinements(nName);
-        return new IfThenElse(cond, ref1, new Predicate());
+        return Predicate.createITE(cond, ref1, new Predicate());
     }
 
     private Constraint createITEConstraint(String nName, Constraint cond, VariableInstance then, VariableInstance els) {
         Constraint ref1 = then.getRenamedRefinements(nName);
         Constraint ref2 = els.getRenamedRefinements(nName);
-        return new IfThenElse(cond, ref1, ref2);
+        return Predicate.createITE(cond, ref1, ref2);
     }
 
-    @Override
     public String toString() {
         return "Variable [name=" + super.getName() + ", type=" + super.getType() + ", refinement="
                 + super.getRefinement() + "]";

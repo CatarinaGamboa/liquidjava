@@ -8,7 +8,6 @@ import java.util.Optional;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.FunctionPredicate;
-import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.Context;
@@ -467,7 +466,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
         super.visitCtConditional(conditional);
         Constraint cond = getRefinement(conditional.getCondition());
-        Constraint c = new IfThenElse(cond, getRefinement(conditional.getThenExpression()),
+        Constraint c = Predicate.createITE(cond, getRefinement(conditional.getThenExpression()),
                 getRefinement(conditional.getElseExpression()));
         conditional.putMetadata(REFINE_KEY, c);
 
