@@ -6,7 +6,6 @@ import java.util.Optional;
 import java.util.Stack;
 
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.IfThenElse;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
@@ -49,7 +48,7 @@ public class Variable extends RefinedVariable {
             VariableInstance vi = ovi.get();
             Constraint n = new VariablePredicate(this.getName());
             Constraint n2 = new VariablePredicate(vi.getName());
-            c = Predicate.createConjunction(new EqualsPredicate(n, n2), c);
+            c = Predicate.createConjunction(Predicate.createEquals(n, n2), c);
         }
         return c;
     }

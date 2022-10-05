@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.OperationPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
@@ -14,8 +13,8 @@ import repair.regen.processor.context.RefinedVariable;
 import repair.regen.processor.context.Variable;
 import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
-import repair.regen.processor.refinement_checker.TypeCheckingUtils;
 import repair.regen.rj_language.parsing.ParsingException;
+import repair.regen.utils.Utils;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
 import spoon.reflect.code.CtBinaryOperator;
@@ -88,9 +87,9 @@ public class OperationsChecker {
             operator.putMetadata(rtc.REFINE_KEY, oper);
             if (parent instanceof CtLocalVariable<?> || parent instanceof CtUnaryOperator<?>
                     || parent instanceof CtReturn<?>)
-                operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), oper));
+                operator.putMetadata(rtc.REFINE_KEY, Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), oper));
         } else if (types.contains(type)) {
-            operator.putMetadata(rtc.REFINE_KEY, new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), oper));
+            operator.putMetadata(rtc.REFINE_KEY, Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), oper));
         } else {
             System.out.println("Literal type not implemented");
         }
@@ -152,7 +151,7 @@ public class OperationsChecker {
         if (p instanceof CtIf)
             all = opS;
         else
-            all = new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), opS);// TODO SEE IF () IN OPS IS NEEDED
+            all = Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), opS);// TODO SEE IF () IN OPS IS NEEDED
 
         rtc.getContext().addInstanceToContext(newName, ex.getType(), newMeta, operator);
         operator.putMetadata(rtc.REFINE_KEY, all);
@@ -328,7 +327,7 @@ public class OperationsChecker {
         Constraint c = getOperatorFromKind(operator.getKind(), ex).substituteVariable(rtc.WILD_VAR, newName);
 
         rtc.getContext().addVarToContext(newName, w.getType(), metadada, w);
-        return new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), c);
+        return Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), c);
     }
 
     // ############################### Operations Auxiliaries ##########################################
@@ -343,33 +342,33 @@ public class OperationsChecker {
     private String getOperatorFromKind(BinaryOperatorKind kind) {
         switch (kind) {
         case PLUS:
-            return "+";
+            return Utils.PLUS;
         case MINUS:
-            return "-";
+            return Utils.MINUS;
         case MUL:
-            return "*";
+            return Utils.MUL;
         case DIV:
-            return "/";
+            return Utils.DIV;
         case MOD:
-            return "%";
+            return Utils.MOD;
 
         case AND:
-            return "&&";
+            return Utils.AND;
         case OR:
-            return "||";
+            return Utils.OR;
 
         case EQ:
-            return "==";
+            return Utils.EQ;
         case NE:
-            return "!=";
+            return Utils.NEQ;
         case GE:
-            return ">=";
+            return Utils.GE;
         case GT:
-            return ">";
+            return Utils.GT;
         case LE:
-            return "<=";
+            return Utils.LE;
         case LT:
-            return "<";
+            return Utils.LT;
         default:
             return null;
         // TODO COMPLETE WITH MORE OPERANDS

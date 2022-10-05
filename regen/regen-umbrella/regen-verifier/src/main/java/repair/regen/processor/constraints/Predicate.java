@@ -11,7 +11,11 @@ import repair.regen.processor.context.GhostState;
 import repair.regen.rj_language.ast.BinaryExpression;
 import repair.regen.rj_language.ast.Expression;
 import repair.regen.rj_language.ast.GroupExpression;
+import repair.regen.rj_language.ast.Ite;
 import repair.regen.rj_language.ast.LiteralBoolean;
+import repair.regen.rj_language.ast.LiteralInt;
+import repair.regen.rj_language.ast.LiteralReal;
+import repair.regen.rj_language.ast.LiteralString;
 import repair.regen.rj_language.ast.UnaryExpression;
 import repair.regen.rj_language.ast.Var;
 import repair.regen.rj_language.parsing.ParsingException;
@@ -134,9 +138,42 @@ public class Predicate extends Constraint {
     }
     
     
-    public static Constraint createConjunction(Constraint c1, Constraint c2) {
+    public static Predicate createConjunction(Constraint c1, Constraint c2) {
     	return new Predicate(new BinaryExpression(c1.getExpression(), 
     			Utils.AND, c2.getExpression()));
     } 
+    
+    public static Predicate createDisjunction(Constraint c1, Constraint c2) {
+    	return new Predicate(new BinaryExpression(c1.getExpression(), 
+    			Utils.OR, c2.getExpression()));
+    } 
+    
+    public static Predicate createEquals(Constraint c1, Constraint c2) {
+    	return new Predicate(new BinaryExpression(c1.getExpression(), 
+    			Utils.EQ, c2.getExpression()));
+    } 
+    
+    public static Predicate createITE(Constraint c1, Constraint c2, Constraint c3) {
+    	 return new Predicate( new Ite(c1.getExpression(), c2.getExpression(), 
+    			 c3.getExpression()));
+    } 
+    
+    public static Predicate createLit(String value, String type) {
+   	 	Expression ex;
+    	if(type.equals(Utils.BOOLEAN))
+   	 		ex = new LiteralBoolean(value);
+    	else if(type.equals(Utils.INT))
+    		ex = new LiteralInt(value);
+    	else if(type.equals(Utils.DOUBLE))
+    		ex = new LiteralReal(value);
+    	else if(type.equals(Utils.SHORT))
+    		ex = new LiteralInt(value);
+    	else if(type.equals(Utils.LONG))
+    		ex = new LiteralReal(value);
+    	else // if(type.equals(Utils.DOUBLE))
+    		ex = new LiteralReal(value);
+    	return new Predicate(ex);
+   } 
+
 
 }

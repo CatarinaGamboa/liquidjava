@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.LiteralPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -79,7 +78,7 @@ public class AuxStateHandler {
         List<GhostFunction> sets = getDifferentSets(tc, klass);
         for (GhostFunction sg : sets) {
             if (sg.getReturnType().toString().equals("int")) {
-                Predicate p = new EqualsPredicate(new InvocationPredicate(tc.getErrorEmitter(), sg.getName(), s),
+                Predicate p = Predicate.createEquals(new InvocationPredicate(tc.getErrorEmitter(), sg.getName(), s),
                         LiteralPredicate.getIntPredicate(0));
                 c = Predicate.createConjunction(c, p);
             } else {
@@ -204,7 +203,7 @@ public class AuxStateHandler {
     private static Constraint addOldStates(Predicate p, String th, List<GhostFunction> sets, TypeChecker tc) {
         Constraint c = p;
         for (GhostFunction gf : sets) {
-            Constraint eq = new EqualsPredicate(new InvocationPredicate(tc.getErrorEmitter(), gf.getName(), th),
+            Constraint eq = Predicate.createEquals(new InvocationPredicate(tc.getErrorEmitter(), gf.getName(), th),
                     new InvocationPredicate(gf.getName(),
                             new InvocationPredicate(tc.getErrorEmitter(), "old", th).getExpression()));
             c = Predicate.createConjunction(c, eq);

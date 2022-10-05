@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.Context;
@@ -358,7 +357,7 @@ public class MethodsFunctionsChecker {
         if (met == null)
             met = new Predicate();
         if (!met.getVariableNames().contains(rtc.WILD_VAR))
-            met = new EqualsPredicate(new VariablePredicate(rtc.WILD_VAR), met);
+            met = Predicate.createEquals(new VariablePredicate(rtc.WILD_VAR), met);
         String nVar = String.format(rtc.instanceFormat, fArg.getName(), rtc.getContext().getCounter());
         rtc.getContext().addInstanceToContext(nVar, fArg.getType(), met.substituteVariable(rtc.WILD_VAR, nVar), iArg);
         return nVar;

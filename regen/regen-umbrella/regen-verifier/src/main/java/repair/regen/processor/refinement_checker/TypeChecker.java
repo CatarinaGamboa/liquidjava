@@ -10,7 +10,6 @@ import java.util.Optional;
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.errors.ErrorHandler;
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.InvocationPredicate;
 import repair.regen.processor.constraints.LiteralPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -43,8 +42,8 @@ public abstract class TypeChecker extends CtScanner {
     public final String freshFormat = "#fresh_%d";
     public final String instanceFormat = "#%s_%d";
     public final String thisFormat = "this#%s";
-    public String[] implementedTypes = { "boolean", "int", "short", "long", "float", "double", "int[]" }; // TODO add
-                                                                                                          // types
+    public String[] implementedTypes = { "boolean", "int", "short", "long", "float", "double"}; // TODO add
+                                                                                                // types e.g., "int[]" 
 
     Context context;
     Factory factory;
@@ -140,7 +139,7 @@ public abstract class TypeChecker extends CtScanner {
                         g.getParentClassName());
                 gs.setGhostParent(g);
                 gs.setRefinement(/* new OperationPredicate(new InvocationPredicate(f, THIS), "<-->", */
-                        new EqualsPredicate(ip, LiteralPredicate.getIntPredicate(order))); // open(THIS) -> state1(THIS)
+                        Predicate.createEquals(ip, LiteralPredicate.getIntPredicate(order))); // open(THIS) -> state1(THIS)
                                                                                            // == 1
                 context.addToGhostClass(g.getParentClassName(), gs);
             }
