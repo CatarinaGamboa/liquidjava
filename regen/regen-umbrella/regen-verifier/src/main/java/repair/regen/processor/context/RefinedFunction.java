@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.declaration.CtElement;
@@ -74,8 +73,8 @@ public class RefinedFunction extends Refined {
     public Constraint getAllRefinements() {
         Constraint c = new Predicate();
         for (RefinedVariable p : argRefinements)
-            c = Conjunction.createConjunction(c, p.getRefinement());// joinArgs
-        c = Conjunction.createConjunction(c, super.getRefinement());// joinReturn
+            c = Predicate.createConjunction(c, p.getRefinement());// joinArgs
+        c = Predicate.createConjunction(c, super.getRefinement());// joinReturn
         return c;
     }
 
@@ -89,7 +88,7 @@ public class RefinedFunction extends Refined {
     public Constraint getRefinementsForParamIndex(int index) {
         Constraint c = new Predicate();
         for (int i = 0; i <= index && i < argRefinements.size(); i++)
-            c = Conjunction.createConjunction(c, argRefinements.get(i).getRefinement());
+            c = Predicate.createConjunction(c, argRefinements.get(i).getRefinement());
         return c;
     }
 

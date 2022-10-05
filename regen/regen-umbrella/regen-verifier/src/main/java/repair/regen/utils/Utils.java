@@ -5,6 +5,16 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class Utils {
 
+	public static final String AND = "&&";
+	public static final String OR = "||";
+	public static final String GREATER = ">";
+	public static final String GREATER_EQUAL = ">=";
+	public static final String SMALLER = "<";
+	public static final String SMALLER_EQUAL = "<=";
+	public static final String PLUS = "+";
+	public static final String MINUS = "-";
+	
+	
     public static CtTypeReference<?> getType(String type, Factory factory) {
         // TODO complete
         switch (type) {
@@ -25,4 +35,5 @@ public class Utils {
             return factory.createReference(type);
         }
     }
+    
 }

@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -165,14 +164,14 @@ public class MethodsFunctionsChecker {
             RefinedVariable v = rtc.getContext().addVarToContext(param.getSimpleName(), param.getType(), c, param);
             if (v instanceof Variable)
                 f.addArgRefinements((Variable) v);
-            joint = Conjunction.createConjunction(joint, c);
+            joint = Predicate.createConjunction(joint, c);
         }
 
         Optional<Constraint> oret = rtc.getRefinementFromAnnotation(method);
         Constraint ret = oret.orElse(new Predicate());
         f.setRefReturn(ret);
         // rtc.context.addFunctionToContext(f);
-        return Conjunction.createConjunction(joint, ret);
+        return Predicate.createConjunction(joint, ret);
     }
 
     public List<CtAnnotation<? extends Annotation>> getStateAnnotation(CtElement element) {

@@ -8,12 +8,14 @@ import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.processor.context.GhostState;
+import repair.regen.rj_language.ast.BinaryExpression;
 import repair.regen.rj_language.ast.Expression;
 import repair.regen.rj_language.ast.GroupExpression;
 import repair.regen.rj_language.ast.LiteralBoolean;
 import repair.regen.rj_language.ast.UnaryExpression;
 import repair.regen.rj_language.ast.Var;
 import repair.regen.rj_language.parsing.ParsingException;
+import repair.regen.utils.Utils;
 import spoon.reflect.declaration.CtElement;
 
 public class Predicate extends Constraint {
@@ -28,6 +30,13 @@ public class Predicate extends Constraint {
         exp = new LiteralBoolean(true);
     }
 
+    /**
+     * Create a new predicate with a refinement
+     * @param ref
+     * @param element
+     * @param e
+     * @throws ParsingException
+     */
     public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
         exp = parse(ref, element, e);
         if (e.foundError())
@@ -80,6 +89,10 @@ public class Predicate extends Constraint {
         return gh;
     }
 
+    /**
+     * Change old mentions of previous name to the new name
+     * e.g., old(previousName) -> newName
+     */
     public Constraint changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
         Expression e = exp.clone();
         Expression prev = innerParse(previousName, ee);
@@ -119,5 +132,11 @@ public class Predicate extends Constraint {
     public Expression getExpression() {
         return exp;
     }
+    
+    
+    public static Constraint createConjunction(Constraint c1, Constraint c2) {
+    	return new Predicate(new BinaryExpression(c1.getExpression(), 
+    			Utils.AND, c2.getExpression()));
+    } 
 
 }

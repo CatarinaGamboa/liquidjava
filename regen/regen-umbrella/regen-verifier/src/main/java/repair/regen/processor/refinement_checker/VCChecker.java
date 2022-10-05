@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VCImplication;
@@ -95,7 +94,7 @@ public class VCChecker {
         Constraint et = new Predicate();
         try {
             premises = joinConstraints(expectedType, element, mainVars, lrv, map).toConjunctions();
-            premises = Conjunction.createConjunction(premises, type).changeStatesToRefinements(list, s, errorEmitter)
+            premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(list, s, errorEmitter)
                     .changeAliasToRefinement(context, element, f);
             et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context, element,
                     f);

@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.errors.ErrorEmitter;
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.FunctionPredicate;
@@ -402,7 +401,7 @@ public class RefinementTypeChecker extends TypeChecker {
         String freshVarName = String.format(freshFormat, context.getCounter());
         expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
         Constraint lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
-        expRefs = Conjunction.createConjunction(expRefs, lastExpRefs);
+        expRefs = Predicate.createConjunction(expRefs, lastExpRefs);
 
         // TODO Change in future
         if (expRefs.getVariableNames().contains("null"))

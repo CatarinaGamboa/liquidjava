@@ -2,6 +2,11 @@ package repair.regen.processor.constraints;
 
 import spoon.reflect.reference.CtTypeReference;
 
+/**
+ * Verification Conditions sent to SMT Solver
+ * @author cgamboa
+ *
+ */
 public class VCImplication {
     String name;
     CtTypeReference<?> type;
@@ -41,7 +46,7 @@ public class VCImplication {
     }
 
     private Constraint auxConjunction(Constraint c) {
-        Constraint t = Conjunction.createConjunction(c, refinement);
+        Constraint t = Predicate.createConjunction(c, refinement);
         if (next == null)
             return t;
         t = next.auxConjunction(t);

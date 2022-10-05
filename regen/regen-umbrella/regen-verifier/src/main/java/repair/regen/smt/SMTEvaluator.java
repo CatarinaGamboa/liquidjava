@@ -5,8 +5,8 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.rj_language.ast.Expression;
 
@@ -17,7 +17,7 @@ public class SMTEvaluator {
         // Creates a parser for our SMT-ready refinement language
         // Discharges the verification to z3
 
-        Constraint toVerify = Conjunction.createConjunction(subRef, supRef.negate());
+        Constraint toVerify = Predicate.createConjunction(subRef, supRef.negate());
         System.out.println(toVerify.toString()); // TODO remove
 
         try {

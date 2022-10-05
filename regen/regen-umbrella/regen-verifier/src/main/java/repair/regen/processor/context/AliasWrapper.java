@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import repair.regen.errors.ErrorEmitter;
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.Predicate;
@@ -69,7 +68,7 @@ public class AliasWrapper {
         List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem, ee);
         Constraint prem = new Predicate();
         for (int i = 0; i < invocationPredicates.size(); i++) {
-            prem = Conjunction.createConjunction(prem,
+            prem = Predicate.createConjunction(prem,
                     new EqualsPredicate(new VariablePredicate(newNames.get(i)), invocationPredicates.get(i)));
         }
         return prem.clone();

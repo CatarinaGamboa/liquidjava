@@ -11,7 +11,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Conjunction;
 import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.EqualsPredicate;
 import repair.regen.processor.constraints.InvocationPredicate;
@@ -27,7 +26,6 @@ import repair.regen.processor.context.VariableInstance;
 import repair.regen.processor.refinement_checker.TypeChecker;
 import repair.regen.processor.refinement_checker.TypeCheckingUtils;
 import repair.regen.rj_language.parsing.ParsingException;
-import spoon.reflect.code.CtBinaryOperator;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtInvocation;
@@ -83,7 +81,7 @@ public class AuxStateHandler {
             if (sg.getReturnType().toString().equals("int")) {
                 Predicate p = new EqualsPredicate(new InvocationPredicate(tc.getErrorEmitter(), sg.getName(), s),
                         LiteralPredicate.getIntPredicate(0));
-                c = Conjunction.createConjunction(c, p);
+                c = Predicate.createConjunction(c, p);
             } else {
                 fail("Ghost Functions not implemented for other types than int -> implement in AuxStateHandler defaultState");
             }
@@ -209,7 +207,7 @@ public class AuxStateHandler {
             Constraint eq = new EqualsPredicate(new InvocationPredicate(tc.getErrorEmitter(), gf.getName(), th),
                     new InvocationPredicate(gf.getName(),
                             new InvocationPredicate(tc.getErrorEmitter(), "old", th).getExpression()));
-            c = Conjunction.createConjunction(c, eq);
+            c = Predicate.createConjunction(c, eq);
         }
         return c;
     }
