@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import repair.regen.errors.ErrorEmitter;
-import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ast.Expression;
@@ -49,22 +48,22 @@ public class AliasWrapper {
         return varNames;
     }
 
-    public Predicate getClonedConstraint() {
+    public Predicate getClonedPredicate() {
         return (Predicate) expression.clone();
     }
 
     public Expression getNewExpression(List<String> newNames) {
-        Constraint expr = getClonedConstraint();
+        Predicate expr = getClonedPredicate();
         for (int i = 0; i < newNames.size(); i++) {
             expr = expr.substituteVariable(varNames.get(i), newNames.get(i));
         }
         return expr.getExpression().clone();
     }
 
-    public Constraint getPremises(List<String> list, List<String> newNames, CtElement elem, ErrorEmitter ee)
+    public Predicate getPremises(List<String> list, List<String> newNames, CtElement elem, ErrorEmitter ee)
             throws ParsingException {
         List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem, ee);
-        Constraint prem = new Predicate();
+        Predicate prem = new Predicate();
         for (int i = 0; i < invocationPredicates.size(); i++) {
             prem = Predicate.createConjunction(prem,
                     Predicate.createEquals(Predicate.createVar(newNames.get(i)), invocationPredicates.get(i)));

@@ -11,7 +11,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.GhostFunction;
 import repair.regen.processor.context.GhostState;
@@ -72,8 +72,8 @@ public class AuxStateHandler {
         String[] path = f.getTargetClass().split("\\.");
         String klass = path[path.length - 1];
 
-        Constraint[] s = { Predicate.createVar(tc.THIS) };
-        Constraint c = new Predicate();
+        Predicate[] s = { Predicate.createVar(tc.THIS) };
+        Predicate c = new Predicate();
         List<GhostFunction> sets = getDifferentSets(tc, klass);
         for (GhostFunction sg : sets) {
             if (sg.getReturnType().toString().equals("int")) {
@@ -151,19 +151,19 @@ public class AuxStateHandler {
         String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
         ObjectState state = new ObjectState();
         if (from != null) // has From
-            state.setFrom(createStateConstraint(from, f, tc, e, false));
+            state.setFrom(createStatePredicate(from, f, tc, e, false));
         if (to != null) // has To
-            state.setTo(createStateConstraint(to, f, tc, e, true));
+            state.setTo(createStatePredicate(to, f, tc, e, true));
 
         if (from != null && to == null) // has From but not To -> the state remains the same
-            state.setTo(createStateConstraint(from, f, tc, e, true));
+            state.setTo(createStatePredicate(from, f, tc, e, true));
         if (from == null && to != null) // has To but not From -> enters with true and exists with a specific state
             state.setFrom(new Predicate());
         return state;
     }
 
 
-	private static Constraint createStateConstraint(String value, RefinedFunction f, TypeChecker tc, CtElement e,
+	private static Predicate createStatePredicate(String value, RefinedFunction f, TypeChecker tc, CtElement e,
             boolean isTo) throws ParsingException {
         Predicate p = new Predicate(value, e, tc.getErrorEmitter());
         String t = f.getTargetClass();
@@ -175,8 +175,8 @@ public class AuxStateHandler {
         tc.getContext().addVarToContext(nameOld, r, new Predicate(), e);
         // TODO REVIEW!!
 
-        Constraint c1 = isTo ? getMissingStates(t, tc, p) : p;
-        Constraint c = c1.substituteVariable(tc.THIS, name);
+        Predicate c1 = isTo ? getMissingStates(t, tc, p) : p;
+        Predicate c = c1.substituteVariable(tc.THIS, name);
         c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
         boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e);
         if (b && !tc.getErrorEmitter().foundError())
@@ -186,7 +186,7 @@ public class AuxStateHandler {
 
     }
 
-    private static Constraint getMissingStates(String t, TypeChecker tc, Predicate p) {
+    private static Predicate getMissingStates(String t, TypeChecker tc, Predicate p) {
         String[] temp = t.split("\\.");
         String simpleT = temp[temp.length - 1];
         List<GhostState> gs = p.getStateInvocations(tc.getContext().getGhostState(simpleT));
@@ -209,10 +209,10 @@ public class AuxStateHandler {
      * @param tc
      * @return
      */
-    private static Constraint addOldStates(Predicate p, Predicate th, List<GhostFunction> sets, TypeChecker tc) {
-        Constraint c = p;
+    private static Predicate addOldStates(Predicate p, Predicate th, List<GhostFunction> sets, TypeChecker tc) {
+        Predicate c = p;
         for (GhostFunction gf : sets) {
-            Constraint eq = Predicate.createEquals( // gf.name == old(gf.name(this))
+            Predicate eq = Predicate.createEquals( // gf.name == old(gf.name(this))
             		Predicate.createInvocation(gf.getName(), th),
             		Predicate.createInvocation(gf.getName(), 
             				Predicate.createInvocation(Utils.OLD, th)));
@@ -233,10 +233,10 @@ public class AuxStateHandler {
      */
     public static void constructorStateMetadata(String refKey, RefinedFunction f, Map<String, String> map,
             CtConstructorCall<?> ctConstructorCall) {
-        List<Constraint> oc = f.getToStates();
+        List<Predicate> oc = f.getToStates();
         if (oc.size() > 0) {// && !oc.get(0).isBooleanTrue())
             // ctConstructorCall.putMetadata(stateKey, oc.get(0));
-            Constraint c = oc.get(0);
+            Predicate c = oc.get(0);
             for (String k : map.keySet()) {
                 c = c.substituteVariable(k, map.get(k));
             }
@@ -261,7 +261,7 @@ public class AuxStateHandler {
         Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(varName);
         if (ovi.isPresent() && e.getMetadata(tc.REFINE_KEY) != null) {
             VariableInstance vi = ovi.get();
-            Constraint c = (Constraint) e.getMetadata(tc.REFINE_KEY);
+            Predicate c = (Predicate) e.getMetadata(tc.REFINE_KEY);
             c = c.substituteVariable(tc.THIS, vi.getName()).substituteVariable(tc.WILD_VAR, vi.getName());
             vi.setRefinement(c);
         }
@@ -302,12 +302,12 @@ public class AuxStateHandler {
      *
      * @return
      */
-    private static Constraint changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name,
+    private static Predicate changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name,
             Map<String, String> map, CtElement invocation) {
         if (vi.getRefinement() == null)
             return new Predicate();
         String instanceName = vi.getName();
-        Constraint prevState = vi.getRefinement().substituteVariable(tc.WILD_VAR, instanceName).substituteVariable(name,
+        Predicate prevState = vi.getRefinement().substituteVariable(tc.WILD_VAR, instanceName).substituteVariable(name,
                 instanceName);
 
         List<ObjectState> los = f.getAllStates();
@@ -318,8 +318,8 @@ public class AuxStateHandler {
         for (int i = 0; i < los.size() && !found; i++) {// TODO: only working for 1 state annotation
             ObjectState os = los.get(i);
             if (os.hasFrom()) {
-                Constraint expectState = os.getFrom().substituteVariable(tc.THIS, instanceName);
-                Constraint prevCheck = prevState;
+                Predicate expectState = os.getFrom().substituteVariable(tc.THIS, instanceName);
+                Predicate prevCheck = prevState;
                 for (String s : map.keySet()) {
                     prevCheck = prevCheck.substituteVariable(s, map.get(s));
                     expectState = expectState.substituteVariable(s, map.get(s));
@@ -329,7 +329,7 @@ public class AuxStateHandler {
                 found = tc.checksStateSMT(prevCheck, expectState, invocation);
                 if (found && os.hasTo()) {
                     String newInstanceName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
-                    Constraint transitionedState = os.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
+                    Predicate transitionedState = os.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
                             .substituteVariable(tc.THIS, newInstanceName);
                     for (String s : map.keySet()) {
                         transitionedState = transitionedState.substituteVariable(s, map.get(s));
@@ -356,7 +356,7 @@ public class AuxStateHandler {
         return new Predicate();
     }
 
-    private static Constraint checkOldMentions(Constraint transitionedState, String instanceName,
+    private static Predicate checkOldMentions(Predicate transitionedState, String instanceName,
             String newInstanceName, TypeChecker tc) {
         return transitionedState.changeOldMentions(instanceName, newInstanceName, tc.getErrorEmitter());
     }
@@ -371,14 +371,14 @@ public class AuxStateHandler {
      *
      * @return
      */
-    private static Constraint sameState(TypeChecker tc, VariableInstance variableInstance, String name,
+    private static Predicate sameState(TypeChecker tc, VariableInstance variableInstance, String name,
             CtElement invocation) {
         // if(variableInstance.getState() != null) {
         if (variableInstance.getRefinement() != null) {
             String newInstanceName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
-            // Constraint c = variableInstance.getState().substituteVariable(variableInstance.getName(),
+            // Predicate c = variableInstance.getState().substituteVariable(variableInstance.getName(),
             // newInstanceName);
-            Constraint c = variableInstance.getRefinement().substituteVariable(tc.WILD_VAR, newInstanceName)
+            Predicate c = variableInstance.getRefinement().substituteVariable(tc.WILD_VAR, newInstanceName)
                     .substituteVariable(variableInstance.getName(), newInstanceName);
 
             addInstanceWithState(tc, name, newInstanceName, variableInstance, c, invocation);
@@ -400,7 +400,7 @@ public class AuxStateHandler {
      * @return
      */
     private static String addInstanceWithState(TypeChecker tc, String superName, String name2,
-            VariableInstance prevInstance, Constraint transitionedState, CtElement invocation) {
+            VariableInstance prevInstance, Predicate transitionedState, CtElement invocation) {
         VariableInstance vi2 = (VariableInstance) tc.getContext().addInstanceToContext(name2, prevInstance.getType(),
                 prevInstance.getRefinement(), invocation);
         // vi2.setState(transitionedState);
@@ -412,7 +412,7 @@ public class AuxStateHandler {
         // if the variable is a parent (not a VariableInstance) we need to check that this refinement
         // is a subtype of the variable's main refinement
         if (rv instanceof Variable) {
-            Constraint superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
+            Predicate superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
             tc.checkSMT(superC, invocation);
             tc.getContext().addRefinementInstanceToVariable(superName, name2);
         }

@@ -4,7 +4,7 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Locale;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VCImplication;
 import repair.regen.processor.context.PlacementInCode;
 import spoon.reflect.code.CtLiteral;
@@ -21,12 +21,12 @@ public class ErrorHandler {
      * @param expectedType
      * @param cSMT
      */
-    public static <T> void printError(CtElement var, Constraint expectedType, Constraint cSMT,
+    public static <T> void printError(CtElement var, Predicate expectedType, Predicate cSMT,
             HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
         printError(var, null, expectedType, cSMT, map, ee);
     }
 
-    public static <T> void printError(CtElement var, String moreInfo, Constraint expectedType, Constraint cSMT,
+    public static <T> void printError(CtElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 
         String resumeMessage = "Type expected:" + expectedType.toString();// + "; " +"Refinement found:" +
@@ -101,7 +101,7 @@ public class ErrorHandler {
         errorl.addError(resumeMessage, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static <T> void printNotFound(CtElement var, Constraint constraint, Constraint constraint2, String msg,
+    public static <T> void printNotFound(CtElement var, Predicate constraint, Predicate constraint2, String msg,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 
         StringBuilder sb = new StringBuilder();
@@ -118,7 +118,7 @@ public class ErrorHandler {
         errorl.addError(msg, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static <T> void printErrorArgs(CtElement var, Constraint expectedType, String msg,
+    public static <T> void printErrorArgs(CtElement var, Predicate expectedType, String msg,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
@@ -132,7 +132,7 @@ public class ErrorHandler {
         errorl.addError(title, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static void printErrorTypeMismatch(CtElement element, Constraint expectedType, String message,
+    public static void printErrorTypeMismatch(CtElement element, Predicate expectedType, String message,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
@@ -145,7 +145,7 @@ public class ErrorHandler {
         errorl.addError(message, sb.toString(), element.getPosition(), 2, map);
     }
 
-    public static void printSameStateSetError(CtElement element, Constraint p, String name,
+    public static void printSameStateSetError(CtElement element, Predicate p, String name,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
         String resume = "Error found multiple disjoint states from a State Set in a refinement";
 

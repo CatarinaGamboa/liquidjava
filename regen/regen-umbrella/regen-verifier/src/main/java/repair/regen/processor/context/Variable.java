@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Stack;
 
-import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -21,12 +20,12 @@ public class Variable extends RefinedVariable {
 
     private Stack<Object[]> ifCombiner;// Optional<VariableInstance>
 
-    public Variable(String name, CtTypeReference<?> type, Constraint ref) {
+    public Variable(String name, CtTypeReference<?> type, Predicate ref) {
         super(name, type, ref);
         startVariables();
     }
 
-    public Variable(String name, String location, CtTypeReference<?> type, Constraint ref) {
+    public Variable(String name, String location, CtTypeReference<?> type, Predicate ref) {
         super(name, type, ref);
         this.location = location;
         startVariables();
@@ -39,19 +38,19 @@ public class Variable extends RefinedVariable {
         ifCombiner = new Stack<>();
     }
 
-    public Constraint getRefinement() {
-        Constraint c = super.getRefinement();
+    public Predicate getRefinement() {
+        Predicate c = super.getRefinement();
         Optional<VariableInstance> ovi = getLastInstance();
         if (ovi.isPresent()) {
             VariableInstance vi = ovi.get();
-            Constraint n = Predicate.createVar(this.getName());
-            Constraint n2 = Predicate.createVar(vi.getName());
+            Predicate n = Predicate.createVar(this.getName());
+            Predicate n2 = Predicate.createVar(vi.getName());
             c = Predicate.createConjunction(Predicate.createEquals(n, n2), c);
         }
         return c;
     }
 
-    public Constraint getMainRefinement() {
+    public Predicate getMainRefinement() {
         return super.getRefinement();
     }
 
@@ -144,12 +143,12 @@ public class Variable extends RefinedVariable {
      *
      * @return A new VariableInfo created by the combination of refinements or an empty Optional
      */
-    Optional<VariableInstance> getIfInstanceCombination(int counter, Constraint cond) {
+    Optional<VariableInstance> getIfInstanceCombination(int counter, Predicate cond) {
         if (ifCombiner.isEmpty() || (!has(ifthenIndex) && !has(ifelseIndex) && !has(ifbeforeIndex)))
             return Optional.empty();
 
         String nName = String.format("#%s_%d", super.getName(), counter);
-        Constraint ref = new Predicate();
+        Predicate ref = new Predicate();
 
         if (!has(ifelseIndex)) {
             if (has(ifbeforeIndex) && has(ifthenIndex)) // value before if and inside then
@@ -188,14 +187,14 @@ public class Variable extends RefinedVariable {
      *
      * @return
      */
-    private Constraint createITEConstraint(String nName, Constraint cond, VariableInstance then) {
-        Constraint ref1 = then.getRenamedRefinements(nName);
+    private Predicate createITEConstraint(String nName, Predicate cond, VariableInstance then) {
+        Predicate ref1 = then.getRenamedRefinements(nName);
         return Predicate.createITE(cond, ref1, new Predicate());
     }
 
-    private Constraint createITEConstraint(String nName, Constraint cond, VariableInstance then, VariableInstance els) {
-        Constraint ref1 = then.getRenamedRefinements(nName);
-        Constraint ref2 = els.getRenamedRefinements(nName);
+    private Predicate createITEConstraint(String nName, Predicate cond, VariableInstance then, VariableInstance els) {
+        Predicate ref1 = then.getRenamedRefinements(nName);
+        Predicate ref2 = els.getRenamedRefinements(nName);
         return Predicate.createITE(cond, ref1, ref2);
     }
 

@@ -1,6 +1,5 @@
 package repair.regen.processor.context;
 
-import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -8,12 +7,12 @@ public abstract class Refined {
 
     private String name;// y
     private CtTypeReference<?> type;// int
-    private Constraint refinement; // 9 <= y && y <= 100
+    private Predicate refinement; // 9 <= y && y <= 100
 
     public Refined() {
     }
 
-    public Refined(String name, CtTypeReference<?> type, Constraint refinement) {
+    public Refined(String name, CtTypeReference<?> type, Predicate refinement) {
         this.name = name;
         this.type = type;
         this.refinement = refinement;
@@ -35,17 +34,17 @@ public abstract class Refined {
         this.type = type;
     }
 
-    public void setRefinement(Constraint c) {
+    public void setRefinement(Predicate c) {
         this.refinement = c;
     }
 
-    public Constraint getRefinement() {
+    public Predicate getRefinement() {
         if (refinement != null)
             return refinement;
         return new Predicate();
     }
 
-    public Constraint getRenamedRefinements(String toReplace) {
+    public Predicate getRenamedRefinements(String toReplace) {
         return refinement.substituteVariable(name, toReplace);
     }
 

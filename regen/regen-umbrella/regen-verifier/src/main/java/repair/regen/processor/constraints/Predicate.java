@@ -7,7 +7,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import repair.regen.errors.ErrorEmitter;
+import repair.regen.errors.ErrorHandler;
+import repair.regen.processor.context.AliasWrapper;
+import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostState;
+import repair.regen.processor.facade.AliasDTO;
 import repair.regen.rj_language.ast.BinaryExpression;
 import repair.regen.rj_language.ast.Expression;
 import repair.regen.rj_language.ast.FunctionInvocation;
@@ -19,11 +23,14 @@ import repair.regen.rj_language.ast.LiteralReal;
 import repair.regen.rj_language.ast.UnaryExpression;
 import repair.regen.rj_language.ast.Var;
 import repair.regen.rj_language.parsing.ParsingException;
+import repair.regen.rj_language.parsing.RefinementsParser;
 import repair.regen.utils.Utils;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.factory.Factory;
 
-public class Predicate extends Constraint {
-    private final String OLD = "old";
+public class Predicate {
+    
+	private final String OLD = "old";
 
     protected Expression exp;
 
@@ -56,20 +63,48 @@ public class Predicate extends Constraint {
     public Predicate(Expression e) {
         exp = e;
     }
+    
+    protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+        try {
+            return RefinementsParser.createAST(ref);
+        } catch (ParsingException e1) {
+            ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
+            throw e1;
+        }
+    }
 
-    @Override
-    public Constraint negate() {
+    protected Expression innerParse(String ref, ErrorEmitter e) {
+        try {
+            return RefinementsParser.createAST(ref);
+        } catch (ParsingException e1) {
+            ErrorHandler.printSyntaxError(e1.getMessage(), ref, e);
+        }
+        return null;
+    }
+
+    public Predicate changeAliasToRefinement(Context context, CtElement element, Factory f) throws Exception {
+        Expression ref = getExpression();
+
+        Map<String, AliasDTO> alias = new HashMap<>();
+        for (AliasWrapper aw : context.getAlias()) {
+            alias.put(aw.getName(), aw.createAliasDTO());
+        }
+
+        ref = ref.changeAlias(alias, context, f);
+        return new Predicate(ref);
+    }
+    
+
+    public Predicate negate() {
         return new Predicate(new UnaryExpression("!", exp));
     }
 
-    @Override
-    public Constraint substituteVariable(String from, String to) {
+    public Predicate substituteVariable(String from, String to) {
         Expression ec = exp.clone();
         ec = ec.substitute(new Var(from), new Var(to));
         return new Predicate(ec);
     }
 
-    @Override
     public List<String> getVariableNames() {
         List<String> l = new ArrayList<>();
         exp.getVariableNames(l);
@@ -97,7 +132,7 @@ public class Predicate extends Constraint {
      * Change old mentions of previous name to the new name
      * e.g., old(previousName) -> newName
      */
-    public Constraint changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
+    public Predicate changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
         Expression e = exp.clone();
         Expression prev = innerParse(previousName, ee);
         List<Expression> le = new ArrayList<>();
@@ -106,8 +141,7 @@ public class Predicate extends Constraint {
         return new Predicate(e);
     }
 
-    @Override
-    public Constraint changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, ErrorEmitter ee) {
+    public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, ErrorEmitter ee) {
         Map<String, Expression> nameRefinementMap = new HashMap<>();
         for (GhostState gs : ghostState)
             if (gs.getRefinement() != null) // is a state and not a ghost state
@@ -127,33 +161,32 @@ public class Predicate extends Constraint {
     }
 
     @Override
-    public Constraint clone() {
-        Constraint c = new Predicate(exp.clone());
+    public Predicate clone() {
+        Predicate c = new Predicate(exp.clone());
         return c;
     }
 
-    @Override
     public Expression getExpression() {
         return exp;
     }
     
     
-    public static Predicate createConjunction(Constraint c1, Constraint c2) {
+    public static Predicate createConjunction(Predicate c1, Predicate c2) {
     	return new Predicate(new BinaryExpression(c1.getExpression(), 
     			Utils.AND, c2.getExpression()));
     } 
     
-    public static Predicate createDisjunction(Constraint c1, Constraint c2) {
+    public static Predicate createDisjunction(Predicate c1, Predicate c2) {
     	return new Predicate(new BinaryExpression(c1.getExpression(), 
     			Utils.OR, c2.getExpression()));
     } 
     
-    public static Predicate createEquals(Constraint c1, Constraint c2) {
+    public static Predicate createEquals(Predicate c1, Predicate c2) {
     	return new Predicate(new BinaryExpression(c1.getExpression(), 
     			Utils.EQ, c2.getExpression()));
     } 
     
-    public static Predicate createITE(Constraint c1, Constraint c2, Constraint c3) {
+    public static Predicate createITE(Predicate c1, Predicate c2, Predicate c3) {
     	 return new Predicate( new Ite(c1.getExpression(), c2.getExpression(), 
     			 c3.getExpression()));
     } 
@@ -175,7 +208,7 @@ public class Predicate extends Constraint {
     	return new Predicate(ex);
    } 
     
-    public static Predicate createOperation(Constraint c1, String op, Constraint c2) {
+    public static Predicate createOperation(Predicate c1, String op, Predicate c2) {
     	return new Predicate(new BinaryExpression(c1.getExpression(), op, c2.getExpression()));
     }
 
@@ -183,10 +216,12 @@ public class Predicate extends Constraint {
     	return new Predicate(new Var(name));
     }
     
-    public static Predicate createInvocation(String name, Constraint... constraints) {
+    public static Predicate createInvocation(String name, Predicate... Predicates) {
     	List<Expression> le = new ArrayList<>();
-    	for(Constraint c: constraints) le.add(c.getExpression());
+    	for(Predicate c: Predicates) le.add(c.getExpression());
     	return new Predicate(new FunctionInvocation(name, le));
     }
+    
 
+ 
 }

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
@@ -24,7 +24,7 @@ public class RefinedFunction extends Refined {
         return argRefinements;
     }
 
-    public void addArgRefinements(String varName, CtTypeReference<?> type, Constraint refinement) {
+    public void addArgRefinements(String varName, CtTypeReference<?> type, Predicate refinement) {
         Variable v = new Variable(varName, type, refinement);
         this.argRefinements.add(v);
 
@@ -34,11 +34,11 @@ public class RefinedFunction extends Refined {
         this.argRefinements.add(vi);
     }
 
-    public Constraint getRefReturn() {
+    public Predicate getRefReturn() {
         return super.getRefinement();
     }
 
-    public void setRefReturn(Constraint ref) {
+    public void setRefReturn(Predicate ref) {
         super.setRefinement(ref);
     }
 
@@ -50,15 +50,15 @@ public class RefinedFunction extends Refined {
         return targetClass;
     }
 
-    public Constraint getRenamedRefinements(Context c, CtElement element) {
+    public Predicate getRenamedRefinements(Context c, CtElement element) {
         return getRenamedRefinements(getAllRefinements(), c, element);
     }
 
-    private Constraint getRenamedRefinements(Constraint place, Context context, CtElement element) {
-        Constraint update = place.clone();
+    private Predicate getRenamedRefinements(Predicate place, Context context, CtElement element) {
+        Predicate update = place.clone();
         for (Variable p : argRefinements) {
             String varName = p.getName();
-            Constraint c = p.getRefinement();
+            Predicate c = p.getRefinement();
             Optional<VariableInstance> ovi = p.getLastInstance();
             if (ovi.isPresent()) {
                 varName = ovi.get().getName();
@@ -70,8 +70,8 @@ public class RefinedFunction extends Refined {
         return update;
     }
 
-    public Constraint getAllRefinements() {
-        Constraint c = new Predicate();
+    public Predicate getAllRefinements() {
+        Predicate c = new Predicate();
         for (RefinedVariable p : argRefinements)
             c = Predicate.createConjunction(c, p.getRefinement());// joinArgs
         c = Predicate.createConjunction(c, super.getRefinement());// joinReturn
@@ -79,14 +79,14 @@ public class RefinedFunction extends Refined {
     }
 
     /**
-     * Gives the Constraint for a certain parameter index and regards all the previous parameters' Constraints
+     * Gives the Predicate for a certain parameter index and regards all the previous parameters' Predicates
      *
      * @param index
      *
      * @return
      */
-    public Constraint getRefinementsForParamIndex(int index) {
-        Constraint c = new Predicate();
+    public Predicate getRefinementsForParamIndex(int index) {
+        Predicate c = new Predicate();
         for (int i = 0; i <= index && i < argRefinements.size(); i++)
             c = Predicate.createConjunction(c, argRefinements.get(i).getRefinement());
         return c;
@@ -119,15 +119,15 @@ public class RefinedFunction extends Refined {
         return stateChange.size() > 0;
     }
 
-    public List<Constraint> getFromStates() {
-        List<Constraint> lc = new ArrayList<>();
+    public List<Predicate> getFromStates() {
+        List<Predicate> lc = new ArrayList<>();
         for (ObjectState os : stateChange)
             lc.add(os.getFrom());
         return lc;
     }
 
-    public List<Constraint> getToStates() {
-        List<Constraint> lc = new ArrayList<>();
+    public List<Predicate> getToStates() {
+        List<Predicate> lc = new ArrayList<>();
         for (ObjectState os : stateChange)
             lc.add(os.getTo());
         return lc;

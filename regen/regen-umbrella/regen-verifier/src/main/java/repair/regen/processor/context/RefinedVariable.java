@@ -4,19 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public abstract class RefinedVariable extends Refined {
     private List<CtTypeReference<?>> supertypes;
     private PlacementInCode placementInCode;
 
-    public RefinedVariable(String name, CtTypeReference<?> type, Constraint c) {
+    public RefinedVariable(String name, CtTypeReference<?> type, Predicate c) {
         super(name, type, c);
         supertypes = new ArrayList<>();
     }
 
-    public abstract Constraint getMainRefinement();
+    public abstract Predicate getMainRefinement();
 
     public void addSuperType(CtTypeReference<?> t) {
         if (!supertypes.contains(t))

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.RefinedFunction;
@@ -132,7 +132,7 @@ public class MethodsFunctionsChecker {
         if (method.getSignature().equals("main(java.lang.String[])"))
             return;
         List<CtParameter<?>> params = method.getParameters();
-        Constraint ref = handleFunctionRefinements(rf, method, params);
+        Predicate ref = handleFunctionRefinements(rf, method, params);
         method.putMetadata(rtc.REFINE_KEY, ref);
 
     }
@@ -148,14 +148,14 @@ public class MethodsFunctionsChecker {
      *
      * @throws ParsingException
      */
-    private Constraint handleFunctionRefinements(RefinedFunction f, CtElement method, List<CtParameter<?>> params)
+    private Predicate handleFunctionRefinements(RefinedFunction f, CtElement method, List<CtParameter<?>> params)
             throws ParsingException {
-        Constraint joint = new Predicate();
+        Predicate joint = new Predicate();
 
         for (CtParameter<?> param : params) {
             String paramName = param.getSimpleName();
-            Optional<Constraint> oc = rtc.getRefinementFromAnnotation(param);
-            Constraint c = new Predicate();
+            Optional<Predicate> oc = rtc.getRefinementFromAnnotation(param);
+            Predicate c = new Predicate();
             if (oc.isPresent())
                 c = oc.get().substituteVariable(rtc.WILD_VAR, paramName);
             param.putMetadata(rtc.REFINE_KEY, c);
@@ -165,8 +165,8 @@ public class MethodsFunctionsChecker {
             joint = Predicate.createConjunction(joint, c);
         }
 
-        Optional<Constraint> oret = rtc.getRefinementFromAnnotation(method);
-        Constraint ret = oret.orElse(new Predicate());
+        Optional<Predicate> oret = rtc.getRefinementFromAnnotation(method);
+        Predicate ret = oret.orElse(new Predicate());
         f.setRefReturn(ret);
         // rtc.context.addFunctionToContext(f);
         return Predicate.createConjunction(joint, ret);
@@ -208,9 +208,9 @@ public class MethodsFunctionsChecker {
                 rtc.getContext().addInstanceToContext(thisName, c.getReference(), new Predicate(), ret);
 
                 String returnVarName = String.format(retNameFormat, rtc.getContext().getCounter());
-                Constraint cretRef = rtc.getRefinement(ret.getReturnedExpression())
+                Predicate cretRef = rtc.getRefinement(ret.getReturnedExpression())
                         .substituteVariable(rtc.WILD_VAR, returnVarName).substituteVariable(rtc.THIS, returnVarName);
-                Constraint cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName)
+                Predicate cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName)
                         .substituteVariable(rtc.THIS, returnVarName);
 
                 rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
@@ -294,7 +294,7 @@ public class MethodsFunctionsChecker {
 
         // -- Part 2: Apply changes
         // applyRefinementsToArguments(element, arguments, f, map);
-        Constraint methodRef = f.getRefReturn();
+        Predicate methodRef = f.getRefReturn();
 
         if (methodRef != null) {
             boolean equalsThis = methodRef.toString().equals("(_ == this)"); // TODO change for better
@@ -352,7 +352,7 @@ public class MethodsFunctionsChecker {
     }
 
     private String createVariableRepresentingArgument(CtExpression<?> iArg, Variable fArg) {
-        Constraint met = (Constraint) iArg.getMetadata(rtc.REFINE_KEY);
+        Predicate met = (Predicate) iArg.getMetadata(rtc.REFINE_KEY);
         if (met == null)
             met = new Predicate();
         if (!met.getVariableNames().contains(rtc.WILD_VAR))
@@ -368,7 +368,7 @@ public class MethodsFunctionsChecker {
         List<Variable> functionParams = f.getArguments();
         for (int i = 0; i < invocationParams.size(); i++) {
             Variable fArg = functionParams.get(i);
-            Constraint c = fArg.getMainRefinement();
+            Predicate c = fArg.getMainRefinement();
             c = c.substituteVariable(fArg.getName(), map.get(fArg.getName()));
             List<String> vars = c.getVariableNames();
             for (String s : vars)
@@ -389,7 +389,7 @@ public class MethodsFunctionsChecker {
 
         for (int i = 0; i < invocationParams.size(); i++) {
             Variable fArg = functionParams.get(i);
-            Constraint inferredRefinement = fArg.getRefinement();
+            Predicate inferredRefinement = fArg.getRefinement();
 
             CtExpression<?> e = invocationParams.get(i);
             if (e instanceof CtVariableRead<?>) {

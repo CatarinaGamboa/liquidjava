@@ -6,7 +6,7 @@ import java.util.Optional;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.processor.context.GhostFunction;
@@ -59,13 +59,13 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (errorEmitter.foundError())
             return;
 
-        Optional<Constraint> oc;
+        Optional<Predicate> oc;
         try {
             oc = getRefinementFromAnnotation(f);
         } catch (ParsingException e) {
             return;// error already in ErrorEmitter
         }
-        Constraint c = oc.orElse(new Predicate());
+        Predicate c = oc.orElse(new Predicate());
         context.addGlobalVariableToContext(f.getSimpleName(), prefix, f.getType(), c);
         super.visitCtField(f);
     }

@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.ObjectState;
 import repair.regen.processor.context.RefinedFunction;
@@ -76,8 +76,8 @@ public class AuxHierarchyRefinememtsPassage {
             Variable superArg = superArgs.get(i);
             String newName = super2function.get(arg.getName());
             // create new name
-            Constraint argRef = arg.getRefinement().substituteVariable(arg.getName(), newName);
-            Constraint superArgRef = superArg.getRefinement().substituteVariable(superArg.getName(), newName);
+            Predicate argRef = arg.getRefinement().substituteVariable(arg.getName(), newName);
+            Predicate superArgRef = superArg.getRefinement().substituteVariable(superArg.getName(), newName);
 
             System.out.println(arg.getName() + " has ref " + argRef);
             if (argRef.isBooleanTrue()) {
@@ -97,8 +97,8 @@ public class AuxHierarchyRefinememtsPassage {
 
     static void transferReturnRefinement(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method,
             TypeChecker tc, HashMap<String, String> super2function) {
-        Constraint functionRef = function.getRefinement();
-        Constraint superRef = superFunction.getRefinement();
+        Predicate functionRef = function.getRefinement();
+        Predicate superRef = superFunction.getRefinement();
         if (functionRef.isBooleanTrue())
             function.setRefinement(superRef);
         else {
@@ -148,8 +148,8 @@ public class AuxHierarchyRefinememtsPassage {
                     String thisName = String.format(tc.freshFormat, tc.getContext().getCounter());
                     createVariableInContext(thisName, tc, subFunction, superFunction, method.getParameters().get(i));
 
-                    Constraint superConst = matchVariableNames(tc.THIS, thisName, superState.getFrom());
-                    Constraint subConst = matchVariableNames(tc.THIS, thisName, superFunction, subFunction,
+                    Predicate superConst = matchVariableNames(tc.THIS, thisName, superState.getFrom());
+                    Predicate subConst = matchVariableNames(tc.THIS, thisName, superFunction, subFunction,
                             subState.getFrom());
 
                     // fromSup <: fromSub <==> fromSup is sub type and fromSub is expectedType
@@ -192,9 +192,9 @@ public class AuxHierarchyRefinememtsPassage {
      *
      * @return
      */
-    private static Constraint matchVariableNames(String fromName, String thisName, RefinedFunction superFunction,
-            RefinedFunction subFunction, Constraint c) {
-        Constraint nc = c.substituteVariable(fromName, thisName);
+    private static Predicate matchVariableNames(String fromName, String thisName, RefinedFunction superFunction,
+            RefinedFunction subFunction, Predicate c) {
+        Predicate nc = c.substituteVariable(fromName, thisName);
         List<Variable> superArgs = superFunction.getArguments();
         List<Variable> subArgs = subFunction.getArguments();
         for (int i = 0; i < subArgs.size(); i++) {
@@ -203,7 +203,7 @@ public class AuxHierarchyRefinememtsPassage {
         return nc;
     }
 
-    private static Constraint matchVariableNames(String fromName, String thisName, Constraint c) {
+    private static Predicate matchVariableNames(String fromName, String thisName, Predicate c) {
         return c.substituteVariable(fromName, thisName);
     }
 }

@@ -3,23 +3,23 @@ package repair.regen.processor.constraints;
 import spoon.reflect.reference.CtTypeReference;
 
 /**
- * Verification Conditions sent to SMT Solver
+ * 
  * @author cgamboa
  *
  */
 public class VCImplication {
     String name;
     CtTypeReference<?> type;
-    Constraint refinement;
+    Predicate refinement;
     VCImplication next;
 
-    public VCImplication(String name, CtTypeReference<?> type, Constraint ref) {
+    public VCImplication(String name, CtTypeReference<?> type, Predicate ref) {
         this.name = name;
         this.type = type;
         this.refinement = ref;
     }
 
-    public VCImplication(Constraint ref) {
+    public VCImplication(Predicate ref) {
         this.refinement = ref;
     }
 
@@ -37,16 +37,16 @@ public class VCImplication {
             return String.format("%-20s %s", "", refinement.toString());
     }
 
-    public Constraint toConjunctions() {
-        Constraint c = new Predicate();
+    public Predicate toConjunctions() {
+        Predicate c = new Predicate();
         if (name == null && type == null && next == null)
             return c;
         c = auxConjunction(c);
         return c;
     }
 
-    private Constraint auxConjunction(Constraint c) {
-        Constraint t = Predicate.createConjunction(c, refinement);
+    private Predicate auxConjunction(Predicate c) {
+        Predicate t = Predicate.createConjunction(c, refinement);
         if (next == null)
             return t;
         t = next.auxConjunction(t);

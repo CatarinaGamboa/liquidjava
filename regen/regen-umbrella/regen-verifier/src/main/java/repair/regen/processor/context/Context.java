@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Stack;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -104,13 +104,13 @@ public class Context {
     }
 
     // ---------------------- Global variables ----------------------
-    public void addGlobalVariableToContext(String simpleName, CtTypeReference<?> type, Constraint c) {
+    public void addGlobalVariableToContext(String simpleName, CtTypeReference<?> type, Predicate c) {
         RefinedVariable vi = new Variable(simpleName, type, c);
         ctxGlobalVars.add(vi);
         vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
     }
 
-    public void addGlobalVariableToContext(String simpleName, String location, CtTypeReference<?> type, Constraint c) {
+    public void addGlobalVariableToContext(String simpleName, String location, CtTypeReference<?> type, Predicate c) {
         RefinedVariable vi = new Variable(simpleName, location, type, c);
         vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
         ctxGlobalVars.add(vi);
@@ -124,7 +124,7 @@ public class Context {
         var.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
     }
 
-    public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, Constraint c,
+    public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, Predicate c,
             CtElement placementInCode) {
         RefinedVariable vi = new Variable(simpleName, type, c);
         vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
@@ -133,7 +133,7 @@ public class Context {
         return vi;
     }
 
-    public RefinedVariable addInstanceToContext(String simpleName, CtTypeReference<?> type, Constraint c,
+    public RefinedVariable addInstanceToContext(String simpleName, CtTypeReference<?> type, Predicate c,
             CtElement placementInCode) {
         RefinedVariable vi = new VariableInstance(simpleName, type, c);
         vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
@@ -142,7 +142,7 @@ public class Context {
         return vi;
     }
 
-    public void addRefinementToVariableInContext(String name, CtTypeReference<?> type, Constraint et,
+    public void addRefinementToVariableInContext(String name, CtTypeReference<?> type, Predicate et,
             CtElement placementInCode) {
         if (hasVariable(name)) {
             RefinedVariable vi = getVariableByName(name);
@@ -159,14 +159,14 @@ public class Context {
      * @param variableName
      * @param expectedType
      */
-    public void newRefinementToVariableInContext(String variableName, Constraint expectedType) {
+    public void newRefinementToVariableInContext(String variableName, Predicate expectedType) {
         if (hasVariable(variableName)) {
             RefinedVariable vi = getVariableByName(variableName);
             vi.setRefinement(expectedType);
         }
     }
 
-    public Constraint getVariableRefinements(String varName) {
+    public Predicate getVariableRefinements(String varName) {
         return hasVariable(varName) ? getVariableByName(varName).getRefinement() : null;
     }
 
@@ -289,7 +289,7 @@ public class Context {
                 ((Variable) vi).finishIfCombination();
     }
 
-    public void variablesCombineFromIf(Constraint cond) {
+    public void variablesCombineFromIf(Predicate cond) {
         for (RefinedVariable vi : getAllVariables()) {
             if (vi instanceof Variable) {
                 Optional<VariableInstance> ovi = ((Variable) vi).getIfInstanceCombination(getCounter(), cond);

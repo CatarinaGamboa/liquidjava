@@ -9,7 +9,7 @@ import java.util.Optional;
 
 import repair.regen.errors.ErrorEmitter;
 import repair.regen.errors.ErrorHandler;
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.AliasWrapper;
 import repair.regen.processor.context.Context;
@@ -64,14 +64,14 @@ public abstract class TypeChecker extends CtScanner {
         return factory;
     }
 
-    public Constraint getRefinement(CtElement elem) {
-        Constraint c = (Constraint) elem.getMetadata(REFINE_KEY);
+    public Predicate getRefinement(CtElement elem) {
+        Predicate c = (Predicate) elem.getMetadata(REFINE_KEY);
         return c == null ? new Predicate() : c;
     }
 
     @SuppressWarnings("unchecked")
-    public Optional<Constraint> getRefinementFromAnnotation(CtElement element) throws ParsingException {
-        Optional<Constraint> constr = Optional.empty();
+    public Optional<Predicate> getRefinementFromAnnotation(CtElement element) throws ParsingException {
+        Optional<Predicate> constr = Optional.empty();
         Optional<String> ref = Optional.empty();
         for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
             String an = ann.getActualAnnotation().annotationType().getCanonicalName();
@@ -262,10 +262,10 @@ public abstract class TypeChecker extends CtScanner {
         return ref;
     }
 
-    public void checkVariableRefinements(Constraint refinementFound, String simpleName, CtTypeReference<?> type,
+    public void checkVariableRefinements(Predicate refinementFound, String simpleName, CtTypeReference<?> type,
             CtElement usage, CtElement variable) throws ParsingException {
-        Optional<Constraint> expectedType = getRefinementFromAnnotation(variable);
-        Constraint cEt;
+        Optional<Predicate> expectedType = getRefinementFromAnnotation(variable);
+        Predicate cEt;
         RefinedVariable mainRV = null;
         if (context.hasVariable(simpleName))
             mainRV = context.getVariableByName(simpleName);
@@ -278,10 +278,10 @@ public abstract class TypeChecker extends CtScanner {
             cEt = new Predicate();
 
         cEt = cEt.substituteVariable(WILD_VAR, simpleName);
-        Constraint cet = cEt.substituteVariable(WILD_VAR, simpleName);
+        Predicate cet = cEt.substituteVariable(WILD_VAR, simpleName);
 
         String newName = String.format(instanceFormat, simpleName, context.getCounter());
-        Constraint correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
+        Predicate correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
         correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
         cEt = cEt.substituteVariable(simpleName, newName);
 
@@ -295,30 +295,30 @@ public abstract class TypeChecker extends CtScanner {
         context.addRefinementToVariableInContext(simpleName, type, cet, usage);
     }
 
-    public void checkSMT(Constraint expectedType, CtElement element) {
+    public void checkSMT(Predicate expectedType, CtElement element) {
         vcChecker.processSubtyping(expectedType, context.getGhostState(), WILD_VAR, THIS, element, factory);
         element.putMetadata(REFINE_KEY, expectedType);
     }
 
-    public void checkStateSMT(Constraint prevState, Constraint expectedState, CtElement target, String string) {
+    public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String string) {
         vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target, string,
                 factory);
     }
 
-    public boolean checksStateSMT(Constraint prevState, Constraint expectedState, CtElement target) {
+    public boolean checksStateSMT(Predicate prevState, Predicate expectedState, CtElement target) {
         return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target,
                 factory);
     }
 
-    public void createError(CtElement element, Constraint expectedType, Constraint foundType, String customeMessage) {
+    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customeMessage) {
         vcChecker.printSubtypingError(element, expectedType, foundType, customeMessage);
     }
 
-    public void createSameStateError(CtElement element, Constraint expectedType, String klass) {
+    public void createSameStateError(CtElement element, Predicate expectedType, String klass) {
         vcChecker.printSameStateError(element, expectedType, klass);
     }
 
-    public void createStateMismatchError(CtElement element, String method, Constraint c, String states) {
+    public void createStateMismatchError(CtElement element, String method, Predicate c, String states) {
         vcChecker.printStateMismatchError(element, method, c, states);
     }
 

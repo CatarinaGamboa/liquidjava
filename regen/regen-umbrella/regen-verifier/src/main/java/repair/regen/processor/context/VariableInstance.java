@@ -2,26 +2,26 @@ package repair.regen.processor.context;
 
 import java.util.Optional;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public class VariableInstance extends RefinedVariable {
 
-    // private Constraint state;
+    // private Predicate state;
     private Variable parent;
 
-    public VariableInstance(String name, CtTypeReference<?> type, Constraint c) {
+    public VariableInstance(String name, CtTypeReference<?> type, Predicate c) {
         super(name, type, c);
         this.parent = null;
     }
 
-    public VariableInstance(String name, CtTypeReference<?> type, Constraint c, Variable parent) {
+    public VariableInstance(String name, CtTypeReference<?> type, Predicate c, Variable parent) {
         super(name, type, c);
         this.parent = parent;
     }
 
     @Override
-    public Constraint getMainRefinement() {
+    public Predicate getMainRefinement() {
         return super.getRefinement();
     }
 
@@ -39,10 +39,10 @@ public class VariableInstance extends RefinedVariable {
         return parent == null ? Optional.empty() : Optional.of(parent);
     }
 
-    // public void setState(Constraint c) {
+    // public void setState(Predicate c) {
     // state = c;
     // }
-    // public Constraint getState() {
+    // public Predicate getState() {
     // return state;
     // }
     //

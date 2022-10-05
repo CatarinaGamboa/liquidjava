@@ -1,26 +1,26 @@
 package repair.regen.processor.context;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.Predicate;
 
 public class ObjectState {
 
-    Constraint from;
-    Constraint to;
+    Predicate from;
+    Predicate to;
 
     public ObjectState() {
     }
 
-    public ObjectState(Constraint from, Constraint to) {
+    public ObjectState(Predicate from, Predicate to) {
         this.from = from;
         this.to = to;
     }
 
-    public void setFrom(Constraint from) {
+    public void setFrom(Predicate from) {
         this.from = from;
     }
 
-    public void setTo(Constraint to) {
+    public void setTo(Predicate to) {
         this.to = to;
     }
 
@@ -32,11 +32,11 @@ public class ObjectState {
         return to != null;
     }
 
-    public Constraint getFrom() {
+    public Predicate getFrom() {
         return from != null ? from : new Predicate();
     }
 
-    public Constraint getTo() {
+    public Predicate getTo() {
         return to != null ? to : new Predicate();
     }
 

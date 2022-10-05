@@ -5,19 +5,18 @@ import com.microsoft.z3.Expr;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
-import repair.regen.processor.constraints.Constraint;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.context.Context;
 import repair.regen.rj_language.ast.Expression;
 
 public class SMTEvaluator {
 
-    public void verifySubtype(Constraint subRef, Constraint supRef, Context c)
+    public void verifySubtype(Predicate subRef, Predicate supRef, Context c)
             throws TypeCheckError, GhostFunctionError, Exception {
         // Creates a parser for our SMT-ready refinement language
         // Discharges the verification to z3
 
-        Constraint toVerify = Predicate.createConjunction(subRef, supRef.negate());
+        Predicate toVerify = Predicate.createConjunction(subRef, supRef.negate());
         System.out.println(toVerify.toString()); // TODO remove
 
         try {

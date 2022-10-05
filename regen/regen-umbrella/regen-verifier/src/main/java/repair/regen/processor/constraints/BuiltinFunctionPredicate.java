@@ -4,21 +4,21 @@ import repair.regen.errors.ErrorEmitter;
 import repair.regen.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtElement;
 
-public class FunctionPredicate extends Predicate {
+public class BuiltinFunctionPredicate extends Predicate {
 
-    public FunctionPredicate(ErrorEmitter ee, CtElement elem, String functionName, String... params)
+    public BuiltinFunctionPredicate(ErrorEmitter ee, CtElement elem, String functionName, String... params)
             throws ParsingException {
         super(functionName + "(" + getFormattedParams(params) + ")", elem, ee);
     }
 
-    public static FunctionPredicate builtin_length(String param, CtElement elem, ErrorEmitter ee)
+    public static BuiltinFunctionPredicate builtin_length(String param, CtElement elem, ErrorEmitter ee)
             throws ParsingException {
-        return new FunctionPredicate(ee, elem, "length", param);
+        return new BuiltinFunctionPredicate(ee, elem, "length", param);
     }
 
-    public static FunctionPredicate builtin_addToIndex(String array, String index, String value, CtElement elem,
+    public static BuiltinFunctionPredicate builtin_addToIndex(String array, String index, String value, CtElement elem,
             ErrorEmitter ee) throws ParsingException {
-        return new FunctionPredicate(ee, elem, "addToIndex", index, value);
+        return new BuiltinFunctionPredicate(ee, elem, "addToIndex", index, value);
     }
 
     private static String getFormattedParams(String... params) {

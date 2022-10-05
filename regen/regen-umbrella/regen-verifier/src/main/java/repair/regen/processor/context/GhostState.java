@@ -2,13 +2,13 @@ package repair.regen.processor.context;
 
 import java.util.List;
 
-import repair.regen.processor.constraints.Constraint;
+import repair.regen.processor.constraints.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public class GhostState extends GhostFunction {
 
     private GhostFunction parent;
-    private Constraint refinement;
+    private Predicate refinement;
 
     public GhostState(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String klass) {
         super(name, list, return_type, klass);
@@ -19,7 +19,7 @@ public class GhostState extends GhostFunction {
         this.parent = parent;
     }
 
-    public void setRefinement(Constraint c) {
+    public void setRefinement(Predicate c) {
         refinement = c;
     }
 
@@ -27,7 +27,7 @@ public class GhostState extends GhostFunction {
         return parent;
     }
 
-    public Constraint getRefinement() {
+    public Predicate getRefinement() {
         return refinement;
     }
 
