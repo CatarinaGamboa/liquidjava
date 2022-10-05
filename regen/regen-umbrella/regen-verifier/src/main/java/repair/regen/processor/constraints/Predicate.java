@@ -174,6 +174,10 @@ public class Predicate extends Constraint {
     		ex = new LiteralReal(value);
     	return new Predicate(ex);
    } 
+    
+    public static Predicate createOperation(Constraint c1, String op, Constraint c2) {
+    	return new Predicate(new BinaryExpression(c1.getExpression(), op, c2.getExpression()));
+    }
 
 
 }

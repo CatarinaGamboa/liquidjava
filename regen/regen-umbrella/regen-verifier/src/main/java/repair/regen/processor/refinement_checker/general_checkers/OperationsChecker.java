@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Optional;
 
 import repair.regen.processor.constraints.Constraint;
-import repair.regen.processor.constraints.OperationPredicate;
 import repair.regen.processor.constraints.Predicate;
 import repair.regen.processor.constraints.VariablePredicate;
 import repair.regen.processor.context.RefinedFunction;
@@ -76,7 +75,7 @@ public class OperationsChecker {
         } else {
             Constraint varLeft = getOperationRefinements(operator, left);
             Constraint varRight = getOperationRefinements(operator, right);
-            oper = new OperationPredicate(varLeft, getOperatorFromKind(operator.getKind()), varRight);
+            oper = Predicate.createOperation(varLeft, getOperatorFromKind(operator.getKind()), varRight);
             // new Predicate(String.format("(%s %s %s)",
             // varLeft,,varRight));
 
@@ -232,7 +231,7 @@ public class OperationsChecker {
             Constraint right = getOperationRefinements(operator, parentVar, binop.getRightHandOperand());
             Constraint left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand());
 
-            return new OperationPredicate(left, getOperatorFromKind(binop.getKind()), right);
+            return Predicate.createOperation(left, getOperatorFromKind(binop.getKind()), right);
             // Predicate(left+" "+ getOperatorFromKind(binop.getKind()) +" "+ right);
 
         } else if (element instanceof CtUnaryOperator<?>) {
