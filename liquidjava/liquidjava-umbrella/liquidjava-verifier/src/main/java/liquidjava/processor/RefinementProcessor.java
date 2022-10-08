@@ -36,7 +36,7 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
             // void spoon.reflect.visitor.CtVisitable.accept(CtVisitor arg0)
             pkg.accept(new ExternalRefinementTypeChecker(c, factory, errorEmitter));
 
-            pkg.accept(new MethodsFirstChecker(c, factory, errorEmitter));// double passing idea
+            pkg.accept(new MethodsFirstChecker(c, factory, errorEmitter));// double passing idea (instead of headers)
 
             pkg.accept(new RefinementTypeChecker(c, factory, errorEmitter));
             if (errorEmitter.foundError())
