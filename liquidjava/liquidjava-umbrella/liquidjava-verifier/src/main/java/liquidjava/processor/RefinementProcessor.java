@@ -34,7 +34,7 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
             Context c = Context.getInstance();
             c.reinitializeAllContext();
 
-            pkg.accept(new FieldGhostsGeneration(c, factory, errorEmitter)); //generate annotations for field ghosts
+            pkg.accept(new FieldGhostsGeneration(c, factory, errorEmitter)); // generate annotations for field ghosts
 
             // void spoon.reflect.visitor.CtVisitable.accept(CtVisitor arg0)
             pkg.accept(new ExternalRefinementTypeChecker(c, factory, errorEmitter));
