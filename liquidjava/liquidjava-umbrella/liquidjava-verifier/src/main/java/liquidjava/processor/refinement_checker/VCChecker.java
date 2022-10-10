@@ -10,10 +10,7 @@ import java.util.stream.Collectors;
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.VCImplication;
-import liquidjava.processor.context.Context;
-import liquidjava.processor.context.GhostState;
-import liquidjava.processor.context.PlacementInCode;
-import liquidjava.processor.context.RefinedVariable;
+import liquidjava.processor.context.*;
 import liquidjava.rj_language.Predicate;
 import liquidjava.smt.GhostFunctionError;
 import liquidjava.smt.NotFoundError;
@@ -25,9 +22,9 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 
 public class VCChecker {
-    private Context context;
-    private List<RefinedVariable> pathVariables;
-    private ErrorEmitter errorEmitter;
+    private final Context context;
+    private final List<RefinedVariable> pathVariables;
+    private final ErrorEmitter errorEmitter;
     Pattern thisPattern = Pattern.compile("#this_\\d+");
     Pattern instancePattern = Pattern.compile("^#(.+)_[0-9]+$");
 
@@ -186,7 +183,7 @@ public class VCChecker {
     private List<RefinedVariable> getVariables(Predicate c, String varName) {
         List<RefinedVariable> allVars = new ArrayList<>();
         getVariablesFromContext(c.getVariableNames(), allVars, varName);
-        List<String> pathNames = pathVariables.stream().map(a -> a.getName()).collect(Collectors.toList());
+        List<String> pathNames = pathVariables.stream().map(Refined::getName).collect(Collectors.toList());
         getVariablesFromContext(pathNames, allVars, "");
 
         return allVars;
@@ -209,15 +206,16 @@ public class VCChecker {
         Predicate c = var.getRefinement();
         String varName = var.getName();
         List<String> l = c.getVariableNames();
-        for (String name : l) {
-            if (!name.equals(varName) && context.hasVariable(name)) {
-                RefinedVariable rv = context.getVariableByName(name);
-                if (!newVars.contains(rv)) {
-                    newVars.add(rv);
-                    recAuxGetVars(rv, newVars);
-                }
-            }
-        }
+        getVariablesFromContext(l, newVars, varName);
+        // for (String name : l) {
+        // if (!name.equals(varName) && context.hasVariable(name)) {
+        // RefinedVariable rv = context.getVariableByName(name);
+        // if (!newVars.contains(rv)) {
+        // newVars.add(rv);
+        // recAuxGetVars(rv, newVars);
+        // }
+        // }
+        // }
     }
 
     public boolean smtChecks(Predicate cSMT, Predicate expectedType, CtElement elem) {
@@ -242,7 +240,6 @@ public class VCChecker {
      * @param cSMT
      * @param expectedType
      * @param element
-     * @param map
      *
      * @throws Exception
      * @throws GhostFunctionError
@@ -278,13 +275,16 @@ public class VCChecker {
     }
 
     void removePathVariableThatIncludes(String otherVar) {
-        List<RefinedVariable> toRemove = new ArrayList<>();
-        for (RefinedVariable rv : pathVariables)
-            if (rv.getRefinement().getVariableNames().contains(otherVar))
-                toRemove.add(rv);
+        pathVariables.stream().filter(rv -> rv.getRefinement().getVariableNames().contains(otherVar))
+                .collect(Collectors.toList()).forEach(rv -> pathVariables.remove(rv));
 
-        for (RefinedVariable rv : toRemove)
-            pathVariables.remove(rv);
+        // List<RefinedVariable> toRemove = new ArrayList<>();
+        // for (RefinedVariable rv : pathVariables)
+        // if (rv.getRefinement().getVariableNames().contains(otherVar))
+        // toRemove.add(rv);
+        //
+        // for (RefinedVariable rv : toRemove)
+        // pathVariables.remove(rv);
     }
 
     private void printVCs(String string, String stringSMT, Predicate expectedType) {
