@@ -353,7 +353,7 @@ public class Context {
 
     public void addGhostClass(String klass) {
         if (!classStates.containsKey(klass))
-            classStates.put(klass, Collections.emptyList());
+            classStates.put(klass, new ArrayList<>());
     }
 
     public void addToGhostClass(String klass, GhostState gs) {
