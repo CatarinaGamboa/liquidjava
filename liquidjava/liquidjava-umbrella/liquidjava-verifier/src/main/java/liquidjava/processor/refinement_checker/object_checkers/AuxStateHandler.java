@@ -4,10 +4,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.fail;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import liquidjava.errors.ErrorHandler;
@@ -16,16 +13,10 @@ import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
+import liquidjava.specification.StateRefinement;
 import liquidjava.utils.Utils;
-import spoon.reflect.code.CtConstructorCall;
-import spoon.reflect.code.CtExpression;
-import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtLiteral;
-import spoon.reflect.code.CtVariableRead;
-import spoon.reflect.declaration.CtAnnotation;
-import spoon.reflect.declaration.CtConstructor;
-import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.code.*;
+import spoon.reflect.declaration.*;
 import spoon.reflect.reference.CtTypeReference;
 
 public class AuxStateHandler {
@@ -147,16 +138,16 @@ public class AuxStateHandler {
         ObjectState state = new ObjectState();
         if (from != null) // has From
         {
-            state.setFrom(createStatePredicate(from, f, tc, e, false));
+            state.setFrom(createStatePredicate(from, f.getTargetClass(), tc, e, false));
         }
         if (to != null) // has To
         {
-            state.setTo(createStatePredicate(to, f, tc, e, true));
+            state.setTo(createStatePredicate(to, f.getTargetClass(), tc, e, true));
         }
 
         if (from != null && to == null) // has From but not To -> the state remains the same
         {
-            state.setTo(createStatePredicate(from, f, tc, e, true));
+            state.setTo(createStatePredicate(from, f.getTargetClass(), tc, e, true));
         }
         if (from == null && to != null) // has To but not From -> enters with true and exists with a specific state
         {
@@ -165,10 +156,10 @@ public class AuxStateHandler {
         return state;
     }
 
-    private static Predicate createStatePredicate(String value, RefinedFunction f, TypeChecker tc, CtElement e,
-            boolean isTo) throws ParsingException {
+    private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
+            TypeChecker tc, CtElement e, boolean isTo) throws ParsingException {
         Predicate p = new Predicate(value, e, tc.getErrorEmitter());
-        String t = f.getTargetClass();
+        String t = targetClass; // f.getTargetClass();
         CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
 
         String nameOld = String.format(tc.instanceFormat, tc.THIS, tc.getContext().getCounter());
@@ -287,11 +278,58 @@ public class AuxStateHandler {
         VariableInstance target = getTarget(tc, invocation);
         if (target != null) {
             if (f.hasStateChange() && f.getFromStates().size() > 0) {
-                changeState(tc, target, f, parentTargetName, map, invocation);
+                changeState(tc, target, f.getAllStates(), parentTargetName, map, invocation);
             }
             if (!f.hasStateChange()) {
                 sameState(tc, target, parentTargetName, invocation);
             }
+        }
+
+    }
+
+    public static void updateGhostField(CtFieldWrite<?> fw, TypeChecker tc) throws ParsingException {
+        CtField<?> field = fw.getVariable().getDeclaration();
+        String updatedVarName = String.format(tc.thisFormat, fw.getVariable().getSimpleName());
+        String targetClass = field.getDeclaringType().getQualifiedName();
+
+        // transition method construction
+        CtMethod<?> transitionMethod = tc.getFactory().createMethod();
+        transitionMethod.setType(tc.getFactory().createCtTypeReference(void.class));
+        transitionMethod.setBody(tc.getFactory().createCtBlock(tc.getFactory().createCodeSnippetStatement()));
+        transitionMethod.setSimpleName("_");
+
+        transitionMethod.setParent(field.getDeclaringType());
+        CtAnnotation<?> ann = tc.getFactory()
+                .createAnnotation(tc.getFactory().createCtTypeReference(StateRefinement.class));
+
+        // state transition annotation construction
+        String stateChangeRefinementTo = field.getSimpleName() + "(this) == " + updatedVarName;
+        String stateChangeRefinementFrom = "true";
+        ann.addValue("to", stateChangeRefinementTo);
+        ann.addValue("from", stateChangeRefinementFrom);
+
+        transitionMethod.addAnnotation(ann);
+
+        // extracting target from assignment
+        System.out.println("Target for invocation: " + fw.getTarget());
+        CtInvocation<?> inv = tc.getFactory().createInvocation(fw.getTarget(), transitionMethod.getReference(),
+                Collections.emptyList());
+
+        // applying transition:
+        // StateRefinement(from="true", to="n(this)=this#n")
+        // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
+
+        ObjectState stateChange = new ObjectState();
+        stateChange.setFrom(createStatePredicate(stateChangeRefinementFrom, targetClass, tc, transitionMethod, false));
+        stateChange.setTo(createStatePredicate(stateChangeRefinementTo, targetClass, tc, transitionMethod, true));
+
+        // AuxStateHandler.checkTargetChanges(tc, rf, inv.getTarget(), Collections.emptyMap(), inv);
+
+        String parentTargetName = searchFistVariableTarget(tc, inv.getTarget(), inv);
+        VariableInstance vi = getTarget(tc, inv);
+
+        if (vi != null) {
+            changeState(tc, vi, Collections.singletonList(stateChange), parentTargetName, Collections.emptyMap(), inv);
         }
 
     }
@@ -301,15 +339,16 @@ public class AuxStateHandler {
      *
      * @param tc
      * @param vi
-     * @param f
+     * @param stateChanges
      * @param name
      * @param map
      * @param invocation
      * 
      * @return
      */
-    private static Predicate changeState(TypeChecker tc, VariableInstance vi, RefinedFunction f, String name,
-            Map<String, String> map, CtElement invocation) {
+    private static Predicate changeState(TypeChecker tc, VariableInstance vi,
+            /* RefinedFunction f */ List<ObjectState> stateChanges, String name, Map<String, String> map,
+            CtElement invocation) {
         if (vi.getRefinement() == null) {
             return new Predicate();
         }
@@ -317,7 +356,7 @@ public class AuxStateHandler {
         Predicate prevState = vi.getRefinement().substituteVariable(tc.WILD_VAR, instanceName).substituteVariable(name,
                 instanceName);
 
-        List<ObjectState> stateChanges = f.getAllStates();
+        // List<ObjectState> stateChanges = f.getAllStates();
 
         boolean found = false;
         // if(los.size() > 1)
@@ -347,7 +386,7 @@ public class AuxStateHandler {
                     transitionedState = transitionedState.substituteVariable(s, map.get(s));
                 }
                 transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
-                // update of stata of new instance of this#(n + 1)
+                // update of stata of new instance of this#n#(whatever it was + 1)
                 addInstanceWithState(tc, name, newInstanceName, vi, transitionedState, invocation);
                 return transitionedState;
 
@@ -356,12 +395,8 @@ public class AuxStateHandler {
         if (!found && !tc.getErrorEmitter().foundError()) {// Reaches the end of stateChange no matching states
             String states = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
                     .map(Predicate::toString).collect(Collectors.joining(","));
-            String simpleInvocation = f.getName();
-            if (invocation instanceof CtInvocation) {
-                CtInvocation<?> i = (CtInvocation<?>) invocation;
-                simpleInvocation = i.getExecutable().toString();
-            }
 
+            String simpleInvocation = invocation.toString(); // .getExecutable().toString();
             tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
             // ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState, states);
         }
