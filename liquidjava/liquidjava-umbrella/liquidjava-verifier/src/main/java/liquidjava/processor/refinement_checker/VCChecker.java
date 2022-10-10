@@ -174,10 +174,11 @@ public class VCChecker {
 
     private void addAllDiferent(List<RefinedVariable> toExpand, List<RefinedVariable> from,
             List<RefinedVariable> remove) {
-        for (RefinedVariable rv : from) {
-            if (!toExpand.contains(rv) && !remove.contains(rv))
-                toExpand.add(rv);
-        }
+        from.stream().filter(rv -> !toExpand.contains(rv) && !remove.contains(rv)).forEach(toExpand::add);
+        // for (RefinedVariable rv : from) {
+        // if (!toExpand.contains(rv) && !remove.contains(rv))
+        // toExpand.add(rv);
+        // }
     }
 
     private List<RefinedVariable> getVariables(Predicate c, String varName) {
@@ -190,14 +191,20 @@ public class VCChecker {
     }
 
     private void getVariablesFromContext(List<String> lvars, List<RefinedVariable> allVars, String notAdd) {
-        for (String name : lvars)
-            if (!name.equals(notAdd) && context.hasVariable(name)) {
-                RefinedVariable rv = context.getVariableByName(name);
-                if (!allVars.contains(rv)) {
+        lvars.stream().filter(name -> name.equals(notAdd) && context.hasVariable(name)).map(context::getVariableByName)
+                .filter(rv -> !allVars.contains(rv)).forEach(rv -> {
                     allVars.add(rv);
                     recAuxGetVars(rv, allVars);
-                }
-            }
+                });
+
+        // for (String name : lvars)
+        // if (!name.equals(notAdd) && context.hasVariable(name)) {
+        // RefinedVariable rv = context.getVariableByName(name);
+        // if (!allVars.contains(rv)) {
+        // allVars.add(rv);
+        // recAuxGetVars(rv, allVars);
+        // }
+        // }
     }
 
     private void recAuxGetVars(RefinedVariable var, List<RefinedVariable> newVars) {
@@ -260,10 +267,13 @@ public class VCChecker {
      */
     @SuppressWarnings("unused")
     private Predicate substituteByMap(Predicate c, HashMap<String, String> map) {
-        Predicate c1 = c;
-        for (String s : map.keySet())
-            c1 = c1.substituteVariable(s, map.get(s));
-        return c1;
+        map.keySet().forEach(s -> c.substituteVariable(s, map.get(s)));
+        return c;
+
+        // Predicate c1 = c;
+        // for (String s : map.keySet())
+        // c1 = c1.substituteVariable(s, map.get(s));
+        // return c1;
     }
 
     public void addPathVariable(RefinedVariable rv) {
