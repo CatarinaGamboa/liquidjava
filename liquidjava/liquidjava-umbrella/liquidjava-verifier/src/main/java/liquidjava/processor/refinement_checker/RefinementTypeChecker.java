@@ -617,7 +617,7 @@ public class RefinementTypeChecker extends TypeChecker {
         transitionMethod.setParent(f.getDeclaringType());
         CtAnnotation<?> ann = factory.createAnnotation(factory.createCtTypeReference(StateRefinement.class));
 
-        // state transition annatation construction
+        // state transition annotation construction
         String stateChangeRefinementTo = f.getSimpleName() + "(this) == " + updatedVarName;
         String stateChangeRefinementFrom = "true";
         ann.addValue("to", stateChangeRefinementTo);
