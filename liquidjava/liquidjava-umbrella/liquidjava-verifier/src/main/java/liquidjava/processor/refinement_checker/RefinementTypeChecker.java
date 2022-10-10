@@ -241,7 +241,7 @@ public class RefinementTypeChecker extends TypeChecker {
             transitionMethod.setParent(f.getDeclaringType());
             CtAnnotation<?> ann = factory.createAnnotation(factory.createCtTypeReference(StateRefinement.class));
 
-            String stateChangeRefinementTo = f.getSimpleName() + "(this) == " + "this#" + f.getSimpleName();
+            String stateChangeRefinementTo = f.getSimpleName() + "(this) == " + name;
             String stateChangeRefinementFrom = "true";
             ann.addValue("to", stateChangeRefinementTo);
             ann.addValue("from", stateChangeRefinementFrom);
@@ -252,13 +252,13 @@ public class RefinementTypeChecker extends TypeChecker {
             CtInvocation<?> inv = factory.createInvocation(fw.getTarget(), transitionMethod.getReference(),
                     Collections.emptyList());
 
-            try {
-                RefinedFunction rf = new RefinedFunction();
-                rf.setName(transitionMethod.getSimpleName());
-                rf.setType(transitionMethod.getType());
-                rf.setRefReturn(new Predicate());
-                rf.setClass(transitionMethod.getDeclaringType().getQualifiedName());
+            RefinedFunction rf = new RefinedFunction();
+            rf.setName(transitionMethod.getSimpleName());
+            rf.setType(transitionMethod.getType());
+            rf.setRefReturn(new Predicate());
+            rf.setClass(transitionMethod.getDeclaringType().getQualifiedName());
 
+            try {
                 AuxStateHandler.handleMethodState(transitionMethod, rf, this);
                 AuxStateHandler.checkTargetChanges(this, rf, inv.getTarget(), Collections.emptyMap(), inv);
             } catch (ParsingException e) {
@@ -617,7 +617,6 @@ public class RefinementTypeChecker extends TypeChecker {
     /**
      * @param <T>
      * @param elem
-     * @param varDecl
      *            Cannot be null
      */
     private <T> void getPutVariableMetadada(CtElement elem, String name) {
