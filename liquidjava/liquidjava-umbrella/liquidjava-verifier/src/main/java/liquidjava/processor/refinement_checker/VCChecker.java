@@ -102,7 +102,7 @@ public class VCChecker {
             // printError(premises, expectedType, element, map, e.getMessage());
         }
 
-        System.out.println(premises.toString() + "\n" + et.toString());
+        System.out.println("premise: " + premises.toString() + "\nexpectation: " + et.toString());
         return smtChecks(premises, et, element);
     }
 

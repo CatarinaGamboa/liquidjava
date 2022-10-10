@@ -17,7 +17,7 @@ public class SMTEvaluator {
         // Discharges the verification to z3
 
         Predicate toVerify = Predicate.createConjunction(subRef, supRef.negate());
-        System.out.println(toVerify.toString()); // TODO remove
+        System.out.println("verification query: " + toVerify); // TODO remove
 
         try {
             Expression exp = toVerify.getExpression();
