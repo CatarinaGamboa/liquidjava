@@ -374,8 +374,7 @@ public class Context {
     public List<GhostState> getGhostState() {
         List<GhostState> lgs = new ArrayList<>();
         for (List<GhostState> l : classStates.values())
-            for (GhostState g : l)
-                lgs.add(g);
+            lgs.addAll(l);
         return lgs;
     }
 
