@@ -312,7 +312,7 @@ public class AuxStateHandler {
 
         boolean found = false;
         // if(los.size() > 1)
-        // assertFalse("Change state only working for one methods with one state",true);
+        // assertFalse("Change state only working for one method with one state",true);
         for (int i = 0; i < los.size() && !found; i++) {// TODO: only working for 1 state annotation
             ObjectState os = los.get(i);
             if (os.hasFrom()) {
