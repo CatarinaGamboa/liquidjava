@@ -22,8 +22,15 @@ public class ErrorEmitter {
             HashMap<String, PlacementInCode> map) {
         this.titleMessage = titleMessage;
         fullMessage = msg;
-        position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
-        filePath = p.getFile().toURI();
+        try {
+            position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
+            filePath = p.getFile().toURI();
+        } catch (Exception ignored) {
+            fullMessage = "Seems like this error is created in generated part of source code, so no precise position is provided. "
+                    + fullMessage;
+            position = null;
+            filePath = null;
+        }
         this.errorStatus = errorStatus;
         this.map = map;
     }
@@ -31,8 +38,15 @@ public class ErrorEmitter {
     public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus) {
         this.titleMessage = titleMessage;
         fullMessage = msg;
-        position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
-        filePath = p.getFile().toURI();
+        try {
+            position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
+            filePath = p.getFile().toURI();
+        } catch (Exception ignored) {
+            fullMessage = "Seems like this error is created in generated part of source code, so no precise position is provided. "
+                    + fullMessage;
+            position = null;
+            filePath = null;
+        }
         this.errorStatus = errorStatus;
     }
 

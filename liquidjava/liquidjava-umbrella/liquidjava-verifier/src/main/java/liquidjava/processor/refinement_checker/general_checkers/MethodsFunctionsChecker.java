@@ -274,7 +274,7 @@ public class MethodsFunctionsChecker {
 
     }
 
-    private Map<String, String> checkInvocationRefinements(CtElement element, List<CtExpression<?>> arguments,
+    private Map<String, String> checkInvocationRefinements(CtElement invocation, List<CtExpression<?>> arguments,
             CtExpression<?> target, String methodName, String className) {
         // -- Part 1: Check if the invocation is possible
         int si = arguments.size();
@@ -282,14 +282,14 @@ public class MethodsFunctionsChecker {
         Map<String, String> map = mapInvocation(arguments, f);
 
         if (target != null) {
-            AuxStateHandler.checkTargetChanges(rtc, f, target, map, element);
+            AuxStateHandler.checkTargetChanges(rtc, f, target, map, invocation);
         }
         if (f.allRefinementsTrue()) {
-            element.putMetadata(rtc.REFINE_KEY, new Predicate());
+            invocation.putMetadata(rtc.REFINE_KEY, new Predicate());
             return map;
         }
 
-        checkParameters(element, arguments, f, map);
+        checkParameters(invocation, arguments, f, map);
 
         // -- Part 2: Apply changes
         // applyRefinementsToArguments(element, arguments, f, map);
@@ -303,8 +303,8 @@ public class MethodsFunctionsChecker {
                     methodRef = methodRef.substituteVariable(s, map.get(s));
 
             String varName = null;
-            if (element.getMetadata(rtc.TARGET_KEY) != null) {
-                VariableInstance vi = (VariableInstance) element.getMetadata(rtc.TARGET_KEY);
+            if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
+                VariableInstance vi = (VariableInstance) invocation.getMetadata(rtc.TARGET_KEY);
                 methodRef = methodRef.substituteVariable(rtc.THIS, vi.getName());
                 Variable v = rtc.getContext().getVariableFromInstance(vi);
                 if (v != null)
@@ -313,11 +313,11 @@ public class MethodsFunctionsChecker {
 
             String viName = String.format(rtc.instanceFormat, f.getName(), rtc.getContext().getCounter());
             VariableInstance vi = (VariableInstance) rtc.getContext().addInstanceToContext(viName, f.getType(),
-                    methodRef.substituteVariable(rtc.WILD_VAR, viName), element); // TODO REVER!!
+                    methodRef.substituteVariable(rtc.WILD_VAR, viName), invocation); // TODO REVER!!
             if (varName != null && f.hasStateChange() && equalsThis)
                 rtc.getContext().addRefinementInstanceToVariable(varName, viName);
-            element.putMetadata(rtc.TARGET_KEY, vi);
-            element.putMetadata(rtc.REFINE_KEY, methodRef);
+            invocation.putMetadata(rtc.TARGET_KEY, vi);
+            invocation.putMetadata(rtc.REFINE_KEY, methodRef);
 
         }
         return map;

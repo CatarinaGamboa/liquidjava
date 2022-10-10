@@ -5,6 +5,16 @@ import org.junit.Test;
 public class TestExamples extends TestAbstract {
 
     @Test
+    public void correctFieldUpdate() {
+        testCorrect(testPath + "field_updates/CorrectFieldUpdate.java");
+    }
+
+    @Test
+    public void incorrectFieldUpdate() {
+        testWrong(testPath + "field_updates/IncorrectFieldUpdate.java");
+    }
+
+    @Test
     public void correctSimpleAssignment() {
         testCorrect(testPath + "CorrectSimpleAssignment.java");
     }

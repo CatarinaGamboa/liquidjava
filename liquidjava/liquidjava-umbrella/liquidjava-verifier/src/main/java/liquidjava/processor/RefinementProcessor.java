@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import liquidjava.errors.ErrorEmitter;
+import liquidjava.processor.ann_generation.FieldGhostsGeneration;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.ExternalRefinementTypeChecker;
 import liquidjava.processor.refinement_checker.MethodsFirstChecker;
@@ -33,10 +34,12 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
             Context c = Context.getInstance();
             c.reinitializeAllContext();
 
+            pkg.accept(new FieldGhostsGeneration(c, factory, errorEmitter)); // generate annotations for field ghosts
+
             // void spoon.reflect.visitor.CtVisitable.accept(CtVisitor arg0)
             pkg.accept(new ExternalRefinementTypeChecker(c, factory, errorEmitter));
 
-            pkg.accept(new MethodsFirstChecker(c, factory, errorEmitter));// double passing idea
+            pkg.accept(new MethodsFirstChecker(c, factory, errorEmitter));// double passing idea (instead of headers)
 
             pkg.accept(new RefinementTypeChecker(c, factory, errorEmitter));
             if (errorEmitter.foundError())
