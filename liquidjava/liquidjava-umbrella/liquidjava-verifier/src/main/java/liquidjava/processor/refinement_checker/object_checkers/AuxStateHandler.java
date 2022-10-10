@@ -346,7 +346,7 @@ public class AuxStateHandler {
             }
         }
         if (!found && !tc.getErrorEmitter().foundError()) {// Reaches the end of stateChange no matching states
-            String states = los.stream().filter(p -> p.hasFrom()).map(p -> p.getFrom().toString())
+            String states = los.stream().filter(ObjectState::hasFrom).map(p -> p.getFrom().toString())
                     .collect(Collectors.joining(","));
             String simpleInvocation = f.getName();
             if (invocation instanceof CtInvocation) {
