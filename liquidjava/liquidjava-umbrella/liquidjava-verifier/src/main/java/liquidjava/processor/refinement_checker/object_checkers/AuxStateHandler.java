@@ -449,10 +449,10 @@ public class AuxStateHandler {
 
             return name;
         } else if (target2.getMetadata(tc.TARGET_KEY) != null) {
-            VariableInstance vi = (VariableInstance) target2.getMetadata(tc.TARGET_KEY);
-            Optional<Variable> v = vi.getParent();
-            invocation.putMetadata(tc.TARGET_KEY, vi);
-            return v.map(Refined::getName).orElse(vi.getName());
+            VariableInstance target2_vi = (VariableInstance) target2.getMetadata(tc.TARGET_KEY);
+            Optional<Variable> v = target2_vi.getParent();
+            invocation.putMetadata(tc.TARGET_KEY, target2_vi);
+            return v.map(Refined::getName).orElse(target2_vi.getName());
         }
         return null;
     }
