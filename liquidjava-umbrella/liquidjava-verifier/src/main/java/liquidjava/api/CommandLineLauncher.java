@@ -13,8 +13,8 @@ public class CommandLineLauncher {
         String allPath = "../liquidjava-example/src/main/java/test/project";
 
         // String allPath = "C://Regen/test-projects/src/Main.java";
-        // In eclipse only needed this:"../regen-example/src/main/java/"
-        // In VSCode needs: "../regen/regen-umbrella/regen-example/src/main/java/regen/test/project";
+        // In eclipse only needed this:"../liquidjava-example/src/main/java/"
+        // In VSCode needs: "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
         String file = args.length == 0 ? allPath : args[0];
         ErrorEmitter ee = launch(file);
         if (ee.foundError()) {
