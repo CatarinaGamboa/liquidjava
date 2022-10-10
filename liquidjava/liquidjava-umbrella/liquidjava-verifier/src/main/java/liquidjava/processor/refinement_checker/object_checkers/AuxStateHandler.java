@@ -431,25 +431,25 @@ public class AuxStateHandler {
      * @param invocation
      * @return
      */
-    static String searchFistVariableTarget(TypeChecker tc, CtElement elem, CtElement invocation) {
-        if (elem instanceof CtVariableRead<?>) {
-            CtVariableRead<?> v = (CtVariableRead<?>) elem;
+    static String searchFistVariableTarget(TypeChecker tc, CtElement target, CtElement invocation) {
+        if (target instanceof CtVariableRead<?>) {
+            CtVariableRead<?> v = (CtVariableRead<?>) target;
             String name = v.getVariable().getSimpleName();
             Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(name);
             if (ovi.isPresent()) {
                 invocation.putMetadata(tc.TARGET_KEY, ovi.get());
-            } else if (elem.getMetadata(tc.TARGET_KEY) == null) {
+            } else if (target.getMetadata(tc.TARGET_KEY) == null) {
                 RefinedVariable var = tc.getContext().getVariableByName(name);
                 String nName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
                 RefinedVariable rv = tc.getContext().addInstanceToContext(nName, var.getType(),
-                        var.getRefinement().substituteVariable(name, nName), elem);
+                        var.getRefinement().substituteVariable(name, nName), target);
                 tc.getContext().addRefinementInstanceToVariable(name, nName);
                 invocation.putMetadata(tc.TARGET_KEY, rv);
             }
 
             return name;
-        } else if (elem.getMetadata(tc.TARGET_KEY) != null) {
-            VariableInstance vi = (VariableInstance) elem.getMetadata(tc.TARGET_KEY);
+        } else if (target.getMetadata(tc.TARGET_KEY) != null) {
+            VariableInstance vi = (VariableInstance) target.getMetadata(tc.TARGET_KEY);
             Optional<Variable> v = vi.getParent();
             invocation.putMetadata(tc.TARGET_KEY, vi);
             return v.map(Refined::getName).orElse(vi.getName());
