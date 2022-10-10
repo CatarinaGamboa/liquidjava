@@ -3,11 +3,9 @@ package liquidjava.field_updates;
 import liquidjava.specification.StateRefinement;
 
 public class CorrectFieldUpdate {
-    public int n;
-    @StateRefinement(from="n(this) > 0", to="n(this) == n(old(this)) + 1")
-    public void shouldSucceedIfFieldIsPositive(){
-        n = n + 1;
-    }
+    public int n = 0;
+    @StateRefinement(from="n(this) > 0", to="n(this) == n(old(this))")
+    public void shouldSucceedIfFieldIsPositive(){}
 
     public static void main(String[] args) {
 
