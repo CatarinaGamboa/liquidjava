@@ -331,10 +331,10 @@ public class AuxStateHandler {
             if (!stateChange.hasFrom()) {
                 continue;
             }
-            //replace "state(this)" to "state(whatever method is called from)"
+            // replace "state(this)" to "state(whatever method is called from) and so on"
             Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName);
             Predicate prevCheck = prevState;
-            for (String s : map.keySet()) {//substituting function variables into annotation if there are any
+            for (String s : map.keySet()) {// substituting function variables into annotation if there are any
                 prevCheck = prevCheck.substituteVariable(s, map.get(s));
                 expectState = expectState.substituteVariable(s, map.get(s));
             }
@@ -349,6 +349,7 @@ public class AuxStateHandler {
                     transitionedState = transitionedState.substituteVariable(s, map.get(s));
                 }
                 transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
+                // update of stata of new instance of this#(n + 1)
                 addInstanceWithState(tc, name, newInstanceName, vi, transitionedState, invocation);
                 return transitionedState;
 
