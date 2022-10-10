@@ -167,12 +167,12 @@ public class VCChecker {
                 if (!mainVars.contains(rv) && !lrv.contains(rv))
                     mainVars.add(rv);
                 List<RefinedVariable> lm = getVariables(rv.getMainRefinement(), rv.getName());
-                addAllDiferent(lrv, lm, mainVars);
+                addAllDifferent(lrv, lm, mainVars);
             }
         }
     }
 
-    private void addAllDiferent(List<RefinedVariable> toExpand, List<RefinedVariable> from,
+    private void addAllDifferent(List<RefinedVariable> toExpand, List<RefinedVariable> from,
             List<RefinedVariable> remove) {
         from.stream().filter(rv -> !toExpand.contains(rv) && !remove.contains(rv)).forEach(toExpand::add);
         // for (RefinedVariable rv : from) {
