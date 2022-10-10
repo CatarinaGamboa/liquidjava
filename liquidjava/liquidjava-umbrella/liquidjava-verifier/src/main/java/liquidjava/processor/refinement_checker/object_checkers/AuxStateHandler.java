@@ -324,14 +324,17 @@ public class AuxStateHandler {
         boolean found = false;
         // if(los.size() > 1)
         // assertFalse("Change state only working for one method with one state",true);
-        for (int i = 0; i < stateChanges.size() && !found; i++) {// TODO: only working for 1 state annotation
-            ObjectState stateChange = stateChanges.get(i);
+        for (ObjectState stateChange : stateChanges) {// TODO: only working for 1 state annotation
+            if (found) {
+                break;
+            }
             if (!stateChange.hasFrom()) {
                 continue;
             }
+            //replace "state(this)" to "state(whatever method is called from)"
             Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName);
             Predicate prevCheck = prevState;
-            for (String s : map.keySet()) {
+            for (String s : map.keySet()) {//substituting function variables into annotation if there are any
                 prevCheck = prevCheck.substituteVariable(s, map.get(s));
                 expectState = expectState.substituteVariable(s, map.get(s));
             }
