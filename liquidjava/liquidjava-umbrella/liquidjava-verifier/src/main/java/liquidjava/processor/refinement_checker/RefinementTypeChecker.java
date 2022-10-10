@@ -262,7 +262,6 @@ public class RefinementTypeChecker extends TypeChecker {
                 AuxStateHandler.handleMethodState(transitionMethod, rf, this);
                 AuxStateHandler.checkTargetChanges(this, rf, inv.getTarget(), Collections.emptyMap(), inv);
             } catch (ParsingException e) {
-                context.exitContext();
                 ErrorHandler.printCostumeError(assignement, "ParsingException in `" + assignement + "` in class `"
                         + f.getDeclaringType() + "` : " + e.getMessage(), errorEmitter);
 
