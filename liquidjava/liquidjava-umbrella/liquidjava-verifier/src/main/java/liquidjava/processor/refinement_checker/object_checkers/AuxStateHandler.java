@@ -37,7 +37,7 @@ public class AuxStateHandler {
      *
      * @param c
      * @param f
-     * @param context
+     * @param tc
      * 
      * @throws ParsingException
      */
@@ -104,8 +104,8 @@ public class AuxStateHandler {
      * Handles the passage of the written state annotations to the context for regular Methods
      *
      * @param method
-     * @param context
      * @param f
+     * @param tc
      * 
      * @throws ParsingException
      */
@@ -231,7 +231,7 @@ public class AuxStateHandler {
     /**
      * Sets the new state acquired from the constructor call
      *
-     * @param key
+     * @param refKey
      * @param f
      * @param map
      * @param ctConstructorCall
@@ -257,9 +257,7 @@ public class AuxStateHandler {
      * If an expression has a state in metadata, then its state is passed to the last instance of the variable with
      * varName
      *
-     * @param context
-     * @param state_key
-     * @param this_key
+     * @param tc
      * @param varName
      * @param e
      */
