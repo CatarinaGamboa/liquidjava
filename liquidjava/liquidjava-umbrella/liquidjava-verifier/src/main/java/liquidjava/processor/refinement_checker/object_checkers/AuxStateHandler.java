@@ -431,25 +431,25 @@ public class AuxStateHandler {
      * @param invocation
      * @return
      */
-    static String searchFistVariableTarget(TypeChecker tc, CtElement target, CtElement invocation) {
-        if (target instanceof CtVariableRead<?>) {
-            CtVariableRead<?> v = (CtVariableRead<?>) target;
+    static String searchFistVariableTarget(TypeChecker tc, CtElement target2, CtElement invocation) {
+        if (target2 instanceof CtVariableRead<?>) {
+            CtVariableRead<?> v = (CtVariableRead<?>) target2;
             String name = v.getVariable().getSimpleName();
             Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(name);
             if (ovi.isPresent()) {
                 invocation.putMetadata(tc.TARGET_KEY, ovi.get());
-            } else if (target.getMetadata(tc.TARGET_KEY) == null) {
+            } else if (target2.getMetadata(tc.TARGET_KEY) == null) {
                 RefinedVariable var = tc.getContext().getVariableByName(name);
                 String nName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
                 RefinedVariable rv = tc.getContext().addInstanceToContext(nName, var.getType(),
-                        var.getRefinement().substituteVariable(name, nName), target);
+                        var.getRefinement().substituteVariable(name, nName), target2);
                 tc.getContext().addRefinementInstanceToVariable(name, nName);
                 invocation.putMetadata(tc.TARGET_KEY, rv);
             }
 
             return name;
-        } else if (target.getMetadata(tc.TARGET_KEY) != null) {
-            VariableInstance vi = (VariableInstance) target.getMetadata(tc.TARGET_KEY);
+        } else if (target2.getMetadata(tc.TARGET_KEY) != null) {
+            VariableInstance vi = (VariableInstance) target2.getMetadata(tc.TARGET_KEY);
             Optional<Variable> v = vi.getParent();
             invocation.putMetadata(tc.TARGET_KEY, vi);
             return v.map(Refined::getName).orElse(vi.getName());
