@@ -1,11 +1,6 @@
 package liquidjava.processor.context;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Stack;
+import java.util.*;
 
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
@@ -358,7 +353,7 @@ public class Context {
 
     public void addGhostClass(String klass) {
         if (!classStates.containsKey(klass))
-            classStates.put(klass, new ArrayList<GhostState>());
+            classStates.put(klass, Collections.emptyList());
     }
 
     public void addToGhostClass(String klass, GhostState gs) {
