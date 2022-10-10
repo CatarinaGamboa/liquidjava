@@ -191,20 +191,11 @@ public class VCChecker {
     }
 
     private void getVariablesFromContext(List<String> lvars, List<RefinedVariable> allVars, String notAdd) {
-        lvars.stream().filter(name -> name.equals(notAdd) && context.hasVariable(name)).map(context::getVariableByName)
+        lvars.stream().filter(name -> !name.equals(notAdd) && context.hasVariable(name)).map(context::getVariableByName)
                 .filter(rv -> !allVars.contains(rv)).forEach(rv -> {
                     allVars.add(rv);
                     recAuxGetVars(rv, allVars);
                 });
-
-        // for (String name : lvars)
-        // if (!name.equals(notAdd) && context.hasVariable(name)) {
-        // RefinedVariable rv = context.getVariableByName(name);
-        // if (!allVars.contains(rv)) {
-        // allVars.add(rv);
-        // recAuxGetVars(rv, allVars);
-        // }
-        // }
     }
 
     private void recAuxGetVars(RefinedVariable var, List<RefinedVariable> newVars) {
@@ -214,15 +205,6 @@ public class VCChecker {
         String varName = var.getName();
         List<String> l = c.getVariableNames();
         getVariablesFromContext(l, newVars, varName);
-        // for (String name : l) {
-        // if (!name.equals(varName) && context.hasVariable(name)) {
-        // RefinedVariable rv = context.getVariableByName(name);
-        // if (!newVars.contains(rv)) {
-        // newVars.add(rv);
-        // recAuxGetVars(rv, newVars);
-        // }
-        // }
-        // }
     }
 
     public boolean smtChecks(Predicate cSMT, Predicate expectedType, CtElement elem) {
@@ -269,11 +251,6 @@ public class VCChecker {
     private Predicate substituteByMap(Predicate c, HashMap<String, String> map) {
         map.keySet().forEach(s -> c.substituteVariable(s, map.get(s)));
         return c;
-
-        // Predicate c1 = c;
-        // for (String s : map.keySet())
-        // c1 = c1.substituteVariable(s, map.get(s));
-        // return c1;
     }
 
     public void addPathVariable(RefinedVariable rv) {
@@ -287,14 +264,6 @@ public class VCChecker {
     void removePathVariableThatIncludes(String otherVar) {
         pathVariables.stream().filter(rv -> rv.getRefinement().getVariableNames().contains(otherVar))
                 .collect(Collectors.toList()).forEach(pathVariables::remove);
-
-        // List<RefinedVariable> toRemove = new ArrayList<>();
-        // for (RefinedVariable rv : pathVariables)
-        // if (rv.getRefinement().getVariableNames().contains(otherVar))
-        // toRemove.add(rv);
-        //
-        // for (RefinedVariable rv : toRemove)
-        // pathVariables.remove(rv);
     }
 
     private void printVCs(String string, String stringSMT, Predicate expectedType) {

@@ -236,7 +236,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
             // corresponding ghost function update
             try {
-                updateGhostField(fw);
+                AuxStateHandler.updateGhostField(fw, this);
             } catch (ParsingException e) {
                 ErrorHandler.printCostumeError(assignement, "ParsingException in `" + assignement + "` in class `"
                         + f.getDeclaringType() + "` : " + e.getMessage(), errorEmitter);
@@ -538,9 +538,8 @@ public class RefinementTypeChecker extends TypeChecker {
             }
         }
         Optional<VariableInstance> r = context.getLastVariableInstance(name);
-        if (r.isPresent()) {
-            vcChecker.removePathVariableThatIncludes(r.get().getName());// AQUI!!
-        }
+        // AQUI!!
+        r.ifPresent(variableInstance -> vcChecker.removePathVariableThatIncludes(variableInstance.getName()));
 
         vcChecker.removePathVariableThatIncludes(name);// AQUI!!
         try {
@@ -592,6 +591,7 @@ public class RefinementTypeChecker extends TypeChecker {
     /**
      * @param <T>
      * @param elem
+     * @param name
      *            Cannot be null
      */
     private <T> void getPutVariableMetadada(CtElement elem, String name) {
@@ -602,44 +602,6 @@ public class RefinementTypeChecker extends TypeChecker {
         }
 
         elem.putMetadata(REFINE_KEY, cref);
-    }
-
-    private void updateGhostField(CtFieldWrite<?> fw) throws ParsingException {
-        CtField<?> f = fw.getVariable().getDeclaration();
-        String updatedVarName = String.format(thisFormat, fw.getVariable().getSimpleName());
-
-        // transition method construction
-        CtMethod<?> transitionMethod = factory.createMethod();
-        transitionMethod.setType(factory.createCtTypeReference(void.class));
-        transitionMethod.setBody(factory.createCtBlock(factory.createCodeSnippetStatement()));
-        transitionMethod.setSimpleName("_");
-
-        transitionMethod.setParent(f.getDeclaringType());
-        CtAnnotation<?> ann = factory.createAnnotation(factory.createCtTypeReference(StateRefinement.class));
-
-        // state transition annotation construction
-        String stateChangeRefinementTo = f.getSimpleName() + "(this) == " + updatedVarName;
-        String stateChangeRefinementFrom = "true";
-        ann.addValue("to", stateChangeRefinementTo);
-        ann.addValue("from", stateChangeRefinementFrom);
-
-        transitionMethod.addAnnotation(ann);
-
-        // extracting target from assignment
-        System.out.println("Target for invocation: " + fw.getTarget());
-        CtInvocation<?> inv = factory.createInvocation(fw.getTarget(), transitionMethod.getReference(),
-                Collections.emptyList());
-
-        // Refined function construction for invocation facilities reuse
-        RefinedFunction rf = new RefinedFunction();
-        rf.setName(transitionMethod.getSimpleName());
-        rf.setType(transitionMethod.getType());
-        rf.setRefReturn(new Predicate());
-        rf.setClass(transitionMethod.getDeclaringType().getQualifiedName());
-
-        // applying transition:
-        AuxStateHandler.handleMethodState(transitionMethod, rf, this);
-        AuxStateHandler.checkTargetChanges(this, rf, inv.getTarget(), Collections.emptyMap(), inv);
     }
 
 }
