@@ -230,8 +230,8 @@ public class RefinementTypeChecker extends TypeChecker {
             CtFieldWrite<?> fw = ((CtFieldWrite<?>) ex);
             CtFieldReference<?> cr = fw.getVariable();
             CtField<?> f = fw.getVariable().getDeclaration();
-            String name = String.format(thisFormat, cr.getSimpleName());
-            checkAssignment(name, cr.getType(), ex, assignement.getAssignment(), assignement, f);
+            String updatedVarName = String.format(thisFormat, cr.getSimpleName());
+            checkAssignment(updatedVarName, cr.getType(), ex, assignement.getAssignment(), assignement, f);
             // corresponding ghost function update
             CtMethod<?> transitionMethod = factory.createMethod();
             transitionMethod.setType(factory.createCtTypeReference(void.class));
@@ -241,7 +241,7 @@ public class RefinementTypeChecker extends TypeChecker {
             transitionMethod.setParent(f.getDeclaringType());
             CtAnnotation<?> ann = factory.createAnnotation(factory.createCtTypeReference(StateRefinement.class));
 
-            String stateChangeRefinementTo = f.getSimpleName() + "(this) == " + name;
+            String stateChangeRefinementTo = f.getSimpleName() + "(this) == " + updatedVarName;
             String stateChangeRefinementFrom = "true";
             ann.addValue("to", stateChangeRefinementTo);
             ann.addValue("from", stateChangeRefinementFrom);
