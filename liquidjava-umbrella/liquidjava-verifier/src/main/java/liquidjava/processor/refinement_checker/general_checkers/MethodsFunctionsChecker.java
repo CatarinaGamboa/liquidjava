@@ -166,6 +166,7 @@ public class MethodsFunctionsChecker {
 
         Optional<Predicate> oret = rtc.getRefinementFromAnnotation(method);
         Predicate ret = oret.orElse(new Predicate());
+        ret = ret.substituteVariable("return", rtc.WILD_VAR);
         f.setRefReturn(ret);
         // rtc.context.addFunctionToContext(f);
         return Predicate.createConjunction(joint, ret);

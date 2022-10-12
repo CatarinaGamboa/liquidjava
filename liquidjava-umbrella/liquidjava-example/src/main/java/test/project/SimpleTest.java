@@ -3,13 +3,12 @@ package test.project;
 import liquidjava.specification.Refinement;
 
 class SimpleTest {
-	public static void main(String[] args) {
-
-		@Refinement("x > 0 &&"
-				+ "x < 100")
-		int x = 10;
-	}
 	
+	
+	@Refinement("return > 0")
+	public int test() {
+		return 10;
+	}
 	
 
 
