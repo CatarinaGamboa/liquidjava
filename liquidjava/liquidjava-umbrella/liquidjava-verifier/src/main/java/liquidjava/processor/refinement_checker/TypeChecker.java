@@ -23,6 +23,7 @@ import liquidjava.utils.Utils;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtNewArray;
+import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
@@ -306,8 +307,8 @@ public abstract class TypeChecker extends CtScanner {
                 factory);
     }
 
-    public boolean checksStateSMT(Predicate prevState, Predicate expectedState, CtElement target) {
-        return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target,
+    public boolean checksStateSMT(Predicate prevState, Predicate expectedState, SourcePosition p) {
+        return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, p,
                 factory);
     }
 

@@ -18,6 +18,7 @@ import liquidjava.smt.SMTEvaluator;
 import liquidjava.smt.TypeCheckError;
 import liquidjava.smt.TypeMismatchError;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
 
@@ -43,14 +44,14 @@ public class VCChecker {
 
         HashMap<String, PlacementInCode> map = new HashMap<>();
         String[] s = { wild_var, this_var };
-        Predicate premisesBeforeChange = joinPredicates(expectedType, element, mainVars, lrv, map).toConjunctions();
+        Predicate premisesBeforeChange = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
         Predicate premises = new Predicate();
         Predicate et = new Predicate();
         try {
             premises = premisesBeforeChange.changeStatesToRefinements(list, s, errorEmitter)
-                    .changeAliasToRefinement(context, element, f);
+                    .changeAliasToRefinement(context, f);
 
-            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context, element,
+            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context,
                     f);
         } catch (Exception e1) {
             printError(premises, expectedType, element, map, e1.getMessage());
@@ -69,13 +70,13 @@ public class VCChecker {
 
     public void processSubtyping(Predicate type, Predicate expectedType, List<GhostState> list, String wild_var,
             String this_var, CtElement element, String string, Factory f) {
-        boolean b = canProcessSubtyping(type, expectedType, list, wild_var, this_var, element, f);
+        boolean b = canProcessSubtyping(type, expectedType, list, wild_var, this_var, element.getPosition(), f);
         if (!b)
             printSubtypingError(element, expectedType, type, string);
     }
 
     public boolean canProcessSubtyping(Predicate type, Predicate expectedType, List<GhostState> list, String wild_var,
-            String this_var, CtElement element, Factory f) {
+            String this_var, SourcePosition p, Factory f) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         gatherVariables(type, lrv, mainVars);
@@ -89,10 +90,10 @@ public class VCChecker {
         Predicate premises = new Predicate();
         Predicate et = new Predicate();
         try {
-            premises = joinPredicates(expectedType, element, mainVars, lrv, map).toConjunctions();
+            premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
             premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(list, s, errorEmitter)
-                    .changeAliasToRefinement(context, element, f);
-            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context, element,
+                    .changeAliasToRefinement(context, f);
+            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context,
                     f);
         } catch (Exception e) {
             return false;
@@ -100,10 +101,10 @@ public class VCChecker {
         }
 
         System.out.println("premise: " + premises.toString() + "\nexpectation: " + et.toString());
-        return smtChecks(premises, et, element);
+        return smtChecks(premises, et, p);
     }
 
-    private /* Predicate */VCImplication joinPredicates(Predicate expectedType, CtElement element,
+    private /* Predicate */VCImplication joinPredicates(Predicate expectedType,
             List<RefinedVariable> mainVars, List<RefinedVariable> vars, HashMap<String, PlacementInCode> map) {
 
         VCImplication firstSi = null;
@@ -207,7 +208,7 @@ public class VCChecker {
         getVariablesFromContext(l, newVars, varName);
     }
 
-    public boolean smtChecks(Predicate cSMT, Predicate expectedType, CtElement elem) {
+    public boolean smtChecks(Predicate cSMT, Predicate expectedType, SourcePosition p) {
         try {
             new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
         } catch (TypeCheckError e) {
@@ -217,7 +218,7 @@ public class VCChecker {
             // e.printStackTrace();
             // System.exit(7);
             // fail();
-            errorEmitter.addError("Unknown Error", e.getMessage(), elem.getPosition(), 7);
+            errorEmitter.addError("Unknown Error", e.getMessage(), p, 7);
         }
         return true;
     }
@@ -280,7 +281,7 @@ public class VCChecker {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         HashMap<String, PlacementInCode> map = new HashMap<>();
-        joinPredicates(expectedType, element, mainVars, lrv, map);
+        joinPredicates(expectedType, mainVars, lrv, map);
         return map;
     }
 
@@ -290,7 +291,7 @@ public class VCChecker {
         gatherVariables(expectedType, lrv, mainVars);
         gatherVariables(foundType, lrv, mainVars);
         HashMap<String, PlacementInCode> map = new HashMap<>();
-        Predicate premises = joinPredicates(expectedType, element, mainVars, lrv, map).toConjunctions();
+        Predicate premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
         printError(premises, expectedType, element, map, customeMsg);
     }
 
@@ -342,7 +343,7 @@ public class VCChecker {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(c, lrv, mainVars);
         HashMap<String, PlacementInCode> map = new HashMap<>();
-        VCImplication constraintForErrorMsg = joinPredicates(c, element, mainVars, lrv, map);
+        VCImplication constraintForErrorMsg = joinPredicates(c, mainVars, lrv, map);
         // HashMap<String, PlacementInCode> map = createMap(element, c);
         ErrorHandler.printStateMismatch(element, method, constraintForErrorMsg, states, map, errorEmitter);
     }

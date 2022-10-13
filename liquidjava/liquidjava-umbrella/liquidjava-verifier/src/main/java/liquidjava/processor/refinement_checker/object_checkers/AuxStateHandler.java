@@ -172,7 +172,7 @@ public class AuxStateHandler {
         Predicate c1 = isTo ? getMissingStates(t, tc, p) : p;
         Predicate c = c1.substituteVariable(tc.THIS, name);
         c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
-        boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e);
+        boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e.getPosition());
         if (b && !tc.getErrorEmitter().foundError()) {
             tc.createSameStateError(e, p, t);
         }
@@ -349,7 +349,7 @@ public class AuxStateHandler {
         Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName);
         expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
 
-        boolean found = tc.checksStateSMT(prevState, expectState, inv);
+        boolean found = tc.checksStateSMT(prevState, expectState, inv.getPosition());
         if (found) {
             String newInstanceName = String.format(tc.instanceFormat, parentTargetName, tc.getContext().getCounter());
             Predicate transitionedState = stateChange.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
@@ -411,7 +411,7 @@ public class AuxStateHandler {
             }
             expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
 
-            found = tc.checksStateSMT(prevCheck, expectState, invocation);
+            found = tc.checksStateSMT(prevCheck, expectState, invocation.getPosition());
             if (found && stateChange.hasTo()) {
                 String newInstanceName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
                 Predicate transitionedState = stateChange.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
