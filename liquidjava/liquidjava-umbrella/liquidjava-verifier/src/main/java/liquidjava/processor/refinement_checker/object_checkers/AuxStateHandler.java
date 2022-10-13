@@ -330,7 +330,7 @@ public class AuxStateHandler {
         // AuxStateHandler.checkTargetChanges(tc, rf, inv.getTarget(), Collections.emptyMap(), inv);
 
         //only works for things in form of this.field_name = 1
-
+        //does not work thor thins like `void method(){otherMethod();}`
         if (!(inv.getTarget() instanceof CtVariableRead<?>)){return;}
 
         String parentTargetName = ((CtVariableRead<?>) inv.getTarget()).getVariable().getSimpleName();
