@@ -51,8 +51,7 @@ public class VCChecker {
             premises = premisesBeforeChange.changeStatesToRefinements(list, s, errorEmitter)
                     .changeAliasToRefinement(context, f);
 
-            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context,
-                    f);
+            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context, f);
         } catch (Exception e1) {
             printError(premises, expectedType, element, map, e1.getMessage());
             return;
