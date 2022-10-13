@@ -88,7 +88,7 @@ public class Predicate {
         return null;
     }
 
-    public Predicate changeAliasToRefinement(Context context, CtElement element, Factory f) throws Exception {
+    public Predicate changeAliasToRefinement(Context context, Factory f) throws Exception {
         Expression ref = getExpression();
 
         Map<String, AliasDTO> alias = new HashMap<>();
