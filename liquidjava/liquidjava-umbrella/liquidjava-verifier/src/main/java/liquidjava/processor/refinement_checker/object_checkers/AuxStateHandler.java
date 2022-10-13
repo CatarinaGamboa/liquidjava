@@ -328,9 +328,12 @@ public class AuxStateHandler {
             Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true);
             stateChange.setFrom(fromPredicate);
             stateChange.setTo(toPredicate);
-        }catch (ParsingException e) {
-            ErrorHandler.printCostumeError(fw, "ParsingException while constructing assignment update for `" + fw + "` in class `"
-                    + fw.getVariable().getDeclaringType() + "` : " + e.getMessage(), tc.getErrorEmitter());
+        } catch (ParsingException e) {
+            ErrorHandler
+                    .printCostumeError(fw,
+                            "ParsingException while constructing assignment update for `" + fw + "` in class `"
+                                    + fw.getVariable().getDeclaringType() + "` : " + e.getMessage(),
+                            tc.getErrorEmitter());
 
             return;
         }
