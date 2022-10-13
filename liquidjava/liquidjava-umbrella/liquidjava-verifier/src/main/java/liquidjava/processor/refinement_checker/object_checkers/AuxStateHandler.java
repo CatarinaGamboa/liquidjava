@@ -329,14 +329,18 @@ public class AuxStateHandler {
 
         // AuxStateHandler.checkTargetChanges(tc, rf, inv.getTarget(), Collections.emptyMap(), inv);
 
-        //only works for things in form of this.field_name = 1
-        //does not work thor thins like `void method(){otherMethod();}`
-        if (!(fw.getTarget() instanceof CtVariableRead<?>)){return;}
+        // only works for things in form of this.field_name = 1
+        // does not work thor thins like `void method(){otherMethod();}`
+        if (!(fw.getTarget() instanceof CtVariableRead<?>)) {
+            return;
+        }
 
         String parentTargetName = ((CtVariableRead<?>) fw.getTarget()).getVariable().getSimpleName();
         Optional<VariableInstance> invocation_callee = tc.getContext().getLastVariableInstance(parentTargetName);
 
-        if(!invocation_callee.isPresent()){return;}
+        if (!invocation_callee.isPresent()) {
+            return;
+        }
 
         VariableInstance vi = invocation_callee.get();
 
@@ -346,24 +350,24 @@ public class AuxStateHandler {
                 .substituteVariable(parentTargetName, instanceName);
 
         // replace "state(this)" to "state(whatever method is called from) and so on"
-        Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName);
-        expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
+        Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName)
+                .changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
 
-        boolean found = tc.checksStateSMT(prevState, expectState, fw.getPosition());
-        if (found) {
-            String newInstanceName = String.format(tc.instanceFormat, parentTargetName, tc.getContext().getCounter());
-            Predicate transitionedState = stateChange.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
-                    .substituteVariable(tc.THIS, newInstanceName);
-
-            transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
-            // update of stata of new instance of this#n#(whatever it was + 1)
-            addInstanceWithState(tc, parentTargetName, newInstanceName, vi, transitionedState, inv);
+        if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) {// Invalid transition
+            if (!tc.getErrorEmitter().foundError()) { // No errors in errorEmitter
+                String states = stateChange.getFrom().toString();
+                tc.createStateMismatchError(fw, fw.toString(), prevState, states);
+            }
+            return;
         }
 
-        if (!found && !tc.getErrorEmitter().foundError()) {// Reaches the end of stateChange no matching states
-            String states = stateChange.getFrom().toString();
-            tc.createStateMismatchError(fw, fw.toString(), prevState, states);
-        }
+        String newInstanceName = String.format(tc.instanceFormat, parentTargetName, tc.getContext().getCounter());
+        Predicate transitionedState = stateChange.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
+                .substituteVariable(tc.THIS, newInstanceName);
+
+        transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
+        // update of stata of new instance of this#n#(whatever it was + 1)
+        addInstanceWithState(tc, parentTargetName, newInstanceName, vi, transitionedState, inv);
 
     }
 
