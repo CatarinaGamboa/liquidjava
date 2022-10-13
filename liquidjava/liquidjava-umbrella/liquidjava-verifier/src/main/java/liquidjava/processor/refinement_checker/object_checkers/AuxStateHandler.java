@@ -321,8 +321,7 @@ public class AuxStateHandler {
         // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
 
         ObjectState stateChange = new ObjectState();
-        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw,
-                false);
+        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false);
         Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true);
         stateChange.setFrom(fromPredicate);
         stateChange.setTo(toPredicate);
