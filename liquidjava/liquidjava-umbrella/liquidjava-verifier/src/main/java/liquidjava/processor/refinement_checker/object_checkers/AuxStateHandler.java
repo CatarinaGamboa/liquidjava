@@ -331,7 +331,7 @@ public class AuxStateHandler {
 
         //only works for things in form of this.field_name = 1
         //does not work thor thins like `void method(){otherMethod();}`
-        if (!(inv.getTarget() instanceof CtVariableRead<?>)){return;}
+        if (!(fw.getTarget() instanceof CtVariableRead<?>)){return;}
 
         String parentTargetName = ((CtVariableRead<?>) fw.getTarget()).getVariable().getSimpleName();
         Optional<VariableInstance> invocation_callee = tc.getContext().getLastVariableInstance(parentTargetName);
