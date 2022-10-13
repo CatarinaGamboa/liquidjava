@@ -288,45 +288,17 @@ public class AuxStateHandler {
 
     }
 
-    public static void updateGhostField(CtFieldWrite<?> fw, TypeChecker tc) throws ParsingException {
+    public static void updateGhostField(CtFieldWrite<?> fw, TypeChecker tc) {
         CtField<?> field = fw.getVariable().getDeclaration();
         String updatedVarName = String.format(tc.thisFormat, fw.getVariable().getSimpleName());
         String targetClass = field.getDeclaringType().getQualifiedName();
 
-        // transition method construction
-        CtMethod<?> transitionMethod = tc.getFactory().createMethod();
-        transitionMethod.setType(tc.getFactory().createCtTypeReference(void.class));
-        transitionMethod.setBody(tc.getFactory().createCtBlock(tc.getFactory().createCodeSnippetStatement()));
-        transitionMethod.setSimpleName("_");
-
-        transitionMethod.setParent(field.getDeclaringType());
-        CtAnnotation<?> ann = tc.getFactory()
-                .createAnnotation(tc.getFactory().createCtTypeReference(StateRefinement.class));
-
         // state transition annotation construction
         String stateChangeRefinementTo = field.getSimpleName() + "(this) == " + updatedVarName;
         String stateChangeRefinementFrom = "true";
-        ann.addValue("to", stateChangeRefinementTo);
-        ann.addValue("from", stateChangeRefinementFrom);
-
-        transitionMethod.addAnnotation(ann);
 
         // extracting target from assignment
-        System.out.println("Target for invocation: " + fw.getTarget());
-        CtInvocation<?> inv = tc.getFactory().createInvocation(fw.getTarget(), transitionMethod.getReference(),
-                Collections.emptyList());
-
-        // applying transition:
-        // StateRefinement(from="true", to="n(this)=this#n")
-        // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
-
-        ObjectState stateChange = new ObjectState();
-        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false);
-        Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true);
-        stateChange.setFrom(fromPredicate);
-        stateChange.setTo(toPredicate);
-
-        // AuxStateHandler.checkTargetChanges(tc, rf, inv.getTarget(), Collections.emptyMap(), inv);
+        System.out.println("Target for field writw: " + fw.getTarget());
 
         // only works for things in form of this.field_name = 1
         // does not work thor thins like `void method(){otherMethod();}`
@@ -343,16 +315,31 @@ public class AuxStateHandler {
 
         VariableInstance vi = invocation_callee.get();
 
-        // changeState(tc, vi, Collections.singletonList(stateChange), parentTargetName, Collections.emptyMap(), inv);
         String instanceName = vi.getName();
         Predicate prevState = vi.getRefinement().substituteVariable(tc.WILD_VAR, instanceName)
                 .substituteVariable(parentTargetName, instanceName);
+
+        // StateRefinement(from="true", to="n(this)=this#n")
+        // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
+
+        ObjectState stateChange = new ObjectState();
+        try {
+            Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false);
+            Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true);
+            stateChange.setFrom(fromPredicate);
+            stateChange.setTo(toPredicate);
+        }catch (ParsingException e) {
+            ErrorHandler.printCostumeError(fw, "ParsingException while constructing assignment update for `" + fw + "` in class `"
+                    + fw.getVariable().getDeclaringType() + "` : " + e.getMessage(), tc.getErrorEmitter());
+
+            return;
+        }
 
         // replace "state(this)" to "state(whatever method is called from) and so on"
         Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName)
                 .changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
 
-        if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) {// Invalid transition
+        if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) {// Invalid field transition
             if (!tc.getErrorEmitter().foundError()) { // No errors in errorEmitter
                 String states = stateChange.getFrom().toString();
                 tc.createStateMismatchError(fw, fw.toString(), prevState, states);
@@ -366,21 +353,13 @@ public class AuxStateHandler {
 
         transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
         // update of stata of new instance of this#n#(whatever it was + 1)
-        // addInstanceWithState(tc, parentTargetName, newInstanceName, vi, transitionedState, inv);
-        // void addInstanceWithState(
-        // String superName,
-        // String name2,
-        // VariableInstance prevInstance,
-        // Predicate transitionedState,
-        // CtElement invocation) {
-        //
+
         VariableInstance vi2 = (VariableInstance) tc.getContext().addInstanceToContext(newInstanceName, vi.getType(),
                 vi.getRefinement(), fw);
         vi2.setRefinement(transitionedState);
+
         RefinedVariable rv = tc.getContext().getVariableByName(parentTargetName);
-        for (CtTypeReference<?> t : rv.getSuperTypes()) {
-            vi2.addSuperType(t);
-        }
+        rv.getSuperTypes().forEach(vi2::addSuperType);
 
         // if the variable is a parent (not a VariableInstance) we need to check that this refinement
         // is a subtype of the variable's main refinement
