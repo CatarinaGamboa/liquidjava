@@ -321,9 +321,9 @@ public class AuxStateHandler {
         // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
 
         ObjectState stateChange = new ObjectState();
-        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, transitionMethod,
+        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw,
                 false);
-        Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, transitionMethod, true);
+        Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true);
         stateChange.setFrom(fromPredicate);
         stateChange.setTo(toPredicate);
 
@@ -376,8 +376,7 @@ public class AuxStateHandler {
         // CtElement invocation) {
         //
         VariableInstance vi2 = (VariableInstance) tc.getContext().addInstanceToContext(newInstanceName, vi.getType(),
-                vi.getRefinement(), inv);
-        // vi2.setState(transitionedState);
+                vi.getRefinement(), fw);
         vi2.setRefinement(transitionedState);
         RefinedVariable rv = tc.getContext().getVariableByName(parentTargetName);
         for (CtTypeReference<?> t : rv.getSuperTypes()) {
@@ -388,7 +387,7 @@ public class AuxStateHandler {
         // is a subtype of the variable's main refinement
         if (rv instanceof Variable) {
             Predicate superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
-            tc.checkSMT(superC, inv);
+            tc.checkSMT(superC, fw);
             tc.getContext().addRefinementInstanceToVariable(parentTargetName, newInstanceName);
         }
 
