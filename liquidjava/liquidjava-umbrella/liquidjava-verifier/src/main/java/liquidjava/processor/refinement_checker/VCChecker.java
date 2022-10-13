@@ -60,7 +60,7 @@ public class VCChecker {
 
         // System.out.println(premises.toString() + "\n"+et.toString());
         try {
-            smtChecking(premises, et, element);
+            smtChecking(premises, et);
         } catch (Exception e) {
             // To emit the message we use the constraints before the alias and state change
             System.out.println();
@@ -93,8 +93,7 @@ public class VCChecker {
             premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
             premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(list, s, errorEmitter)
                     .changeAliasToRefinement(context, f);
-            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context,
-                    f);
+            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context, f);
         } catch (Exception e) {
             return false;
             // printError(premises, expectedType, element, map, e.getMessage());
@@ -104,8 +103,8 @@ public class VCChecker {
         return smtChecks(premises, et, p);
     }
 
-    private /* Predicate */VCImplication joinPredicates(Predicate expectedType,
-            List<RefinedVariable> mainVars, List<RefinedVariable> vars, HashMap<String, PlacementInCode> map) {
+    private /* Predicate */VCImplication joinPredicates(Predicate expectedType, List<RefinedVariable> mainVars,
+            List<RefinedVariable> vars, HashMap<String, PlacementInCode> map) {
 
         VCImplication firstSi = null;
         VCImplication lastSi = null;
@@ -229,13 +228,12 @@ public class VCChecker {
      *
      * @param cSMT
      * @param expectedType
-     * @param element
      *
      * @throws Exception
      * @throws GhostFunctionError
      * @throws TypeCheckError
      */
-    private void smtChecking(Predicate cSMT, Predicate expectedType, CtElement element)
+    private void smtChecking(Predicate cSMT, Predicate expectedType)
             throws TypeCheckError, GhostFunctionError, Exception {
         new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
     }
