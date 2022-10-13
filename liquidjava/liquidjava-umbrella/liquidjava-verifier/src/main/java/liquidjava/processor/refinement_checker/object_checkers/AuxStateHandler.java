@@ -328,14 +328,18 @@ public class AuxStateHandler {
         stateChange.setTo(toPredicate);
 
         // AuxStateHandler.checkTargetChanges(tc, rf, inv.getTarget(), Collections.emptyMap(), inv);
-        String parentTargetName = searchFistVariableTarget(tc, inv.getTarget(), inv);
-        // ^- metadata is put here
-        // v- and accessed here
-        VariableInstance vi = getTarget(tc, inv);
 
-        if (vi == null) {
-            return;
-        }
+        //only works for things in form of this.field_name = 1
+
+        if (!(inv.getTarget() instanceof CtVariableRead<?>)){return;}
+
+        String parentTargetName = ((CtVariableRead<?>) inv.getTarget()).getVariable().getSimpleName();
+        Optional<VariableInstance> invocation_callee = tc.getContext().getLastVariableInstance(parentTargetName);
+
+        if(!invocation_callee.isPresent()){return;}
+
+        VariableInstance vi = invocation_callee.get();
+
         // changeState(tc, vi, Collections.singletonList(stateChange), parentTargetName, Collections.emptyMap(), inv);
         String instanceName = vi.getName();
         Predicate prevState = vi.getRefinement().substituteVariable(tc.WILD_VAR, instanceName)
