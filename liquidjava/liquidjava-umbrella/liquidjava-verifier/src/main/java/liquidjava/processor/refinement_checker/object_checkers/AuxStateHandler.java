@@ -349,7 +349,7 @@ public class AuxStateHandler {
         Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName);
         expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
 
-        boolean found = tc.checksStateSMT(prevState, expectState, inv.getPosition());
+        boolean found = tc.checksStateSMT(prevState, expectState, fw.getPosition());
         if (found) {
             String newInstanceName = String.format(tc.instanceFormat, parentTargetName, tc.getContext().getCounter());
             Predicate transitionedState = stateChange.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
@@ -362,8 +362,7 @@ public class AuxStateHandler {
 
         if (!found && !tc.getErrorEmitter().foundError()) {// Reaches the end of stateChange no matching states
             String states = stateChange.getFrom().toString();
-            String simpleInvocation = inv.toString();
-            tc.createStateMismatchError(inv, simpleInvocation, prevState, states);
+            tc.createStateMismatchError(fw, fw.toString(), prevState, states);
         }
 
     }
