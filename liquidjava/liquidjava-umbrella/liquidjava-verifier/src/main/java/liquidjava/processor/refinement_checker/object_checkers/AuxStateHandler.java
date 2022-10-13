@@ -6,6 +6,7 @@ import static org.junit.Assert.fail;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.*;
@@ -167,7 +168,7 @@ public class AuxStateHandler {
         tc.getContext().addVarToContext(name, r, new Predicate(), e);
         tc.getContext().addVarToContext(nameOld, r, new Predicate(), e);
         // TODO REVIEW!!
-
+        // what is it for?
         Predicate c1 = isTo ? getMissingStates(t, tc, p) : p;
         Predicate c = c1.substituteVariable(tc.THIS, name);
         c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
@@ -320,16 +321,45 @@ public class AuxStateHandler {
         // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
 
         ObjectState stateChange = new ObjectState();
-        stateChange.setFrom(createStatePredicate(stateChangeRefinementFrom, targetClass, tc, transitionMethod, false));
-        stateChange.setTo(createStatePredicate(stateChangeRefinementTo, targetClass, tc, transitionMethod, true));
+        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, transitionMethod,
+                false);
+        Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, transitionMethod, true);
+        stateChange.setFrom(fromPredicate);
+        stateChange.setTo(toPredicate);
 
         // AuxStateHandler.checkTargetChanges(tc, rf, inv.getTarget(), Collections.emptyMap(), inv);
-
         String parentTargetName = searchFistVariableTarget(tc, inv.getTarget(), inv);
+        // ^- metadata is put here
+        // v- and accessed here
         VariableInstance vi = getTarget(tc, inv);
 
-        if (vi != null) {
-            changeState(tc, vi, Collections.singletonList(stateChange), parentTargetName, Collections.emptyMap(), inv);
+        if (vi == null) {
+            return;
+        }
+        // changeState(tc, vi, Collections.singletonList(stateChange), parentTargetName, Collections.emptyMap(), inv);
+        String instanceName = vi.getName();
+        Predicate prevState = vi.getRefinement().substituteVariable(tc.WILD_VAR, instanceName)
+                .substituteVariable(parentTargetName, instanceName);
+
+        // replace "state(this)" to "state(whatever method is called from) and so on"
+        Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName);
+        expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
+
+        boolean found = tc.checksStateSMT(prevState, expectState, inv);
+        if (found) {
+            String newInstanceName = String.format(tc.instanceFormat, parentTargetName, tc.getContext().getCounter());
+            Predicate transitionedState = stateChange.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
+                    .substituteVariable(tc.THIS, newInstanceName);
+
+            transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
+            // update of stata of new instance of this#n#(whatever it was + 1)
+            addInstanceWithState(tc, parentTargetName, newInstanceName, vi, transitionedState, inv);
+        }
+
+        if (!found && !tc.getErrorEmitter().foundError()) {// Reaches the end of stateChange no matching states
+            String states = stateChange.getFrom().toString();
+            String simpleInvocation = inv.toString();
+            tc.createStateMismatchError(inv, simpleInvocation, prevState, states);
         }
 
     }
@@ -478,11 +508,13 @@ public class AuxStateHandler {
      */
     static String searchFistVariableTarget(TypeChecker tc, CtElement target2, CtElement invocation) {
         if (target2 instanceof CtVariableRead<?>) {
+            // v--------- field read
+            // means invokation is in a form of `t.method(args)`
             CtVariableRead<?> v = (CtVariableRead<?>) target2;
             String name = v.getVariable().getSimpleName();
-            Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(name);
-            if (ovi.isPresent()) {
-                invocation.putMetadata(tc.TARGET_KEY, ovi.get());
+            Optional<VariableInstance> invocation_callee = tc.getContext().getLastVariableInstance(name);
+            if (invocation_callee.isPresent()) {
+                invocation.putMetadata(tc.TARGET_KEY, invocation_callee.get());
             } else if (target2.getMetadata(tc.TARGET_KEY) == null) {
                 RefinedVariable var = tc.getContext().getVariableByName(name);
                 String nName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
@@ -494,6 +526,8 @@ public class AuxStateHandler {
 
             return name;
         } else if (target2.getMetadata(tc.TARGET_KEY) != null) {
+            // invokation is in
+            // who did put the metadata here then?
             VariableInstance target2_vi = (VariableInstance) target2.getMetadata(tc.TARGET_KEY);
             Optional<Variable> v = target2_vi.getParent();
             invocation.putMetadata(tc.TARGET_KEY, target2_vi);
