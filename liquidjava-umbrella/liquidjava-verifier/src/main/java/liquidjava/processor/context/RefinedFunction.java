@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import liquidjava.logging.LogElement;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
@@ -49,11 +50,11 @@ public class RefinedFunction extends Refined {
         return targetClass;
     }
 
-    public Predicate getRenamedRefinements(Context c, CtElement element) {
+    public Predicate getRenamedRefinements(Context c, LogElement element) {
         return getRenamedRefinements(getAllRefinements(), c, element);
     }
 
-    private Predicate getRenamedRefinements(Predicate place, Context context, CtElement element) {
+    private Predicate getRenamedRefinements(Predicate place, Context context, LogElement element) {
         Predicate update = place.clone();
         for (Variable p : argRefinements) {
             String varName = p.getName();

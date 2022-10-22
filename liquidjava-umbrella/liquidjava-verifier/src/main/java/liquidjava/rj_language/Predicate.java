@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
+import liquidjava.logging.LogElement;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostState;
@@ -54,7 +55,7 @@ public class Predicate {
      * 
      * @throws ParsingException
      */
-    public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+    public Predicate(String ref, LogElement element, ErrorEmitter e) throws ParsingException {
         exp = parse(ref, element, e);
         if (e.foundError())
             return;
@@ -70,7 +71,7 @@ public class Predicate {
         exp = e;
     }
 
-    protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+    protected Expression parse(String ref, LogElement element, ErrorEmitter e) throws ParsingException {
         try {
             return RefinementsParser.createAST(ref);
         } catch (ParsingException e1) {

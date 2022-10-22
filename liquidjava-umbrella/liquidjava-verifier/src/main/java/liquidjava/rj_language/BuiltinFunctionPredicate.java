@@ -1,22 +1,23 @@
 package liquidjava.rj_language;
 
 import liquidjava.errors.ErrorEmitter;
+import liquidjava.logging.LogElement;
 import liquidjava.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtElement;
 
 public class BuiltinFunctionPredicate extends Predicate {
 
-    public BuiltinFunctionPredicate(ErrorEmitter ee, CtElement elem, String functionName, String... params)
+    public BuiltinFunctionPredicate(ErrorEmitter ee, LogElement elem, String functionName, String... params)
             throws ParsingException {
         super(functionName + "(" + getFormattedParams(params) + ")", elem, ee);
     }
 
-    public static BuiltinFunctionPredicate builtin_length(String param, CtElement elem, ErrorEmitter ee)
+    public static BuiltinFunctionPredicate builtin_length(String param, LogElement elem, ErrorEmitter ee)
             throws ParsingException {
         return new BuiltinFunctionPredicate(ee, elem, "length", param);
     }
 
-    public static BuiltinFunctionPredicate builtin_addToIndex(String array, String index, String value, CtElement elem,
+    public static BuiltinFunctionPredicate builtin_addToIndex(String array, String index, String value, LogElement elem,
             ErrorEmitter ee) throws ParsingException {
         return new BuiltinFunctionPredicate(ee, elem, "addToIndex", index, value);
     }

@@ -1,5 +1,6 @@
 package liquidjava.logging;
 
+import liquidjava.processor.context.PlacementInCode;
 import spoon.reflect.code.CtComment;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtAnnotation;
@@ -11,6 +12,7 @@ import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.Filter;
 
 import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +26,6 @@ public class LogElement {
         this.elem = elem;
     }
 
-
     public <A extends Annotation> A getAnnotation(Class<A> var1) {
         return elem.getAnnotation(var1);
     }
@@ -33,23 +34,23 @@ public class LogElement {
         return elem.hasAnnotation(var1);
     }
 
-    List<CtAnnotation<? extends Annotation>> getAnnotations() {
+    public List<CtAnnotation<? extends Annotation>> getAnnotations() {
         return elem.getAnnotations();
     }
 
-    String getDocComment() {
+    public String getDocComment() {
         return elem.getDocComment();
     }
 
-    String getShortRepresentation() {
+    public String getShortRepresentation() {
         return elem.getShortRepresentation();
     }
 
-    SourcePosition getPosition() {
+    public SourcePosition getPosition() {
         return elem.getPosition();
     }
 
-    List<LogElement> getAnnotatedChildren(Class<? extends Annotation> var1) {
+    public List<LogElement> getAnnotatedChildren(Class<? extends Annotation> var1) {
         return elem.getAnnotatedChildren(var1).stream().map(LogElement::new).collect(Collectors.toList());
     }
 
@@ -63,10 +64,6 @@ public class LogElement {
 
     public <E extends CtElement> List<LogElement> getElements(Filter<E> var1) {
         return elem.getElements(var1).stream().map(LogElement::new).collect(Collectors.toList());
-    }
-
-    public LogElement setPositions(SourcePosition var1) {
-        return new LogElement(elem.setPositions(var1));
     }
 
     public LogElement getParent() throws ParentNotInitializedException {
@@ -150,5 +147,26 @@ public class LogElement {
                 };
             }
         };
+    }
+
+    public LogElement strippedElement() {
+        CtElement elemCopy = elem.clone();
+        // cleanup annotations
+        if (elem.getAnnotations().size() > 0) {
+            for (CtAnnotation<? extends Annotation> a : elem.getAnnotations()) {
+                elemCopy.removeAnnotation(a);
+            }
+        }
+        // cleanup comments
+        if (elem.getComments().size() > 0) {
+            for (CtComment a : elem.getComments()) {
+                elemCopy.removeComment(a);
+            }
+        }
+        return new LogElement(elemCopy);
+    }
+
+    public String toString() {
+        return elem.toString();
     }
 }

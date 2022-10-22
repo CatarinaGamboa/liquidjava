@@ -4,11 +4,11 @@ import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Locale;
 
+import liquidjava.logging.LogElement;
 import liquidjava.processor.VCImplication;
 import liquidjava.processor.context.PlacementInCode;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.code.CtLiteral;
-import spoon.reflect.declaration.CtElement;
 
 public class ErrorHandler {
 
@@ -17,16 +17,15 @@ public class ErrorHandler {
      *
      * @param <T>
      * @param var
-     * @param s
      * @param expectedType
      * @param cSMT
      */
-    public static <T> void printError(CtElement var, Predicate expectedType, Predicate cSMT,
+    public static <T> void printError(LogElement var, Predicate expectedType, Predicate cSMT,
             HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
         printError(var, null, expectedType, cSMT, map, ee);
     }
 
-    public static <T> void printError(CtElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
+    public static <T> void printError(LogElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 
         String resumeMessage = "Type expected:" + expectedType.toString();// + "; " +"Refinement found:" +
@@ -52,7 +51,7 @@ public class ErrorHandler {
 
     }
 
-    public static void printStateMismatch(CtElement element, String method, VCImplication constraintForErrorMsg,
+    public static void printStateMismatch(LogElement element, String method, VCImplication constraintForErrorMsg,
             String states, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 
         String resumeMessage = "Failed to check state transitions. " + "Expected possible states:" + states;// + ";
@@ -82,7 +81,7 @@ public class ErrorHandler {
 
     }
 
-    public static <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement,
+    public static <T> void printErrorUnknownVariable(LogElement var, String et, String correctRefinement,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 
         String resumeMessage = "Encountered unknown variable";
@@ -101,7 +100,7 @@ public class ErrorHandler {
         errorl.addError(resumeMessage, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static <T> void printNotFound(CtElement var, Predicate constraint, Predicate constraint2, String msg,
+    public static <T> void printNotFound(LogElement var, Predicate constraint, Predicate constraint2, String msg,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
 
         StringBuilder sb = new StringBuilder();
@@ -118,7 +117,7 @@ public class ErrorHandler {
         errorl.addError(msg, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static <T> void printErrorArgs(CtElement var, Predicate expectedType, String msg,
+    public static <T> void printErrorArgs(LogElement var, Predicate expectedType, String msg,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
@@ -132,7 +131,7 @@ public class ErrorHandler {
         errorl.addError(title, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static void printErrorTypeMismatch(CtElement element, Predicate expectedType, String message,
+    public static void printErrorTypeMismatch(LogElement element, Predicate expectedType, String message,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
@@ -145,7 +144,7 @@ public class ErrorHandler {
         errorl.addError(message, sb.toString(), element.getPosition(), 2, map);
     }
 
-    public static void printSameStateSetError(CtElement element, Predicate p, String name,
+    public static void printSameStateSetError(LogElement element, Predicate p, String name,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
         String resume = "Error found multiple disjoint states from a State Set in a refinement";
 
@@ -165,7 +164,7 @@ public class ErrorHandler {
 
     }
 
-    public static void printErrorConstructorFromState(CtElement element, CtLiteral<String> from, ErrorEmitter errorl) {
+    public static void printErrorConstructorFromState(LogElement element, CtLiteral<String> from, ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
         String s = " Error found constructor with FROM state (Constructor's should only have a TO state)\n\n";
@@ -178,7 +177,7 @@ public class ErrorHandler {
         errorl.addError(s, sb.toString(), element.getPosition(), 1);
     }
 
-    public static void printCostumeError(CtElement element, String msg, ErrorEmitter errorl) {
+    public static void printCostumeError(LogElement element, String msg, ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
         String s = "Found Error: " + msg;
@@ -191,7 +190,7 @@ public class ErrorHandler {
         errorl.addError(s, sb.toString(), element.getPosition(), 1);
     }
 
-    public static void printSyntaxError(String msg, String ref, CtElement element, ErrorEmitter errorl) {
+    public static void printSyntaxError(String msg, String ref, LogElement element, ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
         StringBuilder sbtitle = new StringBuilder();
