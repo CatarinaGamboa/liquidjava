@@ -1,6 +1,8 @@
 package liquidjava.processor.context;
 
 import java.util.*;
+
+import liquidjava.logging.LogElement;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
@@ -116,7 +118,7 @@ public class Context {
     }
 
     public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, Predicate c,
-            CtElement placementInCode) {
+            LogElement placementInCode) {
         RefinedVariable vi = new Variable(simpleName, type, c);
         vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
         vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
@@ -125,7 +127,7 @@ public class Context {
     }
 
     public RefinedVariable addInstanceToContext(String simpleName, CtTypeReference<?> type, Predicate c,
-            CtElement placementInCode) {
+            LogElement placementInCode) {
         RefinedVariable vi = new VariableInstance(simpleName, type, c);
         vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
         if (!ctxSpecificVars.contains(vi))
@@ -134,7 +136,7 @@ public class Context {
     }
 
     public void addRefinementToVariableInContext(String name, CtTypeReference<?> type, Predicate et,
-            CtElement placementInCode) {
+            LogElement placementInCode) {
         if (hasVariable(name)) {
             RefinedVariable vi = getVariableByName(name);
             vi.setRefinement(et);
@@ -248,7 +250,8 @@ public class Context {
         }
     }
 
-    // ---------------------- Variables - if information storing ----------------------
+    // ---------------------- Variables - if information storing
+    // ----------------------
     public void variablesSetBeforeIf() {
         for (RefinedVariable vi : getAllVariables())
             if (vi instanceof Variable)

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Optional;
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
+import liquidjava.logging.LogElement;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
@@ -86,7 +87,7 @@ public abstract class TypeChecker extends CtScanner {
             }
         }
         if (ref.isPresent()) {
-            Predicate p = new Predicate(ref.get(), element, errorEmitter);
+            Predicate p = new Predicate(ref.get(), new LogElement(element), errorEmitter);
             if (errorEmitter.foundError())
                 return Optional.empty();
             constr = Optional.of(p);
@@ -147,11 +148,12 @@ public abstract class TypeChecker extends CtScanner {
         try {
             gd = RefinementsParser.getGhostDeclaration(string);
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(ann, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
+            ErrorHandler.printCostumeError(new LogElement(ann), "Could not parse the Ghost Function" + e.getMessage(),
+                    errorEmitter);
             return;
         }
         if (gd.getParam_types().size() > 0) {
-            ErrorHandler.printCostumeError(ann, "Ghost States have the class as parameter "
+            ErrorHandler.printCostumeError(new LogElement(ann), "Ghost States have the class as parameter "
                     + "by default, no other parameters are allowed in '" + string + "'", errorEmitter);
             return;
         }
@@ -211,8 +213,8 @@ public abstract class TypeChecker extends CtScanner {
                 context.addGhostFunction(gh);
             }
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function" + e.getMessage(),
-                    errorEmitter);
+            ErrorHandler.printCostumeError(new LogElement(element),
+                    "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
             // e.printStackTrace();
             return;
         }
@@ -238,7 +240,7 @@ public abstract class TypeChecker extends CtScanner {
                 }
             }
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(element, e.getMessage(), errorEmitter);
+            ErrorHandler.printCostumeError(new LogElement(element), e.getMessage(), errorEmitter);
             return;
             // e.printStackTrace();
         }
@@ -280,39 +282,40 @@ public abstract class TypeChecker extends CtScanner {
         cEt = cEt.substituteVariable(simpleName, newName);
 
         // Substitute variable in verification
-        RefinedVariable rv = context.addInstanceToContext(newName, type, correctNewRefinement, usage);
+        RefinedVariable rv = context.addInstanceToContext(newName, type, correctNewRefinement, new LogElement(usage));
         for (CtTypeReference<?> t : mainRV.getSuperTypes())
             rv.addSuperType(t);
         context.addRefinementInstanceToVariable(simpleName, newName);
         // smt check
-        checkSMT(cEt, usage); // TODO CHANGE
-        context.addRefinementToVariableInContext(simpleName, type, cet, usage);
+        checkSMT(cEt, usage);// TODO CHANGE
+        context.addRefinementToVariableInContext(simpleName, type, cet, new LogElement(usage));
     }
 
     public void checkSMT(Predicate expectedType, CtElement element) {
-        vcChecker.processSubtyping(expectedType, context.getGhostState(), WILD_VAR, THIS, element, factory);
+        vcChecker.processSubtyping(expectedType, context.getGhostState(), WILD_VAR, THIS, new LogElement(element),
+                factory);
         element.putMetadata(REFINE_KEY, expectedType);
     }
 
-    public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String string) {
+    public void checkStateSMT(Predicate prevState, Predicate expectedState, LogElement target, String string) {
         vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target, string,
                 factory);
     }
 
-    public boolean checksStateSMT(Predicate prevState, Predicate expectedState, SourcePosition p) {
+    public boolean checksStateSMT(Predicate prevState, Predicate expectedState, LogElement p) {
         return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, p,
                 factory);
     }
 
-    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customeMessage) {
+    public void createError(LogElement element, Predicate expectedType, Predicate foundType, String customeMessage) {
         vcChecker.printSubtypingError(element, expectedType, foundType, customeMessage);
     }
 
-    public void createSameStateError(CtElement element, Predicate expectedType, String klass) {
+    public void createSameStateError(LogElement element, Predicate expectedType, String klass) {
         vcChecker.printSameStateError(element, expectedType, klass);
     }
 
-    public void createStateMismatchError(CtElement element, String method, Predicate c, String states) {
+    public void createStateMismatchError(LogElement element, String method, Predicate c, String states) {
         vcChecker.printStateMismatchError(element, method, c, states);
     }
 

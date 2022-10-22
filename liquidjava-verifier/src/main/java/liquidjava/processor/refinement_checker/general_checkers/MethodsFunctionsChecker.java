@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import liquidjava.logging.LogElement;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
@@ -151,7 +153,8 @@ public class MethodsFunctionsChecker {
             if (oc.isPresent())
                 c = oc.get().substituteVariable(rtc.WILD_VAR, paramName);
             param.putMetadata(rtc.REFINE_KEY, c);
-            RefinedVariable v = rtc.getContext().addVarToContext(param.getSimpleName(), param.getType(), c, param);
+            RefinedVariable v = rtc.getContext().addVarToContext(param.getSimpleName(), param.getType(), c,
+                    new LogElement(param));
             if (v instanceof Variable)
                 f.addArgRefinements((Variable) v);
             joint = Predicate.createConjunction(joint, c);
@@ -198,7 +201,7 @@ public class MethodsFunctionsChecker {
 
                 // Both return and the method have metadata
                 String thisName = String.format(rtc.thisFormat, className);
-                rtc.getContext().addInstanceToContext(thisName, c.getReference(), new Predicate(), ret);
+                rtc.getContext().addInstanceToContext(thisName, c.getReference(), new Predicate(), new LogElement(ret));
 
                 String returnVarName = String.format(retNameFormat, rtc.getContext().getCounter());
                 Predicate cretRef = rtc.getRefinement(ret.getReturnedExpression())
@@ -206,7 +209,7 @@ public class MethodsFunctionsChecker {
                 Predicate cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName)
                         .substituteVariable(rtc.THIS, returnVarName);
 
-                rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
+                rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, new LogElement(ret));
                 rtc.checkSMT(cexpectedType, ret);
                 rtc.getContext().newRefinementToVariableInContext(returnVarName, cexpectedType);
             }
@@ -314,7 +317,7 @@ public class MethodsFunctionsChecker {
 
             String viName = String.format(rtc.instanceFormat, f.getName(), rtc.getContext().getCounter());
             VariableInstance vi = (VariableInstance) rtc.getContext().addInstanceToContext(viName, f.getType(),
-                    methodRef.substituteVariable(rtc.WILD_VAR, viName), invocation); // TODO REVER!!
+                    methodRef.substituteVariable(rtc.WILD_VAR, viName), new LogElement(invocation)); // TODO REVER!!
             if (varName != null && f.hasStateChange() && equalsThis)
                 rtc.getContext().addRefinementInstanceToVariable(varName, viName);
             invocation.putMetadata(rtc.TARGET_KEY, vi);
@@ -356,7 +359,8 @@ public class MethodsFunctionsChecker {
         if (!met.getVariableNames().contains(rtc.WILD_VAR))
             met = Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), met);
         String nVar = String.format(rtc.instanceFormat, fArg.getName(), rtc.getContext().getCounter());
-        rtc.getContext().addInstanceToContext(nVar, fArg.getType(), met.substituteVariable(rtc.WILD_VAR, nVar), iArg);
+        rtc.getContext().addInstanceToContext(nVar, fArg.getType(), met.substituteVariable(rtc.WILD_VAR, nVar),
+                new LogElement(iArg));
         return nVar;
     }
 
@@ -378,7 +382,7 @@ public class MethodsFunctionsChecker {
 
     // IN CONSTRUCTION _ NOT USED
     @SuppressWarnings("unused")
-    private void applyRefinementsToArguments(CtElement element, List<CtExpression<?>> arguments, RefinedFunction f,
+    private void applyRefinementsToArguments(LogElement element, List<CtExpression<?>> arguments, RefinedFunction f,
             Map<String, String> map) {
         Context context = rtc.getContext();
         List<CtExpression<?>> invocationParams = arguments;

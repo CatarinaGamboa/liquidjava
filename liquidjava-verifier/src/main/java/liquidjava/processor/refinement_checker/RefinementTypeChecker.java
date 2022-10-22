@@ -8,6 +8,11 @@ import java.util.Optional;
 import org.apache.commons.lang3.NotImplementedException;
 
 import liquidjava.errors.ErrorEmitter;
+<<<<<<< HEAD:liquidjava-verifier/src/main/java/liquidjava/processor/refinement_checker/RefinementTypeChecker.java
+=======
+import liquidjava.errors.ErrorHandler;
+import liquidjava.logging.LogElement;
+>>>>>>> efcaaf1d (LogElement introduction):liquidjava-umbrella/liquidjava-verifier/src/main/java/liquidjava/processor/refinement_checker/RefinementTypeChecker.java
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.processor.refinement_checker.general_checkers.OperationsChecker;
@@ -133,7 +138,7 @@ public class RefinementTypeChecker extends TypeChecker {
                 return; // error already in ErrorEmitter
             }
             context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), a.orElse(new Predicate()),
-                    localVariable);
+                    new LogElement(localVariable));
         } else {
             String varName = localVariable.getSimpleName();
             CtExpression<?> e = localVariable.getAssignment();
@@ -142,7 +147,7 @@ public class RefinementTypeChecker extends TypeChecker {
             if (refinementFound == null) {
                 refinementFound = new Predicate();
             }
-            context.addVarToContext(varName, localVariable.getType(), new Predicate(), e);
+            context.addVarToContext(varName, localVariable.getType(), new Predicate(), new LogElement(e));
 
             try {
                 checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable,
@@ -177,11 +182,11 @@ public class RefinementTypeChecker extends TypeChecker {
             } else {
                 c = Predicate.createEquals(Predicate.createVar(name), c);
             }
-            context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, exp);
+            context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, new LogElement(exp));
             Predicate ep;
             try {
                 ep = Predicate.createEquals(
-                        BuiltinFunctionPredicate.builtin_length(WILD_VAR, newArray, getErrorEmitter()),
+                        BuiltinFunctionPredicate.builtin_length(WILD_VAR, new LogElement(newArray), getErrorEmitter()),
                         Predicate.createVar(name));
             } catch (ParsingException e) {
                 return; // error already in ErrorEmitter
@@ -249,7 +254,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
         super.visitCtArrayRead(arrayRead);
         String name = String.format(instanceFormat, "arrayAccess", context.getCounter());
-        context.addVarToContext(name, arrayRead.getType(), new Predicate(), arrayRead);
+        context.addVarToContext(name, arrayRead.getType(), new Predicate(), new LogElement(arrayRead));
         arrayRead.putMetadata(REFINE_KEY, Predicate.createVar(name));
         // TODO predicate for now is always TRUE
     }
@@ -295,7 +300,7 @@ public class RefinementTypeChecker extends TypeChecker {
         if (c.isPresent()) {
             ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
         }
-        RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, f);
+        RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, new LogElement(f));
         if (v instanceof Variable) {
             ((Variable) v).setLocation("this");
         }
@@ -326,8 +331,9 @@ public class RefinementTypeChecker extends TypeChecker {
         } else if (fieldRead.getVariable().getSimpleName().equals("length")) {
             String targetName = fieldRead.getTarget().toString();
             try {
-                fieldRead.putMetadata(REFINE_KEY, Predicate.createEquals(Predicate.createVar(WILD_VAR),
-                        BuiltinFunctionPredicate.builtin_length(targetName, fieldRead, getErrorEmitter())));
+                fieldRead.putMetadata(REFINE_KEY,
+                        Predicate.createEquals(Predicate.createVar(WILD_VAR), BuiltinFunctionPredicate
+                                .builtin_length(targetName, new LogElement(fieldRead), getErrorEmitter())));
             } catch (ParsingException e) {
                 return; // error already in ErrorEmitter
             }
@@ -425,7 +431,7 @@ public class RefinementTypeChecker extends TypeChecker {
         }
 
         RefinedVariable freshRV = context.addInstanceToContext(freshVarName, factory.Type().INTEGER_PRIMITIVE, expRefs,
-                exp);
+                new LogElement(exp));
         vcChecker.addPathVariable(freshRV);
 
         context.variablesNewIfCombination();
@@ -467,7 +473,7 @@ public class RefinementTypeChecker extends TypeChecker {
         BuiltinFunctionPredicate fp;
         try {
             fp = BuiltinFunctionPredicate.builtin_addToIndex(arrayWrite.getTarget().toString(), index.toString(),
-                    WILD_VAR, arrayWrite, getErrorEmitter());
+                    WILD_VAR, new LogElement(arrayWrite), getErrorEmitter());
         } catch (ParsingException e) {
             return; // error already in ErrorEmitter
         }
@@ -547,7 +553,7 @@ public class RefinementTypeChecker extends TypeChecker {
             return getRefinement(op);
         } else if (element instanceof CtLiteral<?>) {
             CtLiteral<?> l = (CtLiteral<?>) element;
-            return new Predicate(l.getValue().toString(), l, errorEmitter);
+            return new Predicate(l.getValue().toString(), new LogElement(l), errorEmitter);
         } else if (element instanceof CtInvocation<?>) {
             CtInvocation<?> inv = (CtInvocation<?>) element;
             visitCtInvocation(inv);

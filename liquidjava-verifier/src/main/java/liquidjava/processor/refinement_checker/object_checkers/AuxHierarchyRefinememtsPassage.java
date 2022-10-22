@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import liquidjava.logging.LogElement;
 import liquidjava.processor.context.ObjectState;
 import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
@@ -39,10 +41,12 @@ public class AuxHierarchyRefinememtsPassage {
 
     static void transferRefinements(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method,
             TypeChecker tc) {
+        List<LogElement> logParams = method.getParameters().stream().map(LogElement::new).collect(Collectors.toList());
+        LogElement logMethod = new LogElement(method);
         HashMap<String, String> super2function = getParametersMap(superFunction, function, tc, method);
-        transferReturnRefinement(superFunction, function, method, tc, super2function);
-        transferArgumentsRefinements(superFunction, function, method, tc, super2function);
-        transferStateRefinements(superFunction, function, method, tc);
+        transferReturnRefinement(superFunction, function, logMethod, tc, super2function);
+        transferArgumentsRefinements(superFunction, function, logMethod, logParams, tc, super2function);
+        transferStateRefinements(superFunction, function, logMethod, logParams, tc);
     }
 
     private static HashMap<String, String> getParametersMap(RefinedFunction superFunction, RefinedFunction function,
@@ -55,7 +59,7 @@ public class AuxHierarchyRefinememtsPassage {
             m.put(superArgs.get(i).getName(), newName);
             m.put(fArgs.get(i).getName(), newName);
             RefinedVariable rv = tc.getContext().addVarToContext(newName, superArgs.get(i).getType(), new Predicate(),
-                    method.getParameters().get(i));
+                    new LogElement(method.getParameters().get(i)));
             for (CtTypeReference<?> t : fArgs.get(i).getSuperTypes()) {
                 rv.addSuperType(t);
             }
@@ -63,11 +67,10 @@ public class AuxHierarchyRefinememtsPassage {
         return m;
     }
 
-    static void transferArgumentsRefinements(RefinedFunction superFunction, RefinedFunction function,
-            CtMethod<?> method, TypeChecker tc, HashMap<String, String> super2function) {
+    static void transferArgumentsRefinements(RefinedFunction superFunction, RefinedFunction function, LogElement method,
+            List<LogElement> params, TypeChecker tc, HashMap<String, String> super2function) {
         List<Variable> superArgs = superFunction.getArguments();
         List<Variable> args = function.getArguments();
-        List<CtParameter<?>> params = method.getParameters();
         for (int i = 0; i < args.size(); i++) {
             Variable arg = args.get(i);
             Variable superArg = superArgs.get(i);
@@ -79,7 +82,7 @@ public class AuxHierarchyRefinememtsPassage {
             if (argRef.isBooleanTrue()) {
                 arg.setRefinement(superArgRef.substituteVariable(newName, arg.getName()));
             } else {
-                boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i).getPosition());
+                boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i));
                 if (!f) {
                     // ErrorPrinter.printError(method, argRef, superArgRef);
                     if (!tc.getErrorEmitter().foundError())
@@ -89,7 +92,7 @@ public class AuxHierarchyRefinememtsPassage {
         }
     }
 
-    static void transferReturnRefinement(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method,
+    static void transferReturnRefinement(RefinedFunction superFunction, RefinedFunction function, LogElement method,
             TypeChecker tc, HashMap<String, String> super2function) {
         Predicate functionRef = function.getRefinement();
         Predicate superRef = superFunction.getRefinement();
@@ -128,7 +131,7 @@ public class AuxHierarchyRefinememtsPassage {
     }
 
     private static void transferStateRefinements(RefinedFunction superFunction, RefinedFunction subFunction,
-            CtMethod<?> method, TypeChecker tc) {
+            LogElement method, List<LogElement> params, TypeChecker tc) {
         if (superFunction.hasStateChange()) {
             if (!subFunction.hasStateChange()) {
                 for (ObjectState o : superFunction.getAllStates())
@@ -141,7 +144,7 @@ public class AuxHierarchyRefinememtsPassage {
                     ObjectState subState = subStates.get(i);
 
                     String thisName = String.format(tc.freshFormat, tc.getContext().getCounter());
-                    createVariableInContext(thisName, tc, subFunction, superFunction, method.getParameters().get(i));
+                    createVariableInContext(thisName, tc, subFunction, superFunction, params.get(i));
 
                     Predicate superConst = matchVariableNames(tc.THIS, thisName, superState.getFrom());
                     Predicate subConst = matchVariableNames(tc.THIS, thisName, superFunction, subFunction,
@@ -168,7 +171,7 @@ public class AuxHierarchyRefinememtsPassage {
     }
 
     private static void createVariableInContext(String thisName, TypeChecker tc, RefinedFunction subFunction,
-            RefinedFunction superFunction, CtParameter<?> ctParameter) {
+            RefinedFunction superFunction, LogElement ctParameter) {
         RefinedVariable rv = tc.getContext().addVarToContext(thisName,
                 Utils.getType(subFunction.getTargetClass(), tc.getFactory()), new Predicate(), ctParameter);
         rv.addSuperType(Utils.getType(superFunction.getTargetClass(), tc.getFactory())); // TODO: change: this only

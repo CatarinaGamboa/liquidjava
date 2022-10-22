@@ -4,6 +4,7 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 import liquidjava.errors.ErrorHandler;
+import liquidjava.logging.LogElement;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;
@@ -19,7 +20,8 @@ public class AuxStateHandler {
     // ########### Get State from StateRefinement declaration #############
 
     /**
-     * Handles the passage of the written state annotations to the context for Constructors
+     * Handles the passage of the written state annotations to the context for
+     * Constructors
      *
      * @param c
      * @param f
@@ -36,11 +38,11 @@ public class AuxStateHandler {
                 Map<String, CtExpression> m = a.getAllValues();
                 CtLiteral<String> from = (CtLiteral<String>) m.get("from");
                 if (from != null) {
-                    ErrorHandler.printErrorConstructorFromState(c, from, tc.getErrorEmitter());
+                    ErrorHandler.printErrorConstructorFromState(new LogElement(c), from, tc.getErrorEmitter());
                     return;
                 }
             }
-            setFunctionStates(f, an, tc, c); // f.setState(an, context.getGhosts(), c);
+            setFunctionStates(f, an, tc, new LogElement(c));// f.setState(an, context.getGhosts(), c);
         } else {
             setDefaultState(f, tc);
         }
@@ -87,7 +89,8 @@ public class AuxStateHandler {
     }
 
     /**
-     * Handles the passage of the written state annotations to the context for regular Methods
+     * Handles the passage of the written state annotations to the context for
+     * regular Methods
      *
      * @param method
      * @param f
@@ -99,7 +102,7 @@ public class AuxStateHandler {
             throws ParsingException {
         List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
         if (!an.isEmpty()) {
-            setFunctionStates(f, an, tc, method);
+            setFunctionStates(f, an, tc, new LogElement(method));
         }
         // f.setState(an, context.getGhosts(), method);
 
@@ -116,7 +119,7 @@ public class AuxStateHandler {
      * @throws ParsingException
      */
     private static void setFunctionStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
-            TypeChecker tc, CtElement element) throws ParsingException {
+            TypeChecker tc, LogElement element) throws ParsingException {
         List<ObjectState> l = new ArrayList<>();
         for (CtAnnotation<? extends Annotation> an : anns) {
             l.add(getStates(an, f, tc, element));
@@ -126,7 +129,7 @@ public class AuxStateHandler {
 
     @SuppressWarnings({ "rawtypes" })
     private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, RefinedFunction f,
-            TypeChecker tc, CtElement e) throws ParsingException {
+            TypeChecker tc, LogElement e) throws ParsingException {
         Map<String, CtExpression> m = ctAnnotation.getAllValues();
         String from = TypeCheckingUtils.getStringFromAnnotation(m.get("from"));
         String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
@@ -151,8 +154,8 @@ public class AuxStateHandler {
         return state;
     }
 
-    private static Predicate createStatePredicate(String value, /* RefinedFunction f */
-            String targetClass, TypeChecker tc, CtElement e, boolean isTo) throws ParsingException {
+    private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
+            TypeChecker tc, LogElement e, boolean isTo) throws ParsingException {
         Predicate p = new Predicate(value, e, tc.getErrorEmitter());
         String t = targetClass; // f.getTargetClass();
         CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
@@ -166,7 +169,7 @@ public class AuxStateHandler {
         Predicate c1 = isTo ? getMissingStates(t, tc, p) : p;
         Predicate c = c1.substituteVariable(tc.THIS, name);
         c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
-        boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e.getPosition());
+        boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e);
         if (b && !tc.getErrorEmitter().foundError()) {
             tc.createSameStateError(e, p, t);
         }
@@ -190,7 +193,8 @@ public class AuxStateHandler {
     }
 
     /**
-     * Create predicate with the equalities with previous versions of the object e.g., ghostfunction1(this) ==
+     * Create predicate with the equalities with previous versions of the object
+     * e.g., ghostfunction1(this) ==
      * ghostfunction1(old(this))
      *
      * @param p
@@ -239,7 +243,8 @@ public class AuxStateHandler {
     }
 
     /**
-     * If an expression has a state in metadata, then its state is passed to the last instance of the variable with
+     * If an expression has a state in metadata, then its state is passed to the
+     * last instance of the variable with
      * varName
      *
      * @param tc
@@ -311,17 +316,20 @@ public class AuxStateHandler {
                 .substituteVariable(parentTargetName, instanceName);
 
         // StateRefinement(from="true", to="n(this)=this#n")
-        // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
+        // ObjectState stateChange =
+
+        LogElement codePlace = new LogElement(fw); // used for logging
 
         ObjectState stateChange = new ObjectState();
         try {
-            Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false);
-            Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true);
+            Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, codePlace,
+                    false);
+            Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, codePlace, true);
             stateChange.setFrom(fromPredicate);
             stateChange.setTo(toPredicate);
         } catch (ParsingException e) {
             ErrorHandler
-                    .printCostumeError(fw,
+                    .printCostumeError(codePlace,
                             "ParsingException while constructing assignment update for `" + fw + "` in class `"
                                     + fw.getVariable().getDeclaringType() + "` : " + e.getMessage(),
                             tc.getErrorEmitter());
@@ -333,10 +341,10 @@ public class AuxStateHandler {
         Predicate expectState = stateChange.getFrom().substituteVariable(tc.THIS, instanceName)
                 .changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
 
-        if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) { // Invalid field transition
+        if (!tc.checksStateSMT(prevState, expectState, codePlace)) {// Invalid field transition
             if (!tc.getErrorEmitter().foundError()) { // No errors in errorEmitter
                 String states = stateChange.getFrom().toString();
-                tc.createStateMismatchError(fw, fw.toString(), prevState, states);
+                tc.createStateMismatchError(codePlace, fw.toString(), prevState, states);
             }
             return;
         }
@@ -349,7 +357,7 @@ public class AuxStateHandler {
         // update of stata of new instance of this#n#(whatever it was + 1)
 
         VariableInstance vi2 = (VariableInstance) tc.getContext().addInstanceToContext(newInstanceName, vi.getType(),
-                vi.getRefinement(), fw);
+                vi.getRefinement(), codePlace);
         vi2.setRefinement(transitionedState);
 
         RefinedVariable rv = tc.getContext().getVariableByName(parentTargetName);
@@ -408,7 +416,7 @@ public class AuxStateHandler {
             }
             expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
 
-            found = tc.checksStateSMT(prevCheck, expectState, invocation.getPosition());
+            found = tc.checksStateSMT(prevCheck, expectState, new LogElement(invocation));
             if (found && stateChange.hasTo()) {
                 String newInstanceName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
                 Predicate transitionedState = stateChange.getTo().substituteVariable(tc.WILD_VAR, newInstanceName)
@@ -427,7 +435,7 @@ public class AuxStateHandler {
                     .map(Predicate::toString).collect(Collectors.joining(","));
 
             String simpleInvocation = invocation.toString(); // .getExecutable().toString();
-            tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
+            tc.createStateMismatchError(new LogElement(invocation), simpleInvocation, prevState, states);
             // ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState,
             // states);
         }
@@ -481,7 +489,7 @@ public class AuxStateHandler {
     private static String addInstanceWithState(TypeChecker tc, String superName, String name2,
             VariableInstance prevInstance, Predicate transitionedState, CtElement invocation) {
         VariableInstance vi2 = (VariableInstance) tc.getContext().addInstanceToContext(name2, prevInstance.getType(),
-                prevInstance.getRefinement(), invocation);
+                prevInstance.getRefinement(), new LogElement(invocation));
         // vi2.setState(transitionedState);
         vi2.setRefinement(transitionedState);
         RefinedVariable rv = tc.getContext().getVariableByName(superName);
@@ -503,7 +511,8 @@ public class AuxStateHandler {
     }
 
     /**
-     * Gets the name of the parent target and adds the closest target to the elem TARGET metadata
+     * Gets the name of the parent target and adds the closest target to the elem
+     * TARGET metadata
      *
      * @param invocation
      * 
@@ -522,7 +531,7 @@ public class AuxStateHandler {
                 RefinedVariable var = tc.getContext().getVariableByName(name);
                 String nName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
                 RefinedVariable rv = tc.getContext().addInstanceToContext(nName, var.getType(),
-                        var.getRefinement().substituteVariable(name, nName), target2);
+                        var.getRefinement().substituteVariable(name, nName), new LogElement(target2));
                 tc.getContext().addRefinementInstanceToVariable(name, nName);
                 invocation.putMetadata(tc.TARGET_KEY, rv);
             }
