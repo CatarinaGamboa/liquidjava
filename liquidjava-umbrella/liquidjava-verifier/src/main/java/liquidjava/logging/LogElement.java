@@ -2,6 +2,7 @@ package liquidjava.logging;
 
 import liquidjava.processor.context.PlacementInCode;
 import spoon.reflect.code.CtComment;
+import spoon.reflect.code.CtInvocation;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtElement;
@@ -13,10 +14,8 @@ import spoon.reflect.visitor.Filter;
 
 import java.lang.annotation.Annotation;
 import java.lang.annotation.ElementType;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class LogElement {
@@ -168,5 +167,11 @@ public class LogElement {
 
     public String toString() {
         return elem.toString();
+    }
+
+    public Optional<String> inspectInvocation(Function<CtInvocation<?>, String> insperctor){
+        return elem instanceof CtInvocation<?> ?
+            Optional.of(insperctor.apply((CtInvocation<?>) elem)) :
+            Optional.empty();
     }
 }

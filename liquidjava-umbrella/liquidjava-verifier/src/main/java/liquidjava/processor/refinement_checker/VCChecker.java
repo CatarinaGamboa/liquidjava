@@ -300,17 +300,14 @@ public class VCChecker {
 
     private void printError(Exception e, Predicate premisesBeforeChange, Predicate expectedType, LogElement element,
             HashMap<String, PlacementInCode> map) {
-        String s = null;
-        if (element instanceof CtInvocation) {
-            CtInvocation<?> ci = (CtInvocation<?>) element;
+        String s = element.inspectInvocation( ci -> {
             String totalS = ci.getExecutable().toString();
             if (ci.getTarget() != null) {
                 int targetL = ci.getTarget().toString().length();
                 totalS = ci.toString().substring(targetL + 1);
             }
-            s = "Method invocation " + totalS + " in:";
-            System.out.println();
-        }
+            return "Method invocation " + totalS + " in:";
+        }).orElse(null);
 
         Predicate etMessageReady = expectedType;// substituteByMap(expectedType, map);
         Predicate cSMTMessageReady = premisesBeforeChange;// substituteByMap(premisesBeforeChange, map);
