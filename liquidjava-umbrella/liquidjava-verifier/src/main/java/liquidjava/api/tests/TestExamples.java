@@ -14,10 +14,10 @@ public class TestExamples extends TestAbstract {
     // testWrong(testPath + "ErrorMethodInvocation.java");
     // }
 
-    @Test
-    public void internalFieldUpdate() {
-        testCorrect(testPath + "field_updates/InternalFieldUpdate.java");
-    }
+    // @Test
+    // public void internalFieldUpdate() {
+    // testCorrect(testPath + "field_updates/InternalFieldUpdate.java");
+    // }
 
     // @Test
     // public void wrongInternalFieldUpdate() {
