@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import liquidjava.logging.LogElement;
 import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
 import liquidjava.processor.context.Variable;
@@ -109,7 +110,7 @@ public class OperationsChecker {
         if (ex instanceof CtVariableWrite) {
             CtVariableWrite<T> w = (CtVariableWrite<T>) ex;
             name = w.getVariable().getSimpleName();
-            all = getRefinementUnaryVariableWrite(ex, operator, w, name);
+            all = getRefinementUnaryVariableWrite(new LogElement(ex), operator, w, name);
             rtc.checkVariableRefinements(all, name, w.getType(), operator, w.getVariable().getDeclaration());
             return;
 
@@ -124,7 +125,7 @@ public class OperationsChecker {
                     CtVariableWrite<T> w = (CtVariableWrite<T>) assign.getAssigned();
                     String parentName = w.getVariable().getSimpleName();
                     if (name.equals(parentName)) {
-                        all = getRefinementUnaryVariableWrite(ex, operator, w, name);
+                        all = getRefinementUnaryVariableWrite(new LogElement(ex), operator, w, name);
                         operator.putMetadata(rtc.REFINE_KEY, all);
                         return;
                     }
@@ -142,7 +143,7 @@ public class OperationsChecker {
             newName = String.format(name, rtc.getContext().getCounter());
         Predicate newMeta = metadata.substituteVariable(rtc.WILD_VAR, newName);
 
-        Predicate unOp = getOperatorFromKind(operator.getKind(), operator);
+        Predicate unOp = getOperatorFromKind(operator.getKind(), new LogElement(operator));
         CtElement p = operator.getParent();
         Predicate opS = unOp.substituteVariable(rtc.WILD_VAR, newName);
 
@@ -151,7 +152,7 @@ public class OperationsChecker {
         else
             all = Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), opS);// TODO SEE IF () IN OPS IS NEEDED
 
-        rtc.getContext().addInstanceToContext(newName, ex.getType(), newMeta, operator);
+        rtc.getContext().addInstanceToContext(newName, ex.getType(), newMeta, new LogElement(operator));
         operator.putMetadata(rtc.REFINE_KEY, all);
 
     }
@@ -188,12 +189,14 @@ public class OperationsChecker {
      */
     private Predicate getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWrite<?> parentVar,
             CtExpression<?> element) throws ParsingException {
+        LogElement elementForLogging = new LogElement(element);
+
         if (element instanceof CtFieldRead<?>) {
             CtFieldRead<?> field = ((CtFieldRead<?>) element);
             if (field.getVariable().getSimpleName().equals("length")) {
                 String name = String.format(rtc.freshFormat, rtc.getContext().getCounter());
                 rtc.getContext().addVarToContext(name, element.getType(),
-                        rtc.getRefinement(element).substituteVariable(rtc.WILD_VAR, name), field);
+                        rtc.getRefinement(element).substituteVariable(rtc.WILD_VAR, name), new LogElement(field));
                 return Predicate.createVar(name);
             }
         }
@@ -201,6 +204,7 @@ public class OperationsChecker {
         if (element instanceof CtVariableRead<?>) {
             CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
             String elemName = elemVar.getVariable().getSimpleName();
+            LogElement elemVarForLogging = new LogElement(elemVar);
             if (elemVar instanceof CtFieldRead)
                 elemName = String.format(rtc.thisFormat, elemName);
             Predicate elem_ref = rtc.getContext().getVariableRefinements(elemName);
@@ -215,13 +219,13 @@ public class OperationsChecker {
                 Predicate newElem_ref = elem_ref.substituteVariable(rtc.WILD_VAR, newName);
                 // String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
                 RefinedVariable newVi = rtc.getContext().addVarToContext(newName, elemVar.getType(), newElem_ref,
-                        elemVar);
+                        elemVarForLogging);
                 rtc.getContext().addSpecificVariable(newVi);
                 returnName = newName;
             }
 
             Predicate e = elem_ref.substituteVariable(rtc.WILD_VAR, elemName);
-            rtc.getContext().addVarToContext(elemName, elemVar.getType(), e, elemVar);
+            rtc.getContext().addVarToContext(elemName, elemVar.getType(), e, elemVarForLogging);
             return Predicate.createVar(returnName);
         }
 
@@ -237,11 +241,11 @@ public class OperationsChecker {
             Predicate a = (Predicate) element.getMetadata(rtc.REFINE_KEY);
             a = a.substituteVariable(rtc.WILD_VAR, "");
             String s = a.toString().replace("(", "").replace(")", "").replace("==", "").replace(" ", "");// TODO IMPROVE
-            return new Predicate(String.format("(%s)", s), element, rtc.getErrorEmitter());
+            return new Predicate(String.format("(%s)", s), elementForLogging, rtc.getErrorEmitter());
 
         } else if (element instanceof CtLiteral<?>) {
             CtLiteral<?> l = (CtLiteral<?>) element;
-            return new Predicate(l.getValue().toString(), element, rtc.getErrorEmitter());
+            return new Predicate(l.getValue().toString(), elementForLogging, rtc.getErrorEmitter());
 
         } else if (element instanceof CtInvocation<?>) {
             CtInvocation<?> inv = (CtInvocation<?>) element;
@@ -253,13 +257,14 @@ public class OperationsChecker {
             // Get function refinements with non_used variables
             String met = ((CtClass<?>) method.getParent()).getQualifiedName();// TODO check
             RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(), met);
-            Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv);// TODO REVER!!
+            Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), elementForLogging);// TODO REVER!!
             // Substitute _ by the variable that we send
             String newName = String.format(rtc.freshFormat, rtc.getContext().getCounter());
 
             innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
-            rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
-            return new Predicate(newName, inv, rtc.getErrorEmitter());// Return variable that represents the invocation
+            rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, elementForLogging);
+            return new Predicate(newName, elementForLogging, rtc.getErrorEmitter());// Return variable that represents
+                                                                                    // the invocation
         }
         return rtc.getRefinement(element);
         // TODO Maybe add cases
@@ -269,6 +274,7 @@ public class OperationsChecker {
             throws ParsingException {
 
         CtExpression<?> t = inv.getTarget();
+        LogElement logging = new LogElement(inv);
         if (t instanceof CtVariableRead) {
             CtVariableReference<?> v = ((CtVariableRead<?>) t).getVariable();
             String c = v.getType().toString();
@@ -279,7 +285,7 @@ public class OperationsChecker {
             String typeNotParametrized = (i > 0) ? c.substring(0, i) : c;
             String methodInClassName = typeNotParametrized + "." + simpleName;
             RefinedFunction fi = rtc.getContext().getFunction(methodInClassName, typeNotParametrized);
-            Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv);// TODO REVER!!
+            Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), logging);// TODO REVER!!
 
             // Substitute _ by the variable that we send
             String newName = String.format(rtc.freshFormat, rtc.getContext().getCounter());
@@ -292,8 +298,9 @@ public class OperationsChecker {
                     innerRefs = innerRefs.substituteVariable(rtc.THIS, ovi.get().getName());
             }
 
-            rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
-            return new Predicate(newName, inv, rtc.getErrorEmitter());// Return variable that represents the invocation
+            rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, logging);
+            return new Predicate(newName, logging, rtc.getErrorEmitter());// Return variable that represents the
+                                                                          // invocation
 
         }
         return new Predicate();
@@ -313,7 +320,7 @@ public class OperationsChecker {
      *
      * @throws ParsingException
      */
-    private <T> Predicate getRefinementUnaryVariableWrite(CtExpression<T> ex, CtUnaryOperator<T> operator,
+    private <T> Predicate getRefinementUnaryVariableWrite(LogElement ex, CtUnaryOperator<T> operator,
             CtVariableWrite<T> w, String name) throws ParsingException {
         String newName = String.format(rtc.instanceFormat, name, rtc.getContext().getCounter());
         CtVariable<T> varDecl = w.getVariable().getDeclaration();
@@ -324,7 +331,7 @@ public class OperationsChecker {
 
         Predicate c = getOperatorFromKind(operator.getKind(), ex).substituteVariable(rtc.WILD_VAR, newName);
 
-        rtc.getContext().addVarToContext(newName, w.getType(), metadada, w);
+        rtc.getContext().addVarToContext(newName, w.getType(), metadada, new LogElement(w));
         return Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), c);
     }
 
@@ -373,7 +380,7 @@ public class OperationsChecker {
         }
     }
 
-    private Predicate getOperatorFromKind(UnaryOperatorKind kind, CtElement elem) throws ParsingException {
+    private Predicate getOperatorFromKind(UnaryOperatorKind kind, LogElement elem) throws ParsingException {
         String ret = null;
         switch (kind) {
 

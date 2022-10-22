@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
+import liquidjava.logging.LogElement;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.facade.GhostDTO;
@@ -99,8 +100,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
 
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function" + e.getMessage(),
-                    errorEmitter);
+            ErrorHandler.printCostumeError(new LogElement(element),
+                    "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
             // e.printStackTrace();
         }
     }
