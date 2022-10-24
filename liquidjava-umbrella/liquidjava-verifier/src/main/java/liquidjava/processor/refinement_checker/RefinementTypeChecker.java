@@ -235,21 +235,16 @@ public class RefinementTypeChecker extends TypeChecker {
             checkAssignment(updatedVarName, cr.getType(), ex, assignement.getAssignment(), assignement, f);
 
             // corresponding ghost function update
-            try {
+            if (fw.getVariable().getType().toString().equals("int")) {
                 AuxStateHandler.updateGhostField(fw, this);
-            } catch (ParsingException e) {
-                ErrorHandler.printCostumeError(assignement, "ParsingException in `" + assignement + "` in class `"
-                        + f.getDeclaringType() + "` : " + e.getMessage(), errorEmitter);
-
-                return;
             }
 
         }
-        if (ex instanceof CtArrayWrite) {
-            // Predicate c = getRefinement(ex);
-            // TODO continue
-            // c.substituteVariable(WILD_VAR, );
-        }
+        // if (ex instanceof CtArrayWrite) {
+        // Predicate c = getRefinement(ex);
+        // TODO continue
+        // c.substituteVariable(WILD_VAR, );
+        // }
     }
 
     @Override

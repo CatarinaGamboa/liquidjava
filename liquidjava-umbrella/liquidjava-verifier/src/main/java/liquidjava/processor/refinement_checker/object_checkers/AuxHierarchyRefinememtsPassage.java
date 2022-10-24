@@ -83,7 +83,7 @@ public class AuxHierarchyRefinememtsPassage {
                 System.out.println(arg.getName() + " has ref boolean true");
                 arg.setRefinement(superArgRef.substituteVariable(newName, arg.getName()));
             } else {
-                boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i));
+                boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i).getPosition());
                 if (!f) {
                     // ErrorPrinter.printError(method, argRef, superArgRef);
                     if (!tc.getErrorEmitter().foundError())
