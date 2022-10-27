@@ -1,5 +1,12 @@
 # Notes on integraing cvc5 to Liquid Java:
 
+## Overview
+
+One need to clone and build cvc5 somewhere in the system. I did it using [official guide](https://cvc5.github.io/docs/cvc5-1.0.0/installation/installation.html).
+Then use absolute path to jar file in `liquidjava-umbrella/liquidjava-verifier/pom.xml`. It is not the best way, but it is easy to do and reproduce. So it will do for now.
+
+
+
 ## Path variables
 
 Error looked like this:
