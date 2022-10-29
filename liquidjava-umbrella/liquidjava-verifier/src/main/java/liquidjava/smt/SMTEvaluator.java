@@ -2,12 +2,14 @@ package liquidjava.smt;
 
 import com.martiansoftware.jsap.SyntaxException;
 import com.microsoft.z3.Expr;
-import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
 import liquidjava.processor.context.Context;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.Expression;
+import liquidjava.smt.solver_wrapper.ExprWrapper;
+import liquidjava.smt.solver_wrapper.SMTWrapper;
+import liquidjava.smt.solver_wrapper.Status;
 
 public class SMTEvaluator {
 
@@ -21,9 +23,9 @@ public class SMTEvaluator {
 
         try {
             Expression exp = toVerify.getExpression();
-            TranslatorToZ3 tz3 = new TranslatorToZ3(c);
+            SMTWrapper tz3 = SMTWrapper.getZ3(c);
             // com.microsoft.z3.Expr
-            Expr<?> e = exp.eval(tz3);
+            ExprWrapper e = exp.eval(tz3);
             Status s = tz3.verifyExpression(e);
             if (s.equals(Status.SATISFIABLE)) {
                 System.out.println("result of SMT: Not Ok!");
