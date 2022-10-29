@@ -18,6 +18,7 @@ public class CommandLineLauncher {
         String file = args.length == 0 ? allPath : args[0];
         ErrorEmitter ee = launch(file);
         if (ee.foundError()) {
+            System.out.println("Found errors. Analysis failed!");
             System.out.println(ee.getFullMessage());
             System.exit(ee.getErrorStatus());
         } else {
@@ -65,7 +66,7 @@ public class CommandLineLauncher {
             processingManager.process(v);
         // To search all previous packages
         // processingManager.process(factory.Package().getRootPackage());
-
+        System.out.println("after process");
         return ee;
 
     }

@@ -1,32 +1,23 @@
 package liquidjava.smt;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
-import com.martiansoftware.jsap.SyntaxException;
-import com.microsoft.z3.ArithExpr;
-import com.microsoft.z3.ArrayExpr;
-import com.microsoft.z3.BoolExpr;
-import com.microsoft.z3.Expr;
-import com.microsoft.z3.FPExpr;
-import com.microsoft.z3.FuncDecl;
-import com.microsoft.z3.IntExpr;
-import com.microsoft.z3.IntNum;
-import com.microsoft.z3.RealExpr;
-import com.microsoft.z3.Solver;
-import com.microsoft.z3.Sort;
-import com.microsoft.z3.Status;
+import com.microsoft.z3.*;
 
 import liquidjava.processor.context.AliasWrapper;
+import liquidjava.processor.context.GhostFunction;
+import liquidjava.processor.context.GhostState;
+import liquidjava.processor.context.RefinedVariable;
+import liquidjava.smt.solver_wrapper.smt;
+import spoon.reflect.reference.CtTypeReference;
 
-public class TranslatorToZ3 {
+public class TranslatorToZ3 extends smt {
 
-    private com.microsoft.z3.Context z3 = new com.microsoft.z3.Context();
-    private Map<String, Expr<?>> varTranslation = new HashMap<>();
-    private Map<String, List<Expr<?>>> varSuperTypes = new HashMap<>();
-    private Map<String, AliasWrapper> aliasTranslation = new HashMap<>();
-    private Map<String, FuncDecl<?>> funcTranslation = new HashMap<>();
+    private final com.microsoft.z3.Context z3 = new com.microsoft.z3.Context();
 
     public TranslatorToZ3(liquidjava.processor.context.Context c) {
         TranslatorContextToZ3.translateVariables(z3, c.getContext(), varTranslation);
@@ -73,21 +64,6 @@ public class TranslatorToZ3 {
         return z3.mkBool(value);
     }
 
-    private Expr<?> getVariableTranslation(String name) throws Exception {
-        if (!varTranslation.containsKey(name))
-            throw new NotFoundError("Variable '" + name.toString() + "' not found");
-        Expr<?> e = varTranslation.get(name);
-        if (e == null)
-            e = varTranslation.get(String.format("this#%s", name));
-        if (e == null)
-            throw new SyntaxException("Unknown variable:" + name);
-        return e;
-    }
-
-    public Expr<?> makeVariable(String name) throws Exception {
-        return getVariableTranslation(name);// int[] not in varTranslation
-    }
-
     public Expr<?> makeFunctionInvocation(String name, Expr<?>[] params) throws Exception {
         if (name.equals("addToIndex"))
             return makeStore(name, params);
@@ -117,14 +93,14 @@ public class TranslatorToZ3 {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Expr<?> makeSelect(String name, Expr<?>[] params) {
+    public Expr<?> makeSelect(String name, Expr<?>[] params) {
         if (params.length == 2 && params[0] instanceof ArrayExpr)
             return z3.mkSelect((ArrayExpr) params[0], params[1]);
         return null;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Expr<?> makeStore(String name, Expr<?>[] params) {
+    public Expr<?> makeStore(String name, Expr<?>[] params) {
         if (params.length == 3 && params[0] instanceof ArrayExpr)
             return z3.mkStore((ArrayExpr) params[0], params[1], params[2]);
         return null;
@@ -243,7 +219,7 @@ public class TranslatorToZ3 {
         return z3.mkMod((IntExpr) eval, (IntExpr) eval2);
     }
 
-    private FPExpr toFP(Expr<?> e) {
+    public FPExpr toFP(Expr<?> e) {
         FPExpr f;
         if (e instanceof FPExpr) {
             f = (FPExpr) e;
@@ -270,3 +246,125 @@ public class TranslatorToZ3 {
     }
 
 }
+
+class TranslatorContextToZ3 {
+
+    static void translateVariables(Context z3, Map<String, CtTypeReference<?>> ctx,
+                                   Map<String, Expr<?>> varTranslation) {
+
+        for (String name : ctx.keySet())
+            varTranslation.put(name, getExpr(z3, name, ctx.get(name)));
+
+        varTranslation.put("true", z3.mkBool(true));
+        varTranslation.put("false", z3.mkBool(false));
+
+    }
+
+    public static void storeVariablesSubtypes(Context z3, List<RefinedVariable> variables,
+                                              Map<String, List<Expr<?>>> varSuperTypes) {
+        for (RefinedVariable v : variables) {
+            if (!v.getSuperTypes().isEmpty()) {
+                ArrayList<Expr<?>> a = new ArrayList<>();
+                for (CtTypeReference<?> ctr : v.getSuperTypes())
+                    a.add(getExpr(z3, v.getName(), ctr));
+                varSuperTypes.put(v.getName(), a);
+            }
+        }
+
+    }
+
+    private static Expr<?> getExpr(Context z3, String name, CtTypeReference<?> type) {
+        String typeName = type.getQualifiedName();
+        if (typeName.contentEquals("int"))
+            return z3.mkIntConst(name);
+        else if (typeName.contentEquals("short"))
+            return z3.mkIntConst(name);
+        else if (typeName.contentEquals("boolean"))
+            return z3.mkBoolConst(name);
+        else if (typeName.contentEquals("long"))
+            return z3.mkRealConst(name);
+        else if (typeName.contentEquals("float")) {
+            return (FPExpr) z3.mkConst(name, z3.mkFPSort64());
+        } else if (typeName.contentEquals("double")) {
+            return (FPExpr) z3.mkConst(name, z3.mkFPSort64());
+        } else if (typeName.contentEquals("int[]")) {
+            return z3.mkArrayConst(name, z3.mkIntSort(), z3.mkIntSort());
+        } else {
+            Sort nSort = z3.mkUninterpretedSort(typeName);
+            return z3.mkConst(name, nSort);
+            // System.out.println("Add new type: "+typeName);
+        }
+
+    }
+
+    static void addAlias(Context z3, List<AliasWrapper> alias, Map<String, AliasWrapper> aliasTranslation) {
+        for (AliasWrapper a : alias) {
+            aliasTranslation.put(a.getName(), a);
+        }
+    }
+
+    public static void addGhostFunctions(Context z3, List<GhostFunction> ghosts,
+                                         Map<String, FuncDecl<?>> funcTranslation) {
+        addBuiltinFunctions(z3, funcTranslation);
+        if (!ghosts.isEmpty()) {
+            for (GhostFunction gh : ghosts) {
+                addGhostFunction(z3, gh, funcTranslation);
+            }
+        }
+    }
+
+    private static void addBuiltinFunctions(Context z3, Map<String, FuncDecl<?>> funcTranslation) {
+        funcTranslation.put("length", z3.mkFuncDecl("length", getSort(z3, "int[]"), getSort(z3, "int")));// ERRRRRRRRRRRRO!!!!!!!!!!!!!
+        System.out.println("\nWorks only for int[] now! Change in future. Ignore this message, it is a glorified todo");
+        // TODO add built-in function
+        Sort[] s = Stream.of(getSort(z3, "int[]"), getSort(z3, "int"), getSort(z3, "int")).toArray(Sort[]::new);
+        funcTranslation.put("addToIndex", z3.mkFuncDecl("addToIndex", s, getSort(z3, "void")));
+
+        s = Stream.of(getSort(z3, "int[]"), getSort(z3, "int")).toArray(Sort[]::new);
+        funcTranslation.put("getFromIndex", z3.mkFuncDecl("getFromIndex", s, getSort(z3, "int")));
+
+    }
+
+    static Sort getSort(Context z3, String sort) {
+        switch (sort) {
+            case "int":
+                return z3.getIntSort();
+            case "boolean":
+                return z3.getBoolSort();
+            case "long":
+                return z3.getRealSort();
+            case "float":
+                return z3.mkFPSort32();
+            case "double":
+                return z3.mkFPSortDouble();
+            case "int[]":
+                return z3.mkArraySort(z3.mkIntSort(), z3.mkIntSort());
+            case "String":
+                return z3.getStringSort();
+            case "void":
+                return z3.mkUninterpretedSort("void");
+            // case "List":return z3.mkListSort(name, elemSort)
+            default:
+                return z3.mkUninterpretedSort(sort);
+        }
+    }
+
+    public static void addGhostStates(Context z3, List<GhostState> ghostState,
+                                      Map<String, FuncDecl<?>> funcTranslation) {
+        for (GhostState g : ghostState) {
+            addGhostFunction(z3, g, funcTranslation);
+            // if(g.getRefinement() != null)
+            // premisesToAdd.add(g.getRefinement().getExpression());
+        }
+
+    }
+
+    private static void addGhostFunction(Context z3, GhostFunction gh, Map<String, FuncDecl<?>> funcTranslation) {
+        List<CtTypeReference<?>> paramTypes = gh.getParametersTypes();
+        Sort ret = getSort(z3, gh.getReturnType().toString());
+        Sort[] d = paramTypes.stream().map(t -> t.toString()).map(t -> getSort(z3, t)).toArray(Sort[]::new);
+        funcTranslation.put(gh.getName(), z3.mkFuncDecl(gh.getName(), d, ret));
+    }
+
+}
+
