@@ -6,7 +6,8 @@ import java.util.stream.Collectors;
 
 import com.microsoft.z3.Expr;
 
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.smt.solver_wrapper.ExprWrapper;
+import liquidjava.smt.solver_wrapper.SMTWrapper;
 
 public class FunctionInvocation extends Expression {
     String name;
@@ -31,8 +32,8 @@ public class FunctionInvocation extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        Expr<?>[] argsExpr = new Expr[getArgs().size()];
+    public ExprWrapper eval(SMTWrapper ctx) throws Exception {
+        ExprWrapper[] argsExpr = new ExprWrapper[getArgs().size()];
         for (int i = 0; i < argsExpr.length; i++) {
             argsExpr[i] = getArgs().get(i).eval(ctx);
         }
@@ -41,7 +42,7 @@ public class FunctionInvocation extends Expression {
 
     @Override
     public String toString() {
-        return name + "(" + getArgs().stream().map(p -> p.toString()).collect(Collectors.joining(",")) + ")";
+        return name + "(" + getArgs().stream().map(Expression::toString).collect(Collectors.joining(",")) + ")";
     }
 
     @Override

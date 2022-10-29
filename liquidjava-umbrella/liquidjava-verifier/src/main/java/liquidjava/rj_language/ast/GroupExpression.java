@@ -2,9 +2,8 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.smt.solver_wrapper.ExprWrapper;
+import liquidjava.smt.solver_wrapper.SMTWrapper;
 
 public class GroupExpression extends Expression {
 
@@ -17,7 +16,7 @@ public class GroupExpression extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
+    public ExprWrapper eval(SMTWrapper ctx) throws Exception {
         return getExpression().eval(ctx);
     }
 

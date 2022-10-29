@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.microsoft.z3.Expr;
-
 import liquidjava.processor.context.Context;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.ast.typing.TypeInfer;
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.smt.solver_wrapper.ExprWrapper;
+import liquidjava.smt.solver_wrapper.SMTWrapper;
 import spoon.reflect.factory.Factory;
 
 public abstract class Expression {
 
-    public abstract Expr<?> eval(TranslatorToZ3 ctx) throws Exception;
+    public abstract ExprWrapper eval(SMTWrapper ctx) throws Exception;
 
     public abstract void getVariableNames(List<String> toAdd);
 
@@ -78,8 +77,6 @@ public abstract class Expression {
     /**
      * Substitutes the function call with the given parameter to the expression e
      *
-     * @param s
-     * @param e
      */
     public void substituteFunction(String functionName, List<Expression> parameters, Expression sub) {
         if (hasChildren())

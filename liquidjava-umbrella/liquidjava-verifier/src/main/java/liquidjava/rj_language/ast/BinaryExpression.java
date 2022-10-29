@@ -6,7 +6,8 @@ import java.util.List;
 
 import com.microsoft.z3.Expr;
 
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.smt.solver_wrapper.ExprWrapper;
+import liquidjava.smt.solver_wrapper.SMTWrapper;
 
 public class BinaryExpression extends Expression {
 
@@ -44,13 +45,13 @@ public class BinaryExpression extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        Expr<?> ee1 = getFirstOperand().eval(ctx);
-        Expr<?> ee2 = getSecondOperand().eval(ctx);
+    public ExprWrapper eval(SMTWrapper ctx) throws Exception {
+        ExprWrapper ee1 = getFirstOperand().eval(ctx);
+        ExprWrapper ee2 = getSecondOperand().eval(ctx);
         return evalBinaryOp(ctx, ee1, ee2);
     }
 
-    private Expr<?> evalBinaryOp(TranslatorToZ3 ctx, Expr<?> e1, Expr<?> e2) {
+    private ExprWrapper evalBinaryOp(SMTWrapper ctx, ExprWrapper e1, ExprWrapper e2) {
         switch (op) {
         case "&&":
             return ctx.makeAnd(e1, e2);
