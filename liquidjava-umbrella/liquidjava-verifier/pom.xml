@@ -179,9 +179,7 @@
 		<dependency>
 			<groupId>io.github.cvc5</groupId>
 			<artifactId>cvc5</artifactId>
-			<version>1.0.0</version>
-			<scope>system</scope>
-			<systemPath>/Users/frogofjuly/GitReps/cvc5/build/install/share/java/cvc5.jar</systemPath>
+			<version>1.0</version>
 		</dependency>
 
 
