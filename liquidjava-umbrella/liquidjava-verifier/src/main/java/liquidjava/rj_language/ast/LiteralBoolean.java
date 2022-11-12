@@ -3,12 +3,13 @@ package liquidjava.rj_language.ast;
 import java.util.List;
 
 import liquidjava.rj_language.visitors.ExpressionVisitor;
-import liquidjava.smt.solver_wrapper.ExprWrapper;
-import liquidjava.smt.solver_wrapper.SMTWrapper;
 
 public class LiteralBoolean extends Expression {
-
     boolean value;
+
+    public boolean getValue() {
+        return value;
+    }
 
     public LiteralBoolean(boolean value) {
         this.value = value;
@@ -21,10 +22,6 @@ public class LiteralBoolean extends Expression {
     @Override
     public void accept(ExpressionVisitor v) {
         v.visitLiteralBoolean(this);
-    }
-
-    public ExprWrapper eval(SMTWrapper ctx) {
-        return ctx.makeBooleanLiteral(value);
     }
 
     public String toString() {

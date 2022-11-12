@@ -3,8 +3,6 @@ package liquidjava.rj_language.ast;
 import java.util.List;
 
 import liquidjava.rj_language.visitors.ExpressionVisitor;
-import liquidjava.smt.solver_wrapper.ExprWrapper;
-import liquidjava.smt.solver_wrapper.SMTWrapper;
 
 public class LiteralString extends Expression {
     private String value;
@@ -16,11 +14,6 @@ public class LiteralString extends Expression {
     @Override
     public void accept(ExpressionVisitor v) {
         v.visitLiteralString(this);
-    }
-
-    @Override
-    public ExprWrapper eval(SMTWrapper ctx) {
-        return ctx.makeString(value);
     }
 
     public String toString() {
@@ -74,4 +67,7 @@ public class LiteralString extends Expression {
         return true;
     }
 
+    public String getValue() {
+        return value;
+    }
 }

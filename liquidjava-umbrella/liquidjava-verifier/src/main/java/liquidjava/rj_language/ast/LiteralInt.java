@@ -3,12 +3,14 @@ package liquidjava.rj_language.ast;
 import java.util.List;
 
 import liquidjava.rj_language.visitors.ExpressionVisitor;
-import liquidjava.smt.solver_wrapper.ExprWrapper;
-import liquidjava.smt.solver_wrapper.SMTWrapper;
 
 public class LiteralInt extends Expression {
 
-    private int value;
+    private final int value;
+
+    public int getValue() {
+        return value;
+    }
 
     public LiteralInt(int v) {
         value = v;
@@ -21,11 +23,6 @@ public class LiteralInt extends Expression {
     @Override
     public void accept(ExpressionVisitor v) {
         v.visitLiteralInt(this);
-    }
-
-    @Override
-    public ExprWrapper eval(SMTWrapper ctx) {
-        return ctx.makeIntegerLiteral(value);
     }
 
     public String toString() {

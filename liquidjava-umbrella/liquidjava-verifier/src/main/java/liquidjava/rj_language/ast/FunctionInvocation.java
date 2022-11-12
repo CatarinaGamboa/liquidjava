@@ -4,11 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.microsoft.z3.Expr;
-
 import liquidjava.rj_language.visitors.ExpressionVisitor;
-import liquidjava.smt.solver_wrapper.ExprWrapper;
-import liquidjava.smt.solver_wrapper.SMTWrapper;
 
 public class FunctionInvocation extends Expression {
     String name;
@@ -33,17 +29,8 @@ public class FunctionInvocation extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {
+    public void accept(ExpressionVisitor v) throws Exception {
         v.visitFunctionInvocation(this);
-    }
-
-    @Override
-    public ExprWrapper eval(SMTWrapper ctx) throws Exception {
-        ExprWrapper[] argsExpr = new ExprWrapper[getArgs().size()];
-        for (int i = 0; i < argsExpr.length; i++) {
-            argsExpr[i] = getArgs().get(i).eval(ctx);
-        }
-        return ctx.makeFunctionInvocation(name, argsExpr);
     }
 
     @Override

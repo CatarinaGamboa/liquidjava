@@ -3,8 +3,6 @@ package liquidjava.rj_language.ast;
 import java.util.List;
 
 import liquidjava.rj_language.visitors.ExpressionVisitor;
-import liquidjava.smt.solver_wrapper.ExprWrapper;
-import liquidjava.smt.solver_wrapper.SMTWrapper;
 
 public class LiteralReal extends Expression {
 
@@ -21,11 +19,6 @@ public class LiteralReal extends Expression {
     @Override
     public void accept(ExpressionVisitor v) {
         v.visitLiteralReal(this);
-    }
-
-    @Override
-    public ExprWrapper eval(SMTWrapper ctx) {
-        return ctx.makeDoubleLiteral(value);
     }
 
     public String toString() {
@@ -76,5 +69,9 @@ public class LiteralReal extends Expression {
         if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value))
             return false;
         return true;
+    }
+
+    public double getValue() {
+        return value;
     }
 }
