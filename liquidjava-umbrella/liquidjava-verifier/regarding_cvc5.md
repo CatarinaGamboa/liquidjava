@@ -67,3 +67,24 @@ Then run building process for liquid java
 ## Symblos not found/loaded
 
 One should compile Liquid Java project with the same JVM as cvc5!
+
+## no cvc5jni in java.library.path
+
+One should add this flag to JVM, for it to find jni files.
+
+```
+-Djava.library.path="/Path/to/cvc5/repository/cvc5/build/src/api/java"
+```
+
+Hard part is that there are tests which are running under `maven-surefire-plugin`.
+Today's solution is not idiomatic, but a working one.
+
+The pom file need to be changed. Line 
+```xml
+<argLine>-Dgumtree.match.gt.minh=1></argLine>
+```
+to
+
+```xml
+<argLine>-Dgumtree.match.gt.minh=1 -Djava.library.path="/Path/to/cvc5/repository/cvc5/build/src/api/java"</argLine>
+```
