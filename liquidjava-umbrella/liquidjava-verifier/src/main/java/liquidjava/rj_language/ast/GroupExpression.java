@@ -18,7 +18,7 @@ public class GroupExpression extends Expression {
 
     @Override
     public void accept(ExpressionVisitor v) {
-        getExpression().accept(v);
+        v.visitGroupExpression(this);
     }
 
     @Override

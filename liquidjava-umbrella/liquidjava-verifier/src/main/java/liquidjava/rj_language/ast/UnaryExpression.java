@@ -24,7 +24,9 @@ public class UnaryExpression extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {}
+    public void accept(ExpressionVisitor v) {
+        v.visitUnaryExpression(this);
+    }
 
     @Override
     public ExprWrapper eval(SMTWrapper ctx) throws Exception {

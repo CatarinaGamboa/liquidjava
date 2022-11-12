@@ -19,7 +19,9 @@ public class LiteralBoolean extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {}
+    public void accept(ExpressionVisitor v) {
+        v.visitLiteralBoolean(this);
+    }
 
     public ExprWrapper eval(SMTWrapper ctx) {
         return ctx.makeBooleanLiteral(value);

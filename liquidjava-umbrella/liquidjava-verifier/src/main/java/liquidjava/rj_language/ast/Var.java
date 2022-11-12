@@ -19,7 +19,9 @@ public class Var extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {}
+    public void accept(ExpressionVisitor v) {
+        v.visitVar(this);
+    }
 
     @Override
     public ExprWrapper eval(SMTWrapper ctx) throws Exception {

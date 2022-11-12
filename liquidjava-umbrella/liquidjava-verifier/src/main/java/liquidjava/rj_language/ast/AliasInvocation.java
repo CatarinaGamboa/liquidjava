@@ -29,7 +29,7 @@ public class AliasInvocation extends Expression {
 
     @Override
     public void accept(ExpressionVisitor v) {
-        getArgs().forEach(a -> a.accept(v));
+        v.visitAliasInvocation(this);
     }
 
     @Override

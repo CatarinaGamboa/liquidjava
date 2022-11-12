@@ -14,7 +14,9 @@ public class LiteralString extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {}
+    public void accept(ExpressionVisitor v) {
+        v.visitLiteralString(this);
+    }
 
     @Override
     public ExprWrapper eval(SMTWrapper ctx) {

@@ -34,7 +34,7 @@ public class FunctionInvocation extends Expression {
 
     @Override
     public void accept(ExpressionVisitor v) {
-        getArgs().forEach(a -> a.accept(v));
+        v.visitFunctionInvocation(this);
     }
 
     @Override

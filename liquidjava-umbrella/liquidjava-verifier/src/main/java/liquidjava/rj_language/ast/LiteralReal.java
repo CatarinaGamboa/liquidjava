@@ -19,7 +19,9 @@ public class LiteralReal extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {}
+    public void accept(ExpressionVisitor v) {
+        v.visitLiteralReal(this);
+    }
 
     @Override
     public ExprWrapper eval(SMTWrapper ctx) {

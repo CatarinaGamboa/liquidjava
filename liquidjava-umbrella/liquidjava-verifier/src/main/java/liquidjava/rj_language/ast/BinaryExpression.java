@@ -47,8 +47,7 @@ public class BinaryExpression extends Expression {
 
     @Override
     public void accept(ExpressionVisitor v) {
-        getFirstOperand().accept(v);
-        getSecondOperand().accept(v);
+        v.visitBinaryExpression(this);
     }
 
     @Override

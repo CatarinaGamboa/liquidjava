@@ -19,7 +19,9 @@ public class LiteralInt extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {}
+    public void accept(ExpressionVisitor v) {
+        v.visitLiteralInt(this);
+    }
 
     @Override
     public ExprWrapper eval(SMTWrapper ctx) {

@@ -28,9 +28,7 @@ public class Ite extends Expression {
 
     @Override
     public void accept(ExpressionVisitor v) {
-        getCondition().accept(v);
-        getThen().accept(v);
-        getElse().accept(v);
+        v.visitITE(this);
     }
 
     @Override
