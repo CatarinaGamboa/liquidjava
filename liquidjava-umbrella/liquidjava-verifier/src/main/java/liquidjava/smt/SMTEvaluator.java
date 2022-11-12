@@ -4,6 +4,7 @@ import com.martiansoftware.jsap.SyntaxException;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Z3Exception;
 
+import io.github.cvc5.CVC5ApiException;
 import liquidjava.processor.context.Context;
 import liquidjava.rj_language.Predicate;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
@@ -20,8 +21,9 @@ public class SMTEvaluator {
         System.out.println("verification query: " + toVerify); // TODO remove
 
         try {
-            SMTWrapper z3 = SMTWrapper.getZ3(c);
-            Status s = z3.verifyExpression(toVerify.getExpression());
+            // SMTWrapper z3 = SMTWrapper.getZ3(c);
+            SMTWrapper cvc5 = SMTWrapper.getCVC5(c);
+            Status s = cvc5.verifyExpression(toVerify.getExpression());
             if (s.equals(Status.SATISFIABLE)) {
                 System.out.println("result of SMT: Not Ok!");
                 throw new TypeCheckError(subRef + " not a subtype of " + supRef);
@@ -37,6 +39,9 @@ public class SMTEvaluator {
                 throw new GhostFunctionError(e.getLocalizedMessage());
             else
                 throw new Z3Exception(e.getLocalizedMessage());
+        } catch (CVC5ApiException e) {
+            System.out.println("Api error!! " + e);
+            throw e;
         }
 
     }

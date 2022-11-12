@@ -61,20 +61,6 @@ public class Z3Translator extends AbstractExpressionVisitor {
         return getVariableTranslation(name);// int[] not in varTranslation
     }
 
-    public liquidjava.smt.solver_wrapper.Status verifyExpression(Expr<?> e) throws Exception {
-        Solver s = z3.mkSolver();
-        // s.add((BoolExpr) e.eval(this));
-        // for(Expression ex: premisesToAdd)
-        // s.add((BoolExpr) ex.eval(this));
-        s.add((BoolExpr) e);
-        com.microsoft.z3.Status st = s.check();
-        if (st.equals(com.microsoft.z3.Status.SATISFIABLE)) {
-            // Example of values
-            // System.out.println(s.getModel());
-        }
-        return liquidjava.smt.solver_wrapper.Status.fromZ3(st);
-    }
-
     private FPExpr toFP(Expr<?> e) {
         FPExpr f;
         if (e instanceof FPExpr) {

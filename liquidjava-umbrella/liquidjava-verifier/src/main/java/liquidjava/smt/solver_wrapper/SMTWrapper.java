@@ -1,5 +1,6 @@
 package liquidjava.smt.solver_wrapper;
 
+import io.github.cvc5.CVC5ApiException;
 import liquidjava.processor.context.Context;
 import liquidjava.rj_language.ast.Expression;
 
@@ -13,7 +14,7 @@ public interface SMTWrapper {
         return new Z3Wrapper(c);
     }
 
-    static SMTWrapper getCVC5(Context c) {
+    static SMTWrapper getCVC5(Context c) throws CVC5ApiException {
         return new CVC5Wrapper(c);
     }
 }
