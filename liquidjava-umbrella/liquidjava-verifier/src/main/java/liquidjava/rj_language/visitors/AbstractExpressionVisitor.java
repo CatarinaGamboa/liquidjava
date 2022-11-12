@@ -2,7 +2,7 @@ package liquidjava.rj_language.visitors;
 
 import liquidjava.rj_language.ast.*;
 
-public class AbstractExpressionVisitor implements ExpressionVisitor{
+public abstract class AbstractExpressionVisitor implements ExpressionVisitor{
     @Override
     public void visitAliasInvocation(AliasInvocation ai) {
         ai.getArgs().forEach(a -> a.accept(this));
