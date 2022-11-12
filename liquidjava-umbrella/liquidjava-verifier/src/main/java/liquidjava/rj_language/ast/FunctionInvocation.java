@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.microsoft.z3.Expr;
 
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 import liquidjava.smt.solver_wrapper.ExprWrapper;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
 
@@ -29,6 +30,11 @@ public class FunctionInvocation extends Expression {
     public void setChild(int index, Expression element) {
         super.setChild(index, element);
         getArgs().set(index, element);
+    }
+
+    @Override
+    public void accept(ExpressionVisitor v) {
+        getArgs().forEach(a -> a.accept(v));
     }
 
     @Override

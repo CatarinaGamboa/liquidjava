@@ -2,6 +2,7 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 import liquidjava.smt.solver_wrapper.ExprWrapper;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
 
@@ -23,6 +24,13 @@ public class Ite extends Expression {
 
     public Expression getElse() {
         return children.get(2);
+    }
+
+    @Override
+    public void accept(ExpressionVisitor v) {
+        getCondition().accept(v);
+        getThen().accept(v);
+        getElse().accept(v);
     }
 
     @Override

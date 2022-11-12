@@ -2,6 +2,7 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 import liquidjava.smt.solver_wrapper.ExprWrapper;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
 
@@ -16,6 +17,9 @@ public class LiteralBoolean extends Expression {
     public LiteralBoolean(String value) {
         this.value = Boolean.parseBoolean(value);
     }
+
+    @Override
+    public void accept(ExpressionVisitor v) {}
 
     public ExprWrapper eval(SMTWrapper ctx) {
         return ctx.makeBooleanLiteral(value);

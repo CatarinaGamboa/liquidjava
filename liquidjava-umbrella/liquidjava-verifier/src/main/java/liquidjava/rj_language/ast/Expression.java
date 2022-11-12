@@ -7,11 +7,14 @@ import java.util.Map;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.ast.typing.TypeInfer;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 import liquidjava.smt.solver_wrapper.ExprWrapper;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
 import spoon.reflect.factory.Factory;
 
 public abstract class Expression {
+
+    public abstract void accept(ExpressionVisitor v);
 
     public abstract ExprWrapper eval(SMTWrapper ctx) throws Exception;
 

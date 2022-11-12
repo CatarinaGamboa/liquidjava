@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.microsoft.z3.Expr;
 
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 import liquidjava.smt.solver_wrapper.ExprWrapper;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
 
@@ -42,6 +43,12 @@ public class BinaryExpression extends Expression {
 
     public boolean isArithmeticOperation() {
         return !isLogicOperation() && !isBooleanOperation();
+    }
+
+    @Override
+    public void accept(ExpressionVisitor v) {
+        getFirstOperand().accept(v);
+        getSecondOperand().accept(v);
     }
 
     @Override

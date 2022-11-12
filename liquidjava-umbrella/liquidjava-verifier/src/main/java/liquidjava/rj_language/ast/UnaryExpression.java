@@ -2,6 +2,7 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 import liquidjava.smt.solver_wrapper.ExprWrapper;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
 
@@ -21,6 +22,9 @@ public class UnaryExpression extends Expression {
     public String getOp() {
         return op;
     }
+
+    @Override
+    public void accept(ExpressionVisitor v) {}
 
     @Override
     public ExprWrapper eval(SMTWrapper ctx) throws Exception {

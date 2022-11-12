@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import com.microsoft.z3.Expr;
 
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 import liquidjava.smt.solver_wrapper.ExprWrapper;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
 
@@ -24,6 +25,11 @@ public class AliasInvocation extends Expression {
 
     public List<Expression> getArgs() {
         return children;
+    }
+
+    @Override
+    public void accept(ExpressionVisitor v) {
+        getArgs().forEach(a -> a.accept(v));
     }
 
     @Override
