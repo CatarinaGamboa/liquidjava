@@ -6,8 +6,6 @@ import com.microsoft.z3.Z3Exception;
 
 import liquidjava.processor.context.Context;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.ast.Expression;
-import liquidjava.smt.solver_wrapper.ExprWrapper;
 import liquidjava.smt.solver_wrapper.SMTWrapper;
 import liquidjava.smt.solver_wrapper.Status;
 
@@ -22,11 +20,8 @@ public class SMTEvaluator {
         System.out.println("verification query: " + toVerify); // TODO remove
 
         try {
-            Expression exp = toVerify.getExpression();
-            SMTWrapper tz3 = SMTWrapper.getZ3(c);
-            // com.microsoft.z3.Expr
-            ExprWrapper e = exp.eval(tz3);
-            Status s = tz3.verifyExpression(e);
+            SMTWrapper z3 = SMTWrapper.getZ3(c);
+            Status s = z3.verifyExpression(toVerify.getExpression());
             if (s.equals(Status.SATISFIABLE)) {
                 System.out.println("result of SMT: Not Ok!");
                 throw new TypeCheckError(subRef + " not a subtype of " + supRef);
