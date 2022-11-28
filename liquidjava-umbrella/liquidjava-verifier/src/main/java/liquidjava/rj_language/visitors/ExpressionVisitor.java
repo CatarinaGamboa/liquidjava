@@ -17,7 +17,7 @@ public interface ExpressionVisitor {
 
     void visitLiteralInt(LiteralInt li);
 
-    void visitLiteralReal(LiteralReal lr);
+    void visitLiteralReal(LiteralReal lr) throws Exception;
 
     void visitLiteralString(LiteralString ls);
 
