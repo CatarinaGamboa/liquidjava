@@ -11,15 +11,13 @@ import liquidjava.rj_language.visitors.AbstractExpressionVisitor;
 import liquidjava.smt.NotFoundError;
 import spoon.reflect.reference.CtTypeReference;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import io.github.cvc5.*;
 
-import static org.junit.Assert.fail;
+import static io.github.cvc5.RoundingMode.ROUND_NEAREST_TIES_TO_EVEN;
 
 public class CVC5Translator extends AbstractExpressionVisitor {
 
@@ -28,21 +26,55 @@ public class CVC5Translator extends AbstractExpressionVisitor {
     protected final Map<String, AliasWrapper> aliasTranslation = new HashMap<>();
     protected final Map<String, Term> funcTranslation = new HashMap<>();
 
-    private final io.github.cvc5.Solver cvc5 = new io.github.cvc5.Solver();
+    protected final io.github.cvc5.Solver cvc5 = new io.github.cvc5.Solver();
+    protected final Term rounding_mod = cvc5.mkRoundingMode(ROUND_NEAREST_TIES_TO_EVEN);
 
+    protected final Map<String, Sort> sortMap = Stream.of(new Pair<>("void", cvc5.mkUninterpretedSort("void")),
+            new Pair<>("int", cvc5.getIntegerSort()), new Pair<>("long", cvc5.getRealSort()),
+            new Pair<>("boolean", cvc5.getBooleanSort()), new Pair<>("float", cvc5.mkFloatingPointSort(8, 24)),
+            new Pair<>("double", cvc5.mkFloatingPointSort(11, 53)),
+            new Pair<>("int[]", cvc5.mkArraySort(cvc5.getIntegerSort(), cvc5.getIntegerSort())),
+            new Pair<>("String", cvc5.getStringSort())).collect(Collectors.toMap(p -> p.first, p -> p.second));
+
+    protected final Map<String, Kind> opmap = Stream.of(new Pair<>("&&", Kind.AND), new Pair<>("||", Kind.OR),
+            new Pair<>("-->", Kind.IMPLIES), new Pair<>("==", Kind.EQUAL), new Pair<>(">=", Kind.GEQ),
+            new Pair<>(">", Kind.GT), new Pair<>("<=", Kind.LEQ), new Pair<>("<", Kind.LT), new Pair<>("+", Kind.ADD),
+            new Pair<>("-", Kind.SUB), new Pair<>("*", Kind.MULT), new Pair<>("/", Kind.INTS_DIVISION),
+            new Pair<>("%", Kind.INTS_MODULUS)).collect(Collectors.toMap(p -> p.first, p -> p.second));
+
+    protected final Map<String, Kind> fp_rm_map = Stream
+            .of(new Pair<>("+", Kind.FLOATINGPOINT_ADD), new Pair<>("-", Kind.FLOATINGPOINT_SUB),
+                    new Pair<>("*", Kind.FLOATINGPOINT_MULT), new Pair<>("/", Kind.FLOATINGPOINT_DIV))
+            .collect(Collectors.toMap(p -> p.first, p -> p.second));
+
+    protected final Map<String, Kind> fp_map = Stream.of(new Pair<>("%", Kind.FLOATINGPOINT_REM),
+            new Pair<>("==", Kind.FLOATINGPOINT_EQ), new Pair<>(">=", Kind.FLOATINGPOINT_GEQ),
+            new Pair<>(">", Kind.FLOATINGPOINT_GT), new Pair<>("<=", Kind.FLOATINGPOINT_LEQ),
+            new Pair<>("<", Kind.FLOATINGPOINT_LT), new Pair<>("+", Kind.FLOATINGPOINT_ADD))
+            .collect(Collectors.toMap(p -> p.first, p -> p.second));
     private Term result;
 
     CVC5Translator(Context c) throws CVC5ApiException {
-        ContextTranslator.translateVariables(cvc5, c.getContext(), varTranslation);
-        ContextTranslator.storeVariablesSubtypes(cvc5, c.getAllVariablesWithSupertypes(), varSuperTypes);
-        ContextTranslator.addAlias(cvc5, c.getAlias(), aliasTranslation);
-        ContextTranslator.addGhostFunctions(cvc5, c.getGhosts(), funcTranslation);
-        ContextTranslator.addGhostStates(cvc5, c.getGhostState(), funcTranslation);
+        // cvc5.setLogic("QF_ALL");
+        ContextTranslator ct = new ContextTranslator(cvc5, sortMap);
+        ct.translateVariables(c.getContext(), varTranslation);
+        ct.storeVariablesSubtypes(c.getAllVariablesWithSupertypes(), varSuperTypes);
+        ContextTranslator.addAlias(c.getAlias(), aliasTranslation);
+        ct.addGhostFunctions(c.getGhosts(), funcTranslation);
+        ct.addGhostStates(c.getGhostState(), funcTranslation);
+    }
+
+    Sort getSort(String sort) {
+        if (!sortMap.containsKey(sort)) {
+            sortMap.put(sort, cvc5.mkUninterpretedSort(sort));
+        }
+
+        return sortMap.get(sort);
     }
 
     protected Term getVariableTranslation(String name) throws Exception {
         if (!varTranslation.containsKey(name))
-            throw new NotFoundError("Variable '" + name.toString() + "' not found");
+            throw new NotFoundError("Variable '" + name + "' not found");
         Term e = varTranslation.get(name);
         if (e == null)
             e = varTranslation.get(String.format("this#%s", name));
@@ -55,20 +87,69 @@ public class CVC5Translator extends AbstractExpressionVisitor {
         return getVariableTranslation(name);// int[] not in varTranslation
     }
 
-    private Term toFP(Term t) {
-        if (t.isFloatingPointValue()) {
+    private Term toFP(Term t) throws CVC5ApiException {
+        // System.out.println("> Converting " + t + " with " + t.getSort() + " and " + t.getKind() + " to floating
+        // point");
+        if (t.getSort().isFloatingPoint()) {
+            // System.out.println("< Nothing to do");
             return t;
         }
-        if (t.isIntegerValue()) {
-            return cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_TO_FP_FROM_REAL), cvc5.mkTerm(cvc5.mkOp(Kind.TO_REAL), t));
+        // System.out.println("Constructing real to floating point");
+        Op real2fp = cvc5.mkOp(Kind.FLOATINGPOINT_TO_FP_FROM_REAL, 11, 53);
+        if (t.getSort().isInteger()) {
+            Term res = cvc5.mkTerm(real2fp, rounding_mod, toReal(t));
+            // System.out.println("< Constructed invocation of real2fp on integer");
+            return res;
         }
-        if (t.isRealValue()) {
-            return cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_TO_FP_FROM_REAL), t);
+        if (t.getSort().isReal()) {
+            Term res = cvc5.mkTerm(real2fp, rounding_mod, t);
+            // System.out.println("< Constructed invocation of real2fp on real");
+            return res;
         }
-        throw new RuntimeException("Expected int, real or floating point. Got " + t);
+        throw new RuntimeException(
+                "Expected int, real or fp. Got " + t + " of sort " + t.getSort() + " and of kind " + t.getKind());
     }
 
-    public Term makeFunctionInvocation(String name, Term[] params) throws CVC5ApiException, Exception {
+    private Term toReal(Term t) throws CVC5ApiException {
+        if (t.getSort().isReal()) {
+            return t;
+        }
+
+        if (t.getSort().isInteger()) {
+            return cvc5.mkTerm(cvc5.mkOp(Kind.TO_REAL), t);
+        }
+
+        throw new RuntimeException(
+                "Expected int or real. Got " + t + " of sort " + t.getSort() + " and of kind " + t.getKind());
+    }
+
+    private boolean isUnifiable(Term t) {
+        return t.getSort().isInteger() || t.getSort().isFloatingPoint() || t.getSort().isInteger()
+                || t.getSort().isReal();
+    }
+
+    private Pair<Term, Term> unifyTypes(Term left, Term right) throws CVC5ApiException {
+        if (Objects.equals(left.getSort(), right.getSort())) {
+            return new Pair<>(left, right);
+        }
+        if (!isUnifiable(right) || !isUnifiable(right)) {
+            return new Pair<>(left, right);
+        }
+
+        if (left.getSort().isFloatingPoint() || right.getSort().isFloatingPoint()) {
+            return new Pair<>(toFP(left), toFP(right));
+        }
+
+        if (left.getSort().isReal() || right.getSort().isReal()) {
+            return new Pair<>(toReal(left), toReal(right));
+        }
+
+        throw new RuntimeException("Can unify only int, real, and fp! "
+                + String.format("Got left: %s with sort %s and kind %s, right: %s with sort %s and kind %s", left,
+                        left.getSort(), left.getKind(), right, right.getSort(), right.getKind()));
+    }
+
+    public Term makeFunctionInvocation(String name, Term[] params) {
         if (name.equals("addToIndex"))
             return makeStore(name, params);
         if (name.equals("getFromIndex"))
@@ -80,38 +161,39 @@ public class CVC5Translator extends AbstractExpressionVisitor {
 
         for (int i = 0; i < argSorts.length; ++i) {
             Term param = params[i];
-            if (argSorts[i].equals(param.getSort())) {
+            Sort paramSort = param.getSort();
+            if (Objects.equals(argSorts[i], paramSort)) {
                 continue;
             }
-            System.out.println("Searching for " + param + " should have `|`s");
             List<Term> le = varSuperTypes.get(param.toString().replace("|", ""));
 
             if (le == null) {
                 continue;
             }
             for (Term t : le) {
-                if (t.getSort().equals(argSorts[i])) {
+                if (Objects.equals(t.getSort(), argSorts[i])) {
                     params[i] = t;
                 }
             }
         }
 
-        Term[] cvc5params = new Term[params.length];
-        System.arraycopy(params, 0, cvc5params, 0, params.length);
+        Term[] invocation = new Term[params.length + 1];
+        System.arraycopy(params, 0, invocation, 1, params.length);
+        invocation[0] = fd;
 
-        return cvc5.mkTerm(cvc5.mkOp(Kind.APPLY_UF), cvc5params);
+        return cvc5.mkTerm(cvc5.mkOp(Kind.APPLY_UF), invocation);
     }
 
-    public Term makeSelect(String name, Term[] params) throws CVC5ApiException {
-        if (params.length == 2 && params[0].getSort() == ContextTranslator.getSort(cvc5, "int[]")) {
+    public Term makeSelect(String name, Term[] params) {
+        if (params.length == 2 && params[0].getSort() == getSort("int[]")) {
             Op selectOp = cvc5.mkOp(Kind.SELECT);
             return cvc5.mkTerm(selectOp, params);
         }
         return null;
     }
 
-    public Term makeStore(String name, Term[] params) throws CVC5ApiException {
-        if (params.length == 3 && params[0].getSort() == ContextTranslator.getSort(cvc5, "int[]")) {
+    public Term makeStore(String name, Term[] params) {
+        if (params.length == 3 && params[0].getSort() == getSort("int[]")) {
             Op selectOp = cvc5.mkOp(Kind.STORE);
             return cvc5.mkTerm(selectOp, params);
         }
@@ -131,103 +213,35 @@ public class CVC5Translator extends AbstractExpressionVisitor {
 
     @Override
     public void visitBinaryExpression(BinaryExpression be) throws Exception {
+        //System.out.println(">> Visiting binary expression: " + be);
         be.getFirstOperand().accept(this);
         Term left = result;
         be.getSecondOperand().accept(this);
         Term right = result;
-        result = null;
-        switch (be.getOperator()) {
-        case "&&":
-            result = cvc5.mkTerm(cvc5.mkOp(Kind.AND), left, right);
-            break;
-        case "||":
-            result = cvc5.mkTerm(cvc5.mkOp(Kind.OR), left, right);
-            break;
-        case "-->":
-            result = cvc5.mkTerm(cvc5.mkOp(Kind.IMPLIES), left, right);
-            break;
-        case "==":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_EQ), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.EQUAL), left, right);
-            }
-            break;
-        case "!=":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_EQ), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.EQUAL), left, right);
-            }
-            result = cvc5.mkTerm(cvc5.mkOp(Kind.NOT), result);
-            break;
-        case ">=":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_GEQ), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.GEQ), left, right);
-            }
-            break;
-        case ">":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_GT), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.GT), left, right);
-            }
-            break;
-        case "<=":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_LEQ), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.LEQ), left, right);
-            }
-            break;
-        case "<":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_LT), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.LT), left, right);
-            }
-            break;
-        case "+":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_ADD), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.ADD), left, right);
-            }
-            break;
-        case "-":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_SUB), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.SUB), left, right);
-            }
-            break;
-        case "*":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_MULT), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.MULT), left, right);
-            }
-            break;
-        case "/":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_DIV), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.INTS_DIVISION), left, right);
-            } // should here be a case for reals?
-            break;
-        case "%":
-            if (left.isFloatingPointValue() || right.isFloatingPointValue()) {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_REM), toFP(left), toFP(right));
-            } else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.INTS_MODULUS), left, right);
-            } // no case for reals
-            break;
+        {
+            Pair<Term, Term> u = unifyTypes(left, right);
+            left = u.first;
+            right = u.second;
         }
-        if (result == null) {
-            fail("Reached unknown operation `" + be.getOperator() + "`");
+
+        String op = Objects.equals(be.getOperator(), "!=") ? "==" : be.getOperator();
+
+        if (!opmap.containsKey(op)) {
+            throw new RuntimeException("unrecognized operation: `" + op + "`");
         }
+
+        if (left.getSort().isFloatingPoint() && fp_rm_map.containsKey(op)) {
+            result = cvc5.mkTerm(fp_rm_map.get(op), rounding_mod, left, right);
+        } else if (left.getSort().isFloatingPoint() && fp_map.containsKey(op)) {
+            result = cvc5.mkTerm(fp_map.get(op), left, right);
+        } else {
+            result = cvc5.mkTerm(opmap.get(op), left, right);
+        }
+
+        if (Objects.equals(be.getOperator(), "!=")) {
+            result = cvc5.mkTerm(Kind.NOT, result);
+        }
+        //System.out.println("<< Result of visiting binary expression: " + result);
     }
 
     @Override
@@ -235,7 +249,7 @@ public class CVC5Translator extends AbstractExpressionVisitor {
         Term[] argsExpr = new Term[fi.getArgs().size()];
         for (int i = 0; i < argsExpr.length; i++) {
             fi.getArgs().get(i).accept(this);
-
+//            System.out.println(">- Argument: `" + this.result + "`");
             argsExpr[i] = this.result;
         }
         result = makeFunctionInvocation(fi.getName(), argsExpr);
@@ -250,7 +264,7 @@ public class CVC5Translator extends AbstractExpressionVisitor {
         ite.getElse().accept(this);
         Term e = result;
 
-        if (!c.getSort().equals(cvc5.getBooleanSort())) {
+        if (!c.getSort().isBoolean()) {
             throw new Exception("Condition is not a boolean expression");
         } else {
             result = cvc5.mkTerm(cvc5.mkOp(Kind.ITE), Stream.of(c, t, e).toArray(Term[]::new));
@@ -269,9 +283,8 @@ public class CVC5Translator extends AbstractExpressionVisitor {
     }
 
     @Override
-    public void visitLiteralReal(LiteralReal lr) {
-        // result = z3.mkFP(lr.getValue(), z3.mkFPSort64());
-        result = cvc5.mkReal((long) lr.getValue());// ????
+    public void visitLiteralReal(LiteralReal lr) throws CVC5ApiException {
+        result = toFP(cvc5.mkReal(String.valueOf(lr.getValue())));
     }
 
     @Override
@@ -286,14 +299,14 @@ public class CVC5Translator extends AbstractExpressionVisitor {
         result = null;
         switch (ue.getOp()) {
         case "-":
-            if (e.isFloatingPointValue())
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.FLOATINGPOINT_NEG), e);
-            else {
-                result = cvc5.mkTerm(cvc5.mkOp(Kind.NEG), e);
+            if (e.getSort().isFloatingPoint()) {
+                result = cvc5.mkTerm(Kind.FLOATINGPOINT_NEG, e);
+            } else {
+                result = cvc5.mkTerm(Kind.NEG, e);
             }
             break;
         case "!":
-            result = cvc5.mkTerm(cvc5.mkOp(Kind.NOT), e);
+            result = cvc5.mkTerm(Kind.NOT, e);
             break;
         }
 
@@ -301,7 +314,8 @@ public class CVC5Translator extends AbstractExpressionVisitor {
 
     @Override
     public void visitVar(Var v) throws Exception {
-        result = makeVariable(v.getName());
+        Term res = makeVariable(v.getName());
+        result = res;
     }
 
     public Term getResult() {
@@ -315,133 +329,100 @@ public class CVC5Translator extends AbstractExpressionVisitor {
 
 class ContextTranslator {
 
-    static void translateVariables(io.github.cvc5.Solver cvc5, Map<String, CtTypeReference<?>> ctx,
-            Map<String, Term> varTranslation) throws CVC5ApiException {
+    final io.github.cvc5.Solver cvc5;
+    final Map<String, Sort> sortMap;
+
+    public ContextTranslator(Solver cvc5, Map<String, Sort> sortMap) {
+        this.cvc5 = cvc5;
+        this.sortMap = sortMap;
+    }
+
+    void translateVariables(Map<String, CtTypeReference<?>> ctx, Map<String, Term> varTranslation) {
 
         for (String name : ctx.keySet())
-            varTranslation.put(name, getExpr(cvc5, name, ctx.get(name)));
+            varTranslation.put(name, getExpr(name, ctx.get(name)));
 
         varTranslation.put("true", cvc5.mkBoolean(true));
         varTranslation.put("false", cvc5.mkBoolean(false));
 
     }
 
-    public static void storeVariablesSubtypes(io.github.cvc5.Solver cvc5, List<RefinedVariable> variables,
-            Map<String, List<Term>> varSuperTypes) throws CVC5ApiException {
+    public void storeVariablesSubtypes(List<RefinedVariable> variables, Map<String, List<Term>> varSuperTypes) {
         for (RefinedVariable v : variables) {
             if (!v.getSuperTypes().isEmpty()) {
                 ArrayList<Term> a = new ArrayList<>();
                 for (CtTypeReference<?> ctr : v.getSuperTypes())
-                    a.add(getExpr(cvc5, v.getName(), ctr));
+                    a.add(getExpr(v.getName(), ctr));
                 varSuperTypes.put(v.getName(), a);
             }
         }
 
     }
 
-    private static Term getExpr(io.github.cvc5.Solver cvc5, String name, CtTypeReference<?> type)
-            throws CVC5ApiException {
+    private Term getExpr(String name, CtTypeReference<?> type) {
         String typeName = type.getQualifiedName();
-        if (typeName.contentEquals("int"))
-            return cvc5.mkConst(cvc5.getIntegerSort(), name);
-        else if (typeName.contentEquals("short"))
-            return cvc5.mkConst(cvc5.getIntegerSort(), name);
-        else if (typeName.contentEquals("boolean"))
-            return cvc5.mkConst(cvc5.getBooleanSort(), name);
-        else if (typeName.contentEquals("long"))
-            return cvc5.mkConst(cvc5.getRealSort(), name); // ???
-        else if (typeName.contentEquals("float")) {
-            // Sort fpt32 = cvc5.mkFloatingPointSort(8, 24);
-            Sort fpt64 = cvc5.mkFloatingPointSort(11, 52);
-            return cvc5.mkConst(getSort(cvc5, "f64"), name);
-        } else if (typeName.contentEquals("double")) {
-            Sort fpt64 = cvc5.mkFloatingPointSort(11, 52);
-            return cvc5.mkConst(fpt64, name);
-        } else if (typeName.contentEquals("int[]")) {
-            return cvc5.mkConst(cvc5.mkArraySort(cvc5.getIntegerSort(), cvc5.getIntegerSort()), name);
-        } else {
-            Sort nSort = cvc5.mkUninterpretedSort(typeName);
-            return cvc5.mkConst(nSort, name);
-        }
+        Sort sort = getSort(typeName);
+        return cvc5.mkConst(sort, name);
 
     }
 
-    static void addAlias(io.github.cvc5.Solver cvc5, List<AliasWrapper> alias,
-            Map<String, AliasWrapper> aliasTranslation) {
+    static void addAlias(List<AliasWrapper> alias, Map<String, AliasWrapper> aliasTranslation) {
         for (AliasWrapper a : alias) {
             aliasTranslation.put(a.getName(), a);
         }
     }
 
-    public static void addGhostFunctions(io.github.cvc5.Solver cvc5, List<GhostFunction> ghosts,
-            Map<String, Term> funcTranslation) throws CVC5ApiException {
-        addBuiltinFunctions(cvc5, funcTranslation);
+    public void addGhostFunctions(List<GhostFunction> ghosts, Map<String, Term> funcTranslation) {
+        addBuiltinFunctions(funcTranslation);
         if (!ghosts.isEmpty()) {
             for (GhostFunction gh : ghosts) {
-                addGhostFunction(cvc5, gh, funcTranslation);
+                addGhostFunction(gh, funcTranslation);
             }
         }
     }
 
-    private static void addBuiltinFunctions(io.github.cvc5.Solver cvc5, Map<String, Term> funcTranslation)
-            throws CVC5ApiException {
-        Term lenfun = cvc5.declareFun("length", Stream.of(getSort(cvc5, "int[]")).toArray(Sort[]::new),
-                getSort(cvc5, "int"));
+    private void addBuiltinFunctions(Map<String, Term> funcTranslation) {
+        Term lenfun = cvc5.declareFun("length", Stream.of(getSort("int[]")).toArray(Sort[]::new), getSort("int"));
         funcTranslation.put("length", lenfun);// ERRRRRRRRRRRRO!!!!!!!!!!!!!
-        System.out.println("\nWorks only for int[] now! Change in future. Ignore this message, it is a glorified todo");
+        //System.out.println("\nWorks only for int[] now! Change in future. Ignore this message, it is a glorified todo");
         // TODO add built-in function
-        Sort[] s = Stream.of(getSort(cvc5, "int[]"), getSort(cvc5, "int"), getSort(cvc5, "int")).toArray(Sort[]::new);
-        funcTranslation.put("addToIndex", cvc5.declareFun("addToIndex", s, getSort(cvc5, "void")));
+        Sort[] s = Stream.of(getSort("int[]"), getSort("int"), getSort("int")).toArray(Sort[]::new);
+        funcTranslation.put("addToIndex", cvc5.declareFun("addToIndex", s, getSort("void")));
 
-        s = Stream.of(getSort(cvc5, "int[]"), getSort(cvc5, "int")).toArray(Sort[]::new);
-        funcTranslation.put("getFromIndex", cvc5.declareFun("getFromIndex", s, getSort(cvc5, "int")));
+        s = Stream.of(getSort("int[]"), getSort("int")).toArray(Sort[]::new);
+        funcTranslation.put("getFromIndex", cvc5.declareFun("getFromIndex", s, getSort("int")));
 
     }
 
-    static Sort getSort(io.github.cvc5.Solver cvc5, String sort) throws CVC5ApiException {
-        switch (sort) {
-        case "int":
-            return cvc5.getIntegerSort();
-        case "boolean":
-            return cvc5.getBooleanSort();
-        case "long":
-            return cvc5.getRealSort();
-        case "float":
-            return cvc5.mkFloatingPointSort(8, 24);
-        case "double":
-            return cvc5.mkFloatingPointSort(11, 52);
-        case "int[]":
-            return cvc5.mkArraySort(cvc5.getIntegerSort(), cvc5.getIntegerSort());
-        case "String":
-            return cvc5.getStringSort();
-        case "void":
-            return cvc5.mkUninterpretedSort("void");
-        // case "List":return z3.mkListSort(name, elemSort)
-        default:
-            return cvc5.mkUninterpretedSort(sort);
+    Sort getSort(String sort) {
+
+        if (!sortMap.containsKey(sort)) {
+            sortMap.put(sort, cvc5.mkUninterpretedSort(sort));
         }
+
+        return sortMap.get(sort);
     }
 
-    public static void addGhostStates(io.github.cvc5.Solver cvc5, List<GhostState> ghostState,
-            Map<String, Term> funcTranslation) throws CVC5ApiException {
+    public void addGhostStates(List<GhostState> ghostState, Map<String, Term> funcTranslation) {
         for (GhostState g : ghostState) {
-            addGhostFunction(cvc5, g, funcTranslation);
+            addGhostFunction(g, funcTranslation);
         }
 
     }
 
-    private static void addGhostFunction(io.github.cvc5.Solver cvc5, GhostFunction gh,
-            Map<String, Term> funcTranslation) throws CVC5ApiException {
+    private void addGhostFunction(GhostFunction gh, Map<String, Term> funcTranslation) {
         List<CtTypeReference<?>> paramTypes = gh.getParametersTypes();
-        Sort ret = getSort(cvc5, gh.getReturnType().toString());
+        Sort ret = getSort(gh.getReturnType().toString());
         List<Sort> list = new ArrayList<>();
         for (CtTypeReference<?> paramType : paramTypes) {
             String t = paramType.toString();
-            Sort sort = getSort(cvc5, t);
+            Sort sort = getSort(t);
             list.add(sort);
         }
         Sort[] d = list.toArray(new Sort[0]);
-        funcTranslation.put(gh.getName(), cvc5.declareFun(gh.getName(), d, ret));
+        Term dclrd_func = cvc5.declareFun(gh.getName(), d, ret);
+        //System.out.println("Adding function: " + dclrd_func);
+        funcTranslation.put(gh.getName(), dclrd_func);
     }
 
 }
