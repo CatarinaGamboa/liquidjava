@@ -2,9 +2,7 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class Ite extends Expression {
 
@@ -27,8 +25,8 @@ public class Ite extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        return ctx.makeIte(getCondition().eval(ctx), getThen().eval(ctx), getElse().eval(ctx));
+    public void accept(ExpressionVisitor v) throws Exception {
+        v.visitITE(this);
     }
 
     @Override

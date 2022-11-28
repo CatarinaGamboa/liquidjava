@@ -4,9 +4,7 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class BinaryExpression extends Expression {
 
@@ -44,46 +42,8 @@ public class BinaryExpression extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        Expr<?> ee1 = getFirstOperand().eval(ctx);
-        Expr<?> ee2 = getSecondOperand().eval(ctx);
-        return evalBinaryOp(ctx, ee1, ee2);
-    }
-
-    private Expr<?> evalBinaryOp(TranslatorToZ3 ctx, Expr<?> e1, Expr<?> e2) {
-        switch (op) {
-        case "&&":
-            return ctx.makeAnd(e1, e2);
-        case "||":
-            return ctx.makeOr(e1, e2);
-        case "-->":
-            return ctx.makeImplies(e1, e2);
-        case "==":
-            return ctx.makeEquals(e1, e2);
-        case "!=":
-            return ctx.mkNot(ctx.makeEquals(e1, e2));
-        case ">=":
-            return ctx.makeGtEq(e1, e2);
-        case ">":
-            return ctx.makeGt(e1, e2);
-        case "<=":
-            return ctx.makeLtEq(e1, e2);
-        case "<":
-            return ctx.makeLt(e1, e2);
-        case "+":
-            return ctx.makeAdd(e1, e2);
-        case "-":
-            return ctx.makeSub(e1, e2);
-        case "*":
-            return ctx.makeMul(e1, e2);
-        case "/":
-            return ctx.makeDiv(e1, e2);
-        case "%":
-            return ctx.makeMod(e1, e2);
-        default: // last case %
-            fail("Reached unkown operation " + op);
-            return null;
-        }
+    public void accept(ExpressionVisitor v) throws Exception {
+        v.visitBinaryExpression(this);
     }
 
     @Override

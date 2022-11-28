@@ -2,13 +2,15 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class LiteralInt extends Expression {
 
-    private int value;
+    private final int value;
+
+    public int getValue() {
+        return value;
+    }
 
     public LiteralInt(int v) {
         value = v;
@@ -19,8 +21,8 @@ public class LiteralInt extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) {
-        return ctx.makeIntegerLiteral(value);
+    public void accept(ExpressionVisitor v) {
+        v.visitLiteralInt(this);
     }
 
     public String toString() {

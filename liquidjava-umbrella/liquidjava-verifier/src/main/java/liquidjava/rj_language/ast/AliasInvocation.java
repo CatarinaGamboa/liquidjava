@@ -4,9 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class AliasInvocation extends Expression {
     String name;
@@ -26,12 +24,8 @@ public class AliasInvocation extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        Expr<?>[] argsExpr = new Expr[getArgs().size()];
-        for (int i = 0; i < argsExpr.length; i++) {
-            argsExpr[i] = getArgs().get(i).eval(ctx);
-        }
-        return ctx.makeFunctionInvocation(name, argsExpr);
+    public void accept(ExpressionVisitor v) throws Exception {
+        v.visitAliasInvocation(this);
     }
 
     @Override

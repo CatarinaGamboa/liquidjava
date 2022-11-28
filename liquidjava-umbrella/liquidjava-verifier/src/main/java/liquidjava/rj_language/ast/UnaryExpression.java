@@ -2,9 +2,7 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class UnaryExpression extends Expression {
 
@@ -24,14 +22,8 @@ public class UnaryExpression extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        switch (op) {
-        case "-":
-            return ctx.makeMinus(getExpression().eval(ctx));
-        case "!":
-            return ctx.mkNot(getExpression().eval(ctx));
-        }
-        return null;
+    public void accept(ExpressionVisitor v) throws Exception {
+        v.visitUnaryExpression(this);
     }
 
     @Override

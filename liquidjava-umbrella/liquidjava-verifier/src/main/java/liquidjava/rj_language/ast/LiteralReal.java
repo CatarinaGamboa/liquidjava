@@ -2,13 +2,12 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import io.github.cvc5.CVC5ApiException;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class LiteralReal extends Expression {
 
-    private double value;
+    private final double value;
 
     public LiteralReal(double v) {
         value = v;
@@ -19,8 +18,8 @@ public class LiteralReal extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) {
-        return ctx.makeDoubleLiteral(value);
+    public void accept(ExpressionVisitor v) throws Exception {
+        v.visitLiteralReal(this);
     }
 
     public String toString() {
@@ -68,8 +67,10 @@ public class LiteralReal extends Expression {
         if (getClass() != obj.getClass())
             return false;
         LiteralReal other = (LiteralReal) obj;
-        if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value))
-            return false;
-        return true;
+        return Double.doubleToLongBits(value) == Double.doubleToLongBits(other.value);
+    }
+
+    public double getValue() {
+        return value;
     }
 }

@@ -2,9 +2,7 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class LiteralString extends Expression {
     private String value;
@@ -14,8 +12,8 @@ public class LiteralString extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) {
-        return ctx.makeString(value);
+    public void accept(ExpressionVisitor v) {
+        v.visitLiteralString(this);
     }
 
     public String toString() {
@@ -69,4 +67,7 @@ public class LiteralString extends Expression {
         return true;
     }
 
+    public String getValue() {
+        return value;
+    }
 }

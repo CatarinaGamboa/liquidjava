@@ -2,9 +2,7 @@ package liquidjava.rj_language.ast;
 
 import java.util.List;
 
-import com.microsoft.z3.Expr;
-
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class Var extends Expression {
 
@@ -19,8 +17,8 @@ public class Var extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        return ctx.makeVariable(name);
+    public void accept(ExpressionVisitor v) throws Exception {
+        v.visitVar(this);
     }
 
     public String toString() {

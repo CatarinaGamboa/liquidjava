@@ -14,10 +14,12 @@ public class CommandLineLauncher {
 
         // String allPath = "C://Regen/test-projects/src/Main.java";
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
-        // In VSCode needs: "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
+        // In VSCode needs:
+        // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
         String file = args.length == 0 ? allPath : args[0];
         ErrorEmitter ee = launch(file);
         if (ee.foundError()) {
+            System.out.println("Found errors. Analysis failed!");
             System.out.println(ee.getFullMessage());
             System.exit(ee.getErrorStatus());
         } else {
@@ -65,7 +67,7 @@ public class CommandLineLauncher {
             processingManager.process(v);
         // To search all previous packages
         // processingManager.process(factory.Package().getRootPackage());
-
+        System.out.println("after process");
         return ee;
 
     }
