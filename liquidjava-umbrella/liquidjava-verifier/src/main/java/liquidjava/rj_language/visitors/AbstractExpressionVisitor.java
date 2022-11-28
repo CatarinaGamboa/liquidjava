@@ -44,7 +44,7 @@ public abstract class AbstractExpressionVisitor implements ExpressionVisitor {
     }
 
     @Override
-    public void visitLiteralReal(LiteralReal lr) {
+    public void visitLiteralReal(LiteralReal lr) throws Exception {
     }
 
     @Override
