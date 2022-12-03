@@ -57,7 +57,8 @@ class LinkedList{
     //                                     *  (head_value.next == sep.nil) 
     //                                     && (list_value.head == headNode))
     // ?
-    // One one hand it will mean that there are many variables in context corresponding to head_node, list, list_value, node_value and so on, on the other hand then it does not make sense to introduce isList at all.
+    // One one hand it will mean that there are many variables in context corresponding to 
+    //head_node, list, list_value, node_value and so on, on the other hand then it does not make sense to introduce isList at all.
     // Answer: Probably no, as there are more ways to obtain a list.
 
     //HeapRefinement is connected with context via separating conjunction instead of usual conjunction
@@ -81,7 +82,8 @@ class LinkedList{
     }
 
 
-    //Question: Should there be separate annotations for precondition and postcondition for heap? Because now it is unclear if attaching heapRefinement to context via separating conjunction and Refinement with usual conjunction is OK.
+    //Question: Should there be separate annotations for precondition and postcondition for heap? 
+    //Because now it is unclear if attaching heapRefinement to context via separating conjunction and Refinement with usual conjunction is OK.
     //Answer: ???
 
     //Question: Should there be an "x reachable from y" predicate for pointers?
