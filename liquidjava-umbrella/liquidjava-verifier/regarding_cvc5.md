@@ -1,4 +1,23 @@
-# Notes on integraing cvc5 to Liquid Java:
+# Notes on state of Separating logic support in SMT-solvers
+
+## TL;DR
+
+Sadly, as of the end of 2022 the the best one can get is `CVC5`, but even there it is only a small subset. There is no way to do `exists v. x -> v`. It requires to use `ALL` in `set-logic` command and gives `unknown` even for simpliest examples.
+
+## Sources of information
+
+Best on is the [sl-comp](https://sl-comp.github.io/), the should be more links to relevant sources there, but as usual, it is best one can get. There will be some usefull information about separation logic subsets supported and what one should expect from differenet tools. The only SMT-sovler participated there is CVC4 and it handles only `propositional separation logic`. No quantifiers and no recursive functions. Other pariticipants are standalone tools with no uniform API. Also, majority of them are only available as binaries and have no documenation. 
+
+The best source of information is however the [repository of sl-comp18](https://github.com/sl-comp/SL-COMP18/), there are pieces of code and text which can be comprehended by common human being and they give said human an understanding of what is acutally possible to do with each tool. 
+
+There are couple useful papers:
+- [SMT-lib doc](https://smtlib.cs.uiowa.edu/papers/smt-lib-reference-v2.6-r2021-05-12.pdf)
+- [SMT-lib tutorial](http://smtlib.github.io/jSMTLIB/SMTLIBTutorial.pdf)
+- [SL-COMP syntax expanstion for smt-lib](https://hal.archives-ouvertes.fr/hal-02388022/document)
+
+I CAN NOT STRESS THIS ENOUGH: SL-COMP uses custom expansion for smt-lib and custom separation logic subset naming, so there are no other sources except their repository. 
+
+# Notes on integrating cvc5 to Liquid Java
 
 ## Overview
 
