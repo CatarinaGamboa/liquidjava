@@ -162,6 +162,22 @@ class LinkedList{
 
 ```
 
+### How does it help?
+
+```java
+var s = LinkedList.singleton(null);
+s.concat(s); // Compile error!
+
+```
+
+```java
+var s1 = LinkedList.singleton(null);
+var s2 = LinkedList.singleton(null);
+s1.concat(s2); 
+s1.concat(s2); //Compile error!
+
+```
+
 ## Binary tree
 
 ## Unbounded buffer
