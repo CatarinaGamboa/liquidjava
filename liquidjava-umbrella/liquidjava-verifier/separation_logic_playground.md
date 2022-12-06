@@ -84,20 +84,10 @@ class LinkedList{
         return list;
     }
 
-    //Question: should it mean that "isList(list) => "
-    //                                     (list -> list_value) && (list_value.head == sep.nil)
-    //                                  || (  (list -> list_value) 
-    //                                     *  (headNode -> node_value) 
-    //                                     *  (head_value.next == sep.nil) 
-    //                                     && (list_value.head == headNode))
-    // ?
-    // One one hand it will mean that there are many variables in context corresponding to 
-    //head_node, list, list_value, node_value and so on, on the other hand then it does not make sense to introduce isList at all.
-    // Answer: Probably no, as there are more ways to obtain a list.
-
     //HeapRefinement is connected with context via separating conjunction instead of usual conjunction
 
-    //We can mark some objests as invalid lists, but know we need to check if this is a valid lists.
+    //We can mark some objests as invalid lists, 
+    //but now we need to check if 'this' is a valid list itself.
     @HeapRefinement("isList(_) * !isList(another)") // <- * or &&?
     //                                  +- tells that 'another' is separate from 'this'.
     //                                  |  but does not tell that isList(this)
