@@ -2,6 +2,20 @@
 
 There are three major parts to add. The annotation language - the way to encode separation logic primitives in lanuguage used inside LJ annotations, java annotations - the way to annotate java code with Liquid Java, and finally, the examples of SL usage in LJ.
 
+There is a huge problem regarding the mutablility of data. For example:
+
+```
+x = [1, 2, 3]
+y = [4, 5, 6]
+z = [7, 8, 9]
+
+xyz = (x ++ y) ++ z
+```
+
+Now `xyz == [1, 2, 3, 4, 5, 6, 7, 8, 9]`, but these elements are not copied and now it is possible to mutate them from different places. It is bad on it's own, but one can forbid mutations. The worst problem is that if one will concatenate `y` to `xyz` then the loop will form and there is no way to forbid such behaviour with separation logic. 
+
+The only thing that I can think of is some kind of ownership model. 
+
 # Anotatations themselves
 
 As there are now two implications and two conjunctions, it is important to distinct between them. 
@@ -15,6 +29,31 @@ The main challange is to distinct between values and pointer as they are treated
 The part where the goal is to show how cool it is to have separation logic support in LJ. 
 
 ## Linked list
+
+logic things:
+
+```
+data List = (head : Loc)
+data Node = (data : Data, next : Loc)
+
+isList(list : List) = 
+    let node = List.head
+    in noLoops(node)
+  where
+    noLoops (node : Loc) = 
+           (exists (v : Node) . node -> v * noLoops(v.next))
+        || (node == sep.nil)
+
+```
+Let see how it truns out for some concrete list
+
+```
+
+
+
+```
+
+Java things
 
 ```java
 
@@ -63,7 +102,7 @@ class LinkedList{
 
     //HeapRefinement is connected with context via separating conjunction instead of usual conjunction
 
-    @HeapRefinement("isList(_)")
+    @HeapRefinement("isList(_) && !isList(another)") // <- * or &&?
     //                                  +- tells that 'another' is separate from 'this'.
     //                                  v  so isList guarantees that there are no loops
     public void concat(@HeapRefinement("isList(another)") 
