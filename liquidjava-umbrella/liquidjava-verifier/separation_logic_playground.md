@@ -50,20 +50,13 @@ isList(list : List) =
 Let see how it truns out for some concrete list
 
 ```
-
-
+todo
 
 ```
 
 Java things
 
 ```java
-
-//Question: Will it help anybody to know this?
-@StructuralPredicate("isList(list)"
-                    , "isList(list) => (list -> list_value) && (list_value.head == sep.nil)"
-                    , "isList(list) => (list -> list_value) * isList(tail) && (list_value.head == tail)"
-)
 class LinkedList{
     Node head;
 
@@ -104,11 +97,14 @@ class LinkedList{
 
     //HeapRefinement is connected with context via separating conjunction instead of usual conjunction
 
-    @HeapRefinement("isList(_) && !isList(another)") // <- * or &&?
+    //We can mark some objests as invalid lists, but know we need to check if this is a valid lists.
+    @HeapRefinement("isList(_) * !isList(another)") // <- * or &&?
     //                                  +- tells that 'another' is separate from 'this'.
+    //                                  |  but does not tell that isList(this)
     //                                  v  so isList guarantees that there are no loops
     public void concat(@HeapRefinement("isList(another)") 
                        LinedList another){
+        // this -> this_value * isList(another)
         if (this.head == null){
             this.head = another.head;
         }else{
@@ -119,8 +115,18 @@ class LinkedList{
 
             curNode.next = another.head;
         }
-        // resulting refinement after invokation: isList(this) * isList(another)
+        // resulting refinement after invokation: isList(this) * !isList(another)
     }
+
+    @HeapRefinement("isList(lhs) * !isList(rhs)")
+    public static void concat(@HeapRefinement("isList(lhs)")
+                             LinkedList lhs, 
+                              @HeapRefinement("isList(rhs)")
+                             LinkedList rhs){
+        //...
+    }
+
+    //Now method will call concat on this and anther and everybody will be fine
 
 
     //Question: Should there be separate annotations for precondition and postcondition for heap? 
@@ -146,7 +152,10 @@ class LinkedList{
         public static Node makeNode(Object data,              
                                     @HeapRefinement("next -> -")
                                     Node next){
-            return new Node(data, next);
+            // next -> -
+            Node node = new Node(data, next);
+            // next -> - * node -> node_value
+            return node;
         }
 
         @HeapRefinement("(_ -> node_value) * (node_value.next == sep.nil)")
