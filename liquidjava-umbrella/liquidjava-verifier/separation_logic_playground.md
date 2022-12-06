@@ -14,7 +14,9 @@ xyz = (x ++ y) ++ z
 
 Now `xyz == [1, 2, 3, 4, 5, 6, 7, 8, 9]`, but these elements are not copied and now it is possible to mutate them from different places. It is bad on it's own, but one can forbid mutations. The worst problem is that if one will concatenate `y` to `xyz` then the loop will form and there is no way to forbid such behaviour with separation logic. 
 
-The only thing that I can think of is some kind of ownership model. 
+It is seems possible to solve it by adding some kind of destructive predicate to concatination.
+
+For example that if `xy = x ++ y` then `x` and `y` are no loginer lists. 
 
 # Anotatations themselves
 
