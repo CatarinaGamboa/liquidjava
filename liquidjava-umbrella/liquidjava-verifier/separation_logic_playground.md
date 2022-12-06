@@ -120,14 +120,13 @@ class LinkedList{
 
 
     //Question: Should there be separate annotations for precondition and postcondition for heap? 
-    //Because now it is unclear if attaching heapRefinement to context via separating conjunction and Refinement with usual conjunction is OK.
+    //Because now it is unclear if attaching heapRefinement to context via separating conjunction and Refinement with usual conjunction is good enough.
     //Answer: ???
-
-    //Question: Should there be an "x reachable from y" predicate for pointers?
-    //Answer: Probably no, as there is no unviersal procedure to determine that without running the program
 
 
     @HeadPrefinement("isList(_)")
+    @HeapPreconditionRefinement("isList(this)") 
+    // ^ should make possible to use 'this' in precondition
     public void remove(Object data){
         //...
     }
@@ -138,8 +137,9 @@ class LinkedList{
 
         
         @HeapRefinement("(_ -> node_value) * (node_value.next -> next)")
-        //Separates this from next, ensuring loop anbsence.
+        //Separates this from next, ensuring loop absence.
         public static Node makeNode(Object data,              
+                                    //v ensures that next is not null
                                     @HeapRefinement("next -> -")
                                     Node next){
             // next -> -
@@ -175,9 +175,50 @@ var s1 = LinkedList.singleton(null);
 var s2 = LinkedList.singleton(null);
 s1.concat(s2); 
 s1.concat(s2); //Compile error!
-
 ```
 
 ## Binary tree
+
+```java
+class BinaryTreeNode{
+    Object value;
+    BinaryTree left;
+    BinaryTree right;
+    
+    @HeapRefinement("isTree(_)")
+    static BinaryTree makeTreeNode(
+                        @HeapRefinement("isTree(left)")
+                        BinaryTreeNode left, 
+                        @HeapRefinement("isTree(right)")
+                        BinaryTreeNode right, 
+                        Object value){
+        Tree t = new BinaryTreeNode();
+        t.value = value;
+        t.left = left;
+        t.right = right;
+        return t;
+    }}
+```
+
+
+### How does it help?
+
+
+```java
+BinaryTreeNode left;  // = ...
+BinaryTreeNode right; // = ...
+
+BinaryTreeNode t = BinaryTreeNode.makeTreeNode(left, left, null); //Compile error!
+
+```
+
+```java
+BinaryTreeNode left;  // = ...
+BinaryTreeNode right; // = ...
+
+BinaryTreeNode t = BinaryTreeNode.makeTreeNode(t, right, null); //Compile error!
+
+```
+
 
 ## Unbounded buffer
