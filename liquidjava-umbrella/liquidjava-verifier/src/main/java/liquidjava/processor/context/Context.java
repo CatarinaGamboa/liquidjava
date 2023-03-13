@@ -1,6 +1,7 @@
 package liquidjava.processor.context;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
@@ -188,13 +189,8 @@ public class Context {
     }
 
     public String allVariablesToString() {
-        StringBuilder sb = new StringBuilder();
-        for (List<RefinedVariable> l : ctxVars) {
-            for (RefinedVariable var : l) {
-                sb.append(var.toString() + "; ");
-            }
-        }
-        return sb.toString();
+        return ctxVars.stream().flatMap(Collection::stream).map(var -> var.toString() + "; ")
+                .collect(Collectors.joining());
     }
 
     /**
@@ -203,25 +199,13 @@ public class Context {
      * @return
      */
     public List<RefinedVariable> getAllVariables() {
-        List<RefinedVariable> lvi = new ArrayList<>();
-        for (List<RefinedVariable> l : ctxVars) {
-            for (RefinedVariable var : l) {
-                lvi.add(var);
-            }
-        }
-        return lvi;
+        return ctxVars.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     public List<RefinedVariable> getAllVariablesWithSupertypes() {
-        List<RefinedVariable> lvi = new ArrayList<>();
-        for (RefinedVariable rv : getAllVariables()) {
-            if (rv.getSuperTypes().size() > 0)
-                lvi.add(rv);
-        }
-        for (RefinedVariable rv : ctxSpecificVars) {
-            if (rv.getSuperTypes().size() > 0)
-                lvi.add(rv);
-        }
+        List<RefinedVariable> lvi = getAllVariables().stream().filter(rv -> rv.getSuperTypes().size() > 0)
+                .collect(Collectors.toList());
+        ctxSpecificVars.stream().filter(rv -> rv.getSuperTypes().size() > 0).forEach(lvi::add);
         return lvi;
     }
 
