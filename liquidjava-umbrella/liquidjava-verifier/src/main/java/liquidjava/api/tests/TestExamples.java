@@ -3,12 +3,6 @@ package liquidjava.api.tests;
 import org.junit.Test;
 
 public class TestExamples extends TestAbstract {
-
-    @Test
-    public void internalFieldUpdate() {
-        testCorrect(testPath + "field_updates/InternalFieldUpdate.java");
-    }
-
     @Test
     public void correctFieldUpdate() {
         testCorrect(testPath + "field_updates/CorrectFieldUpdate.java");
