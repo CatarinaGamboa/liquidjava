@@ -2,11 +2,25 @@
 
 There are three major parts to add. The annotation language - the way to encode separation logic primitives in lanuguage used inside LJ annotations, java annotations - the way to annotate java code with Liquid Java, and finally, the examples of SL usage in LJ.
 
+There is a huge problem regarding the mutablility of data. For example:
+
+```
+x = [1, 2, 3]
+y = [4, 5, 6]
+z = [7, 8, 9]
+
+xyz = (x ++ y) ++ z
+```
+
+Now `xyz == [1, 2, 3, 4, 5, 6, 7, 8, 9]`, but these elements are not copied and now it is possible to mutate them from different places. It is bad on it's own, but one can forbid mutations. The worst problem is that if one will concatenate `y` to `xyz` then the loop will form and there is no way to forbid such behaviour with separation logic. 
+
+It is seems possible to solve it by adding some kind of destructive predicate to concatination.
+
+For example that if `xy = x ++ y` then `x` and `y` are no loginer lists. 
+
 # Anotatations themselves
 
 As there are now two implications and two conjunctions, it is important to distinct between them. 
-
-It is important to notice that heap refinements in precondition are consumed, in contrust with usual refinements which are not.
 
 # Anotatation language
 
@@ -48,7 +62,7 @@ class LinkedList{
 
     private LinedList(){}
 
-    @HeapRefinement("isList(_)")
+    @Refinement("isList(_)")
     static LinkedList empty(){
         var list = new LinkedList();
         // list -> list_value
@@ -56,7 +70,7 @@ class LinkedList{
         // (list -> list_value) && (list_value.head == sep.nil`)
         return list;
     }
-    @HeapRefinement("isList(_)")
+    @Refinement("isList(_)")
     static LinkedList singleton(Object data){
         var list = new LinkedList();
         // list -> list_value
@@ -72,13 +86,12 @@ class LinkedList{
 
     //HeapRefinement is connected with context via separating conjunction instead of usual conjunction
 
-    
-    @HeapRefinement("isList(_)") // 
+    //We can mark some objests as invalid lists, 
+    //but now we need to check if 'this' is a valid list itself.
+    @HeapRefinement("isList(_) * !isList(another)") // <- * or &&?
     //                                  +- tells that 'another' is separate from 'this'.
     //                                  |  but does not tell that isList(this)
     //                                  v  so isList guarantees that there are no loops
-    // xyz = x ++ y ++ z
-    // xyzy = xyz ++ y
     public void concat(@HeapRefinement("isList(another)") 
                        LinedList another){
         // this -> this_value * isList(another)
@@ -95,7 +108,7 @@ class LinkedList{
         // resulting refinement after invokation: isList(this) * !isList(another)
     }
 
-    @HeapRefinement("isList(lhs)")
+    @HeapRefinement("isList(lhs) * !isList(rhs)")
     public static void concat(@HeapRefinement("isList(lhs)")
                              LinkedList lhs, 
                               @HeapRefinement("isList(rhs)")
@@ -124,7 +137,7 @@ class LinkedList{
 
         
         @HeapRefinement("(_ -> node_value) * (node_value.next -> next)")
-        //Separates this from next, ensuring simple loop absence.
+        //Separates this from next, ensuring loop absence.
         public static Node makeNode(Object data,              
                                     //v ensures that next is not null
                                     @HeapRefinement("next -> -")
@@ -135,7 +148,7 @@ class LinkedList{
             return node;
         }
 
-        @HeapRefinement("(_ -> node_value) && (node_value.next == sep.nil)")
+        @HeapRefinement("(_ -> node_value) * (node_value.next == sep.nil)")
         public static Node makeNode(Object data){
             return new Node(data, null);
         }
@@ -203,9 +216,7 @@ BinaryTreeNode t = BinaryTreeNode.makeTreeNode(left, left, null); //Compile erro
 BinaryTreeNode left;  // = ...
 BinaryTreeNode right; // = ...
 
-BinaryTreeNode t = BinaryTreeNode.makeTreeNode(left, right, null);
-
-BinaryTreeNode loopedTree = BinaryTreeNode.makeTreeNode(t, right, null); //Compile error!
+BinaryTreeNode t = BinaryTreeNode.makeTreeNode(t, right, null); //Compile error!
 
 ```
 
