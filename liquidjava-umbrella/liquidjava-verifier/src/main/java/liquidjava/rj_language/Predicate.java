@@ -61,7 +61,7 @@ public class Predicate {
         exp = e;
     }
 
-    protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+    protected static Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
         try {
             return RefinementsParser.createAST(ref);
         } catch (ParsingException e1) {
