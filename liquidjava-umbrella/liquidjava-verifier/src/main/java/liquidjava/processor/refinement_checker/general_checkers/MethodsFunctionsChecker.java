@@ -298,9 +298,12 @@ public class MethodsFunctionsChecker {
         if (methodRef != null) {
             boolean equalsThis = methodRef.toString().equals("(_ == this)"); // TODO change for better
             List<String> vars = methodRef.getVariableNames();
-            for (String s : vars)
-                if (map.containsKey(s))
-                    methodRef = methodRef.substituteVariable(s, map.get(s));
+            for (String s : vars) {
+                if (!map.containsKey(s)) {
+                    continue;
+                }
+                methodRef = methodRef.substituteVariable(s, map.get(s));
+            }
 
             String varName = null;
             if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
