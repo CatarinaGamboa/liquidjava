@@ -24,4 +24,8 @@ public interface ExpressionVisitor {
     void visitUnaryExpression(UnaryExpression ue) throws Exception;
 
     void visitVar(Var v) throws Exception;
+
+    void visitUnit(SepUnit unit) throws Exception;
+
+    void visitSepEmp(SepEmp sepEmp) throws Exception;
 }

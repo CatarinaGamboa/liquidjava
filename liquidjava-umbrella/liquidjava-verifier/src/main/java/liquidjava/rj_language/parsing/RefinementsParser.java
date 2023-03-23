@@ -21,7 +21,11 @@ public class RefinementsParser {
 
     public static Expression createAST(String toParse) throws ParsingException {
         ParseTree pt = compile(toParse);
-        return CreateASTVisitor.create(pt);
+        Expression e = CreateASTVisitor.create(pt);
+        if (e == null) {
+            throw new ParsingException("Failed to parse: " + toParse);
+        }
+        return e;
     }
 
     /**

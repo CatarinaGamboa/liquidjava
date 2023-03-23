@@ -12,16 +12,7 @@ import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostState;
 import liquidjava.processor.facade.AliasDTO;
-import liquidjava.rj_language.ast.BinaryExpression;
-import liquidjava.rj_language.ast.Expression;
-import liquidjava.rj_language.ast.FunctionInvocation;
-import liquidjava.rj_language.ast.GroupExpression;
-import liquidjava.rj_language.ast.Ite;
-import liquidjava.rj_language.ast.LiteralBoolean;
-import liquidjava.rj_language.ast.LiteralInt;
-import liquidjava.rj_language.ast.LiteralReal;
-import liquidjava.rj_language.ast.UnaryExpression;
-import liquidjava.rj_language.ast.Var;
+import liquidjava.rj_language.ast.*;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
@@ -42,7 +33,7 @@ public class Predicate {
      * Create a predicate with the expression true
      */
     public Predicate() {
-        exp = new LiteralBoolean(true);
+        exp = new BinaryExpression(new SepEmp(), "&&", new LiteralBoolean(true));
     }
 
     /**

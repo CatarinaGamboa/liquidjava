@@ -5,20 +5,10 @@ import static org.junit.Assert.fail;
 import java.util.ArrayList;
 import java.util.List;
 
+import liquidjava.rj_language.ast.*;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import liquidjava.rj_language.ast.AliasInvocation;
-import liquidjava.rj_language.ast.BinaryExpression;
-import liquidjava.rj_language.ast.Expression;
-import liquidjava.rj_language.ast.FunctionInvocation;
-import liquidjava.rj_language.ast.GroupExpression;
-import liquidjava.rj_language.ast.Ite;
-import liquidjava.rj_language.ast.LiteralBoolean;
-import liquidjava.rj_language.ast.LiteralInt;
-import liquidjava.rj_language.ast.LiteralReal;
-import liquidjava.rj_language.ast.LiteralString;
-import liquidjava.rj_language.ast.UnaryExpression;
-import liquidjava.rj_language.ast.Var;
+import rj.grammar.RJParser;
 import rj.grammar.RJParser.AliasCallContext;
 import rj.grammar.RJParser.ArgsContext;
 import rj.grammar.RJParser.ExpBoolContext;
@@ -50,6 +40,8 @@ import rj.grammar.RJParser.StartContext;
 import rj.grammar.RJParser.StartPredContext;
 import rj.grammar.RJParser.TargetInvocationContext;
 import rj.grammar.RJParser.VarContext;
+import rj.grammar.RJParser.StartSepContext;
+import rj.grammar.RJParser.SepContext;
 
 /**
  * Create refinements language AST using antlr
@@ -64,7 +56,9 @@ public class CreateASTVisitor {
             return progCreate((ProgContext) rc);
         else if (rc instanceof StartContext)
             return startCreate(rc);
-        else if (rc instanceof PredContext)
+        else if (rc instanceof SepContext) {
+            return sepCreate(rc);
+        } else if (rc instanceof PredContext)
             return predCreate(rc);
         else if (rc instanceof ExpContext)
             return expCreate(rc);
@@ -90,8 +84,55 @@ public class CreateASTVisitor {
         if (rc instanceof StartPredContext)
             return create(((StartPredContext) rc).pred());
         // alias and ghost do not have evaluation
+        if (rc instanceof StartSepContext) {
+            return create(((StartSepContext) rc).sep());
+        }
         return null;
     }
+
+    // ------------------- separation logic ------------------
+    private static Expression sepCreate(ParseTree rc) {
+        if (rc instanceof RJParser.ComplexHeapContext) {
+            RJParser.ComplexHeapContext ptog = (RJParser.ComplexHeapContext) rc;
+            return new BinaryExpression(sepCreate(ptog.pto()), "|*", sepCreate(ptog.sep()));
+        }
+        if (rc instanceof RJParser.HeapContext) {
+            RJParser.HeapContext ptog = (RJParser.HeapContext) rc;
+            return new BinaryExpression(sepCreate(ptog.empty()), "|*", sepCreate(ptog.sep()));
+        }
+        if (rc instanceof RJParser.SinglePointerContext) {
+            RJParser.SinglePointerContext ptog = (RJParser.SinglePointerContext) rc;
+            return sepCreate(ptog.pto());
+        }
+        if (rc instanceof RJParser.EmptyHeapContext) {
+            return emptyHeapCreate(rc);
+        }
+        if (rc instanceof RJParser.PtoContext) {
+            RJParser.PtoContext pto = (RJParser.PtoContext) rc;
+            return ptoCreate(pto);
+        }
+        return null;
+    }
+
+    private static Expression emptyHeapCreate(ParseTree rc) {
+        return new SepEmp();
+    }
+
+    private static Expression ptoCreate(ParseTree rc) {
+        if (rc instanceof RJParser.PtoContext) {
+            List<ParseTree> chdrn = ((RJParser.PtoContext) rc).children;
+            Expression pointer = new Var((chdrn.get(0).getText()));
+            Expression pointee = Unitcreate(chdrn.get(2));
+            return new BinaryExpression(pointer, "|->", pointee);
+        }
+        return null;
+    }
+
+    private static Expression Unitcreate(ParseTree rc) {
+        return new SepUnit();
+    }
+
+    // ------------------- end of separation logic ------------------
 
     private static Expression predCreate(ParseTree rc) {
         if (rc instanceof PredGroupContext)

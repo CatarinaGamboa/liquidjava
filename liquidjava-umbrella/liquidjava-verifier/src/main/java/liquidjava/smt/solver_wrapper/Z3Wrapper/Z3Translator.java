@@ -228,6 +228,10 @@ public class Z3Translator extends AbstractExpressionVisitor {
                 result = z3.mkRem((IntExpr) left, (IntExpr) right);
             }
             break;
+        case "|->":
+            throw new Exception("Z3 does not support separation logic: |->");
+        case "|*":
+            throw new Exception("Z3 does not support separation logic: |*");
         }
         if (result == null) {
             fail("Reached unknown operation `" + be.getOperator() + "`");
@@ -306,6 +310,16 @@ public class Z3Translator extends AbstractExpressionVisitor {
     @Override
     public void visitVar(Var v) throws Exception {
         result = makeVariable(v.getName());
+    }
+
+    @Override
+    public void visitUnit(SepUnit unit) throws Exception {
+        throw new Exception("Z3 solver does not support separation logic!");
+    }
+
+    @Override
+    public void visitSepEmp(SepEmp sepEmp) throws Exception {
+        throw new Exception("Z3 solver does not support separation logic!");
     }
 }
 
