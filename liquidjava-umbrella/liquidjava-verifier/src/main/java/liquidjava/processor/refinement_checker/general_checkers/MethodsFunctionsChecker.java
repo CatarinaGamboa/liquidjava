@@ -295,34 +295,36 @@ public class MethodsFunctionsChecker {
         // applyRefinementsToArguments(element, arguments, f, map);
         Predicate methodRef = f.getRefReturn();
 
-        if (methodRef != null) {
-            boolean equalsThis = methodRef.toString().equals("(_ == this)"); // TODO change for better
-            List<String> vars = methodRef.getVariableNames();
-            for (String s : vars) {
-                if (!map.containsKey(s)) {
-                    continue;
-                }
-                methodRef = methodRef.substituteVariable(s, map.get(s));
-            }
-
-            String varName = null;
-            if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
-                VariableInstance vi = (VariableInstance) invocation.getMetadata(rtc.TARGET_KEY);
-                methodRef = methodRef.substituteVariable(rtc.THIS, vi.getName());
-                Variable v = rtc.getContext().getVariableFromInstance(vi);
-                if (v != null)
-                    varName = v.getName();
-            }
-
-            String viName = String.format(rtc.instanceFormat, f.getName(), rtc.getContext().getCounter());
-            VariableInstance vi = (VariableInstance) rtc.getContext().addInstanceToContext(viName, f.getType(),
-                    methodRef.substituteVariable(rtc.WILD_VAR, viName), invocation); // TODO REVER!!
-            if (varName != null && f.hasStateChange() && equalsThis)
-                rtc.getContext().addRefinementInstanceToVariable(varName, viName);
-            invocation.putMetadata(rtc.TARGET_KEY, vi);
-            invocation.putMetadata(rtc.REFINE_KEY, methodRef);
-
+        if (methodRef == null) {
+            return map;
         }
+
+        boolean equalsThis = methodRef.toString().equals("(_ == this)"); // TODO change for better
+        List<String> vars = methodRef.getVariableNames();
+        for (String s : vars) {
+            if (!map.containsKey(s)) {
+                continue;
+            }
+            methodRef = methodRef.substituteVariable(s, map.get(s));
+        }
+
+        String varName = null;
+        if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
+            VariableInstance vi = (VariableInstance) invocation.getMetadata(rtc.TARGET_KEY);
+            methodRef = methodRef.substituteVariable(rtc.THIS, vi.getName());
+            Variable v = rtc.getContext().getVariableFromInstance(vi);
+            if (v != null)
+                varName = v.getName();
+        }
+
+        String viName = String.format(rtc.instanceFormat, f.getName(), rtc.getContext().getCounter());
+        VariableInstance vi = (VariableInstance) rtc.getContext().addInstanceToContext(viName, f.getType(),
+                methodRef.substituteVariable(rtc.WILD_VAR, viName), invocation); // TODO REVER!!
+        if (varName != null && f.hasStateChange() && equalsThis)
+            rtc.getContext().addRefinementInstanceToVariable(varName, viName);
+        invocation.putMetadata(rtc.TARGET_KEY, vi);
+        invocation.putMetadata(rtc.REFINE_KEY, methodRef);
+
         return map;
 
     }
