@@ -4,25 +4,10 @@ import org.junit.Test;
 
 public class TestExamples extends TestAbstract {
 
-    // @Test
-    // public void interanallyInconsistentMethod() {
-    // testWrong(testPath + "field_updates/InternalInconsistency.java");
-    // }
-
-    // @Test
-    // public void ErrorMethodInvocation() {
-    // testWrong(testPath + "ErrorMethodInvocation.java");
-    // }
-
     @Test
     public void internalFieldUpdate() {
         testCorrect(testPath + "field_updates/InternalFieldUpdate.java");
     }
-
-    // @Test
-    // public void wrongInternalFieldUpdate() {
-    // testWrong(testPath + "field_updates/WrongInternalFieldUpdate.java");
-    // }
 
     @Test
     public void correctFieldUpdate() {
