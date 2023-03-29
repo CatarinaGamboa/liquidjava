@@ -28,7 +28,7 @@ a = -8; // type error!
 1. Clone the repository;
 2. Open Eclipse and do `Ìmport...\ Existing Maven Project` selecting the folder `liquidjava-umbrella` and waiting for the build process to finish (bottom right update bar)
 3. Select the `liquidjava-umbrella` folder, right click it and select `Run as...\Maven install...`
-4. Select `liquidjava-verifier`, on right-click, go to `Build Path\Link Source...` and browse for `liquidjava-verifier\target\generated-sources\antlr4` and select `Finish`
+4. If inside the `liquidjava-verifier` build path there is not a `tregt/generated-sources/antr4`: Select `liquidjava-verifier`, on right-click, go to `Build Path\Link Source...` and browse for `liquidjava-verifier\target\generated-sources\antlr4` and select `Finish`
 
 ## Run verification
 #### In a specific project
