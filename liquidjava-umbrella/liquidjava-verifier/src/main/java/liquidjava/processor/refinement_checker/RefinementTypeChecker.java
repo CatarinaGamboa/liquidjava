@@ -94,6 +94,12 @@ public class RefinementTypeChecker extends TypeChecker {
         super.visitCtAnnotationType(annotationType);
     }
 
+    /**
+     * Loads constructor data obtained from mfc pass earlier to context
+     * Mainly arguments refinements
+     * @param c Spoon's constructor representation
+     */
+
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
         if (errorEmitter.foundError()) {
@@ -105,6 +111,12 @@ public class RefinementTypeChecker extends TypeChecker {
         super.visitCtConstructor(c);
         context.exitContext();
     }
+
+    /**
+     * Loads method data obtained from mfc pass earlier to context
+     * Mainly arguments refinements
+     * @param method Spoon's constructor representation
+     */
 
     public <R> void visitCtMethod(CtMethod<R> method) {
         if (errorEmitter.foundError()) {
@@ -119,6 +131,12 @@ public class RefinementTypeChecker extends TypeChecker {
         context.exitContext();
 
     }
+
+    /**
+     * Handles declaration with or without assignment and adds new variable to context
+     * Checks if right hand side of assignment satisfies refinement if present
+     * @param localVariable Spoon's representation of local variable creation
+     */
 
     @Override
     public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
@@ -193,6 +211,11 @@ public class RefinementTypeChecker extends TypeChecker {
         }
     }
 
+    /**
+     * Handles {@code return this} by creating connection with wildcard
+     * @param thisAccess Spoon's internal representation of {@code this} as in read
+     */
+
     @Override
     public <T> void visitCtThisAccess(CtThisAccess<T> thisAccess) {
         if (errorEmitter.foundError()) {
@@ -207,38 +230,42 @@ public class RefinementTypeChecker extends TypeChecker {
             thisAccess.putMetadata(REFINE_KEY,
                     Predicate.createEquals(Predicate.createVar(WILD_VAR), Predicate.createVar(thisName)));
         }
-
     }
 
+    /**
+     * Calls SMT to check refinements of the assignment.
+     * Updates ghost function if left hand side is a field
+     * @param assignment Spoon's internal representation of {@code x = y}
+     */
     @SuppressWarnings("unchecked")
     @Override
-    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignement) {
+    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignment) {
         if (errorEmitter.foundError()) {
             return;
         }
 
-        super.visitCtAssignment(assignement);
-        CtExpression<T> ex = assignement.getAssigned();
+        super.visitCtAssignment(assignment);
+        CtExpression<T> ex = assignment.getAssigned();
 
         if (ex instanceof CtVariableWriteImpl) {
             CtVariableReference<?> var = ((CtVariableAccess<?>) ex).getVariable();
             CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
             String name = var.getSimpleName();
-            checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), assignement, varDecl);
+            checkAssignment(name, varDecl.getType(), ex, assignment.getAssignment(), assignment, varDecl);
 
         } else if (ex instanceof CtFieldWrite) {
-            System.out.println("Got field write: " + assignement);
+            System.out.println("Got field write: " + assignment);
             CtFieldWrite<?> fw = ((CtFieldWrite<?>) ex);
             CtFieldReference<?> cr = fw.getVariable();
             CtField<?> f = fw.getVariable().getDeclaration();
             String updatedVarName = String.format(thisFormat, cr.getSimpleName());
-            checkAssignment(updatedVarName, cr.getType(), ex, assignement.getAssignment(), assignement, f);
+            checkAssignment(updatedVarName, cr.getType(), ex, assignment.getAssignment(), assignment, f);
 
             // corresponding ghost function update
             try {
                 AuxStateHandler.updateGhostField(fw, this);
             } catch (ParsingException e) {
-                ErrorHandler.printCostumeError(assignement, "ParsingException in `" + assignement + "` in class `"
+                ErrorHandler.printCostumeError(assignment, "ParsingException in `" + assignment + "` in class `"
                         + f.getDeclaringType() + "` : " + e.getMessage(), errorEmitter);
 
                 return;
@@ -265,6 +292,10 @@ public class RefinementTypeChecker extends TypeChecker {
         // TODO predicate for now is always TRUE
     }
 
+    /**
+     * Creates refinement for constant literal: "lifts" it to the refinement level.
+     * @param lit Spoon's internal representation of a literal
+     */
     @Override
     public <T> void visitCtLiteral(CtLiteral<T> lit) {
         if (errorEmitter.foundError()) {
@@ -284,6 +315,10 @@ public class RefinementTypeChecker extends TypeChecker {
         }
     }
 
+    /**
+     * Adds field and its refienment to context for the future use in methods
+     * @param f Spoon's internal representation of field declaration
+     */
     @Override
     public <T> void visitCtField(CtField<T> f) {
         if (errorEmitter.foundError()) {
@@ -311,6 +346,10 @@ public class RefinementTypeChecker extends TypeChecker {
 
     }
 
+    /**
+     *
+     * @param fieldRead
+     */
     @Override
     public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
         if (errorEmitter.foundError()) {
@@ -320,6 +359,8 @@ public class RefinementTypeChecker extends TypeChecker {
         String fieldName = fieldRead.getVariable().getSimpleName();
         if (context.hasVariable(fieldName)) {
             RefinedVariable rv = context.getVariableByName(fieldName);
+            //if rv is a variable not an instance, and it has known location in code.
+            //check if this location is the same as ??
             if (rv instanceof Variable && ((Variable) rv).getLocation().isPresent()
                     && ((Variable) rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
                 fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
