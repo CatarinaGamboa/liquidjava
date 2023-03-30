@@ -1,6 +1,7 @@
 package liquidjava.processor.refinement_checker.general_checkers;
 
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -38,9 +39,9 @@ import spoon.reflect.reference.CtExecutableReference;
 
 public class MethodsFunctionsChecker {
 
-    private TypeChecker rtc;
+    private final TypeChecker rtc;
 
-    private static String retNameFormat = "#ret_%d";
+    private static final String retNameFormat = "#ret_%d";
 
     public MethodsFunctionsChecker(TypeChecker rtc) {
         this.rtc = rtc;
@@ -139,13 +140,13 @@ public class MethodsFunctionsChecker {
     /**
      * Joins all the refinements from parameters and return
      *
-     * @param f
-     * @param methodRef
-     * @param params
+     * @param f internal representation of function
+     * @param method Spoon's representation of function
+     * @param params Spoon's representation of function arguments
      *
-     * @return Conjunction of all
+     * @return Conjunction of predicates in method and its arguments
      *
-     * @throws ParsingException
+     * @throws ParsingException when annotation parsing is failed
      */
     private Predicate handleFunctionRefinements(RefinedFunction f, CtElement method, List<CtParameter<?>> params)
             throws ParsingException {
@@ -433,8 +434,7 @@ public class MethodsFunctionsChecker {
                 for (Variable v : lv)
                     rtc.getContext().addVarToContext(v);
             } else {
-                assertFalse("Method should already be in context. Should not arrive this point in refinement checker.",
-                        true);
+                fail("Method should already be in context. Should not arrive this point in refinement checker.");
                 // getMethodRefinements(method); //should be irrelevant -should never need to get here
             }
         }
