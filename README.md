@@ -8,7 +8,7 @@ Simple example
 
 
 ```java
-@Refined("a > 0")
+@Refinement("a > 0")
 int a = 3; // okay
 a = -8; // type error!
 ```
