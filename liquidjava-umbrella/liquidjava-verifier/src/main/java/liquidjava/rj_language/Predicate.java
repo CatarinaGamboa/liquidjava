@@ -10,8 +10,10 @@ import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
+import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.context.GhostState;
 import liquidjava.processor.facade.AliasDTO;
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.ast.*;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
@@ -33,7 +35,7 @@ public class Predicate {
      * Create a predicate with the expression true
      */
     public Predicate() {
-        exp = new BinaryExpression(new SepEmp(), "&&", new LiteralBoolean(true));
+        exp = new LiteralBoolean(true);
     }
 
     /**
@@ -110,7 +112,7 @@ public class Predicate {
     public List<GhostState> getStateInvocations(List<GhostState> lgs) {
         if (lgs == null)
             return new ArrayList<>();
-        List<String> all = lgs.stream().map(p -> p.getName()).collect(Collectors.toList());
+        List<String> all = lgs.stream().map(GhostFunction::getName).collect(Collectors.toList());
         List<String> toAdd = new ArrayList<>();
         exp.getStateInvocations(toAdd, all);
 
