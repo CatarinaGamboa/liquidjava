@@ -95,9 +95,10 @@ public class RefinementTypeChecker extends TypeChecker {
     }
 
     /**
-     * Loads constructor data obtained from mfc pass earlier to context
-     * Mainly arguments refinements
-     * @param c Spoon's constructor representation
+     * Loads constructor data obtained from mfc pass earlier to context Mainly arguments refinements
+     * 
+     * @param c
+     *            Spoon's constructor representation
      */
 
     @Override
@@ -113,9 +114,10 @@ public class RefinementTypeChecker extends TypeChecker {
     }
 
     /**
-     * Loads method data obtained from mfc pass earlier to context
-     * Mainly arguments refinements
-     * @param method Spoon's constructor representation
+     * Loads method data obtained from mfc pass earlier to context Mainly arguments refinements
+     * 
+     * @param method
+     *            Spoon's constructor representation
      */
 
     public <R> void visitCtMethod(CtMethod<R> method) {
@@ -133,9 +135,11 @@ public class RefinementTypeChecker extends TypeChecker {
     }
 
     /**
-     * Handles declaration with or without assignment and adds new variable to context
-     * Checks if right hand side of assignment satisfies refinement if present
-     * @param localVariable Spoon's representation of local variable creation
+     * Handles declaration with or without assignment and adds new variable to context Checks if right hand side of
+     * assignment satisfies refinement if present
+     * 
+     * @param localVariable
+     *            Spoon's representation of local variable creation
      */
 
     @Override
@@ -213,7 +217,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
     /**
      * Handles {@code return this} by creating connection with wildcard
-     * @param thisAccess Spoon's internal representation of {@code this} as in read
+     * 
+     * @param thisAccess
+     *            Spoon's internal representation of {@code this} as in read
      */
 
     @Override
@@ -233,9 +239,10 @@ public class RefinementTypeChecker extends TypeChecker {
     }
 
     /**
-     * Calls SMT to check refinements of the assignment.
-     * Updates ghost function if left hand side is a field
-     * @param assignment Spoon's internal representation of {@code x = y}
+     * Calls SMT to check refinements of the assignment. Updates ghost function if left hand side is a field
+     * 
+     * @param assignment
+     *            Spoon's internal representation of {@code x = y}
      */
     @SuppressWarnings("unchecked")
     @Override
@@ -294,7 +301,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
     /**
      * Creates refinement for constant literal: "lifts" it to the refinement level.
-     * @param lit Spoon's internal representation of a literal
+     * 
+     * @param lit
+     *            Spoon's internal representation of a literal
      */
     @Override
     public <T> void visitCtLiteral(CtLiteral<T> lit) {
@@ -317,7 +326,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
     /**
      * Adds field and its refienment to context for the future use in methods
-     * @param f Spoon's internal representation of field declaration
+     * 
+     * @param f
+     *            Spoon's internal representation of field declaration
      */
     @Override
     public <T> void visitCtField(CtField<T> f) {
@@ -359,8 +370,8 @@ public class RefinementTypeChecker extends TypeChecker {
         String fieldName = fieldRead.getVariable().getSimpleName();
         if (context.hasVariable(fieldName)) {
             RefinedVariable rv = context.getVariableByName(fieldName);
-            //if rv is a variable not an instance, and it has known location in code.
-            //check if this location is the same as ??
+            // if rv is a variable not an instance, and it has known location in code.
+            // check if this location is the same as ??
             if (rv instanceof Variable && ((Variable) rv).getLocation().isPresent()
                     && ((Variable) rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
                 fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
