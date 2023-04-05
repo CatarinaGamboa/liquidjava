@@ -239,7 +239,7 @@ public class AuxStateHandler {
             ctConstructorCall.putMetadata(refKey, c);
             // add maping to oc.get(0)-HERE
         } else if (oc.size() > 1) {
-            assertFalse("Constructor can only have one to state, not multiple", true);
+            fail("Constructor can only have one to state, not multiple");
         }
 
     }

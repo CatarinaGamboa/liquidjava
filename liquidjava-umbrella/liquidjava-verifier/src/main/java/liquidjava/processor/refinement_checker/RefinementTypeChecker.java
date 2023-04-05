@@ -257,8 +257,8 @@ public class RefinementTypeChecker extends TypeChecker {
         if (ex instanceof CtVariableWriteImpl) {
             CtVariableReference<?> var = ((CtVariableAccess<?>) ex).getVariable();
             CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
-            String name = var.getSimpleName();
-            checkAssignment(name, varDecl.getType(), ex, assignment.getAssignment(), assignment, varDecl);
+            String assigneeName = var.getSimpleName();
+            checkAssignment(assigneeName, varDecl.getType(), ex, assignment.getAssignment(), assignment, varDecl);
 
         } else if (ex instanceof CtFieldWrite) {
             System.out.println("Got field write: " + assignment);
@@ -576,26 +576,27 @@ public class RefinementTypeChecker extends TypeChecker {
     }
 
     // ############################### Inner Visitors ##########################################
-    private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, CtExpression<?> assignment,
-            CtElement parentElem, CtElement varDecl) {
-        getPutVariableMetadada(ex, name);
+    private void checkAssignment(String assigneeName, CtTypeReference<?> type, CtExpression<?> ex,
+            CtExpression<?> assignment, CtElement parentElem, CtElement varDecl) {
+        getPutVariableMetadada(ex, assigneeName);
 
         Predicate refinementFound = getRefinement(assignment);
         if (refinementFound == null) {
-            RefinedVariable rv = context.getVariableByName(name);
+            RefinedVariable rv = context.getVariableByName(assigneeName);
             if (rv instanceof Variable) {
                 refinementFound = rv.getMainRefinement();
             } else {
                 refinementFound = new Predicate();
             }
         }
-        Optional<VariableInstance> r = context.getLastVariableInstance(name);
+        Optional<VariableInstance> r = context.getLastVariableInstance(assigneeName);
         // AQUI!!
+        // what??
         r.ifPresent(variableInstance -> vcChecker.removePathVariableThatIncludes(variableInstance.getName()));
 
-        vcChecker.removePathVariableThatIncludes(name);// AQUI!!
+        vcChecker.removePathVariableThatIncludes(assigneeName);// AQUI!! what..?
         try {
-            checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
+            checkVariableRefinements(refinementFound, assigneeName, type, parentElem, varDecl);
         } catch (ParsingException e) {
             return;// error already in ErrorEmitter
         }

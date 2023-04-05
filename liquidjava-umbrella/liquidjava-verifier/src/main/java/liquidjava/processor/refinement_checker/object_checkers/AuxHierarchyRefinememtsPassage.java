@@ -98,9 +98,10 @@ public class AuxHierarchyRefinememtsPassage {
             TypeChecker tc, HashMap<String, String> super2function) {
         Predicate functionRef = function.getRefinement();
         Predicate superRef = superFunction.getRefinement();
-        if (functionRef.isBooleanTrue())
+        if (functionRef.isBooleanTrue()) {
             function.setRefinement(superRef);
-        else {
+            // TODO(sep logic): handle heap changes
+        } else {
             String name = String.format(tc.freshFormat, tc.getContext().getCounter());
             tc.getContext().addVarToContext(name, superFunction.getType(), new Predicate(), method);
             // functionRef might be stronger than superRef -> check (superRef <: functionRef)

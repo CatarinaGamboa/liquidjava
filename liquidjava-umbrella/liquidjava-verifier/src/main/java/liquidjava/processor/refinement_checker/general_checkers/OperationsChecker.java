@@ -106,7 +106,7 @@ public class OperationsChecker {
         CtExpression<T> ex = operator.getOperand();
         String name = rtc.freshFormat;
         Predicate all;
-        if (ex instanceof CtVariableWrite) {
+        if (ex instanceof CtVariableWrite) {//`x++`, for example, performs write
             CtVariableWrite<T> w = (CtVariableWrite<T>) ex;
             name = w.getVariable().getSimpleName();
             all = getRefinementUnaryVariableWrite(ex, operator, w, name);
@@ -301,17 +301,16 @@ public class OperationsChecker {
     }
 
     /**
-     * Retrieves the refinements for the a variable write inside unary operation
+     * Retrieves the refinements for the variable write inside unary operation
      *
-     * @param <T>
-     * @param ex
-     * @param operator
-     * @param w
-     * @param name
+     * @param ex Spoon's representation of operand in unary operation
+     * @param operator Spoon's operation representation
+     * @param w Spoon's write representation
+     * @param name of the operand
      *
      * @return String with the refinements
      *
-     * @throws ParsingException
+     * @throws ParsingException if annotation parsing throws
      */
     private <T> Predicate getRefinementUnaryVariableWrite(CtExpression<T> ex, CtUnaryOperator<T> operator,
             CtVariableWrite<T> w, String name) throws ParsingException {

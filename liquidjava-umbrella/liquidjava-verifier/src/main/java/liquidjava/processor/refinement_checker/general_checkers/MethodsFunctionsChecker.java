@@ -16,6 +16,7 @@ import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
 import liquidjava.processor.context.Variable;
 import liquidjava.processor.context.VariableInstance;
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.object_checkers.AuxHierarchyRefinememtsPassage;
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
@@ -53,7 +54,8 @@ public class MethodsFunctionsChecker {
         f.setName(c.getSimpleName());
         f.setType(c.getType());
         handleFunctionRefinements(f, c, c.getParameters());
-        f.setRefReturn(new Predicate());
+        f.setRefReturn(new Predicate());// why it is set to true, despite being handle in `handleFunctionRefinement`?
+        // TODO(sep logic): handle heap change
         if (c.getParent() instanceof CtClass) {
             CtClass<?> klass = (CtClass<?>) c.getParent();
             f.setClass(klass.getQualifiedName());
@@ -84,6 +86,7 @@ public class MethodsFunctionsChecker {
         f.setName(method.getSimpleName());
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
+        // TODO(sep logic): handle heap change
 
         CtClass<?> klass = null;
         if (method.getParent() instanceof CtClass) {
@@ -118,6 +121,7 @@ public class MethodsFunctionsChecker {
         f.setName(functionName);
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
+        // TODO(sep logic): handle heap change
         f.setClass(prefix);
         rtc.getContext().addFunctionToContext(f);
         auxGetMethodRefinements(method, f);
@@ -173,6 +177,8 @@ public class MethodsFunctionsChecker {
         Optional<Predicate> oret = rtc.getRefinementFromAnnotation(method);
         Predicate ret = oret.orElse(new Predicate());
         f.setRefReturn(ret);
+        // TODO(sep logic): handle heap change
+
         // rtc.context.addFunctionToContext(f);
         return Predicate.createConjunction(joint, ret);
     }
@@ -282,6 +288,8 @@ public class MethodsFunctionsChecker {
 
     private Map<String, String> checkInvocationRefinements(CtElement invocation, List<CtExpression<?>> arguments,
             CtExpression<?> target, String methodName, String className) {
+        // TODO(sep logic): check if heap is ok and apply changes
+
         // -- Part 1: Check if the invocation is possible
         int si = arguments.size();
         RefinedFunction f = rtc.getContext().getFunction(methodName, className, si);
@@ -295,7 +303,8 @@ public class MethodsFunctionsChecker {
             return map;
         }
 
-        checkParameters(invocation, arguments, f, map);
+        checkParameters(invocation, arguments, f, map); // <- only actual check via SMT solver
+        // TODO(sep logic): check heap
 
         // -- Part 2: Apply changes
         // applyRefinementsToArguments(element, arguments, f, map);
@@ -330,6 +339,7 @@ public class MethodsFunctionsChecker {
             rtc.getContext().addRefinementInstanceToVariable(varName, viName);
         invocation.putMetadata(rtc.TARGET_KEY, vi);
         invocation.putMetadata(rtc.REFINE_KEY, methodRef);
+        // TODO(sep logic): invocation.puMetadata(rtc.HEAP_KEY, newHeapContext) ????
 
         return map;
 

@@ -4,29 +4,36 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction extends Refined {
 
-    private List<Variable> argRefinements;
+    private final List<Variable> argRefinements;
     private String targetClass;
     private List<ObjectState> stateChange;
+
+    private HeapContext.Transition heapChange;
 
     public RefinedFunction() {
         argRefinements = new ArrayList<>();
         stateChange = new ArrayList<>();
+        heapChange = HeapContext.Transition.id();
     }
 
     public List<Variable> getArguments() {
         return argRefinements;
     }
 
+    public void setHeapChange(HeapContext.Transition tr) {
+        heapChange = tr;
+    }
+
     public void addArgRefinements(String varName, CtTypeReference<?> type, Predicate refinement) {
         Variable v = new Variable(varName, type, refinement);
         this.argRefinements.add(v);
-
     }
 
     public void addArgRefinements(Variable vi) {
