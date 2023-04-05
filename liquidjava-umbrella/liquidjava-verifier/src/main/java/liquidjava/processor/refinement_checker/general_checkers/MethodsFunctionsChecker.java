@@ -64,16 +64,17 @@ public class MethodsFunctionsChecker {
 
     public void getConstructorInvocationRefinements(CtConstructorCall<?> ctConstructorCall) {
         CtExecutableReference<?> exe = ctConstructorCall.getExecutable();
-        if (exe != null) {
-            RefinedFunction f = rtc.getContext().getFunction(exe.getSimpleName(),
-                    exe.getDeclaringType().getQualifiedName(), ctConstructorCall.getArguments().size());
-            if (f != null) {
-                Map<String, String> map = checkInvocationRefinements(ctConstructorCall,
-                        ctConstructorCall.getArguments(), ctConstructorCall.getTarget(), f.getName(),
-                        f.getTargetClass());
-                AuxStateHandler.constructorStateMetadata(rtc.REFINE_KEY, f, map, ctConstructorCall);
-            }
+        if (exe == null) {
+            return;
         }
+        RefinedFunction f = rtc.getContext().getFunction(exe.getSimpleName(), exe.getDeclaringType().getQualifiedName(),
+                ctConstructorCall.getArguments().size());
+        if (f == null) {
+            return;
+        }
+        Map<String, String> map = checkInvocationRefinements(ctConstructorCall, ctConstructorCall.getArguments(),
+                ctConstructorCall.getTarget(), f.getName(), f.getTargetClass());
+        AuxStateHandler.constructorStateMetadata(rtc.REFINE_KEY, f, map, ctConstructorCall);
 
     }
 
@@ -140,13 +141,17 @@ public class MethodsFunctionsChecker {
     /**
      * Joins all the refinements from parameters and return
      *
-     * @param f internal representation of function
-     * @param method Spoon's representation of function
-     * @param params Spoon's representation of function arguments
+     * @param f
+     *            internal representation of function
+     * @param method
+     *            Spoon's representation of function
+     * @param params
+     *            Spoon's representation of function arguments
      *
      * @return Conjunction of predicates in method and its arguments
      *
-     * @throws ParsingException when annotation parsing is failed
+     * @throws ParsingException
+     *             when annotation parsing is failed
      */
     private Predicate handleFunctionRefinements(RefinedFunction f, CtElement method, List<CtParameter<?>> params)
             throws ParsingException {
