@@ -33,10 +33,15 @@ public class CVC5Wrapper implements SMTWrapper {
         if (st.isSat() || st.isUnknown()) {
             // Term h = s.getValueSepHeap();
             // System.out.println("Heap:\n" + h.toString());
+            try {
+                String model = s.getModel(new Sort[] { cvc5tr.getPointerSort(), cvc5tr.getPointeeSort() },
+                        new Term[] {});
 
-            String model = s.getModel(new Sort[] { cvc5tr.getPointerSort(), cvc5tr.getPointeeSort() }, new Term[] {});
+                System.out.println("Model:\n" + model);
+            } catch (Exception m) {
+                System.out.println("Failed to produce model: " + m);
+            }
 
-            System.out.println("Model:\n" + model);
         }
 
         return Status.fromCVC5(st);
