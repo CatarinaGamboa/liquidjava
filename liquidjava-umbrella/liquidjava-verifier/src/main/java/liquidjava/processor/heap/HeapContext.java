@@ -3,6 +3,7 @@ package liquidjava.processor.heap;
 import liquidjava.processor.context.Variable;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.*;
+import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 import java.util.HashMap;
@@ -33,87 +34,108 @@ import java.util.Objects;
  */
 public class HeapContext {
 
-    Map<String, Pointee> heap;
+    static class Pointer{
+        Predicate p;
 
-    public static HeapContext fromPredicate(Predicate p) throws Exception {
+        public Pointer(Predicate p) {
+            this.p = p;
+        }
+    }
+
+    static class Pointee{
+        Predicate p;
+
+        public Pointee(Predicate p) {
+            this.p = p;
+        }
+    }
+
+    Map<Pointer, Pointee> heap;
+
+    public static HeapContext fromPredicate(Predicate p) throws ParsingException {
         HeapContext res = new HeapContext();
 
-        p.getExpression().accept(new ExpressionVisitor() {
-            @Override
-            public void visitAliasInvocation(AliasInvocation ai) throws Exception {
-
-            }
-
-            @Override
-            public void visitBinaryExpression(BinaryExpression be) throws Exception {
-
-                if (Objects.equals(be.getOperator(), "|*")) {
-                    be.getFirstOperand().accept(this);
-
-                    be.getSecondOperand().accept(this);
-
-                } else if (Objects.equals(be.getOperator(), "|->")) {
-
-                } else {
-                    throw new Exception("Heap refinement should contain only `|*` and `|->` connections");
+        try {
+            p.getExpression().accept(new ExpressionVisitor() {
+                @Override
+                public void visitAliasInvocation(AliasInvocation ai) throws Exception {
+                        throw new Exception("Can't have top level alias invocation: " + ai);
                 }
-            }
 
-            @Override
-            public void visitFunctionInvocation(FunctionInvocation fi) throws Exception {
+                @Override
+                public void visitBinaryExpression(BinaryExpression be) throws Exception {
 
-            }
+                    if (Objects.equals(be.getOperator(), "|*")) {
+                        be.getFirstOperand().accept(this);
+                        be.getSecondOperand().accept(this);
 
-            @Override
-            public void visitGroupExpression(GroupExpression ge) throws Exception {
+                    } else if (Objects.equals(be.getOperator(), "|->")) {
+                        Pointer pointer = new Pointer(new Predicate(be.getFirstOperand()));
+                        Pointee pointee = new Pointee(new Predicate(be.getSecondOperand()));
+                        res.heap.put(pointer, pointee);
+                    } else {
+                        throw new Exception("Heap refinement should contain only `|*` and `|->` connections");
+                    }
+                }
 
-            }
+                @Override
+                public void visitFunctionInvocation(FunctionInvocation fi) throws Exception {
+                    throw new Exception("Can't have top level function invocation: " + fi);
+                }
 
-            @Override
-            public void visitITE(Ite ite) throws Exception {
+                @Override
+                public void visitGroupExpression(GroupExpression ge) throws Exception {
+                    ge.getExpression().accept(this);
+                }
 
-            }
+                @Override
+                public void visitITE(Ite ite) throws Exception {
+                    throw new Exception("Can't have top level ite: " + ite);
+                }
 
-            @Override
-            public void visitLiteralBoolean(LiteralBoolean lb) {
+                @Override
+                public void visitLiteralBoolean(LiteralBoolean lb) throws Exception {
+                    throw new Exception("Can't have top level boolean literal: " + lb);
+                }
 
-            }
+                @Override
+                public void visitLiteralInt(LiteralInt li) throws Exception {
+                    throw new Exception("Can't have top level int literal: " + li);
+                }
 
-            @Override
-            public void visitLiteralInt(LiteralInt li) {
+                @Override
+                public void visitLiteralReal(LiteralReal lr) throws Exception {
+                    throw new Exception("Can't have top level real literal: " + lr);
+                }
 
-            }
+                @Override
+                public void visitLiteralString(LiteralString ls) throws Exception {
+                    throw new Exception("Can't have top level string literal: " + ls);
+                }
 
-            @Override
-            public void visitLiteralReal(LiteralReal lr) throws Exception {
+                @Override
+                public void visitUnaryExpression(UnaryExpression ue) throws Exception {
+                    throw new Exception("Can't have top level unary expression literal: " + ue);
+                }
 
-            }
+                @Override
+                public void visitVar(Var v) throws Exception {
+                    throw new Exception("Can't have top level variable: " + v);
+                }
 
-            @Override
-            public void visitLiteralString(LiteralString ls) {
+                @Override
+                public void visitUnit(SepUnit unit) throws Exception {
+                    return;
+                }
 
-            }
-
-            @Override
-            public void visitUnaryExpression(UnaryExpression ue) throws Exception {
-
-            }
-
-            @Override
-            public void visitVar(Var v) throws Exception {
-
-            }
-
-            @Override
-            public void visitUnit(SepUnit unit) throws Exception {
-
-            }
-
-            @Override
-            public void visitSepEmp(SepEmp sepEmp) throws Exception {
-
-            }
-        });
+                @Override
+                public void visitSepEmp(SepEmp sepEmp) throws Exception {
+                    return;
+                }
+            });
+        } catch (Exception e) {
+            throw new ParsingException(e);
+        }
 
         return res;
     }
@@ -173,6 +195,14 @@ public class HeapContext {
 
     public HeapContext applyFrameRule(Transition transition) {
         return applyFrameRule(transition.getPre(), transition.getPost());
+    }
+
+    public void enterContext() {
+
+    }
+
+    public void exitContext() {
+
     }
 
     static public class Transition {
@@ -271,6 +301,13 @@ public class HeapContext {
          */
         static public Transition allocation(Variable v) {
             return null;
+        }
+
+        static public Transition create(HeapContext pre, HeapContext post){
+            Transition res = new Transition();
+            res.precondition = pre;
+            res.postcondition = post;
+            return res;
         }
     }
 }

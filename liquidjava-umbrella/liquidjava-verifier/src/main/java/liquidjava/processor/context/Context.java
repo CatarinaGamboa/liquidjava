@@ -3,6 +3,7 @@ package liquidjava.processor.context;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
@@ -18,10 +19,14 @@ public class Context {
     private Map<String, List<GhostState>> classStates;
     private List<AliasWrapper> alias;
 
+    private HeapContext heapCtx;
+
     public int counter;
     private static Context instance;
 
     private Context() {
+        heapCtx = HeapContext.empty();
+
         ctxVars = new Stack<>();
         ctxVars.add(new ArrayList<>());
         ctxFunctions = new ArrayList<>();
@@ -52,6 +57,7 @@ public class Context {
         // alias = new ArrayList<>();
         // ghosts = new ArrayList<>();
         // counter = 0;
+        heapCtx = HeapContext.empty();
     }
 
     public void reinitializeAllContext() {
@@ -71,6 +77,7 @@ public class Context {
             if (vi instanceof Variable)
                 ((Variable) vi).enterContext();
 
+        heapCtx.enterContext();
     }
 
     public void exitContext() {
@@ -79,13 +86,19 @@ public class Context {
         for (RefinedVariable vi : getAllVariables())
             if (vi instanceof Variable)
                 ((Variable) vi).exitContext();
+
+        heapCtx.exitContext();
+    }
+
+    public HeapContext getHeapCtx(){
+        return heapCtx;
     }
 
     public int getCounter() {
         return counter++;
     }
 
-    public Map<String, CtTypeReference<?>> getContext() {
+    public Map<String, CtTypeReference<?>> getTypeContext() {
         Map<String, CtTypeReference<?>> ret = new HashMap<>();
         for (List<RefinedVariable> l : ctxVars) {
             for (RefinedVariable var : l) {

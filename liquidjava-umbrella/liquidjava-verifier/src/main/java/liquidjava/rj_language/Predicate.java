@@ -1,9 +1,6 @@
 package liquidjava.rj_language;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import liquidjava.errors.ErrorEmitter;
@@ -54,6 +51,18 @@ public class Predicate {
         if (!(exp instanceof GroupExpression)) {
             exp = new GroupExpression(exp);
         }
+    }
+
+    public static Optional<Predicate> tryFromExpression(String ref, CtElement element, ErrorEmitter e){
+        try{
+            return Optional.of(new Predicate(ref, element, e));
+        } catch (ParsingException ex) {
+            return Optional.empty();
+        }
+    }
+
+    public static Predicate EmptyHeap(){
+        return new Predicate(new SepEmp());
     }
 
     /**

@@ -19,14 +19,14 @@ import spoon.reflect.reference.CtTypeReference;
  * First visit to Spoon AST to get the method's refinements
  */
 public class MethodsFirstChecker extends TypeChecker {
-    MethodsFunctionsChecker mfc;
+    final MethodsFunctionsChecker mfc;
     List<String> visitedClasses;
 
     public MethodsFirstChecker(Context c, Factory fac, ErrorEmitter errorEmitter) {
         super(c, fac, errorEmitter);
         mfc = new MethodsFunctionsChecker(this);
         visitedClasses = new ArrayList<>();
-        System.out.println("In Methids First Checker");
+        System.out.println("In Methods First Checker");
     }
 
     @Override

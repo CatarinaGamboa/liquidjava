@@ -55,7 +55,8 @@ public class MethodsFunctionsChecker {
         f.setType(c.getType());
         handleFunctionRefinements(f, c, c.getParameters());
         f.setRefReturn(new Predicate());// why it is set to true, despite being handle in `handleFunctionRefinement`?
-        // TODO(sep logic): handle heap change
+        //TODO(sep logic): handle heap change.
+        // Maybe I should do everything in handleFunctionRefinement, not here
         if (c.getParent() instanceof CtClass) {
             CtClass<?> klass = (CtClass<?>) c.getParent();
             f.setClass(klass.getQualifiedName());
@@ -86,7 +87,6 @@ public class MethodsFunctionsChecker {
         f.setName(method.getSimpleName());
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
-        // TODO(sep logic): handle heap change
 
         CtClass<?> klass = null;
         if (method.getParent() instanceof CtClass) {
@@ -100,6 +100,9 @@ public class MethodsFunctionsChecker {
         rtc.getContext().addFunctionToContext(f);
 
         auxGetMethodRefinements(method, f);
+        //TODO(sep logic): handle heap change
+        // But here implicitly handleFunctionRefinement is called,
+        // so maybe nothing should be done here
         AuxStateHandler.handleMethodState(method, f, rtc);
 
         if (klass != null)
@@ -121,10 +124,13 @@ public class MethodsFunctionsChecker {
         f.setName(functionName);
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
-        // TODO(sep logic): handle heap change
+
         f.setClass(prefix);
         rtc.getContext().addFunctionToContext(f);
         auxGetMethodRefinements(method, f);
+        //TODO(sep logic): handle heap change
+        // internally handleFunctionRefinement is called
+        // maybe nothing to do here
 
         AuxStateHandler.handleMethodState(method, f, rtc);
         if (functionName.equals(constructorName) && !f.hasStateChange()) {
@@ -177,7 +183,9 @@ public class MethodsFunctionsChecker {
         Optional<Predicate> oret = rtc.getRefinementFromAnnotation(method);
         Predicate ret = oret.orElse(new Predicate());
         f.setRefReturn(ret);
-        // TODO(sep logic): handle heap change
+        //TODO(sep logic): handle heap change
+        // I think maybe just store heap transition with substituted variables
+        // in rtc.HEAP_TR_KEY
 
         // rtc.context.addFunctionToContext(f);
         return Predicate.createConjunction(joint, ret);
@@ -288,7 +296,8 @@ public class MethodsFunctionsChecker {
 
     private Map<String, String> checkInvocationRefinements(CtElement invocation, List<CtExpression<?>> arguments,
             CtExpression<?> target, String methodName, String className) {
-        // TODO(sep logic): check if heap is ok and apply changes
+        //TODO(sep logic): check if heap is ok and apply changes
+        // Here I should actually call frame rule. Maybe it is the only place to do so
 
         // -- Part 1: Check if the invocation is possible
         int si = arguments.size();
@@ -304,7 +313,6 @@ public class MethodsFunctionsChecker {
         }
 
         checkParameters(invocation, arguments, f, map); // <- only actual check via SMT solver
-        // TODO(sep logic): check heap
 
         // -- Part 2: Apply changes
         // applyRefinementsToArguments(element, arguments, f, map);
@@ -339,7 +347,8 @@ public class MethodsFunctionsChecker {
             rtc.getContext().addRefinementInstanceToVariable(varName, viName);
         invocation.putMetadata(rtc.TARGET_KEY, vi);
         invocation.putMetadata(rtc.REFINE_KEY, methodRef);
-        // TODO(sep logic): invocation.puMetadata(rtc.HEAP_KEY, newHeapContext) ????
+        //TODO(sep logic): invocation.puMetadata(rtc.HEAP_KEY, newHeapContext) ????
+        // Yes I think so
 
         return map;
 

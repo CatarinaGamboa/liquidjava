@@ -38,7 +38,7 @@ public class Z3Translator extends AbstractExpressionVisitor {
     private Expr<?> result;
 
     public Z3Translator(liquidjava.processor.context.Context c) {
-        ContextTranslator.translateVariables(z3, c.getContext(), varTranslation);
+        ContextTranslator.translateVariables(z3, c.getTypeContext(), varTranslation);
         ContextTranslator.storeVariablesSubtypes(z3, c.getAllVariablesWithSupertypes(), varSuperTypes);
         ContextTranslator.addAlias(z3, c.getAlias(), aliasTranslation);
         ContextTranslator.addGhostFunctions(z3, c.getGhosts(), funcTranslation);

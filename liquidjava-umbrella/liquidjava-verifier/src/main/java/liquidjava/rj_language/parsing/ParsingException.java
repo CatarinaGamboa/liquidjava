@@ -11,4 +11,8 @@ public class ParsingException extends Exception {
         super(errorMessage);
     }
 
+    public ParsingException(Exception e){
+        super(e);
+    }
+
 }

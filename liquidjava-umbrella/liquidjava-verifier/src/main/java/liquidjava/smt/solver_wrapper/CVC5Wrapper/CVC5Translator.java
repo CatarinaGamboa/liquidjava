@@ -61,7 +61,7 @@ public class CVC5Translator extends AbstractExpressionVisitor {
 
     CVC5Translator(Context c) throws CVC5ApiException {
         ContextTranslator ct = new ContextTranslator(cvc5, sortMap);
-        ct.translateVariables(c.getContext(), varTranslation);
+        ct.translateVariables(c.getTypeContext(), varTranslation);
 
         // constant for sep.()
         varTranslation.put(CVC5Translator.pointeeSingletonName, cvc5.mkConst(getPointeeSort()));

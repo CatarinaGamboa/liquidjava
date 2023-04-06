@@ -1,5 +1,6 @@
 package liquidjava.processor.refinement_checker;
 
+import static liquidjava.rj_language.Predicate.tryFromExpression;
 import static org.junit.Assert.fail;
 
 import java.lang.annotation.Annotation;
@@ -117,21 +118,21 @@ public abstract class TypeChecker extends CtScanner {
         if (!pre.isPresent() && !post.isPresent()) {
             return Optional.empty();
         }
-        Predicate preP = new Predicate(new SepEmp());
-        if (pre.isPresent()) {
-            preP = new Predicate(pre.get(), element, errorEmitter);
-        }
-        if (errorEmitter.foundError())
-            return Optional.empty();
-        Predicate postP = new Predicate(new SepEmp());
 
-        if (post.isPresent()) {
-            postP = new Predicate(post.get(), element, errorEmitter);
-        }
+        Predicate preP = pre.flatMap(s -> Predicate.tryFromExpression(s, element, errorEmitter)).orElseGet(Predicate::EmptyHeap);
+
         if (errorEmitter.foundError())
             return Optional.empty();
 
-        return null;// ??
+        HeapContext precondition = HeapContext.fromPredicate(preP);
+
+        Predicate postP = post.flatMap(s -> Predicate.tryFromExpression(s, element, errorEmitter)).orElseGet(Predicate::EmptyHeap);
+        if (errorEmitter.foundError())
+            return Optional.empty();
+
+        HeapContext postcondition = HeapContext.fromPredicate(postP);
+
+        return Optional.of(HeapContext.Transition.create(precondition, postcondition));
     }
 
     @SuppressWarnings("unchecked")
@@ -299,9 +300,9 @@ public abstract class TypeChecker extends CtScanner {
     }
 
     /**
-     * Function that checks if found refinement holds against refinement from annotation.
-     * Usually found refinement have wildcard for given variable, so some substitutions take place.
-     * Used in variable declaration, variable assignment and when unary operation performs write (x++)
+     * Function that checks if found refinement holds against refinement from annotation. Usually found refinement have
+     * wildcard for given variable, so some substitutions take place. Used in variable declaration, variable assignment
+     * and when unary operation performs write (x++)
      * 
      * @param refinementFound
      *            usually obtained from getRefinement call for some CtElement
@@ -333,7 +334,9 @@ public abstract class TypeChecker extends CtScanner {
             cEt = expectedType.orElseGet(Predicate::new);
 
         cEt = cEt.substituteVariable(WILD_VAR, simpleName);
-        // TODO(sep logic): I need also to substitute in heapContext
+        //TODO(sep logic): I need also to substitute in heapContext
+        // For the first prototype I should focus on methods
+        // Now no annotations on variables allowed
         Predicate cet = cEt.substituteVariable(WILD_VAR, simpleName);
 
         String newName = String.format(instanceFormat, simpleName, context.getCounter());

@@ -13,13 +13,13 @@ public interface ExpressionVisitor {
 
     void visitITE(Ite ite) throws Exception;
 
-    void visitLiteralBoolean(LiteralBoolean lb);
+    void visitLiteralBoolean(LiteralBoolean lb) throws Exception;
 
-    void visitLiteralInt(LiteralInt li);
+    void visitLiteralInt(LiteralInt li) throws Exception;
 
     void visitLiteralReal(LiteralReal lr) throws Exception;
 
-    void visitLiteralString(LiteralString ls);
+    void visitLiteralString(LiteralString ls) throws Exception;
 
     void visitUnaryExpression(UnaryExpression ue) throws Exception;
 
