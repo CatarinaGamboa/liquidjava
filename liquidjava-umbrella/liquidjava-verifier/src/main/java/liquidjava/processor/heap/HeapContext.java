@@ -34,7 +34,7 @@ import java.util.Objects;
  */
 public class HeapContext {
 
-    static class Pointer{
+    static class Pointer {
         Predicate p;
 
         public Pointer(Predicate p) {
@@ -42,7 +42,7 @@ public class HeapContext {
         }
     }
 
-    static class Pointee{
+    static class Pointee {
         Predicate p;
 
         public Pointee(Predicate p) {
@@ -59,7 +59,7 @@ public class HeapContext {
             p.getExpression().accept(new ExpressionVisitor() {
                 @Override
                 public void visitAliasInvocation(AliasInvocation ai) throws Exception {
-                        throw new Exception("Can't have top level alias invocation: " + ai);
+                    throw new Exception("Can't have top level alias invocation: " + ai);
                 }
 
                 @Override
@@ -303,7 +303,17 @@ public class HeapContext {
             return null;
         }
 
-        static public Transition create(HeapContext pre, HeapContext post){
+        /**
+         * Creates heap transition from pre- and postcondition.
+         * 
+         * @param pre
+         *            precondition
+         * @param post
+         *            postcondition
+         * 
+         * @return triple representation of {@code pre {C} post}
+         */
+        static public Transition fromPrePostCond(HeapContext pre, HeapContext post) {
             Transition res = new Transition();
             res.precondition = pre;
             res.postcondition = post;

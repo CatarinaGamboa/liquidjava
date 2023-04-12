@@ -75,13 +75,13 @@ public class AuxHierarchyRefinememtsPassage {
             Variable superArg = superArgs.get(i);
             String newName = super2function.get(arg.getName());
             // create new name
-            Predicate argRef = arg.getRefinement().substituteVariable(arg.getName(), newName);
-            Predicate superArgRef = superArg.getRefinement().substituteVariable(superArg.getName(), newName);
+            Predicate argRef = arg.getRefinement().makeSubstitution(arg.getName(), newName);
+            Predicate superArgRef = superArg.getRefinement().makeSubstitution(superArg.getName(), newName);
 
             System.out.println(arg.getName() + " has ref " + argRef);
             if (argRef.isBooleanTrue()) {
                 System.out.println(arg.getName() + " has ref boolean true");
-                arg.setRefinement(superArgRef.substituteVariable(newName, arg.getName()));
+                arg.setRefinement(superArgRef.makeSubstitution(newName, arg.getName()));
             } else {
                 boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i));
                 if (!f) {
@@ -105,12 +105,12 @@ public class AuxHierarchyRefinememtsPassage {
             String name = String.format(tc.freshFormat, tc.getContext().getCounter());
             tc.getContext().addVarToContext(name, superFunction.getType(), new Predicate(), method);
             // functionRef might be stronger than superRef -> check (superRef <: functionRef)
-            functionRef = functionRef.substituteVariable(tc.WILD_VAR, name);
-            superRef = superRef.substituteVariable(tc.WILD_VAR, name);
+            functionRef = functionRef.makeSubstitution(tc.WILD_VAR, name);
+            superRef = superRef.makeSubstitution(tc.WILD_VAR, name);
             for (String m : super2function.keySet())
-                superRef = superRef.substituteVariable(m, super2function.get(m));
+                superRef = superRef.makeSubstitution(m, super2function.get(m));
             for (String m : super2function.keySet())
-                functionRef = functionRef.substituteVariable(m, super2function.get(m));
+                functionRef = functionRef.makeSubstitution(m, super2function.get(m));
 
             tc.checkStateSMT(functionRef, superRef, method,
                     "Return Refinement of Subclass must be subtype of the Return Refinement of the Superclass");
@@ -194,16 +194,16 @@ public class AuxHierarchyRefinememtsPassage {
      */
     private static Predicate matchVariableNames(String fromName, String thisName, RefinedFunction superFunction,
             RefinedFunction subFunction, Predicate c) {
-        Predicate nc = c.substituteVariable(fromName, thisName);
+        Predicate nc = c.makeSubstitution(fromName, thisName);
         List<Variable> superArgs = superFunction.getArguments();
         List<Variable> subArgs = subFunction.getArguments();
         for (int i = 0; i < subArgs.size(); i++) {
-            nc.substituteVariable(subArgs.get(i).getName(), superArgs.get(i).getName());
+            nc.makeSubstitution(subArgs.get(i).getName(), superArgs.get(i).getName());
         }
         return nc;
     }
 
     private static Predicate matchVariableNames(String fromName, String thisName, Predicate c) {
-        return c.substituteVariable(fromName, thisName);
+        return c.makeSubstitution(fromName, thisName);
     }
 }

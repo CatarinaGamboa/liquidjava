@@ -2,7 +2,6 @@ package liquidjava.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +14,6 @@ import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.BuiltinFunctionPredicate;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
-import liquidjava.specification.StateRefinement;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
@@ -198,7 +196,7 @@ public class RefinementTypeChecker extends TypeChecker {
             }
             String name = String.format(freshFormat, context.getCounter());
             if (c.getVariableNames().contains(WILD_VAR)) {
-                c = c.substituteVariable(WILD_VAR, name);
+                c = c.makeSubstitution(WILD_VAR, name);
             } else {
                 c = Predicate.createEquals(Predicate.createVar(name), c);
             }
@@ -348,7 +346,7 @@ public class RefinementTypeChecker extends TypeChecker {
         String nname = String.format(thisFormat, f.getSimpleName());
         Predicate ret = new Predicate();
         if (c.isPresent()) {
-            ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
+            ret = c.get().makeSubstitution(WILD_VAR, nname).makeSubstitution(f.getSimpleName(), nname);
         }
         RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, f);
         if (v instanceof Variable) {
@@ -481,7 +479,7 @@ public class RefinementTypeChecker extends TypeChecker {
             return;// error already in ErrorEmitter
         }
         String freshVarName = String.format(freshFormat, context.getCounter());
-        expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
+        expRefs = expRefs.makeSubstitution(WILD_VAR, freshVarName);
         Predicate lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
         expRefs = Predicate.createConjunction(expRefs, lastExpRefs);
 
@@ -633,7 +631,7 @@ public class RefinementTypeChecker extends TypeChecker {
             Optional<VariableInstance> rv = context.getLastVariableInstance(s);
             if (rv.isPresent()) {
                 VariableInstance vi = rv.get();
-                ret = ret.substituteVariable(s, vi.getName());
+                ret = ret.makeSubstitution(s, vi.getName());
             }
         }
         return ret;

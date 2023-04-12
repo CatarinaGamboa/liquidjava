@@ -140,11 +140,11 @@ public class OperationsChecker {
             newName = String.format(rtc.instanceFormat, name, rtc.getContext().getCounter());
         else
             newName = String.format(name, rtc.getContext().getCounter());
-        Predicate newMeta = metadata.substituteVariable(rtc.WILD_VAR, newName);
+        Predicate newMeta = metadata.makeSubstitution(rtc.WILD_VAR, newName);
 
         Predicate unOp = getOperatorFromKind(operator.getKind(), operator);
         CtElement p = operator.getParent();
-        Predicate opS = unOp.substituteVariable(rtc.WILD_VAR, newName);
+        Predicate opS = unOp.makeSubstitution(rtc.WILD_VAR, newName);
 
         if (p instanceof CtIf)
             all = opS;
@@ -193,7 +193,7 @@ public class OperationsChecker {
             if (field.getVariable().getSimpleName().equals("length")) {
                 String name = String.format(rtc.freshFormat, rtc.getContext().getCounter());
                 rtc.getContext().addVarToContext(name, element.getType(),
-                        rtc.getRefinement(element).substituteVariable(rtc.WILD_VAR, name), field);
+                        rtc.getRefinement(element).makeSubstitution(rtc.WILD_VAR, name), field);
                 return Predicate.createVar(name);
             }
         }
@@ -212,7 +212,7 @@ public class OperationsChecker {
             if (parent != null && !(parent instanceof CtIfImpl)) {
                 elem_ref = rtc.getRefinement(elemVar);
                 String newName = String.format(rtc.instanceFormat, elemName, rtc.getContext().getCounter());
-                Predicate newElem_ref = elem_ref.substituteVariable(rtc.WILD_VAR, newName);
+                Predicate newElem_ref = elem_ref.makeSubstitution(rtc.WILD_VAR, newName);
                 // String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
                 RefinedVariable newVi = rtc.getContext().addVarToContext(newName, elemVar.getType(), newElem_ref,
                         elemVar);
@@ -220,7 +220,7 @@ public class OperationsChecker {
                 returnName = newName;
             }
 
-            Predicate e = elem_ref.substituteVariable(rtc.WILD_VAR, elemName);
+            Predicate e = elem_ref.makeSubstitution(rtc.WILD_VAR, elemName);
             rtc.getContext().addVarToContext(elemName, elemVar.getType(), e, elemVar);
             return Predicate.createVar(returnName);
         }
@@ -235,7 +235,7 @@ public class OperationsChecker {
 
         } else if (element instanceof CtUnaryOperator<?>) {
             Predicate a = (Predicate) element.getMetadata(rtc.REFINE_KEY);
-            a = a.substituteVariable(rtc.WILD_VAR, "");
+            a = a.makeSubstitution(rtc.WILD_VAR, "");
             String s = a.toString().replace("(", "").replace(")", "").replace("==", "").replace(" ", "");// TODO IMPROVE
             return new Predicate(String.format("(%s)", s), element, rtc.getErrorEmitter());
 
@@ -257,7 +257,7 @@ public class OperationsChecker {
             // Substitute _ by the variable that we send
             String newName = String.format(rtc.freshFormat, rtc.getContext().getCounter());
 
-            innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
+            innerRefs = innerRefs.makeSubstitution(rtc.WILD_VAR, newName);
             rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
             return new Predicate(newName, inv, rtc.getErrorEmitter());// Return variable that represents the invocation
         }
@@ -283,13 +283,13 @@ public class OperationsChecker {
 
             // Substitute _ by the variable that we send
             String newName = String.format(rtc.freshFormat, rtc.getContext().getCounter());
-            innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
+            innerRefs = innerRefs.makeSubstitution(rtc.WILD_VAR, newName);
             // change this for the current instance
             RefinedVariable r = rtc.getContext().getVariableByName(v.getSimpleName());
             if (r instanceof Variable) {
                 Optional<VariableInstance> ovi = ((Variable) r).getLastInstance();
                 if (ovi.isPresent())
-                    innerRefs = innerRefs.substituteVariable(rtc.THIS, ovi.get().getName());
+                    innerRefs = innerRefs.makeSubstitution(rtc.THIS, ovi.get().getName());
             }
 
             rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
@@ -323,10 +323,10 @@ public class OperationsChecker {
         CtVariable<T> varDecl = w.getVariable().getDeclaration();
 
         Predicate metadada = rtc.getContext().getVariableRefinements(varDecl.getSimpleName());
-        metadada = metadada.substituteVariable(rtc.WILD_VAR, newName);
-        metadada = metadada.substituteVariable(name, newName);
+        metadada = metadada.makeSubstitution(rtc.WILD_VAR, newName);
+        metadada = metadada.makeSubstitution(name, newName);
 
-        Predicate c = getOperatorFromKind(operator.getKind(), ex).substituteVariable(rtc.WILD_VAR, newName);
+        Predicate c = getOperatorFromKind(operator.getKind(), ex).makeSubstitution(rtc.WILD_VAR, newName);
 
         rtc.getContext().addVarToContext(newName, w.getType(), metadada, w);
         return Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), c);

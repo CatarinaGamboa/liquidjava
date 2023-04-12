@@ -90,7 +90,7 @@ public class Context {
         heapCtx.exitContext();
     }
 
-    public HeapContext getHeapCtx(){
+    public HeapContext getHeapCtx() {
         return heapCtx;
     }
 
