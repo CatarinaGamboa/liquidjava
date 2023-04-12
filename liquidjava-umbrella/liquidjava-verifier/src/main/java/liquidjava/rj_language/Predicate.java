@@ -10,7 +10,6 @@ import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.context.GhostState;
 import liquidjava.processor.facade.AliasDTO;
-import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.ast.*;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
@@ -53,16 +52,20 @@ public class Predicate {
         }
     }
 
-    public static Optional<Predicate> tryFromExpression(String ref, CtElement element, ErrorEmitter e){
-        try{
+    public static Optional<Predicate> tryFromExpression(String ref, CtElement element, ErrorEmitter e) {
+        try {
             return Optional.of(new Predicate(ref, element, e));
         } catch (ParsingException ex) {
             return Optional.empty();
         }
     }
 
-    public static Predicate EmptyHeap(){
+    public static Predicate emptyHeap() {
         return new Predicate(new SepEmp());
+    }
+
+    public static Predicate booleanTrue() {
+        return new Predicate();
     }
 
     /**
@@ -106,10 +109,14 @@ public class Predicate {
         return new Predicate(new UnaryExpression("!", exp));
     }
 
-    public Predicate substituteVariable(String from, String to) {
+    public Predicate makeSubstitution(String from, String to) {
         Expression ec = exp.clone();
         ec = ec.substitute(new Var(from), new Var(to));
         return new Predicate(ec);
+    }
+
+    public void substituteInPlace(String from, String to) {
+        exp = exp.substitute(new Var(from), new Var(to));
     }
 
     public List<String> getVariableNames() {
