@@ -249,7 +249,7 @@ public class VCChecker {
      */
     @SuppressWarnings("unused")
     private Predicate substituteByMap(Predicate c, HashMap<String, String> map) {
-        map.keySet().forEach(s -> c.substituteVariable(s, map.get(s)));
+        map.keySet().forEach(s -> c.makeSubstitution(s, map.get(s)));
         return c;
     }
 
