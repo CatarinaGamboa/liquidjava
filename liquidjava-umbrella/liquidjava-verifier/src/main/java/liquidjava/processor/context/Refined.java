@@ -41,11 +41,11 @@ public abstract class Refined {
     public Predicate getRefinement() {
         if (refinement != null)
             return refinement;
-        return new Predicate();
+        return Predicate.booleanTrue();
     }
 
     public Predicate getRenamedRefinements(String toReplace) {
-        return refinement.substituteVariable(name, toReplace);
+        return refinement.makeSubstitution(name, toReplace);
     }
 
     @Override

@@ -71,7 +71,7 @@ public class RefinedFunction extends Refined {
                 c = p.getRenamedRefinements(varName);
             }
             context.addVarToContext(varName, p.getType(), c, element);
-            update = update.substituteVariable(p.getName(), varName);
+            update = update.makeSubstitution(p.getName(), varName);
         }
         return update;
     }
