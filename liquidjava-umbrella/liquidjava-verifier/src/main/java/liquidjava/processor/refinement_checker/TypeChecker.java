@@ -1,6 +1,5 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.rj_language.Predicate.tryFromExpression;
 import static org.junit.Assert.fail;
 
 import java.lang.annotation.Annotation;
@@ -19,7 +18,6 @@ import liquidjava.processor.facade.AliasDTO;
 import liquidjava.processor.facade.GhostDTO;
 import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.ast.SepEmp;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
@@ -119,20 +117,22 @@ public abstract class TypeChecker extends CtScanner {
             return Optional.empty();
         }
 
-        Predicate preP = pre.flatMap(s -> Predicate.tryFromExpression(s, element, errorEmitter)).orElseGet(Predicate::EmptyHeap);
+        Predicate preP = pre.flatMap(s -> Predicate.tryFromExpression(s, element, errorEmitter))
+                .orElseGet(Predicate::emptyHeap);
 
         if (errorEmitter.foundError())
             return Optional.empty();
 
         HeapContext precondition = HeapContext.fromPredicate(preP);
 
-        Predicate postP = post.flatMap(s -> Predicate.tryFromExpression(s, element, errorEmitter)).orElseGet(Predicate::EmptyHeap);
+        Predicate postP = post.flatMap(s -> Predicate.tryFromExpression(s, element, errorEmitter))
+                .orElseGet(Predicate::emptyHeap);
         if (errorEmitter.foundError())
             return Optional.empty();
 
         HeapContext postcondition = HeapContext.fromPredicate(postP);
 
-        return Optional.of(HeapContext.Transition.create(precondition, postcondition));
+        return Optional.of(HeapContext.Transition.fromPrePostCond(precondition, postcondition));
     }
 
     @SuppressWarnings("unchecked")
@@ -321,29 +321,29 @@ public abstract class TypeChecker extends CtScanner {
     public void checkVariableRefinements(Predicate refinementFound, String simpleName, CtTypeReference<?> type,
             CtElement usage, CtElement variable) throws ParsingException {
         Optional<Predicate> expectedType = getRefinementFromAnnotation(variable);
-        Predicate cEt;
+        Predicate cEt = expectedType.orElseGet(Predicate::booleanTrue);
         RefinedVariable mainRV = null;
+
         if (context.hasVariable(simpleName)) {
             mainRV = context.getVariableByName(simpleName);
-            // what if it is not in context??
+            if (!context.getVariableByName(simpleName).getRefinement().isBooleanTrue()) {
+                cEt = mainRV.getMainRefinement();
+            }
         }
+        cEt.substituteInPlace(WILD_VAR, simpleName);
 
-        if (context.hasVariable(simpleName) && !context.getVariableByName(simpleName).getRefinement().isBooleanTrue())
-            cEt = mainRV.getMainRefinement();
-        else
-            cEt = expectedType.orElseGet(Predicate::new);
-
-        cEt = cEt.substituteVariable(WILD_VAR, simpleName);
-        //TODO(sep logic): I need also to substitute in heapContext
+        // TODO(sep logic): I need also to substitute in heapContext
         // For the first prototype I should focus on methods
         // Now no annotations on variables allowed
-        Predicate cet = cEt.substituteVariable(WILD_VAR, simpleName);
+        Predicate cet = cEt.makeSubstitution(WILD_VAR, simpleName);
 
         String newName = String.format(instanceFormat, simpleName, context.getCounter());
-        Predicate correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
-        correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
-        // why `this` is replaced by new variable name?
-        cEt = cEt.substituteVariable(simpleName, newName);
+        Predicate correctNewRefinement = refinementFound.makeSubstitution(WILD_VAR, newName);
+        // `this` here must be replaced
+        // a.method(): old(this) -> new(this)
+        correctNewRefinement = correctNewRefinement.makeSubstitution(THIS, newName);
+        // why `this` is replaced by new variable name? YES
+        cEt.substituteInPlace(simpleName, newName);
 
         // Substitute variable in verification
         RefinedVariable rv = context.addInstanceToContext(newName, type, correctNewRefinement, usage);
