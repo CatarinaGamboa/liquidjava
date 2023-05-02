@@ -58,7 +58,7 @@ public abstract class TypeChecker extends CtScanner {
 
     public Context getContext() {
         return context;
-    }
+    } 
 
     public Factory getFactory() {
         return factory;
