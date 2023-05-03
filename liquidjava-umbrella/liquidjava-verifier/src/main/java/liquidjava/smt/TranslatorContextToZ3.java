@@ -86,7 +86,8 @@ public class TranslatorContextToZ3 {
 
     private static void addBuiltinFunctions(Context z3, Map<String, FuncDecl<?>> funcTranslation) {
         funcTranslation.put("length", z3.mkFuncDecl("length", getSort(z3, "int[]"), getSort(z3, "int")));// ERRRRRRRRRRRRO!!!!!!!!!!!!!
-        System.out.println("\nWorks only for int[] now! Change in future. Ignore this message, it is a glorified todo");
+        // System.out.println("\nWorks only for int[] now! Change in future. Ignore this message, it is a glorified
+        // todo");
         // TODO add built-in function
         Sort[] s = Stream.of(getSort(z3, "int[]"), getSort(z3, "int"), getSort(z3, "int")).toArray(Sort[]::new);
         funcTranslation.put("addToIndex", z3.mkFuncDecl("addToIndex", s, getSort(z3, "void")));
