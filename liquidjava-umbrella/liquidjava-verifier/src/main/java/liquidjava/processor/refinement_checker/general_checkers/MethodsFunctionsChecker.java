@@ -53,11 +53,11 @@ public class MethodsFunctionsChecker {
         f.setType(c.getType());
         handleFunctionRefinements(f, c, c.getParameters());
         f.setRefReturn(new Predicate());
-        if (c.getParent() instanceof CtClass) {
+        if (c.getParent() instanceof CtClass) { 
             CtClass<?> klass = (CtClass<?>) c.getParent();
             f.setClass(klass.getQualifiedName());
         }
-        rtc.getContext().addFunctionToContext(f);
+        rtc.getContext().addFunctionToContext(f); 
         AuxStateHandler.handleConstructorState(c, f, rtc);
     }
 
@@ -79,7 +79,7 @@ public class MethodsFunctionsChecker {
     // ################### VISIT METHOD ##############################
     public <R> void getMethodRefinements(CtMethod<R> method) throws ParsingException {
         RefinedFunction f = new RefinedFunction();
-        f.setName(method.getSimpleName());
+        f.setName(method.getSimpleName().replaceAll("\\p{C}", "")); //remove any empty chars from string
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
 
@@ -113,7 +113,7 @@ public class MethodsFunctionsChecker {
         }
 
         RefinedFunction f = new RefinedFunction();
-        f.setName(functionName);
+        f.setName(functionName.replaceAll("\\p{C}", ""));//remove any empty chars from string
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
         f.setClass(prefix);
@@ -225,9 +225,12 @@ public class MethodsFunctionsChecker {
     public <R> void getInvocationRefinements(CtInvocation<R> invocation) {
         CtExecutable<?> method = invocation.getExecutable().getDeclaration();
         if (method == null) {
-            Method m = invocation.getExecutable().getActualMethod();
-            if (m != null)
-                searchMethodInLibrary(m, invocation);
+    
+        	CtExecutableReference<?> cte = invocation.getExecutable();
+        
+            
+            if (cte != null)
+                searchMethodInLibrary(cte, invocation);
 
         } else if (method.getParent() instanceof CtClass) {
             String ctype = ((CtClass<?>) method.getParent()).getQualifiedName();
@@ -256,15 +259,22 @@ public class MethodsFunctionsChecker {
         return f;
     }
 
-    private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
-        String ctype = m.getDeclaringClass().getCanonicalName();
-        if (rtc.getContext().getFunction(m.getName(), ctype) != null) {// inside rtc.context
-            checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), m.getName(),
+    private void searchMethodInLibrary(CtExecutableReference<?> ctr, CtInvocation<?> invocation) {
+        String ctype= "";
+        if(ctr.getDeclaringType() == null && invocation.getTarget() != null) {
+        	CtExpression o = invocation.getTarget();
+        	ctype = o.getType().toString();
+        }
+        else
+        	ctype = ctr.getDeclaringType().toString();//missing
+        
+        String name = ctr.getSimpleName();//missing  
+        if (rtc.getContext().getFunction(name, ctype) != null) {// inside rtc.context
+            checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), name,
                     ctype);
             return;
         } else {
-            String name = m.getName();
-            String prefix = m.getDeclaringClass().getCanonicalName();
+            String prefix = ctype;
             String completeName = String.format("%s.%s", prefix, name);
             if (rtc.getContext().getFunction(completeName, ctype) != null) {
                 checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), completeName,
@@ -274,6 +284,7 @@ public class MethodsFunctionsChecker {
         }
 
     }
+   
 
     private Map<String, String> checkInvocationRefinements(CtElement invocation, List<CtExpression<?>> arguments,
             CtExpression<?> target, String methodName, String className) {
