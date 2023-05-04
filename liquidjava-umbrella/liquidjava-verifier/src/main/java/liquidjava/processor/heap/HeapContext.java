@@ -37,6 +37,10 @@ import static liquidjava.utils.Utils.WILD_VAR;
  *
  */
 public class HeapContext {
+    public HeapContext merge(HeapContext ctx) {
+        heap.putAll(ctx.heap);
+        return this;
+    }
 
     private HeapContext(HashMap<Pointer, Pointee> heap) {
         this.heap = heap;

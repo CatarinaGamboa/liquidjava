@@ -420,4 +420,8 @@ public class Context {
     public void setHeapFromPredicate(Predicate newHeap) throws ParsingException {
         this.heapCtx = HeapContext.fromPredicate(newHeap);
     }
+
+    public void setHeapCtx(HeapContext oldHeap) {
+        this.heapCtx = oldHeap;
+    }
 }

@@ -8,6 +8,7 @@ import java.util.Optional;
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.*;
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.processor.refinement_checker.general_checkers.OperationsChecker;
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
@@ -512,6 +513,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
         context.variablesNewIfCombination();
         context.variablesSetBeforeIf();
+
+        HeapContext oldHeap = context.getHeapCtx();
+
         context.enterContext();
 
         // VISIT THEN
@@ -519,6 +523,12 @@ public class RefinementTypeChecker extends TypeChecker {
         visitCtBlock(ifElement.getThenStatement());
         context.variablesSetThenIf();
         context.exitContext();
+
+        HeapContext ifHeapCtx = context.getHeapCtx();
+
+        context.setHeapCtx(oldHeap);
+
+        HeapContext elseHeapCtx = HeapContext.empty();
 
         // VISIT ELSE
         if (ifElement.getElseStatement() != null) {
@@ -530,12 +540,29 @@ public class RefinementTypeChecker extends TypeChecker {
             visitCtBlock(ifElement.getElseStatement());
             context.variablesSetElseIf();
             context.exitContext();
+
+            elseHeapCtx = context.getHeapCtx();
         }
         // end
         vcChecker.removePathVariable(freshRV);
         context.exitContext();
         context.variablesCombineFromIf(expRefs);
         context.variablesFinishIfCombination();
+
+        // checks if merged heap holds. If not - reduces knowledge for it to hold.
+        HeapContext heapPile = oldHeap.merge(ifHeapCtx).merge(elseHeapCtx);
+        if (vcChecker.doesHeapHold(Predicate.booleanTrue(), heapPile, ifElement)) {
+            context.setHeapCtx(heapPile);
+            return;
+        }
+
+        Predicate newHeap = vcChecker.reduceHeapKnowledge(Predicate.booleanTrue(), heapPile, ifElement);
+        try {
+            context.setHeapFromPredicate(newHeap);
+        } catch (ParsingException e) {
+            System.out.println(
+                    "Something has gone very wrong. Reconstructed heap after if is invalid: " + e.getMessage());
+        }
     }
 
     @Override

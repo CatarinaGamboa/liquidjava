@@ -39,7 +39,7 @@ public class VCChecker {
     public boolean doesHeapHold(Predicate booleanCtx, HeapContext curHeap, CtElement element) {
 
         Predicate heaplets = curHeap.toSeparateHeaplets().stream()
-                .map(h -> Predicate.createConjunction(Predicate.booleanTrue(), h))
+                .map(h -> Predicate.createSepConjunction(Predicate.booleanTrue(), h))
                 .reduce(Predicate.booleanTrue(), Predicate::createConjunction);
 
         // `heaplets` is a proof that individual heaplets are pointing to whatever they are pointing to
