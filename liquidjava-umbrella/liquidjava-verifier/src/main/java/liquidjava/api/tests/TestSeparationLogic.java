@@ -32,4 +32,14 @@ public class TestSeparationLogic extends TestAbstract {
     public void errorConstructor() {
         testWrong(testPath + "separation_logic/ErrorConstructor.java");
     }
+
+    @Test
+    public void errorSimpleIf() {
+        testWrong(testPath + "separation_logic/ErrorSimpleIf.java");
+    }
+
+//    @Test
+//    public void correctSimpleIf() {
+//        testCorrect(testPath + "separation_logic/CorrectSimpleIf.java");
+//    }
 }
