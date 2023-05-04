@@ -224,38 +224,39 @@ public class MethodsFunctionsChecker {
     public <R> void getReturnRefinements(CtReturn<R> ret) {
         CtClass<?> c = ret.getParent(CtClass.class);
         String className = c.getSimpleName();
-        if (ret.getReturnedExpression() != null) {
-            // check if there are refinements
-            if (rtc.getRefinement(ret.getReturnedExpression()) == null)
-                ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, Predicate.booleanTrue());
-            CtMethod<?> method = ret.getParent(CtMethod.class);
-            // check if method has refinements
-            if (rtc.getRefinement(method) == null)
-                return;
-            if (method.getParent() instanceof CtClass) {
-                RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(),
-                        ((CtClass<?>) method.getParent()).getQualifiedName());
-
-                List<Variable> lv = fi.getArguments();
-                for (Variable v : lv) {
-                    rtc.getContext().addVarToContext(v);
-                }
-
-                // Both return and the method have metadata
-                String thisName = String.format(rtc.thisFormat, className);
-                rtc.getContext().addInstanceToContext(thisName, c.getReference(), Predicate.booleanTrue(), ret);
-                // ???
-                String returnVarName = String.format(retNameFormat, rtc.getContext().getCounter());
-                Predicate cretRef = rtc.getRefinement(ret.getReturnedExpression())
-                        .makeSubstitution(rtc.WILD_VAR, returnVarName).makeSubstitution(rtc.THIS, returnVarName);
-                Predicate cexpectedType = fi.getRefReturn().makeSubstitution(rtc.WILD_VAR, returnVarName)
-                        .makeSubstitution(rtc.THIS, returnVarName);
-
-                rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
-                rtc.checkSMT(cexpectedType, ret);
-                rtc.getContext().newRefinementToVariableInContext(returnVarName, cexpectedType);
-            }
+        if (ret.getReturnedExpression() == null) {
+            return;
         }
+        // check if there are refinements
+        if (rtc.getRefinement(ret.getReturnedExpression()) == null) {
+            ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, Predicate.booleanTrue());
+        }
+        CtMethod<?> method = ret.getParent(CtMethod.class);
+        // check if method has refinements
+        if (rtc.getRefinement(method) == null) {
+            return;
+        }
+        if (method.getParent() instanceof CtClass) {
+            RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(),
+                    ((CtClass<?>) method.getParent()).getQualifiedName());
+
+            fi.getArguments().forEach(v -> rtc.getContext().addVarToContext(v));
+
+            // Both return and the method have metadata
+            String thisName = String.format(rtc.thisFormat, className);
+            rtc.getContext().addInstanceToContext(thisName, c.getReference(), Predicate.booleanTrue(), ret);
+            // ???
+            String returnVarName = String.format(retNameFormat, rtc.getContext().getCounter());
+            Predicate cretRef = rtc.getRefinement(ret.getReturnedExpression())
+                    .makeSubstitution(rtc.WILD_VAR, returnVarName).makeSubstitution(rtc.THIS, returnVarName);
+            Predicate cexpectedType = fi.getRefReturn().makeSubstitution(rtc.WILD_VAR, returnVarName)
+                    .makeSubstitution(rtc.THIS, returnVarName);
+
+            rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
+            rtc.checkSMT(cexpectedType, ret);
+            rtc.getContext().newRefinementToVariableInContext(returnVarName, cexpectedType);
+        }
+
     }
 
     // ############################### VISIT INVOCATION ################################3
@@ -289,8 +290,9 @@ public class MethodsFunctionsChecker {
 
     public RefinedFunction getRefinementFunction(String methodName, String className, int size) {
         RefinedFunction f = rtc.getContext().getFunction(methodName, className, size);
-        if (f == null)
+        if (f == null) {
             f = rtc.getContext().getFunction(String.format("%s.%s", className, methodName), methodName, size);
+        }
         return f;
     }
 
