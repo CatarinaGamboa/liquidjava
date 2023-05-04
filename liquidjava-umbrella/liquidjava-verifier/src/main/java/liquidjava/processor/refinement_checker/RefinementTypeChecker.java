@@ -13,6 +13,8 @@ import liquidjava.processor.refinement_checker.general_checkers.OperationsChecke
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.BuiltinFunctionPredicate;
 import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.ast.BinaryExpression;
+import liquidjava.rj_language.ast.Var;
 import liquidjava.rj_language.parsing.ParsingException;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
@@ -165,6 +167,22 @@ public class RefinementTypeChecker extends TypeChecker {
             if (refinementFound == null) {
                 refinementFound = new Predicate();
             }
+
+            // to link assigned variable to variable returned from the right-hand-side of the assignment
+            // var x = creteX(); there will be `createX#somthing` variable and `x`. They should be connected vai `==`
+
+            Object targetMetaData = e.getMetadata(TARGET_KEY);
+            if (targetMetaData instanceof VariableInstance) {
+                VariableInstance vi = (VariableInstance) targetMetaData;
+                String viName = vi.getName();
+                Predicate vif = vi.getRefinement();
+                Predicate updRef = Predicate.createConjunction(vif,
+                        new Predicate(new BinaryExpression(new Var(varName), "==", new Var(viName))));
+                vi.setRefinement(updRef);
+            }
+
+            // Why there is `new Predicate` instead of found refinement?
+            // Because check refinements adds instance with refinemnt to context
             context.addVarToContext(varName, localVariable.getType(), new Predicate(), e);
 
             try {
@@ -447,7 +465,7 @@ public class RefinementTypeChecker extends TypeChecker {
         if (errorEmitter.foundError()) {
             return;
         }
-
+        System.out.println("Found invocation: " + invocation);
         super.visitCtInvocation(invocation);
         mfc.getInvocationRefinements(invocation);
         System.out.println();
@@ -589,15 +607,25 @@ public class RefinementTypeChecker extends TypeChecker {
         }
         Optional<VariableInstance> r = context.getLastVariableInstance(assigneeName);
         // AQUI!!
-        // what??
+        // TODO(ask)
         r.ifPresent(variableInstance -> vcChecker.removePathVariableThatIncludes(variableInstance.getName()));
 
         vcChecker.removePathVariableThatIncludes(assigneeName);// AQUI!! what..?
         try {
-            checkVariableRefinements(refinementFound, assigneeName, type, parentElem, varDecl);
+            Predicate substRef = checkVariableRefinements(refinementFound, assigneeName, type, parentElem, varDecl);
+
+            vcChecker.doesHeapHold(substRef, context.getHeapCtx(), parentElem);
+            Predicate newHeap = vcChecker.reduceHeapKnowledge(substRef, context.getHeapCtx(), parentElem);
+            // can throw, but never should throw
+            context.setHeapFromPredicate(newHeap);
+
         } catch (ParsingException e) {
+            System.out.println("if this is heap predicate parsing related, then you are in trouble: " + e.getMessage());
             return;// error already in ErrorEmitter
         }
+
+        // TODO(sep logic) if does not hold, remove things that are aliased.
+        // at worst we will go to empty heap
 
     }
 

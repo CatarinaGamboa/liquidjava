@@ -303,7 +303,7 @@ public abstract class TypeChecker extends CtScanner {
      * Function that checks if found refinement holds against refinement from annotation. Usually found refinement have
      * wildcard for given variable, so some substitutions take place. Used in variable declaration, variable assignment
      * and when unary operation performs write (x++)
-     * 
+     *
      * @param refinementFound
      *            usually obtained from getRefinement call for some CtElement
      * @param simpleName
@@ -315,10 +315,12 @@ public abstract class TypeChecker extends CtScanner {
      * @param variable
      *            Source of annotation
      * 
+     * @return
+     * 
      * @throws ParsingException
      *             if parsing of annotation on variable throws
      */
-    public void checkVariableRefinements(Predicate refinementFound, String simpleName, CtTypeReference<?> type,
+    public Predicate checkVariableRefinements(Predicate refinementFound, String simpleName, CtTypeReference<?> type,
             CtElement usage, CtElement variable) throws ParsingException {
         Optional<Predicate> expectedType = getRefinementFromAnnotation(variable);
         Predicate cEt = expectedType.orElseGet(Predicate::booleanTrue);
@@ -353,6 +355,38 @@ public abstract class TypeChecker extends CtScanner {
         // smt check
         checkSMT(cEt, usage);// TODO CHANGE
         context.addRefinementToVariableInContext(simpleName, type, cet, usage);
+
+        return cEt;
+    }
+
+    public void changeHeap(Predicate booleanCtx, HeapContext.Transition tr, CtElement element) {
+        System.out.println("-------------------- Applying heap transition for heap:");
+        System.out.println(booleanCtx + " && " + context.getHeapCtx());
+        System.out.println("via transition:");
+        System.out.println();
+        System.out.println(tr.getPre());
+        System.out.println("v------v------v");
+        System.out.println(tr.getPost());
+        System.out.println();
+
+        vcChecker.checkHeapPrecondition(booleanCtx, context.getHeapCtx().toSepConjunctions(), tr, element);
+
+        Predicate newHeap = vcChecker.applyHeapTransition(booleanCtx, context.getHeapCtx(), tr, element);
+
+        // TODO(sep logic): postcondition is SAT. Or in definition
+        try {
+            context.setHeapFromPredicate(newHeap);
+        } catch (ParsingException e) {
+            System.err.println("Failed to use predicate as heap: " + newHeap + ". This happened during transition from "
+                    + booleanCtx + " && " + context.getHeapCtx() + " via transition: ");
+            System.err.println(tr.getPre());
+            System.err.println("---------------");
+            System.err.println(tr.getPost());
+        }
+
+        System.out.println("Updated heap:");
+        System.out.println(context.getHeapCtx());
+        System.out.println("--------------------");
     }
 
     public void checkSMT(Predicate expectedType, CtElement element) {

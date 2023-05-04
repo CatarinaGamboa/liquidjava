@@ -10,13 +10,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import liquidjava.processor.context.*;
 import liquidjava.processor.heap.HeapContext;
 import liquidjava.processor.refinement_checker.TypeChecker;
+import liquidjava.processor.refinement_checker.VCChecker;
 import liquidjava.processor.refinement_checker.object_checkers.AuxHierarchyRefinememtsPassage;
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.ast.SepUnit;
 import liquidjava.rj_language.parsing.ParsingException;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
@@ -51,8 +54,11 @@ public class MethodsFunctionsChecker {
         f.setType(c.getType());
         handleFunctionRefinements(f, c, c.getParameters());
         f.setRefReturn(new Predicate());// why it is set to true, despite being handle in `handleFunctionRefinement`?
-        // TODO(sep logic): handle heap change.
-        // Maybe I should do everything in handleFunctionRefinement, not here
+
+        if (f.getHeapChange().isId()) {
+            f.setHeapChange(HeapContext.Transition.simpleConstructorTransition());
+        }
+        // sep logic: Maybe I should do everything in handleFunctionRefinement, not here
         if (c.getParent() instanceof CtClass) {
             CtClass<?> klass = (CtClass<?>) c.getParent();
             f.setClass(klass.getQualifiedName());
@@ -74,6 +80,10 @@ public class MethodsFunctionsChecker {
         Map<String, String> map = checkInvocationRefinements(ctConstructorCall, ctConstructorCall.getArguments(),
                 ctConstructorCall.getTarget(), f.getName(), f.getTargetClass());
         AuxStateHandler.constructorStateMetadata(rtc.REFINE_KEY, f, map, ctConstructorCall);
+
+        // TODO(sep logic): here should be `new` handling, probably
+        // but its actually handled in the same place where constructor refinements are handled
+        //
 
     }
 
@@ -255,7 +265,7 @@ public class MethodsFunctionsChecker {
         if (method == null) {
             Method m = invocation.getExecutable().getActualMethod();
             if (m != null)
-                searchMethodInLibrary(m, invocation);
+                searchMethodInLibrary(m, invocation);// calls checkInvocationRefinements
 
         } else if (method.getParent() instanceof CtClass) {
             String ctype = ((CtClass<?>) method.getParent()).getQualifiedName();
@@ -285,6 +295,7 @@ public class MethodsFunctionsChecker {
     }
 
     private void searchMethodInLibrary(Method m, CtInvocation<?> invocation) {
+        System.out.println("Searching method in library: " + m);
         String ctype = m.getDeclaringClass().getCanonicalName();
         if (rtc.getContext().getFunction(m.getName(), ctype) != null) {// inside rtc.context
             checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), m.getName(),
@@ -312,20 +323,21 @@ public class MethodsFunctionsChecker {
         int si = arguments.size();
         RefinedFunction f = rtc.getContext().getFunction(methodName, className, si);
         Map<String, String> map = mapInvocation(arguments, f);
+        HeapContext.Transition heapTransition = f.getHeapChange().clone();
 
         if (target != null) {
             AuxStateHandler.checkTargetChanges(rtc, f, target, map, invocation);
         }
-        if (f.allRefinementsTrue()) {
-            invocation.putMetadata(rtc.REFINE_KEY, new Predicate());
+        if (f.allRefinementsTrue() && heapTransition.isId()) {
+            invocation.putMetadata(rtc.REFINE_KEY, Predicate.booleanTrue());
             return map;
         }
 
-        checkParameters(invocation, arguments, f, map); // <- only actual check via SMT solver
+        checkParameters(invocation, arguments, f, map); // <- only actual check via SMT solver, besides heap change
 
         // -- Part 2: Apply changes
         // applyRefinementsToArguments(element, arguments, f, map);
-        Predicate methodRef = f.getRefReturn();
+        final Predicate methodRef = f.getRefReturn().clone();
 
         if (methodRef == null) {
             return map;
@@ -333,17 +345,12 @@ public class MethodsFunctionsChecker {
 
         boolean equalsThis = methodRef.toString().equals("(_ == this)"); // TODO change for better
         List<String> vars = methodRef.getVariableNames();
-        for (String s : vars) {
-            if (!map.containsKey(s)) {
-                continue;
-            }
-            methodRef = methodRef.makeSubstitution(s, map.get(s));
-        }
+        vars.stream().filter(map::containsKey).forEach(s -> methodRef.substituteInPlace(s, map.get(s)));
 
         String varName = null;
         if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
             VariableInstance vi = (VariableInstance) invocation.getMetadata(rtc.TARGET_KEY);
-            methodRef = methodRef.makeSubstitution(rtc.THIS, vi.getName());
+            methodRef.substituteInPlace(rtc.THIS, vi.getName());
             Variable v = rtc.getContext().getVariableFromInstance(vi);
             if (v != null)
                 varName = v.getName();
@@ -357,7 +364,11 @@ public class MethodsFunctionsChecker {
         invocation.putMetadata(rtc.TARGET_KEY, vi);
         invocation.putMetadata(rtc.REFINE_KEY, methodRef);
         // TODO(sep logic): invocation.puMetadata(rtc.HEAP_KEY, newHeapContext) ????
-        // Yes I think so
+        // YES it is likely a right thing to do.
+        // Is there a place to reuse the stored value?
+
+        // heap change: there are approx len(HeapCtx) + 1 checks via smt-solver
+        rtc.changeHeap(methodRef, heapTransition.substituteWildVar(viName).substituteFromMap(map), invocation);
 
         return map;
 
@@ -402,16 +413,13 @@ public class MethodsFunctionsChecker {
     private <R> void checkParameters(CtElement invocation, List<CtExpression<?>> invocationParams, RefinedFunction f,
             Map<String, String> map) {
         List<Variable> functionParams = f.getArguments();
-        for (int i = 0; i < invocationParams.size(); i++) {
-            Variable fArg = functionParams.get(i);
-            Predicate c = fArg.getMainRefinement();
-            c = c.makeSubstitution(fArg.getName(), map.get(fArg.getName()));
+        functionParams.forEach(fArg -> {
+            Predicate c = fArg.getMainRefinement().clone();
+            c.substituteInPlace(fArg.getName(), map.get(fArg.getName()));
             List<String> vars = c.getVariableNames();
-            for (String s : vars)
-                if (map.containsKey(s))
-                    c = c.makeSubstitution(s, map.get(s));
+            vars.stream().filter(map::containsKey).forEach(s -> c.substituteInPlace(s, map.get(s)));
             rtc.checkSMT(c, invocation);
-        }
+        });
 
     }
 

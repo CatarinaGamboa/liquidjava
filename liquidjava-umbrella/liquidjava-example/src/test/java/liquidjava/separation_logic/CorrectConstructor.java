@@ -3,15 +3,16 @@ package liquidjava.separation_logic;
 import liquidjava.specification.HeapPostcondition;
 import liquidjava.specification.HeapPrecondition;
 
-public class ConstructorCorrect {
+public class CorrectConstructor {
 
     static class MyObject {
-        @HeapPostcondition("_ -> ?")
         MyObject(){
+
         }
     }
-    @HeapPrecondition("x |-> ?")
+    @HeapPrecondition("x |-> sep.()")
     static void f(MyObject x){
+        System.out.println(x);
     }
 
     public static void main(String[] args) {

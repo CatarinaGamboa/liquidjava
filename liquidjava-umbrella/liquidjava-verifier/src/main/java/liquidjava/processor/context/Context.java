@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -416,4 +417,7 @@ public class Context {
         // return null;
     }
 
+    public void setHeapFromPredicate(Predicate newHeap) throws ParsingException {
+        this.heapCtx = HeapContext.fromPredicate(newHeap);
+    }
 }

@@ -84,6 +84,10 @@ public class Predicate {
         }
     }
 
+    public static Predicate booleanFalse() {
+        return new Predicate(new LiteralBoolean(false));
+    }
+
     protected Expression innerParse(String ref, ErrorEmitter e) {
         try {
             return RefinementsParser.createAST(ref);
@@ -185,6 +189,14 @@ public class Predicate {
 
     public static Predicate createConjunction(Predicate c1, Predicate c2) {
         return new Predicate(new BinaryExpression(c1.getExpression(), Utils.AND, c2.getExpression()));
+    }
+
+    public static Predicate createSepConjunction(Predicate c1, Predicate c2) {
+        return new Predicate(new BinaryExpression(c1.getExpression(), "|*", c2.getExpression()));
+    }
+
+    public static Predicate createPto(Predicate c1, Predicate c2) {
+        return new Predicate(new BinaryExpression(c1.getExpression(), "|->", c2.getExpression()));
     }
 
     public static Predicate createDisjunction(Predicate c1, Predicate c2) {

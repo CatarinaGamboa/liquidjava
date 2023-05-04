@@ -7,8 +7,12 @@ import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static liquidjava.utils.Utils.WILD_VAR;
 
 /**
  * Context to keep information about the heap. For a simple code:
@@ -34,11 +38,56 @@ import java.util.Objects;
  */
 public class HeapContext {
 
+    private HeapContext(HashMap<Pointer, Pointee> heap) {
+        this.heap = heap;
+    }
+
+    private HeapContext addPtoPredicate(Predicate pointer) {
+        this.heap.put(new Pointer(pointer), new Pointee(new Predicate(new SepUnit())));
+        return this;
+    }
+
+    public HeapContext clone() {
+        HashMap<Pointer, Pointee> cloned_heap = new HashMap<>();
+        heap.forEach((key, value) -> cloned_heap.put(new Pointer(key.p.clone()), new Pointee(value.p.clone())));
+        return new HeapContext(cloned_heap);
+    }
+
+    /**
+     * @return k1 |-> v1 * k2 |-> v2 * ....
+     */
+    public Predicate toSepConjunctions() {
+        return heap.entrySet().stream().map(e -> Predicate.createPto(e.getKey().p, e.getValue().p))
+                .reduce(Predicate.emptyHeap(), Predicate::createSepConjunction);
+    }
+
+    /**
+     * @return (k1 |-> v1 * true) && (k2 |-> v2 * true) && ....
+     */
+    public List<Predicate> toSeparateHeaplets() {
+        return heap.entrySet().stream().map(e -> Predicate.createPto(e.getKey().p, e.getValue().p))
+                .collect(Collectors.toList());
+    }
+
+    public String toString() {
+        if (heap.isEmpty()) {
+            return "[]";
+        }
+        return "["
+                + heap.entrySet().stream().map(e -> e.getKey() + "|->" + e.getValue()).collect(Collectors.joining(","))
+                + "]";
+
+    }
+
     static class Pointer {
         Predicate p;
 
         public Pointer(Predicate p) {
             this.p = p;
+        }
+
+        public String toString() {
+            return p.toString();
         }
     }
 
@@ -47,6 +96,10 @@ public class HeapContext {
 
         public Pointee(Predicate p) {
             this.p = p;
+        }
+
+        public String toString() {
+            return p.toString();
         }
     }
 
@@ -209,6 +262,15 @@ public class HeapContext {
         HeapContext precondition;
         HeapContext postcondition;
 
+        private Transition(HeapContext precondition, HeapContext postcondition) {
+            this.precondition = precondition;
+            this.postcondition = postcondition;
+        }
+
+        public Transition clone() {
+            return new Transition(precondition.clone(), postcondition.clone());
+        }
+
         private Transition() {
             precondition = HeapContext.empty();
             postcondition = HeapContext.empty();
@@ -226,6 +288,36 @@ public class HeapContext {
 
         public HeapContext getPost() {
             return postcondition;
+        }
+
+        public Transition substituteWildVar(String to) {
+            return this.substituteInPlace(WILD_VAR, to);
+        }
+
+        public Transition substituteThis(String to) {
+            return this.substituteInPlace("this", to);
+        }
+
+        public Transition substituteFromMap(Map<String, String> map) {
+            map.forEach(this::substituteInPlace);
+            return this;
+        }
+
+        public Transition substituteInPlace(String from, String to) {
+
+            System.out.println("Substituting: " + from + " -> " + to);
+            System.out.println("Heap transition: " + precondition + " > " + postcondition);
+            postcondition.heap.forEach((key, value) -> {
+                key.p.substituteInPlace(from, to);
+                value.p.substituteInPlace(from, to);
+            });
+            precondition.heap.forEach((key, value) -> {
+                key.p.substituteInPlace(from, to);
+                value.p.substituteInPlace(from, to);
+            });
+
+            System.out.println("Substituted heap transition: " + precondition + " > " + postcondition);
+            return this;
         }
 
         /**
@@ -318,6 +410,14 @@ public class HeapContext {
             res.precondition = pre;
             res.postcondition = post;
             return res;
+        }
+
+        static public Transition simpleConstructorTransition() {
+            return fromPrePostCond(HeapContext.empty(), HeapContext.empty().addPtoPredicate(Predicate.createVar("_")));
+        }
+
+        public boolean isId() {
+            return postcondition.heap.isEmpty() && precondition.heap.isEmpty();
         }
     }
 }

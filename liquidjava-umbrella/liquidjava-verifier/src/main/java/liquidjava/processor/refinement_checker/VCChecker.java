@@ -11,7 +11,9 @@ import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.VCImplication;
 import liquidjava.processor.context.*;
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.smt.GhostFunctionError;
 import liquidjava.smt.NotFoundError;
 import liquidjava.smt.SMTEvaluator;
@@ -34,6 +36,125 @@ public class VCChecker {
         this.errorEmitter = errorEmitter;
     }
 
+    public boolean doesHeapHold(Predicate booleanCtx, HeapContext curHeap, CtElement element) {
+
+        Predicate heaplets = curHeap.toSeparateHeaplets().stream()
+                .map(h -> Predicate.createConjunction(Predicate.booleanTrue(), h))
+                .reduce(Predicate.booleanTrue(), Predicate::createConjunction);
+
+        // `heaplets` is a proof that individual heaplets are pointing to whatever they are pointing to
+        // but not a proof that they are valid together.
+
+        Predicate premises = Predicate.createConjunction(booleanCtx, heaplets);
+
+        Predicate target = curHeap.toSepConjunctions();
+
+        List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
+
+        gatherVariables(premises, lrv, mainVars);
+
+        HashMap<String, PlacementInCode> map = new HashMap<>();
+        // heap predicate is not in refinements, so it should be added separately
+        premises = Predicate.createConjunction(heaplets,
+                joinPredicates(booleanCtx, element, mainVars, lrv, map).toConjunctions());
+
+        try {
+            // is it true that if individual heaplets are pointing to whaterver they are pointing,
+            // heap holds together?
+            smtChecking(premises, target, element);
+            return true;
+        } catch (Exception e) {
+            System.out.println();
+            System.out.println("Heap does not hold:");
+            System.out.println(booleanCtx + " && " + curHeap);
+            return false;
+        }
+    }
+
+    public Predicate reduceHeapKnowledge(Predicate booleanCtx, HeapContext curHeapCtx, CtElement element) {
+        return curHeapCtx.toSeparateHeaplets().stream().reduce(Predicate.emptyHeap(), (heap, heaplet) -> {
+            Predicate updHeap = Predicate.createSepConjunction(heap, heaplet);
+            try {
+                if (doesHeapHold(booleanCtx, HeapContext.fromPredicate(updHeap), element)) {
+                    System.out.println("Heaplet accepted: " + heaplet);
+                    return updHeap;
+                } else {
+                    System.out.println("Heaplet rejected: " + heaplet);
+                    return heap;
+                }
+            } catch (ParsingException e) {
+                System.out.println("Error while reconstructing heap: " + updHeap);
+                return heap;
+            }
+        });
+    }
+
+    public void checkHeapPrecondition(Predicate booleanCtx, Predicate curHeap, HeapContext.Transition tr,
+            CtElement element) {
+        Predicate premises = Predicate.createConjunction(booleanCtx, curHeap);
+
+        Predicate target = Predicate.createSepConjunction(tr.getPre().toSepConjunctions(), Predicate.booleanTrue());
+
+        List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
+
+        gatherVariables(premises, lrv, mainVars);
+        gatherVariables(target, lrv, mainVars);
+
+        HashMap<String, PlacementInCode> map = new HashMap<>();
+        // heap predicate is not in refinements, so it should be added separately
+        premises = Predicate.createConjunction(curHeap,
+                joinPredicates(booleanCtx, element, mainVars, lrv, map).toConjunctions());
+
+        try {
+            smtChecking(premises, target, element);
+        } catch (Exception e) {
+            System.out.println();
+            printError(e, premises, target, element, map);
+        }
+    }
+
+    /**
+     * The goal is to filter pointers from current heap H to find H1 such that: H = Pre * H1 Then it is sufficient to
+     * just swap `Pre` with `Post` by frame rule such that: Res = Post * H1
+     * 
+     * @param booleanCtx
+     *            used to determine which pointers are equal
+     * @param curHeap
+     *            current heap
+     * @param tr
+     *            current transition
+     * @param element
+     *            Spoon's representation of piece of code we currently in
+     * 
+     * @return transformed heap
+     */
+    public Predicate applyHeapTransition(Predicate booleanCtx, HeapContext curHeap, HeapContext.Transition tr,
+            CtElement element) {
+        return curHeap.toSeparateHeaplets().stream().filter(h -> {
+            Predicate heap = Predicate.createSepConjunction(tr.getPre().toSepConjunctions(), h);
+            Predicate premises = Predicate.createConjunction(booleanCtx, heap);
+
+            List<RefinedVariable> lrv = new ArrayList<>();
+            List<RefinedVariable> mainVars = new ArrayList<>();
+            gatherVariables(premises, lrv, mainVars);
+            HashMap<String, PlacementInCode> map = new HashMap<>();
+
+            premises = Predicate.createConjunction(heap,
+                    joinPredicates(booleanCtx, element, mainVars, lrv, map).toConjunctions());
+
+            try {
+                smtCheckSAT(premises, element);// to verify that it is possible to have premises
+                return true;
+            } catch (TypeCheckError e) {
+                return false;
+            } catch (Exception e) {
+                printError(e, premises, Predicate.booleanFalse(), element, map);
+                return false;
+            }
+        }).reduce(tr.getPost().toSepConjunctions(), Predicate::createSepConjunction);
+
+    }
+
     public void processSubtyping(Predicate expectedType, List<GhostState> list, String wild_var, String this_var,
             CtElement element, Factory f) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
@@ -43,9 +164,13 @@ public class VCChecker {
 
         HashMap<String, PlacementInCode> map = new HashMap<>();
         String[] s = { wild_var, this_var };
+        // I think, that here the whole context is assembled to verify the implication.
+        // expected type is the result of an implication. The premises here are the premise in said implication.
+        // Linked list in VCImplication is to mimic the structure of implication: `a -> b -> c -> expectedType`.
+
         Predicate premisesBeforeChange = joinPredicates(expectedType, element, mainVars, lrv, map).toConjunctions();
-        Predicate premises = new Predicate();
-        Predicate et = new Predicate();
+        Predicate premises = Predicate.booleanTrue();
+        Predicate et = Predicate.booleanTrue();
         try {
             premises = premisesBeforeChange.changeStatesToRefinements(list, s, errorEmitter)
                     .changeAliasToRefinement(context, element, f);
@@ -160,6 +285,7 @@ public class VCChecker {
         // map.put(var.getName(), "this");
     }
 
+    // TODO(ask what is this)
     private void gatherVariables(Predicate expectedType, List<RefinedVariable> lrv, List<RefinedVariable> mainVars) {
         for (String s : expectedType.getVariableNames()) {
             if (context.hasVariable(s)) {
@@ -172,13 +298,9 @@ public class VCChecker {
         }
     }
 
-    private void addAllDifferent(List<RefinedVariable> toExpand, List<RefinedVariable> from,
+    private static void addAllDifferent(List<RefinedVariable> toExpand, List<RefinedVariable> from,
             List<RefinedVariable> remove) {
         from.stream().filter(rv -> !toExpand.contains(rv) && !remove.contains(rv)).forEach(toExpand::add);
-        // for (RefinedVariable rv : from) {
-        // if (!toExpand.contains(rv) && !remove.contains(rv))
-        // toExpand.add(rv);
-        // }
     }
 
     private List<RefinedVariable> getVariables(Predicate c, String varName) {
@@ -190,6 +312,7 @@ public class VCChecker {
         return allVars;
     }
 
+    // TODO(ask what is this)
     private void getVariablesFromContext(List<String> lvars, List<RefinedVariable> allVars, String notAdd) {
         lvars.stream().filter(name -> !name.equals(notAdd) && context.hasVariable(name)).map(context::getVariableByName)
                 .filter(rv -> !allVars.contains(rv)).forEach(rv -> {
@@ -198,6 +321,7 @@ public class VCChecker {
                 });
     }
 
+    // TODO(ask what is this)
     private void recAuxGetVars(RefinedVariable var, List<RefinedVariable> newVars) {
         if (!context.hasVariable(var.getName()))
             return;
@@ -237,6 +361,10 @@ public class VCChecker {
     private void smtChecking(Predicate cSMT, Predicate expectedType, CtElement element)
             throws TypeCheckError, GhostFunctionError, Exception {
         new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
+    }
+
+    private void smtCheckSAT(Predicate cSMT, CtElement element) throws TypeCheckError, GhostFunctionError, Exception {
+        new SMTEvaluator().checkIfSAT(cSMT, context);
     }
 
     /**

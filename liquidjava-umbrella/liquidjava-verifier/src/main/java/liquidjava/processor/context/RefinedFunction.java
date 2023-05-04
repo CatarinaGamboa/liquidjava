@@ -31,6 +31,10 @@ public class RefinedFunction extends Refined {
         heapChange = tr;
     }
 
+    public HeapContext.Transition getHeapChange() {
+        return heapChange;
+    }
+
     public void addArgRefinements(String varName, CtTypeReference<?> type, Predicate refinement) {
         Variable v = new Variable(varName, type, refinement);
         this.argRefinements.add(v);

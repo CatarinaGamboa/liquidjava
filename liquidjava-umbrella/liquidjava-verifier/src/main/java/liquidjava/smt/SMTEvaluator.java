@@ -12,6 +12,32 @@ import liquidjava.smt.solver_wrapper.Status;
 
 public class SMTEvaluator {
 
+    public void checkIfSAT(Predicate toVerify, Context c) throws TypeCheckError, GhostFunctionError, Exception {
+        System.out.println("verification query for SAT: " + toVerify); // TODO remove
+        try {
+            // SMTWrapper z3 = SMTWrapper.getZ3(c);
+            SMTWrapper cvc5 = SMTWrapper.getCVC5(c);
+            Status s = cvc5.verifyExpression(toVerify.getExpression());
+            if (s.equals(Status.UNSATISFIABLE)) {
+                System.out.println("result of SMT: Not Ok!");
+                throw new TypeCheckError(toVerify + " is not satisfiable");
+            }
+            System.out.println("result of SMT: Ok!");
+        } catch (SyntaxException e1) {
+            System.out.println("Could not parse: " + toVerify);
+            e1.printStackTrace();
+        } catch (Z3Exception e) {
+            if (e.getLocalizedMessage().substring(0, 24).equals("Wrong number of argument")
+                    || e.getLocalizedMessage().substring(0, 13).equals("Sort mismatch"))
+                throw new GhostFunctionError(e.getLocalizedMessage());
+            else
+                throw new Z3Exception(e.getLocalizedMessage());
+        } catch (CVC5ApiException e) {
+            System.out.println("Api error!! " + e);
+            throw e;
+        }
+    }
+
     public void verifySubtype(Predicate subRef, Predicate supRef, Context c)
             throws TypeCheckError, GhostFunctionError, Exception {
         // Creates a parser for our SMT-ready refinement language
