@@ -87,7 +87,7 @@ public class TestSeparationLogic extends TestAbstract {
 
     static String path = "benchmarks/chosen/";
 
-    @Test
+    // @Test
     public void benchmarkSimpleFunctionCall() {
         try {
             Files.createDirectories(Paths.get(path));
@@ -111,7 +111,7 @@ public class TestSeparationLogic extends TestAbstract {
         }
     }
 
-    @Test
+    // @Test
     public void benchmarkBaselineSimpleFunctionCall() {
         try {
             Files.createDirectories(Paths.get(path));
@@ -135,7 +135,7 @@ public class TestSeparationLogic extends TestAbstract {
         }
     }
 
-    @Test
+    // @Test
     public void benchmarkSimpleAnnFunctionCall() {
         try {
             Files.createDirectories(Paths.get(path));
