@@ -62,9 +62,7 @@ public class CommandLineLauncher {
         System.out.println("before process");
 
         // To only search the last package - less time spent
-        CtPackage v = factory.Package().getAll().stream().reduce((first, second) -> second).orElse(null);
-        if (v != null)
-            processingManager.process(v);
+        factory.Package().getAll().stream().reduce((first, second) -> second).ifPresent(processingManager::process);
         // To search all previous packages
         // processingManager.process(factory.Package().getRootPackage());
         System.out.println("after process");
