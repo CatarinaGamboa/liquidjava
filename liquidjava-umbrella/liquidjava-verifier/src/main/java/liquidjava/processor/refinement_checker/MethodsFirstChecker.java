@@ -35,7 +35,7 @@ public class MethodsFirstChecker extends TypeChecker {
             return;
 
         System.out.println("CTCLASS:" + ctClass.getSimpleName());
-        context.reinitializeContext();
+        context.reinitializeForClass();
         if (visitedClasses.contains(ctClass.getQualifiedName()))
             return;
         else

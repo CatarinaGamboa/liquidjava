@@ -70,7 +70,7 @@ public class RefinementTypeChecker extends TypeChecker {
         }
 
         // System.out.println("CTCLASS:"+ctClass.getSimpleName());
-        context.reinitializeContext();
+        context.reinitializeForClass();
         super.visitCtClass(ctClass);
     }
 
@@ -644,6 +644,18 @@ public class RefinementTypeChecker extends TypeChecker {
             vcChecker.doesHeapHold(substRef, context.getHeapCtx(), parentElem);
             Predicate newHeap = vcChecker.reduceHeapKnowledge(substRef, context.getHeapCtx(), parentElem);
             // can throw, but never should throw
+            // @Refinement("_ > 0")
+            // int x = 1 @Refinement("x == 1")
+
+            // HeapPrecondition(this -> ())
+            // HeapPostcondition(_ -> ())
+            // Stream map(..)
+
+            // HeapPrecondition(file -> ())
+            // HeapStrictPostcondition(file -> ())
+            // void writeToFile(File file){ f.close();}
+
+            // int y = x; && y == x
             context.setHeapFromPredicate(newHeap);
 
         } catch (ParsingException e) {

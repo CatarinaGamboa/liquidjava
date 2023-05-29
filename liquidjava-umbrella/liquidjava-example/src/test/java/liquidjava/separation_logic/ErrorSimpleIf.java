@@ -25,9 +25,13 @@ public class ErrorSimpleIf {
         Object b = createObject();
 
         if (x == 0){
+            // a * b | a, b
             Object tmp = a;
+            // tmp == a && a * b | a, b, tmp
             a = b;
+            // tmp == a && b
             b = tmp;
+            // tmp == b && b
         }else{
             System.out.println(String.valueOf(a) + b);
         }

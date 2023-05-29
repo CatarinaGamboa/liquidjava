@@ -50,7 +50,7 @@ public class Context {
         return instance;
     }
 
-    public void reinitializeContext() {
+    public void reinitializeForClass() {
         ctxVars = new Stack<>();
         ctxVars.add(new ArrayList<>());// global vars
         // ctxFunctions = new ArrayList<>();
@@ -61,8 +61,8 @@ public class Context {
         heapCtx = HeapContext.empty();
     }
 
-    public void reinitializeAllContext() {
-        reinitializeContext();
+    public void reinitializeForPkg() {
+        reinitializeForClass();
         ctxFunctions = new ArrayList<>();
         alias = new ArrayList<>();
         ghosts = new ArrayList<>();

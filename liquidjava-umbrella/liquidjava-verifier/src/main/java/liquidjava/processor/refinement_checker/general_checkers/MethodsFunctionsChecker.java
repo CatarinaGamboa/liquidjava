@@ -255,6 +255,8 @@ public class MethodsFunctionsChecker {
             rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
             rtc.checkSMT(cexpectedType, ret);
             rtc.getContext().newRefinementToVariableInContext(returnVarName, cexpectedType);
+
+            // TODO(sep logic): verify postcondition
         }
 
     }
