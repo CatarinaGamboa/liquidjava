@@ -72,14 +72,14 @@ public class MethodsFunctionsChecker {
         if (exe == null) {
             return;
         }
-        RefinedFunction f = rtc.getContext().getFunction(exe.getSimpleName(), exe.getDeclaringType().getQualifiedName(),
-                ctConstructorCall.getArguments().size());
+        RefinedFunction f = Context.getInstance().getFunction(exe.getSimpleName(),
+                exe.getDeclaringType().getQualifiedName(), ctConstructorCall.getArguments().size());
         if (f == null) {
             return;
         }
         Map<String, String> map = checkInvocationRefinements(ctConstructorCall, ctConstructorCall.getArguments(),
                 ctConstructorCall.getTarget(), f.getName(), f.getTargetClass());
-        AuxStateHandler.constructorStateMetadata(rtc.REFINE_KEY, f, map, ctConstructorCall);
+        AuxStateHandler.constructorStateMetadata(TypeChecker.REFINE_KEY, f, map, ctConstructorCall);
 
         // TODO(sep logic): here should be `new` handling, probably
         // but its actually handled in the same place where constructor refinements are handled
@@ -103,7 +103,7 @@ public class MethodsFunctionsChecker {
             CtInterface<?> inter = (CtInterface<?>) method.getParent();
             f.setClass(inter.getQualifiedName());
         }
-        rtc.getContext().addFunctionToContext(f);
+        Context.getInstance().addFunctionToContext(f);
 
         auxGetMethodRefinements(method, f);
         // TODO(sep logic): handle heap change
@@ -132,7 +132,7 @@ public class MethodsFunctionsChecker {
         f.setRefReturn(new Predicate());
 
         f.setClass(prefix);
-        rtc.getContext().addFunctionToContext(f);
+        Context.getInstance().addFunctionToContext(f);
         auxGetMethodRefinements(method, f);
         // TODO(sep logic): handle heap change
         // internally handleFunctionRefinement is called

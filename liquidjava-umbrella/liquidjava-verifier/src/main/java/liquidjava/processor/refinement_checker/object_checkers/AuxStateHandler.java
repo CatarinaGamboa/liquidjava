@@ -56,7 +56,7 @@ public class AuxStateHandler {
         String[] path = f.getTargetClass().split("\\.");
         String klass = path[path.length - 1];
 
-        Predicate[] s = { Predicate.createVar(tc.THIS) };
+        Predicate[] s = { Predicate.createVar(TypeChecker.THIS) };
         Predicate c = new Predicate();
         List<GhostFunction> sets = getDifferentSets(tc, klass);
         for (GhostFunction sg : sets) {
@@ -77,7 +77,7 @@ public class AuxStateHandler {
 
     private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klass) {
         List<GhostFunction> sets = new ArrayList<>();
-        List<GhostState> l = tc.getContext().getGhostState(klass);
+        List<GhostState> l = Context.getInstance().getGhostState(klass);
         if (l != null) {
             for (GhostState g : l) {
                 if (g.getParent() == null) {
@@ -159,21 +159,21 @@ public class AuxStateHandler {
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
             TypeChecker tc, CtElement e, boolean isTo) throws ParsingException {
         Predicate p = new Predicate(value, e, tc.getErrorEmitter());
-        String t = targetClass; // f.getTargetClass();
-        CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
+        CtTypeReference<?> r = tc.getFactory().Type().createReference(targetClass);
 
-        String nameOld = String.format(tc.instanceFormat, tc.THIS, tc.getContext().getCounter());
-        String name = String.format(tc.instanceFormat, tc.THIS, tc.getContext().getCounter());
+        String nameOld = String.format(TypeChecker.instanceFormat, TypeChecker.THIS,
+                Context.getInstance().getCounter());
+        String name = String.format(TypeChecker.instanceFormat, TypeChecker.THIS, Context.getInstance().getCounter());
         tc.getContext().addVarToContext(name, r, new Predicate(), e);
         tc.getContext().addVarToContext(nameOld, r, new Predicate(), e);
         // TODO REVIEW!!
 
-        Predicate c1 = isTo ? getMissingStates(t, tc, p) : p;
-        Predicate c = c1.makeSubstitution(tc.THIS, name);
+        Predicate c1 = isTo ? getMissingStates(targetClass, tc, p) : p;
+        Predicate c = c1.makeSubstitution(TypeChecker.THIS, name);
         c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
         boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e);
         if (b && !tc.getErrorEmitter().foundError()) {
-            tc.createSameStateError(e, p, t);
+            tc.createSameStateError(e, p, targetClass);
         }
 
         return c1;
