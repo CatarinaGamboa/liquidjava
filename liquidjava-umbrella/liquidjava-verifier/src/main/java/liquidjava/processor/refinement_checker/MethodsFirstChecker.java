@@ -89,6 +89,7 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
+        System.out.println("MF: Found constructor: " + c.getSignature());
         if (errorEmitter.foundError())
             return;
 

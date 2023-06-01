@@ -21,12 +21,7 @@ import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.SepUnit;
 import liquidjava.rj_language.parsing.ParsingException;
-import spoon.reflect.code.CtConstructorCall;
-import spoon.reflect.code.CtExpression;
-import spoon.reflect.code.CtFieldRead;
-import spoon.reflect.code.CtInvocation;
-import spoon.reflect.code.CtReturn;
-import spoon.reflect.code.CtVariableRead;
+import spoon.reflect.code.*;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
@@ -36,6 +31,7 @@ import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
+import spoon.reflect.reference.CtTypeReference;
 
 public class MethodsFunctionsChecker {
 
@@ -63,7 +59,7 @@ public class MethodsFunctionsChecker {
             CtClass<?> klass = (CtClass<?>) c.getParent();
             f.setClass(klass.getQualifiedName());
         }
-        rtc.getContext().addFunctionToContext(f);
+        Context.getInstance().addFunctionToContext(f);
         AuxStateHandler.handleConstructorState(c, f, rtc);
     }
 
@@ -122,8 +118,10 @@ public class MethodsFunctionsChecker {
         String k = pac[pac.length - 1];
 
         String functionName = String.format("%s.%s", prefix, method.getSimpleName());
+        Optional<HeapContext.Transition> tr = Optional.empty();
         if (k.equals(method.getSimpleName())) {// is a constructor
             functionName = String.format(constructorName);
+            tr = Optional.of(HeapContext.Transition.simpleConstructorTransition());
         }
 
         RefinedFunction f = new RefinedFunction();
@@ -134,10 +132,13 @@ public class MethodsFunctionsChecker {
         f.setClass(prefix);
         Context.getInstance().addFunctionToContext(f);
         auxGetMethodRefinements(method, f);
-        // TODO(sep logic): handle heap change
-        // internally handleFunctionRefinement is called
-        // maybe nothing to do here
 
+        if (f.getHeapChange().isId()) {
+            // if auxGet.. did not assign any heapChange
+            // and this function is a construtor
+            // assign simple heap change
+            tr.ifPresent(f::setHeapChange);
+        }
         AuxStateHandler.handleMethodState(method, f, rtc);
         if (functionName.equals(constructorName) && !f.hasStateChange()) {
             AuxStateHandler.setDefaultState(f, rtc);
@@ -174,10 +175,13 @@ public class MethodsFunctionsChecker {
         Predicate joint = new Predicate();
 
         for (CtParameter<?> param : params) {
+            if (param.isVarArgs()) {
+                f.setVarargs(param.getType());
+            }
             String paramName = param.getSimpleName();
             Predicate c = rtc.getRefinementFromAnnotation(param).orElse(Predicate.booleanTrue())
-                    .makeSubstitution(rtc.WILD_VAR, paramName);
-            param.putMetadata(rtc.REFINE_KEY, c);
+                    .makeSubstitution(TypeChecker.WILD_VAR, paramName);
+            param.putMetadata(TypeChecker.REFINE_KEY, c);
             RefinedVariable v = rtc.getContext().addVarToContext(param.getSimpleName(), param.getType(), c, param);
             if (v instanceof Variable)
                 f.addArgRefinements((Variable) v);
@@ -318,13 +322,14 @@ public class MethodsFunctionsChecker {
 
     }
 
-    private Map<String, String> checkInvocationRefinements(CtElement invocation, List<CtExpression<?>> arguments,
-            CtExpression<?> target, String methodName, String className) {
+    private Map<String, String> checkInvocationRefinements(CtAbstractInvocation<?> invocation,
+            List<CtExpression<?>> arguments, CtExpression<?> target, String methodName, String className) {
         // TODO(sep logic): check if heap is ok and apply changes
         // Here I should actually call frame rule. Maybe it is the only place to do so
 
         // -- Part 1: Check if the invocation is possible
         int si = arguments.size();
+
         RefinedFunction f = rtc.getContext().getFunction(methodName, className, si);
         Map<String, String> map = mapInvocation(arguments, f);
         HeapContext.Transition heapTransition = f.getHeapChange().clone();
@@ -333,7 +338,7 @@ public class MethodsFunctionsChecker {
             AuxStateHandler.checkTargetChanges(rtc, f, target, map, invocation);
         }
         if (f.allRefinementsTrue() && heapTransition.isId()) {
-            invocation.putMetadata(rtc.REFINE_KEY, Predicate.booleanTrue());
+            invocation.putMetadata(TypeChecker.REFINE_KEY, Predicate.booleanTrue());
             return map;
         }
 
@@ -352,21 +357,23 @@ public class MethodsFunctionsChecker {
         vars.stream().filter(map::containsKey).forEach(s -> methodRef.substituteInPlace(s, map.get(s)));
 
         String varName = null;
-        if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
-            VariableInstance vi = (VariableInstance) invocation.getMetadata(rtc.TARGET_KEY);
-            methodRef.substituteInPlace(rtc.THIS, vi.getName());
+        if (invocation.getMetadata(TypeChecker.TARGET_KEY) != null) {
+            VariableInstance vi = (VariableInstance) invocation.getMetadata(TypeChecker.TARGET_KEY);
+            methodRef.substituteInPlace(TypeChecker.THIS, vi.getName());
+            heapTransition.substituteInPlace(TypeChecker.THIS, vi.getName());// ?
+
             Variable v = rtc.getContext().getVariableFromInstance(vi);
             if (v != null)
                 varName = v.getName();
         }
 
-        String viName = String.format(rtc.instanceFormat, f.getName(), rtc.getContext().getCounter());
+        String viName = String.format(TypeChecker.instanceFormat, f.getName(), rtc.getContext().getCounter());
         VariableInstance vi = (VariableInstance) rtc.getContext().addInstanceToContext(viName, f.getType(),
-                methodRef.makeSubstitution(rtc.WILD_VAR, viName), invocation); // TODO REVER!!
+                methodRef.makeSubstitution(TypeChecker.WILD_VAR, viName), invocation); // TODO REVER!!
         if (varName != null && f.hasStateChange() && equalsThis)
             rtc.getContext().addRefinementInstanceToVariable(varName, viName);
-        invocation.putMetadata(rtc.TARGET_KEY, vi);
-        invocation.putMetadata(rtc.REFINE_KEY, methodRef);
+        invocation.putMetadata(TypeChecker.TARGET_KEY, vi);
+        invocation.putMetadata(TypeChecker.REFINE_KEY, methodRef);
         // TODO(sep logic): invocation.puMetadata(rtc.HEAP_KEY, newHeapContext) ????
         // YES it is likely a right thing to do.
         // Is there a place to reuse the stored value?
@@ -381,6 +388,13 @@ public class MethodsFunctionsChecker {
     private <R> Map<String, String> mapInvocation(List<CtExpression<?>> invocationParams, RefinedFunction f) {
         Map<String, String> mapInvocation = new HashMap<>();
         List<Variable> functionParams = f.getArguments();
+        if (invocationParams.size() > functionParams.size() && f.hasVarargs()) {
+            // fill args with varargs type
+            CtTypeReference<?> varargsT = f.getVarargType().get();
+            for (int i = functionParams.size(); i < invocationParams.size(); i++) {
+                functionParams.add(new Variable("genArgForVararg", varargsT, new Predicate()));
+            }
+        }
         for (int i = 0; i < invocationParams.size(); i++) {
             Variable fArg = functionParams.get(i);
             CtExpression<?> iArg = invocationParams.get(i);

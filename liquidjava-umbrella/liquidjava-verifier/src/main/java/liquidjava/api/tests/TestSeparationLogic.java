@@ -45,7 +45,22 @@ public class TestSeparationLogic extends TestAbstract {
 
     @Test
     public void errorFileAnn() {
-        testWrong(testPath + "separation_logic/filetest");
+        testWrong(testPath + "separation_logic/errorfiletest");
+    }
+
+    @Test
+    public void correctFileAnn() {
+        testCorrect(testPath + "separation_logic/correctfiletest");
+    }
+
+    @Test
+    public void correctStreamAnn() {
+        testCorrect(testPath + "separation_logic/correctstreamtest");
+    }
+
+    @Test
+    public void errorStreamAnn() {
+        testWrong(testPath + "separation_logic/errorstreamtest");
     }
 
     // @Test

@@ -1,12 +1,23 @@
-package liquidjava.separation_logic.filetest;
+package liquidjava.separation_logic.errorfiletest;
 
+import liquidjava.specification.ExternalRefinementsFor;
 import liquidjava.specification.HeapPostcondition;
 import liquidjava.specification.HeapPrecondition;
 
-import liquidjava.separation_logic.filetest.FileAnnotations;
-
 import java.io.FileWriter;
 import java.io.IOException;
+
+@ExternalRefinementsFor("java.io.FileWriter")
+interface FileWriterConstrutor {
+    FileWriter FileWriter(String str);
+}
+
+@ExternalRefinementsFor("java.io.OutputStreamWriter")
+interface OutputStreamCloseAnnotations {
+    @HeapPrecondition("this |-> sep.()")
+    @HeapPostcondition("sep.emp")
+    void close();
+}
 
 public class ErrorFileTest {
     static void run() throws IOException {

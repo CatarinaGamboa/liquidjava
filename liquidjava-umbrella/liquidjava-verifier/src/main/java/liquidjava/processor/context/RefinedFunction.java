@@ -7,6 +7,7 @@ import java.util.Optional;
 import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction extends Refined {
@@ -16,6 +17,7 @@ public class RefinedFunction extends Refined {
     private List<ObjectState> stateChange;
 
     private HeapContext.Transition heapChange;
+    private Optional<CtTypeReference<?>> varargsType = Optional.empty();
 
     public RefinedFunction() {
         argRefinements = new ArrayList<>();
@@ -25,6 +27,10 @@ public class RefinedFunction extends Refined {
 
     public List<Variable> getArguments() {
         return argRefinements;
+    }
+
+    public void setVarargs(CtTypeReference<?> t) {
+        varargsType = Optional.of(t);
     }
 
     public void setHeapChange(HeapContext.Transition tr) {
@@ -180,4 +186,11 @@ public class RefinedFunction extends Refined {
         return true;
     }
 
+    public boolean hasVarargs() {
+        return varargsType.isPresent();
+    }
+
+    public Optional<CtTypeReference<?>> getVarargType() {
+        return varargsType;
+    }
 }

@@ -315,9 +315,12 @@ public class Context {
     }
 
     public RefinedFunction getFunction(String name, String target, int size) {
+
         for (RefinedFunction fi : ctxFunctions) {
-            if (fi.getTargetClass() != null && fi.getName().equals(name) && fi.getTargetClass().equals(target)
-                    && fi.getArguments().size() == size)
+            boolean hasVarargs = fi.hasVarargs();
+            boolean fitargs = hasVarargs || fi.getArguments().size() == size;
+            boolean fitname = fi.getName().equals(name);
+            if (fi.getTargetClass() != null && fitname && fi.getTargetClass().equals(target) && fitargs)
                 return fi;
         }
         return null;

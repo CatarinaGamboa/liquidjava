@@ -371,7 +371,15 @@ public abstract class TypeChecker extends CtScanner {
 
         vcChecker.checkHeapPrecondition(booleanCtx, context.getHeapCtx().toSepConjunctions(), tr, element);
 
+        if (errorEmitter.foundError()) {
+            return;
+        }
+
         Predicate newHeap = vcChecker.applyHeapTransition(booleanCtx, context.getHeapCtx(), tr, element);
+
+        if (errorEmitter.foundError()) {
+            return;
+        }
 
         // TODO(sep logic): postcondition is SAT. Or in definition
         try {

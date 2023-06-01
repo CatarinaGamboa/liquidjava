@@ -145,6 +145,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
+        System.out.println("Visiting " + localVariable);
         if (errorEmitter.foundError()) {
             return;
         }
@@ -600,6 +601,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
+        System.out.println("RTcH: Found constructor call: " + ctConstructorCall);
         if (errorEmitter.foundError()) {
             return;
         }
