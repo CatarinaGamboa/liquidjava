@@ -43,10 +43,17 @@ public class TestSeparationLogic extends TestAbstract {
         testWrong(testPath + "separation_logic/ErrorSimpleIf.java");
     }
 
+    @Test
+    public void errorFileAnn() {
+        testWrong(testPath + "separation_logic/filetest");
+    }
+
     // @Test
     // public void correctSimpleIf() {
     // testCorrect(testPath + "separation_logic/CorrectSimpleIf.java");
     // }
+
+    // -------------- BENCHMARKS ----------------
 
     private long meanTimeOfAnnSimpleFunctionCall(int sampleSize) {
         Long totalTime = Stream.generate(() -> 0).limit(sampleSize).map(i -> {
@@ -61,8 +68,8 @@ public class TestSeparationLogic extends TestAbstract {
     private long meanTimeOfSimpleFunctionCall(int sampleSize) {
         Long totalTime = Stream.generate(() -> 0).limit(sampleSize).map(i -> {
             long start = System.currentTimeMillis();
-            testCorrect(testPath + "separation_logic/SimpleFunctionCall.java");
-            testCorrect(testPath + "separation_logic/SimpleFunctionCall.java");
+            testCorrect(testPath + "separation_logic/benchsup/SimpleFunctionCall.java");
+            testCorrect(testPath + "separation_logic/benchsup/SimpleFunctionCall.java");
             return (System.currentTimeMillis() - start) / 2L;
         }).reduce(0L, Long::sum);
         return totalTime / sampleSize;
@@ -71,8 +78,8 @@ public class TestSeparationLogic extends TestAbstract {
     private long meanTimeOfSimpleBaseline(int sampleSize) {
         Long totalTime = Stream.generate(() -> 0).limit(sampleSize).map(i -> {
             long start = System.currentTimeMillis();
-            testCorrect(testPath + "separation_logic/SimpleBaseline.java");
-            testCorrect(testPath + "separation_logic/SimpleBaseline.java");
+            testCorrect(testPath + "separation_logic/benchsup/SimpleBaseline.java");
+            testCorrect(testPath + "separation_logic/benchsup/SimpleBaseline.java");
             return (System.currentTimeMillis() - start) / 2L;
         }).reduce(0L, Long::sum);
         return totalTime / sampleSize;

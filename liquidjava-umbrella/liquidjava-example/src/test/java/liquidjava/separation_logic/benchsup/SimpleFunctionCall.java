@@ -1,4 +1,4 @@
-package liquidjava.separation_logic;
+package liquidjava.separation_logic.benchsup;
 
 public class SimpleFunctionCall {
 

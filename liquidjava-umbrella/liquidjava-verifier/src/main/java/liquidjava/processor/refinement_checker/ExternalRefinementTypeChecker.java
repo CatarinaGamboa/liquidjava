@@ -32,7 +32,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        return;
     }
 
     @Override
@@ -40,9 +39,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (errorEmitter.foundError())
             return;
 
-        Optional<String> externalRefinements = getExternalRefinement(intrface);
-        if (externalRefinements.isPresent()) {
-            prefix = externalRefinements.get();
+        getExternalRefinement(intrface).ifPresent(p -> {
+            prefix = p;
             try {
                 getRefinementFromAnnotation(intrface);
             } catch (ParsingException e) {
@@ -50,7 +48,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
             handleStateSetsFromAnnotation(intrface);
             super.visitCtInterface(intrface);
-        }
+        });
     }
 
     @Override
@@ -58,13 +56,12 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (errorEmitter.foundError())
             return;
 
-        Optional<Predicate> oc;
+        Predicate c;
         try {
-            oc = getRefinementFromAnnotation(f);
+            c = getRefinementFromAnnotation(f).orElse(new Predicate());
         } catch (ParsingException e) {
             return;// error already in ErrorEmitter
         }
-        Predicate c = oc.orElse(new Predicate());
         context.addGlobalVariableToContext(f.getSimpleName(), prefix, f.getType(), c);
         super.visitCtField(f);
     }
