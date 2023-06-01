@@ -1,5 +1,6 @@
 package liquidjava.classes.state_multiple_cases;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import liquidjava.specification.ExternalRefinementsFor;
 import liquidjava.specification.Refinement;
@@ -11,8 +12,7 @@ import liquidjava.specification.StateSet;
 @StateSet({"open",  "close"})
 @StateSet({"nothingRead", "alreadyRead"})
 public interface InputStreamReaderRefinements {
-	
-	public void InputStreamReader(InputStream in);
+	public InputStreamReader InputStreamReader(InputStream in);
 
 	@StateRefinement(from="open(this)", to="open(this) && alreadyRead(this)")
 	@Refinement("(_ >= -1) && (_ <= 127)")

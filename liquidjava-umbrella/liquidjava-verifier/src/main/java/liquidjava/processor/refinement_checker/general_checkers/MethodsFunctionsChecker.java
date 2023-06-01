@@ -418,12 +418,12 @@ public class MethodsFunctionsChecker {
     }
 
     private String createVariableRepresentingArgument(CtExpression<?> iArg, Variable fArg) {
-        Predicate met = (Predicate) iArg.getMetadata(rtc.REFINE_KEY);
+        Predicate met = (Predicate) iArg.getMetadata(TypeChecker.REFINE_KEY);
         if (met == null)
             met = new Predicate();
-        if (!met.getVariableNames().contains(rtc.WILD_VAR))
-            met = Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), met);
-        String nVar = String.format(rtc.instanceFormat, fArg.getName(), rtc.getContext().getCounter());
+        if (!met.getVariableNames().contains(TypeChecker.WILD_VAR))
+            met = Predicate.createEquals(Predicate.createVar(TypeChecker.WILD_VAR), met);
+        String nVar = String.format(TypeChecker.instanceFormat, fArg.getName(), rtc.getContext().getCounter());
         rtc.getContext().addInstanceToContext(nVar, fArg.getType(), met.makeSubstitution(rtc.WILD_VAR, nVar), iArg);
         return nVar;
     }
