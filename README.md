@@ -1,10 +1,13 @@
-# LiquidJava - Extending Java with Refinement Types
+# LiquidJava - Extending Java with Liquid Types
+
+![LiquidJava Banner](docs/design/figs/banner.gif)
+
 
 ### Welcome to LiquidJava!
 
-LiquidJava is an additional typechecker for Java that supports refinement types.
+LiquidJava is an additional typechecker for Java that supports liquid types and typestate.
 
-Simple example
+Simple example:
 
 
 ```java
@@ -13,15 +16,14 @@ int a = 3; // okay
 a = -8; // type error!
 ```
 
+This project has the LiquidJava verifier, the api and some examples for testing.
+You can find out more about LiquidJava in the following resources:
 
-## More information
-
-
-* [VSCode plugin for LiquidJava](https://github.com/CatarinaGamboa/vscode-liquidjava)
+* [Website](https://catarinagamboa.github.io/liquidjava.html)
 * [Examples of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-examples)
 * [LiquidJava Specification of Java StdLib](https://github.com/CatarinaGamboa/liquid-java-external-libs)
-* [Formalization of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-formalization)
-
+* [VSCode plugin for LiquidJava](https://github.com/CatarinaGamboa/vscode-liquidjava)
+<!-- * [Formalization of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-formalization) - not opensource yet -->
 
 
 ## Setup the project
