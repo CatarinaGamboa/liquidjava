@@ -62,7 +62,6 @@ extensions=\${jpf-core},\${jpf-nhandler},\${jpf-symbc}
 cd -
 
 # Cleans installs the maven dependencies
-cd liquidjava-umbrella
 mvn clean install
 cd ..
 

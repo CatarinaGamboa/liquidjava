@@ -28,8 +28,8 @@ You can find out more about LiquidJava in the following resources:
 
 ## Setup the project
 1. Clone the repository;
-2. Open Eclipse and do `Ìmport...\ Existing Maven Project` selecting the folder `liquidjava-umbrella` and waiting for the build process to finish (bottom right update bar)
-3. Select the `liquidjava-umbrella` folder, right click it and select `Run as...\Maven install...`
+2. Open Eclipse and do `Ìmport...\ Existing Maven Project` selecting the current folder and waiting for the build process to finish (bottom right update bar)
+3. Select the current folder, right click it and select `Run as...\Maven install...`
 4. If inside the `liquidjava-verifier` build path there is not a `target/generated-sources/antr4`: Select `liquidjava-verifier`, on right-click, go to `Build Path\Link Source...` and browse for `liquidjava-verifier\target\generated-sources\antlr4` and select `Finish`
 
 ## Run verification
@@ -45,14 +45,13 @@ Make sure to run these tests after making changes in the verification code.
 
 ## Project structure
 - **docs**: documents used for the design of the language. The folder includes a readme to a full artifact used in the design process, here are some initial documents used to prepare the design of the refinements language at its evaluation
-- **liquidjava-umbrella**: maven project with the different sub-folders with api, examples and the verifier.
-    - **liquidjava-api**: inlcudes the annotations that can be introduced in the Java programs to add the refinements
-    - **liquidjava-examples**: includes a main folder with the current example that the verifier is testing; and inlcudes the classes for the tests
-    - **liquidjava-verifier**: has the project for verification of the classes
-        - *api*: classes that test the verifier. Includes the `CommandLineLauncher` that runs the verification on a given class or on the main folder of `liquidjava-examples` if no argument is given. This package includes the JUnit tests to verify if the examples in `liquidjava-example/tests` are correctly verified.
-        - *ast*: represents the abstract syntax tree of the refinement's language.
-        - *errors*: package for reporting the errors.
-        - *processor*: package that handles the type checking.
-        - *rj_language*: handles the processing of the strings with refinements.
-        - *smt*: package that handles the translation to the smt solver and the processing of the results the smt solver produces.
-        - *utils*: includes useful methods for all the previous packages.
+- **liquidjava-api**: inlcudes the annotations that can be introduced in the Java programs to add the refinements
+- **liquidjava-examples**: includes a main folder with the current example that the verifier is testing; and inlcudes the classes for the tests
+- **liquidjava-verifier**: has the project for verification of the classes
+    - *api*: classes that test the verifier. Includes the `CommandLineLauncher` that runs the verification on a given class or on the main folder of `liquidjava-examples` if no argument is given. This package includes the JUnit tests to verify if the examples in `liquidjava-example/tests` are correctly verified.
+    - *ast*: represents the abstract syntax tree of the refinement's language.
+    - *errors*: package for reporting the errors.
+    - *processor*: package that handles the type checking.
+    - *rj_language*: handles the processing of the strings with refinements.
+    - *smt*: package that handles the translation to the smt solver and the processing of the results the smt solver produces.
+    - *utils*: includes useful methods for all the previous packages.

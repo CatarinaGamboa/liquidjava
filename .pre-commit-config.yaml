@@ -3,4 +3,4 @@ repos:
   rev: v0.3.3
   hooks:
   - id: maven
-    args: [clean compile clean]
+    args: [clean compile]
