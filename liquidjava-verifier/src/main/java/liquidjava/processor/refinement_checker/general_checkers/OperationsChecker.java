@@ -100,8 +100,9 @@ public class OperationsChecker {
      * 
      * @throws ParsingException
      */
+    @SuppressWarnings({ "unchecked" })
     public <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) throws ParsingException {
-        CtExpression<T> ex = operator.getOperand();
+        CtExpression<T> ex = (CtExpression<T>) operator.getOperand();
         String name = rtc.freshFormat;
         Predicate all;
         if (ex instanceof CtVariableWrite) {

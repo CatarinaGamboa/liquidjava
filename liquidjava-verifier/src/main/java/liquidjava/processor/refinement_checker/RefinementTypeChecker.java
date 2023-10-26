@@ -348,7 +348,9 @@ public class RefinementTypeChecker extends TypeChecker {
         getPutVariableMetadada(variableRead, varDecl.getSimpleName());
     }
 
-    /** Visitor for binary operations Adds metadata to the binary operations from the operands */
+    /**
+     * Visitor for binary operations Adds metadata to the binary operations from the operands
+     */
     @Override
     public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
         if (errorEmitter.foundError()) {
@@ -469,7 +471,6 @@ public class RefinementTypeChecker extends TypeChecker {
             return; // error already in ErrorEmitter
         }
         arrayWrite.putMetadata(REFINE_KEY, fp);
-        // TODO fazer mais...? faz sentido
     }
 
     @Override

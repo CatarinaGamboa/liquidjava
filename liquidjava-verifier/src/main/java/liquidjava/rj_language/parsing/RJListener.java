@@ -24,7 +24,6 @@ public class RJListener implements ParseTreeListener {
 
     @Override
     public void visitErrorNode(ErrorNode node) {
-        // TODO Auto-generated method stub
 
     }
 
@@ -40,7 +39,5 @@ public class RJListener implements ParseTreeListener {
 
     @Override
     public void exitEveryRule(ParserRuleContext ctx) {
-        // TODO Auto-generated method stub
-
     }
 }

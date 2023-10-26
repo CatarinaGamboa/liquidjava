@@ -11,7 +11,6 @@ public class GhostState extends GhostFunction {
 
     public GhostState(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String klass) {
         super(name, list, return_type, klass);
-        // TODO Auto-generated constructor stub
     }
 
     public void setGhostParent(GhostFunction parent) {
