@@ -34,174 +34,183 @@ import spoon.reflect.factory.Factory;
  */
 public class Predicate {
 
-  protected Expression exp;
+    protected Expression exp;
 
-  /** Create a predicate with the expression true */
-  public Predicate() {
-    exp = new LiteralBoolean(true);
-  }
-
-  /**
-   * Create a new predicate with a refinement
-   *
-   * @param ref
-   * @param element
-   * @param e
-   * @throws ParsingException
-   */
-  public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
-    exp = parse(ref, element, e);
-    if (e.foundError()) return;
-    if (!(exp instanceof GroupExpression)) {
-      exp = new GroupExpression(exp);
-    }
-  }
-
-  /** Create a predicate with the expression true */
-  public Predicate(Expression e) {
-    exp = e;
-  }
-
-  protected Expression parse(String ref, CtElement element, ErrorEmitter e)
-      throws ParsingException {
-    try {
-      return RefinementsParser.createAST(ref);
-    } catch (ParsingException e1) {
-      ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
-      throw e1;
-    }
-  }
-
-  protected Expression innerParse(String ref, ErrorEmitter e) {
-    try {
-      return RefinementsParser.createAST(ref);
-    } catch (ParsingException e1) {
-      ErrorHandler.printSyntaxError(e1.getMessage(), ref, e);
-    }
-    return null;
-  }
-
-  public Predicate changeAliasToRefinement(Context context, Factory f) throws Exception {
-    Expression ref = getExpression();
-
-    Map<String, AliasDTO> alias = new HashMap<>();
-    for (AliasWrapper aw : context.getAlias()) {
-      alias.put(aw.getName(), aw.createAliasDTO());
+    /** Create a predicate with the expression true */
+    public Predicate() {
+        exp = new LiteralBoolean(true);
     }
 
-    ref = ref.changeAlias(alias, context, f);
-    return new Predicate(ref);
-  }
-
-  public Predicate negate() {
-    return new Predicate(new UnaryExpression("!", exp));
-  }
-
-  public Predicate substituteVariable(String from, String to) {
-    Expression ec = exp.clone();
-    ec = ec.substitute(new Var(from), new Var(to));
-    return new Predicate(ec);
-  }
-
-  public List<String> getVariableNames() {
-    List<String> l = new ArrayList<>();
-    exp.getVariableNames(l);
-    return l;
-  }
-
-  public List<GhostState> getStateInvocations(List<GhostState> lgs) {
-    if (lgs == null) return new ArrayList<>();
-    List<String> all = lgs.stream().map(p -> p.getName()).collect(Collectors.toList());
-    List<String> toAdd = new ArrayList<>();
-    exp.getStateInvocations(toAdd, all);
-
-    List<GhostState> gh = new ArrayList<>();
-    for (String n : toAdd) {
-      for (GhostState g : lgs) if (g.getName().equals(n)) gh.add(g);
+    /**
+     * Create a new predicate with a refinement
+     *
+     * @param ref
+     * @param element
+     * @param e
+     * 
+     * @throws ParsingException
+     */
+    public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+        exp = parse(ref, element, e);
+        if (e.foundError())
+            return;
+        if (!(exp instanceof GroupExpression)) {
+            exp = new GroupExpression(exp);
+        }
     }
 
-    return gh;
-  }
+    /** Create a predicate with the expression true */
+    public Predicate(Expression e) {
+        exp = e;
+    }
 
-  /** Change old mentions of previous name to the new name e.g., old(previousName) -> newName */
-  public Predicate changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
-    Expression e = exp.clone();
-    Expression prev = createVar(previousName).getExpression();
-    List<Expression> le = new ArrayList<>();
-    le.add(createVar(newName).getExpression());
-    e.substituteFunction(Utils.OLD, le, prev);
-    return new Predicate(e);
-  }
+    protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+        try {
+            return RefinementsParser.createAST(ref);
+        } catch (ParsingException e1) {
+            ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
+            throw e1;
+        }
+    }
 
-  public Predicate changeStatesToRefinements(
-      List<GhostState> ghostState, String[] toChange, ErrorEmitter ee) {
-    Map<String, Expression> nameRefinementMap = new HashMap<>();
-    for (GhostState gs : ghostState)
-      if (gs.getRefinement() != null) // is a state and not a ghost state
-      nameRefinementMap.put(gs.getName(), innerParse(gs.getRefinement().toString(), ee));
+    protected Expression innerParse(String ref, ErrorEmitter e) {
+        try {
+            return RefinementsParser.createAST(ref);
+        } catch (ParsingException e1) {
+            ErrorHandler.printSyntaxError(e1.getMessage(), ref, e);
+        }
+        return null;
+    }
 
-    Expression e = exp.substituteState(nameRefinementMap, toChange);
-    return new Predicate(e);
-  }
+    public Predicate changeAliasToRefinement(Context context, Factory f) throws Exception {
+        Expression ref = getExpression();
 
-  public boolean isBooleanTrue() {
-    return exp.isBooleanTrue();
-  }
+        Map<String, AliasDTO> alias = new HashMap<>();
+        for (AliasWrapper aw : context.getAlias()) {
+            alias.put(aw.getName(), aw.createAliasDTO());
+        }
 
-  @Override
-  public String toString() {
-    return exp.toString();
-  }
+        ref = ref.changeAlias(alias, context, f);
+        return new Predicate(ref);
+    }
 
-  @Override
-  public Predicate clone() {
-    Predicate c = new Predicate(exp.clone());
-    return c;
-  }
+    public Predicate negate() {
+        return new Predicate(new UnaryExpression("!", exp));
+    }
 
-  public Expression getExpression() {
-    return exp;
-  }
+    public Predicate substituteVariable(String from, String to) {
+        Expression ec = exp.clone();
+        ec = ec.substitute(new Var(from), new Var(to));
+        return new Predicate(ec);
+    }
 
-  public static Predicate createConjunction(Predicate c1, Predicate c2) {
-    return new Predicate(new BinaryExpression(c1.getExpression(), Utils.AND, c2.getExpression()));
-  }
+    public List<String> getVariableNames() {
+        List<String> l = new ArrayList<>();
+        exp.getVariableNames(l);
+        return l;
+    }
 
-  public static Predicate createDisjunction(Predicate c1, Predicate c2) {
-    return new Predicate(new BinaryExpression(c1.getExpression(), Utils.OR, c2.getExpression()));
-  }
+    public List<GhostState> getStateInvocations(List<GhostState> lgs) {
+        if (lgs == null)
+            return new ArrayList<>();
+        List<String> all = lgs.stream().map(p -> p.getName()).collect(Collectors.toList());
+        List<String> toAdd = new ArrayList<>();
+        exp.getStateInvocations(toAdd, all);
 
-  public static Predicate createEquals(Predicate c1, Predicate c2) {
-    return new Predicate(new BinaryExpression(c1.getExpression(), Utils.EQ, c2.getExpression()));
-  }
+        List<GhostState> gh = new ArrayList<>();
+        for (String n : toAdd) {
+            for (GhostState g : lgs)
+                if (g.getName().equals(n))
+                    gh.add(g);
+        }
 
-  public static Predicate createITE(Predicate c1, Predicate c2, Predicate c3) {
-    return new Predicate(new Ite(c1.getExpression(), c2.getExpression(), c3.getExpression()));
-  }
+        return gh;
+    }
 
-  public static Predicate createLit(String value, String type) {
-    Expression ex;
-    if (type.equals(Utils.BOOLEAN)) ex = new LiteralBoolean(value);
-    else if (type.equals(Utils.INT)) ex = new LiteralInt(value);
-    else if (type.equals(Utils.DOUBLE)) ex = new LiteralReal(value);
-    else if (type.equals(Utils.SHORT)) ex = new LiteralInt(value);
-    else if (type.equals(Utils.LONG)) ex = new LiteralReal(value);
-    else // if(type.equals(Utils.DOUBLE))
-    ex = new LiteralReal(value);
-    return new Predicate(ex);
-  }
+    /** Change old mentions of previous name to the new name e.g., old(previousName) -> newName */
+    public Predicate changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
+        Expression e = exp.clone();
+        Expression prev = createVar(previousName).getExpression();
+        List<Expression> le = new ArrayList<>();
+        le.add(createVar(newName).getExpression());
+        e.substituteFunction(Utils.OLD, le, prev);
+        return new Predicate(e);
+    }
 
-  public static Predicate createOperation(Predicate c1, String op, Predicate c2) {
-    return new Predicate(new BinaryExpression(c1.getExpression(), op, c2.getExpression()));
-  }
+    public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, ErrorEmitter ee) {
+        Map<String, Expression> nameRefinementMap = new HashMap<>();
+        for (GhostState gs : ghostState)
+            if (gs.getRefinement() != null) // is a state and not a ghost state
+                nameRefinementMap.put(gs.getName(), innerParse(gs.getRefinement().toString(), ee));
 
-  public static Predicate createVar(String name) {
-    return new Predicate(new Var(name));
-  }
+        Expression e = exp.substituteState(nameRefinementMap, toChange);
+        return new Predicate(e);
+    }
 
-  public static Predicate createInvocation(String name, Predicate... Predicates) {
-    List<Expression> le = new ArrayList<>();
-    for (Predicate c : Predicates) le.add(c.getExpression());
-    return new Predicate(new FunctionInvocation(name, le));
-  }
+    public boolean isBooleanTrue() {
+        return exp.isBooleanTrue();
+    }
+
+    @Override
+    public String toString() {
+        return exp.toString();
+    }
+
+    @Override
+    public Predicate clone() {
+        Predicate c = new Predicate(exp.clone());
+        return c;
+    }
+
+    public Expression getExpression() {
+        return exp;
+    }
+
+    public static Predicate createConjunction(Predicate c1, Predicate c2) {
+        return new Predicate(new BinaryExpression(c1.getExpression(), Utils.AND, c2.getExpression()));
+    }
+
+    public static Predicate createDisjunction(Predicate c1, Predicate c2) {
+        return new Predicate(new BinaryExpression(c1.getExpression(), Utils.OR, c2.getExpression()));
+    }
+
+    public static Predicate createEquals(Predicate c1, Predicate c2) {
+        return new Predicate(new BinaryExpression(c1.getExpression(), Utils.EQ, c2.getExpression()));
+    }
+
+    public static Predicate createITE(Predicate c1, Predicate c2, Predicate c3) {
+        return new Predicate(new Ite(c1.getExpression(), c2.getExpression(), c3.getExpression()));
+    }
+
+    public static Predicate createLit(String value, String type) {
+        Expression ex;
+        if (type.equals(Utils.BOOLEAN))
+            ex = new LiteralBoolean(value);
+        else if (type.equals(Utils.INT))
+            ex = new LiteralInt(value);
+        else if (type.equals(Utils.DOUBLE))
+            ex = new LiteralReal(value);
+        else if (type.equals(Utils.SHORT))
+            ex = new LiteralInt(value);
+        else if (type.equals(Utils.LONG))
+            ex = new LiteralReal(value);
+        else // if(type.equals(Utils.DOUBLE))
+            ex = new LiteralReal(value);
+        return new Predicate(ex);
+    }
+
+    public static Predicate createOperation(Predicate c1, String op, Predicate c2) {
+        return new Predicate(new BinaryExpression(c1.getExpression(), op, c2.getExpression()));
+    }
+
+    public static Predicate createVar(String name) {
+        return new Predicate(new Var(name));
+    }
+
+    public static Predicate createInvocation(String name, Predicate... Predicates) {
+        List<Expression> le = new ArrayList<>();
+        for (Predicate c : Predicates)
+            le.add(c.getExpression());
+        return new Predicate(new FunctionInvocation(name, le));
+    }
 }

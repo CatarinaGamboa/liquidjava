@@ -15,35 +15,32 @@ import spoon.reflect.factory.Factory;
 /** Finds circular dependencies between packages */
 public class RefinementProcessor extends AbstractProcessor<CtPackage> {
 
-  List<CtPackage> visitedPackages = new ArrayList<>();
-  Factory factory;
-  ErrorEmitter errorEmitter;
+    List<CtPackage> visitedPackages = new ArrayList<>();
+    Factory factory;
+    ErrorEmitter errorEmitter;
 
-  public RefinementProcessor(Factory factory, ErrorEmitter ee) {
-    this.factory = factory;
-    errorEmitter = ee;
-  }
-
-  @Override
-  public void process(CtPackage pkg) {
-    if (!visitedPackages.contains(pkg)) {
-      visitedPackages.add(pkg);
-      Context c = Context.getInstance();
-      c.reinitializeAllContext();
-
-      pkg.accept(
-          new FieldGhostsGeneration(
-              c, factory, errorEmitter)); // generate annotations for field ghosts
-
-      // void spoon.reflect.visitor.CtVisitable.accept(CtVisitor arg0)
-      pkg.accept(new ExternalRefinementTypeChecker(c, factory, errorEmitter));
-
-      pkg.accept(
-          new MethodsFirstChecker(
-              c, factory, errorEmitter)); // double passing idea (instead of headers)
-
-      pkg.accept(new RefinementTypeChecker(c, factory, errorEmitter));
-      if (errorEmitter.foundError()) return;
+    public RefinementProcessor(Factory factory, ErrorEmitter ee) {
+        this.factory = factory;
+        errorEmitter = ee;
     }
-  }
+
+    @Override
+    public void process(CtPackage pkg) {
+        if (!visitedPackages.contains(pkg)) {
+            visitedPackages.add(pkg);
+            Context c = Context.getInstance();
+            c.reinitializeAllContext();
+
+            pkg.accept(new FieldGhostsGeneration(c, factory, errorEmitter)); // generate annotations for field ghosts
+
+            // void spoon.reflect.visitor.CtVisitable.accept(CtVisitor arg0)
+            pkg.accept(new ExternalRefinementTypeChecker(c, factory, errorEmitter));
+
+            pkg.accept(new MethodsFirstChecker(c, factory, errorEmitter)); // double passing idea (instead of headers)
+
+            pkg.accept(new RefinementTypeChecker(c, factory, errorEmitter));
+            if (errorEmitter.foundError())
+                return;
+        }
+    }
 }

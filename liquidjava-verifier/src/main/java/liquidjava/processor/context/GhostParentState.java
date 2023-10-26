@@ -7,28 +7,23 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class GhostParentState extends GhostFunction {
 
-  private ArrayList<GhostState> states;
+    private ArrayList<GhostState> states;
 
-  public GhostParentState(
-      String name,
-      List<String> params,
-      CtTypeReference<?> ret,
-      Factory factory,
-      String qualifiedName,
-      String simpleName) {
-    super(name, params, ret, factory, qualifiedName, simpleName);
-    states = new ArrayList<>();
-  }
+    public GhostParentState(String name, List<String> params, CtTypeReference<?> ret, Factory factory,
+            String qualifiedName, String simpleName) {
+        super(name, params, ret, factory, qualifiedName, simpleName);
+        states = new ArrayList<>();
+    }
 
-  public void addState(GhostState s) {
-    states.add(s);
-  }
+    public void addState(GhostState s) {
+        states.add(s);
+    }
 
-  public GhostState getFirstState() {
-    return states.get(0);
-  }
+    public GhostState getFirstState() {
+        return states.get(0);
+    }
 
-  public ArrayList<GhostState> getStates() {
-    return states;
-  }
+    public ArrayList<GhostState> getStates() {
+        return states;
+    }
 }

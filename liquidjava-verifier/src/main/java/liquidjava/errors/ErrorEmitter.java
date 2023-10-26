@@ -7,93 +7,86 @@ import spoon.reflect.cu.SourcePosition;
 
 public class ErrorEmitter {
 
-  private String titleMessage;
-  private String fullMessage;
-  private URI filePath;
-  private ErrorPosition position;
-  private int errorStatus;
-  private HashMap<String, PlacementInCode> map;
+    private String titleMessage;
+    private String fullMessage;
+    private URI filePath;
+    private ErrorPosition position;
+    private int errorStatus;
+    private HashMap<String, PlacementInCode> map;
 
-  public ErrorEmitter() {}
-
-  public void addError(
-      String titleMessage,
-      String msg,
-      SourcePosition p,
-      int errorStatus,
-      HashMap<String, PlacementInCode> map) {
-    this.titleMessage = titleMessage;
-    fullMessage = msg;
-    try {
-      position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
-      filePath = p.getFile().toURI();
-    } catch (Exception ignored) {
-      fullMessage =
-          "Seems like this error is created in generated part of source code, so no precise"
-              + " position is provided. "
-              + fullMessage;
-      position = null;
-      filePath = null;
+    public ErrorEmitter() {
     }
-    this.errorStatus = errorStatus;
-    this.map = map;
-  }
 
-  public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus) {
-    this.titleMessage = titleMessage;
-    fullMessage = msg;
-    try {
-      position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
-      filePath = p.getFile().toURI();
-    } catch (Exception ignored) {
-      fullMessage =
-          "Seems like this error is created in generated part of source code, so no precise"
-              + " position is provided. "
-              + fullMessage;
-      position = null;
-      filePath = null;
+    public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus,
+            HashMap<String, PlacementInCode> map) {
+        this.titleMessage = titleMessage;
+        fullMessage = msg;
+        try {
+            position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
+            filePath = p.getFile().toURI();
+        } catch (Exception ignored) {
+            fullMessage = "Seems like this error is created in generated part of source code, so no precise"
+                    + " position is provided. " + fullMessage;
+            position = null;
+            filePath = null;
+        }
+        this.errorStatus = errorStatus;
+        this.map = map;
     }
-    this.errorStatus = errorStatus;
-  }
 
-  public void addError(String titleMessage, String msg, int errorStatus) {
-    this.titleMessage = titleMessage;
-    fullMessage = msg;
-    this.errorStatus = errorStatus;
-  }
+    public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus) {
+        this.titleMessage = titleMessage;
+        fullMessage = msg;
+        try {
+            position = new ErrorPosition(p.getLine(), p.getColumn(), p.getEndLine(), p.getEndColumn());
+            filePath = p.getFile().toURI();
+        } catch (Exception ignored) {
+            fullMessage = "Seems like this error is created in generated part of source code, so no precise"
+                    + " position is provided. " + fullMessage;
+            position = null;
+            filePath = null;
+        }
+        this.errorStatus = errorStatus;
+    }
 
-  public boolean foundError() {
-    return fullMessage != null && position != null;
-  }
+    public void addError(String titleMessage, String msg, int errorStatus) {
+        this.titleMessage = titleMessage;
+        fullMessage = msg;
+        this.errorStatus = errorStatus;
+    }
 
-  public String getTitleMessage() {
-    return titleMessage;
-  }
+    public boolean foundError() {
+        return fullMessage != null && position != null;
+    }
 
-  public String getFullMessage() {
-    return fullMessage;
-  }
+    public String getTitleMessage() {
+        return titleMessage;
+    }
 
-  public URI getFilePath() {
-    return filePath;
-  }
+    public String getFullMessage() {
+        return fullMessage;
+    }
 
-  public void reset() {
-    fullMessage = null;
-    position = null;
-    errorStatus = 0;
-    map = null;
-  }
+    public URI getFilePath() {
+        return filePath;
+    }
 
-  public ErrorPosition getPosition() {
-    return position;
-  }
+    public void reset() {
+        fullMessage = null;
+        position = null;
+        errorStatus = 0;
+        map = null;
+    }
 
-  public int getErrorStatus() {
-    return errorStatus;
-  }
+    public ErrorPosition getPosition() {
+        return position;
+    }
 
-  public HashMap<String, PlacementInCode> getVCMap() {
-    return map;
-  }
+    public int getErrorStatus() {
+        return errorStatus;
+    }
+
+    public HashMap<String, PlacementInCode> getVCMap() {
+        return map;
+    }
 }
