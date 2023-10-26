@@ -1,7 +1,6 @@
 package liquidjava.smt;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -86,7 +85,8 @@ public class TranslatorContextToZ3 {
 
     private static void addBuiltinFunctions(Context z3, Map<String, FuncDecl<?>> funcTranslation) {
         funcTranslation.put("length", z3.mkFuncDecl("length", getSort(z3, "int[]"), getSort(z3, "int")));// ERRRRRRRRRRRRO!!!!!!!!!!!!!
-        // System.out.println("\nWorks only for int[] now! Change in future. Ignore this message, it is a glorified
+        // System.out.println("\nWorks only for int[] now! Change in future. Ignore this
+        // message, it is a glorified
         // todo");
         // TODO add built-in function
         Sort[] s = Stream.of(getSort(z3, "int[]"), getSort(z3, "int"), getSort(z3, "int")).toArray(Sort[]::new);
@@ -99,25 +99,25 @@ public class TranslatorContextToZ3 {
 
     static Sort getSort(Context z3, String sort) {
         switch (sort) {
-        case "int":
-            return z3.getIntSort();
-        case "boolean":
-            return z3.getBoolSort();
-        case "long":
-            return z3.getRealSort();
-        case "float":
-            return z3.mkFPSort32();
-        case "double":
-            return z3.mkFPSortDouble();
-        case "int[]":
-            return z3.mkArraySort(z3.mkIntSort(), z3.mkIntSort());
-        case "String":
-            return z3.getStringSort();
-        case "void":
-            return z3.mkUninterpretedSort("void");
-        // case "List":return z3.mkListSort(name, elemSort)
-        default:
-            return z3.mkUninterpretedSort(sort);
+            case "int":
+                return z3.getIntSort();
+            case "boolean":
+                return z3.getBoolSort();
+            case "long":
+                return z3.getRealSort();
+            case "float":
+                return z3.mkFPSort32();
+            case "double":
+                return z3.mkFPSortDouble();
+            case "int[]":
+                return z3.mkArraySort(z3.mkIntSort(), z3.mkIntSort());
+            case "String":
+                return z3.getStringSort();
+            case "void":
+                return z3.mkUninterpretedSort("void");
+            // case "List":return z3.mkListSort(name, elemSort)
+            default:
+                return z3.mkUninterpretedSort(sort);
         }
     }
 

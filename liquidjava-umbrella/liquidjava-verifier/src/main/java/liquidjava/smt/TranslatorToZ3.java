@@ -109,7 +109,8 @@ public class TranslatorToZ3 {
                         if (e.getSort().equals(s[i]))
                             params[i] = e;
             }
-            // System.out.println("Expected sort"+s[i]+"; Final sort->" +params[i].toString() +":"+
+            // System.out.println("Expected sort"+s[i]+"; Final sort->"
+            // +params[i].toString() +":"+
             // params[i].getSort());
         }
 

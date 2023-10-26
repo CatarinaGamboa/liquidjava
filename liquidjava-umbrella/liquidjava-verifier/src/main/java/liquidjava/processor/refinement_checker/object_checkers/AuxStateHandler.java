@@ -6,7 +6,6 @@ import static org.junit.Assert.fail;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.*;
@@ -14,7 +13,6 @@ import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
-import liquidjava.specification.StateRefinement;
 import liquidjava.utils.Utils;
 import spoon.reflect.code.*;
 import spoon.reflect.declaration.*;
@@ -25,7 +23,8 @@ public class AuxStateHandler {
     // ########### Get State from StateRefinement declaration #############
 
     /**
-     * Handles the passage of the written state annotations to the context for Constructors
+     * Handles the passage of the written state annotations to the context for
+     * Constructors
      *
      * @param c
      * @param f
@@ -93,7 +92,8 @@ public class AuxStateHandler {
     }
 
     /**
-     * Handles the passage of the written state annotations to the context for regular Methods
+     * Handles the passage of the written state annotations to the context for
+     * regular Methods
      *
      * @param method
      * @param f
@@ -130,7 +130,7 @@ public class AuxStateHandler {
         f.setAllStates(l);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({ "rawtypes" })
     private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, RefinedFunction f,
             TypeChecker tc, CtElement e) throws ParsingException {
         Map<String, CtExpression> m = ctAnnotation.getAllValues();
@@ -197,7 +197,8 @@ public class AuxStateHandler {
     }
 
     /**
-     * Create predicate with the equalities with previous versions of the object e.g., ghostfunction1(this) ==
+     * Create predicate with the equalities with previous versions of the object
+     * e.g., ghostfunction1(this) ==
      * ghostfunction1(old(this))
      *
      * @param p
@@ -246,7 +247,8 @@ public class AuxStateHandler {
     }
 
     /**
-     * If an expression has a state in metadata, then its state is passed to the last instance of the variable with
+     * If an expression has a state in metadata, then its state is passed to the
+     * last instance of the variable with
      * varName
      *
      * @param tc
@@ -364,7 +366,8 @@ public class AuxStateHandler {
         RefinedVariable rv = tc.getContext().getVariableByName(parentTargetName);
         rv.getSuperTypes().forEach(vi2::addSuperType);
 
-        // if the variable is a parent (not a VariableInstance) we need to check that this refinement
+        // if the variable is a parent (not a VariableInstance) we need to check that
+        // this refinement
         // is a subtype of the variable's main refinement
         if (rv instanceof Variable) {
             Predicate superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
@@ -438,7 +441,8 @@ public class AuxStateHandler {
 
             String simpleInvocation = invocation.toString(); // .getExecutable().toString();
             tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
-            // ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState, states);
+            // ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState,
+            // states);
         }
         return new Predicate();
     }
@@ -463,7 +467,8 @@ public class AuxStateHandler {
         // if(variableInstance.getState() != null) {
         if (variableInstance.getRefinement() != null) {
             String newInstanceName = String.format(tc.instanceFormat, name, tc.getContext().getCounter());
-            // Predicate c = variableInstance.getState().substituteVariable(variableInstance.getName(),
+            // Predicate c =
+            // variableInstance.getState().substituteVariable(variableInstance.getName(),
             // newInstanceName);
             Predicate c = variableInstance.getRefinement().substituteVariable(tc.WILD_VAR, newInstanceName)
                     .substituteVariable(variableInstance.getName(), newInstanceName);
@@ -497,7 +502,8 @@ public class AuxStateHandler {
             vi2.addSuperType(t);
         }
 
-        // if the variable is a parent (not a VariableInstance) we need to check that this refinement
+        // if the variable is a parent (not a VariableInstance) we need to check that
+        // this refinement
         // is a subtype of the variable's main refinement
         if (rv instanceof Variable) {
             Predicate superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
@@ -510,7 +516,8 @@ public class AuxStateHandler {
     }
 
     /**
-     * Gets the name of the parent target and adds the closest target to the elem TARGET metadata
+     * Gets the name of the parent target and adds the closest target to the elem
+     * TARGET metadata
      *
      * @param invocation
      * 
@@ -558,7 +565,8 @@ public class AuxStateHandler {
                 .getCanonicalName().contentEquals("liquidjava.specification.StateRefinement"))
                 .collect(Collectors.toList());
 
-        // List<CtAnnotation<? extends Annotation>> l = new ArrayList<CtAnnotation<? extends Annotation>>();
+        // List<CtAnnotation<? extends Annotation>> l = new ArrayList<CtAnnotation<?
+        // extends Annotation>>();
         // for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
         // String an = ann.getActualAnnotation().annotationType().getCanonicalName();
         // if (an.contentEquals("liquidjava.specification.StateRefinement")) {

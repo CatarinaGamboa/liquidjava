@@ -58,7 +58,7 @@ public abstract class TypeChecker extends CtScanner {
 
     public Context getContext() {
         return context;
-    } 
+    }
 
     public Factory getFactory() {
         return factory;
@@ -69,7 +69,6 @@ public abstract class TypeChecker extends CtScanner {
         return c == null ? new Predicate() : c;
     }
 
-    @SuppressWarnings("unchecked")
     public Optional<Predicate> getRefinementFromAnnotation(CtElement element) throws ParsingException {
         Optional<Predicate> constr = Optional.empty();
         Optional<String> ref = Optional.empty();

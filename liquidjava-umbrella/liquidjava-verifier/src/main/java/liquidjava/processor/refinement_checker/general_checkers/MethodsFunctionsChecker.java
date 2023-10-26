@@ -3,7 +3,6 @@ package liquidjava.processor.refinement_checker.general_checkers;
 import static org.junit.Assert.assertFalse;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -53,11 +52,11 @@ public class MethodsFunctionsChecker {
         f.setType(c.getType());
         handleFunctionRefinements(f, c, c.getParameters());
         f.setRefReturn(new Predicate());
-        if (c.getParent() instanceof CtClass) { 
+        if (c.getParent() instanceof CtClass) {
             CtClass<?> klass = (CtClass<?>) c.getParent();
             f.setClass(klass.getQualifiedName());
         }
-        rtc.getContext().addFunctionToContext(f); 
+        rtc.getContext().addFunctionToContext(f);
         AuxStateHandler.handleConstructorState(c, f, rtc);
     }
 
@@ -79,7 +78,7 @@ public class MethodsFunctionsChecker {
     // ################### VISIT METHOD ##############################
     public <R> void getMethodRefinements(CtMethod<R> method) throws ParsingException {
         RefinedFunction f = new RefinedFunction();
-        f.setName(method.getSimpleName().replaceAll("\\p{C}", "")); //remove any empty chars from string
+        f.setName(method.getSimpleName().replaceAll("\\p{C}", "")); // remove any empty chars from string
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
 
@@ -113,7 +112,7 @@ public class MethodsFunctionsChecker {
         }
 
         RefinedFunction f = new RefinedFunction();
-        f.setName(functionName.replaceAll("\\p{C}", ""));//remove any empty chars from string
+        f.setName(functionName.replaceAll("\\p{C}", ""));// remove any empty chars from string
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
         f.setClass(prefix);
@@ -220,15 +219,15 @@ public class MethodsFunctionsChecker {
         }
     }
 
-    // ############################### VISIT INVOCATION ################################3
+    // ############################### VISIT INVOCATION
+    // ################################3
 
     public <R> void getInvocationRefinements(CtInvocation<R> invocation) {
         CtExecutable<?> method = invocation.getExecutable().getDeclaration();
         if (method == null) {
-    
-        	CtExecutableReference<?> cte = invocation.getExecutable();
-        
-            
+
+            CtExecutableReference<?> cte = invocation.getExecutable();
+
             if (cte != null)
                 searchMethodInLibrary(cte, invocation);
 
@@ -260,18 +259,16 @@ public class MethodsFunctionsChecker {
     }
 
     private void searchMethodInLibrary(CtExecutableReference<?> ctr, CtInvocation<?> invocation) {
-        String ctype= "";
-        if(ctr.getDeclaringType() == null && invocation.getTarget() != null) {
-        	CtExpression o = invocation.getTarget();
-        	ctype = o.getType().toString();
-        }
-        else
-        	ctype = ctr.getDeclaringType().toString();//missing
-        
-        String name = ctr.getSimpleName();//missing  
+        String ctype = "";
+        if (ctr.getDeclaringType() == null && invocation.getTarget() != null) {
+            CtExpression<?> o = invocation.getTarget();
+            ctype = o.getType().toString();
+        } else
+            ctype = ctr.getDeclaringType().toString();// missing
+
+        String name = ctr.getSimpleName();// missing
         if (rtc.getContext().getFunction(name, ctype) != null) {// inside rtc.context
-            checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), name,
-                    ctype);
+            checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), name, ctype);
             return;
         } else {
             String prefix = ctype;
@@ -284,7 +281,6 @@ public class MethodsFunctionsChecker {
         }
 
     }
-   
 
     private Map<String, String> checkInvocationRefinements(CtElement invocation, List<CtExpression<?>> arguments,
             CtExpression<?> target, String methodName, String className) {
@@ -442,7 +438,8 @@ public class MethodsFunctionsChecker {
             } else {
                 assertFalse("Method should already be in context. Should not arrive this point in refinement checker.",
                         true);
-                // getMethodRefinements(method); //should be irrelevant -should never need to get here
+                // getMethodRefinements(method); //should be irrelevant -should never need to
+                // get here
             }
         }
 

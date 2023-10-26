@@ -2,12 +2,10 @@ package liquidjava.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import liquidjava.errors.ErrorEmitter;
-import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.processor.refinement_checker.general_checkers.OperationsChecker;
@@ -15,7 +13,6 @@ import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.BuiltinFunctionPredicate;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
-import liquidjava.specification.StateRefinement;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
@@ -293,7 +290,8 @@ public class RefinementTypeChecker extends TypeChecker {
             return;// error already in ErrorEmitter
         }
         // context.addVarToContext(f.getSimpleName(), f.getType(),
-        // c.map( i -> i.substituteVariable(WILD_VAR, f.getSimpleName()).orElse(new Predicate()) );
+        // c.map( i -> i.substituteVariable(WILD_VAR, f.getSimpleName()).orElse(new
+        // Predicate()) );
         String nname = String.format(thisFormat, f.getSimpleName());
         Predicate ret = new Predicate();
         if (c.isPresent()) {
@@ -356,7 +354,8 @@ public class RefinementTypeChecker extends TypeChecker {
     }
 
     /**
-     * Visitor for binary operations Adds metadata to the binary operations from the operands
+     * Visitor for binary operations Adds metadata to the binary operations from the
+     * operands
      */
     @Override
     public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
@@ -518,7 +517,8 @@ public class RefinementTypeChecker extends TypeChecker {
         System.out.println("new class");
     }
 
-    // ############################### Inner Visitors ##########################################
+    // ############################### Inner Visitors
+    // ##########################################
     private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, CtExpression<?> assignment,
             CtElement parentElem, CtElement varDecl) {
         getPutVariableMetadada(ex, name);
@@ -581,13 +581,14 @@ public class RefinementTypeChecker extends TypeChecker {
         return ret;
     }
 
-    // ############################### Get Metadata ##########################################
+    // ############################### Get Metadata
+    // ##########################################
 
     /**
      * @param <T>
      * @param elem
      * @param name
-     *            Cannot be null
+     *             Cannot be null
      */
     private <T> void getPutVariableMetadada(CtElement elem, String name) {
         Predicate cref = Predicate.createEquals(Predicate.createVar(WILD_VAR), Predicate.createVar(name));

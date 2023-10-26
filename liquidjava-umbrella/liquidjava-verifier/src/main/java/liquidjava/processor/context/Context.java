@@ -26,7 +26,7 @@ public class Context {
         ctxFunctions = new ArrayList<>();
         ctxSpecificVars = new ArrayList<>();
         // globals
-        ctxGlobalVars = new ArrayList<>(); 
+        ctxGlobalVars = new ArrayList<>();
         // ctxGlobalFunctions = new ArrayList<>();
 
         alias = new ArrayList<>();
@@ -305,7 +305,7 @@ public class Context {
     }
 
     public RefinedFunction getFunction(String name, String target) {
-        for (RefinedFunction fi : ctxFunctions) { 
+        for (RefinedFunction fi : ctxFunctions) {
             if (fi.getTargetClass() != null && fi.getName().equals(name) && fi.getTargetClass().equals(target))
                 return fi;
         }

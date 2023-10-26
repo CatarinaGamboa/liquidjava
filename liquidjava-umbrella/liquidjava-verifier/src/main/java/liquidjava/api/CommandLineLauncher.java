@@ -14,7 +14,7 @@ public class CommandLineLauncher {
 
         // String allPath = "C://Regen/test-projects/src/Main.java";
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
-        // In VSCode needs: 
+        // In VSCode needs:
         // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
         String file = args.length == 0 ? allPath : args[0];
         ErrorEmitter ee = launch(file);

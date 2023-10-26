@@ -10,8 +10,6 @@ public abstract class TestAbstract {
     String testPath = "../liquidjava-example/src/test/java/liquidjava/";
 
     protected void testCorrect(String filename) {
-        MySecurityManager secManager = new MySecurityManager();
-        System.setSecurityManager(secManager);
         try {
             CommandLineLauncher.launchTest(filename);
         } catch (SecurityException e) {
@@ -20,8 +18,6 @@ public abstract class TestAbstract {
     }
 
     protected void testWrong(String filename) {
-        MySecurityManager secManager = new MySecurityManager();
-        System.setSecurityManager(secManager);
         try {
             CommandLineLauncher.launchTest(filename);
         } catch (SecurityException e) {
