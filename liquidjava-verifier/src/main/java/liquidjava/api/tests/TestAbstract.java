@@ -20,18 +20,4 @@ public abstract class TestAbstract {
         if(!errorEmitter.foundError())
         	fail();
     }
-
-    class MySecurityManager extends SecurityManager {
-        // Handles exit(1) when the refinements are not respected
-        @Override
-        public void checkExit(int status) {
-            if (status == 1 || status == 2)
-                throw new SecurityException("subtyping");
-        }
-
-        @Override
-        public void checkPermission(Permission perm) {
-            // Allow other activities by default
-        }
-    }
 }
