@@ -26,14 +26,15 @@ public class CommandLineLauncher {
         }
     }
 
-    public static void launchTest(String file) {
+    public static ErrorEmitter launchTest(String file) {
         ErrorEmitter ee = launch(file);
         if (ee.foundError()) {
             System.out.println(ee.getFullMessage());
-            System.exit(ee.getErrorStatus());
+            // System.exit(ee.getErrorStatus());
         } else {
             System.out.println("Analysis complete!");
         }
+        return ee;
     }
 
     public static ErrorEmitter launch(String file) {
