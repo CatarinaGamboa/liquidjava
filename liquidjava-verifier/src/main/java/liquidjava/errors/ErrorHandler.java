@@ -27,7 +27,6 @@ public class ErrorHandler {
 
     public static <T> void printError(CtElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
-
         String resumeMessage = "Type expected:" + expectedType.toString(); // + "; " +"Refinement found:" +
         // cSMT.toString();
 

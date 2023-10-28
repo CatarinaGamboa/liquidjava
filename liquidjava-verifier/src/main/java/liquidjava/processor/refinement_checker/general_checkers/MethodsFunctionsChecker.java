@@ -33,6 +33,7 @@ import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtExecutableReference;
+import spoon.reflect.reference.CtTypeReference;
 
 public class MethodsFunctionsChecker {
 
@@ -254,12 +255,13 @@ public class MethodsFunctionsChecker {
     }
 
     private void searchMethodInLibrary(CtExecutableReference<?> ctr, CtInvocation<?> invocation) {
-        String ctype = "";
-        if (ctr.getDeclaringType() == null && invocation.getTarget() != null) {
+        CtTypeReference<?> ctref = ctr.getDeclaringType();
+        if (ctref == null) {
+            // Plan B: get us get the definition from the invocation.
             CtExpression<?> o = invocation.getTarget();
-            ctype = o.getType().toString();
-        } else
-            ctype = ctr.getDeclaringType().toString(); // missing
+            ctref = o.getType();
+        }
+        String ctype = (ctref != null) ? ctref.toString() : null;
 
         String name = ctr.getSimpleName(); // missing
         if (rtc.getContext().getFunction(name, ctype) != null) { // inside rtc.context

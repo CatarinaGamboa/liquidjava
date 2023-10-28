@@ -6,10 +6,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
+import org.junit.Test;
+
 import liquidjava.api.CommandLineLauncher;
 import liquidjava.errors.ErrorEmitter;
 
 public class TestExamples {
+
+    @Test
     public void testFile() {
         try {
             Files.find(Paths.get("../liquidjava-example/src/main/java/"), Integer.MAX_VALUE,
