@@ -56,12 +56,10 @@ public class VCChecker {
             return;
         }
 
-        // System.out.println(premises.toString() + "\n"+et.toString());
         try {
             smtChecking(premises, et);
         } catch (Exception e) {
             // To emit the message we use the constraints before the alias and state change
-            System.out.println();
             printError(e, premisesBeforeChange, expectedType, element, map);
         }
     }
@@ -97,7 +95,8 @@ public class VCChecker {
             // printError(premises, expectedType, element, map, e.getMessage());
         }
 
-        System.out.println("premise: " + premises.toString() + "\nexpectation: " + et.toString());
+        // System.out.println("premise: " + premises.toString() + "\nexpectation: " +
+        // et.toString());
         return smtChecks(premises, et, p);
     }
 
@@ -136,7 +135,7 @@ public class VCChecker {
         if (firstSi != null && lastSi != null) {
             cSMT = firstSi.clone();
             lastSi.setNext(new VCImplication(expectedType));
-            printVCs(firstSi.toString(), cSMT.toConjunctions().toString(), expectedType);
+            // printVCs(firstSi.toString(), cSMT.toConjunctions().toString(), expectedType);
         }
 
         return cSMT; // firstSi != null ? firstSi : new VCImplication(new Predicate());
@@ -144,13 +143,13 @@ public class VCChecker {
 
     private void addMap(RefinedVariable var, HashMap<String, PlacementInCode> map) {
         map.put(var.getName(), var.getPlacementInCode());
-        // System.out.println();
         // if(var instanceof VariableInstance) {
         // VariableInstance vi = (VariableInstance) var;
         // if(vi.getParent().isPresent())
         // map.put(vi.getName(), vi.getParent().get().getName());
         // else if(instancePattern.matcher(var.getName()).matches()){
-        // String result = var.getName().replaceAll("(_[0-9]+)$", "").replaceAll("^#", "");
+        // String result = var.getName().replaceAll("(_[0-9]+)$", "").replaceAll("^#",
+        // "");
         // map.put(var.getName(), result);
         // }
         // }else if(thisPattern.matcher(var.getName()).matches())
@@ -306,7 +305,6 @@ public class VCChecker {
                 totalS = ci.toString().substring(targetL + 1);
             }
             s = "Method invocation " + totalS + " in:";
-            System.out.println();
         }
 
         Predicate etMessageReady = expectedType; // substituteByMap(expectedType, map);

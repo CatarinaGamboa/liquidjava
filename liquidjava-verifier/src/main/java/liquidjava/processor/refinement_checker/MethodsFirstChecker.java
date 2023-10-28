@@ -23,7 +23,6 @@ public class MethodsFirstChecker extends TypeChecker {
         super(c, fac, errorEmitter);
         mfc = new MethodsFunctionsChecker(this);
         visitedClasses = new ArrayList<>();
-        System.out.println("In Methids First Checker");
     }
 
     @Override
@@ -31,7 +30,6 @@ public class MethodsFirstChecker extends TypeChecker {
         if (errorEmitter.foundError())
             return;
 
-        System.out.println("CTCLASS:" + ctClass.getSimpleName());
         context.reinitializeContext();
         if (visitedClasses.contains(ctClass.getQualifiedName()))
             return;

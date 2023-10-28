@@ -76,9 +76,7 @@ public class AuxHierarchyRefinememtsPassage {
             Predicate argRef = arg.getRefinement().substituteVariable(arg.getName(), newName);
             Predicate superArgRef = superArg.getRefinement().substituteVariable(superArg.getName(), newName);
 
-            System.out.println(arg.getName() + " has ref " + argRef);
             if (argRef.isBooleanTrue()) {
-                System.out.println(arg.getName() + " has ref boolean true");
                 arg.setRefinement(superArgRef.substituteVariable(newName, arg.getName()));
             } else {
                 boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i).getPosition());
@@ -100,7 +98,8 @@ public class AuxHierarchyRefinememtsPassage {
         else {
             String name = String.format(tc.freshFormat, tc.getContext().getCounter());
             tc.getContext().addVarToContext(name, superFunction.getType(), new Predicate(), method);
-            // functionRef might be stronger than superRef -> check (superRef <: functionRef)
+            // functionRef might be stronger than superRef -> check (superRef <:
+            // functionRef)
             functionRef = functionRef.substituteVariable(tc.WILD_VAR, name);
             superRef = superRef.substituteVariable(tc.WILD_VAR, name);
             for (String m : super2function.keySet())
@@ -152,8 +151,8 @@ public class AuxHierarchyRefinememtsPassage {
                     tc.checkStateSMT(superConst, subConst, method,
                             "FROM State from Superclass must be subtype of FROM State from Subclass");
                     // boolean correct = tc.checkStateSMT(superConst, subConst, method);
-                    // if(!correct) ErrorPrinter.printError(method, subState.getFrom(), superState.getFrom());
-                    System.out.println("Came to checkStates hierarchy");
+                    // if(!correct) ErrorPrinter.printError(method, subState.getFrom(),
+                    // superState.getFrom());
 
                     superConst = matchVariableNames(tc.THIS, thisName, superState.getTo());
                     subConst = matchVariableNames(tc.THIS, thisName, superFunction, subFunction, subState.getTo());
@@ -161,7 +160,8 @@ public class AuxHierarchyRefinememtsPassage {
                     tc.checkStateSMT(subConst, superConst, method,
                             "TO State from Subclass must be subtype of TO State from Superclass");
                     // boolean correct = tc.checkStateSMT(subConst, superConst, method);
-                    // if(!correct) ErrorPrinter.printError(method, subState.getTo(), superState.getTo());
+                    // if(!correct) ErrorPrinter.printError(method, subState.getTo(),
+                    // superState.getTo());
                 }
             }
         }

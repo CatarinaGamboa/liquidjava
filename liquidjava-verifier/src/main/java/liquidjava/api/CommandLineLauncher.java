@@ -21,25 +21,16 @@ public class CommandLineLauncher {
         if (ee.foundError()) {
             System.out.println(ee.getFullMessage());
             System.exit(ee.getErrorStatus());
-        } else {
-            System.out.println("Analysis complete!");
         }
     }
 
     public static ErrorEmitter launchTest(String file) {
         ErrorEmitter ee = launch(file);
-        if (ee.foundError()) {
-            System.out.println(ee.getFullMessage());
-            // System.exit(ee.getErrorStatus());
-        } else {
-            System.out.println("Analysis complete!");
-        }
         return ee;
     }
 
     public static ErrorEmitter launch(String file) {
         Launcher launcher = new Launcher();
-        System.out.println("File path in launch before spoon:" + file);
         launcher.addInputResource(file);
         launcher.getEnvironment().setNoClasspath(true);
         // optional
@@ -47,10 +38,7 @@ public class CommandLineLauncher {
         // "lib1.jar:lib2.jar".split(":"));
         launcher.getEnvironment().setComplianceLevel(8);
 
-        System.out.println("before run");
         launcher.run();
-
-        System.out.println("after run");
 
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);
@@ -59,7 +47,6 @@ public class CommandLineLauncher {
         final RefinementProcessor processor = new RefinementProcessor(factory, ee);
         processingManager.addProcessor(processor);
 
-        System.out.println("before process");
         try {
             // To only search the last package - less time spent
             CtPackage v = factory.Package().getAll().stream().reduce((first, second) -> second).orElse(null);

@@ -26,7 +26,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     public ExternalRefinementTypeChecker(Context context, Factory fac, ErrorEmitter errorEmitter) {
         super(context, fac, errorEmitter);
-        System.out.println("ExternalRefinementTypeChecker");
     }
 
     @Override
@@ -94,7 +93,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                 String d = a[a.length - 1];
                 GhostFunction gh = new GhostFunction(f, factory, prefix, d);
                 context.addGhostFunction(gh);
-                System.out.println(gh.toString());
             }
 
         } catch (ParsingException e) {
@@ -113,7 +111,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             List<String> params = Arrays.asList(klass);
             GhostFunction gh = new GhostFunction(String.format("%s_state%d", klass.toLowerCase(), order), params, ret,
                     factory, prefix, klass);
-            System.out.println(gh.toString());
             return Optional.of(gh);
         }
         return Optional.empty();

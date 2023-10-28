@@ -113,8 +113,7 @@ public abstract class TypeChecker extends CtScanner {
     private void createStateSet(CtNewArray<String> e, int set, CtElement element) {
         Optional<GhostFunction> og = createStateGhost(set, element);
         if (!og.isPresent()) {
-            System.out.println("Error in creation of GhostFunction");
-            assert false;
+            throw new RuntimeException("Error in creation of GhostFunction");
         }
         GhostFunction g = og.get();
         context.addGhostFunction(g);

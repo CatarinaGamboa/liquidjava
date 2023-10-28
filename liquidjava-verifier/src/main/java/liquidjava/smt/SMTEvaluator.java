@@ -16,7 +16,7 @@ public class SMTEvaluator {
         // Discharges the verification to z3
 
         Predicate toVerify = Predicate.createConjunction(subRef, supRef.negate());
-        System.out.println("verification query: " + toVerify); // TODO remove
+        // System.out.println("verification query: " + toVerify); // TODO remove
 
         try {
             Expression exp = toVerify.getExpression();
@@ -25,10 +25,10 @@ public class SMTEvaluator {
             Expr<?> e = exp.eval(tz3);
             Status s = tz3.verifyExpression(e);
             if (s.equals(Status.SATISFIABLE)) {
-                System.out.println("result of SMT: Not Ok!");
+                // System.out.println("result of SMT: Not Ok!");
                 throw new TypeCheckError(subRef + " not a subtype of " + supRef);
             }
-            System.out.println("result of SMT: Ok!");
+            // System.out.println("result of SMT: Ok!");
 
         } catch (SyntaxException e1) {
             System.out.println("Could not parse: " + toVerify);

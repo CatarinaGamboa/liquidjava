@@ -16,6 +16,9 @@ import com.microsoft.z3.Status;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.NotImplementedException;
+
 import liquidjava.processor.context.AliasWrapper;
 
 public class TranslatorToZ3 {
@@ -32,7 +35,6 @@ public class TranslatorToZ3 {
         TranslatorContextToZ3.addAlias(z3, c.getAlias(), aliasTranslation);
         TranslatorContextToZ3.addGhostFunctions(z3, c.getGhosts(), funcTranslation);
         TranslatorContextToZ3.addGhostStates(z3, c.getGhostState(), funcTranslation);
-        System.out.println();
     }
 
     @SuppressWarnings("unchecked")
@@ -254,8 +256,7 @@ public class TranslatorToZ3 {
         } else if (e instanceof RealExpr) {
             f = z3.mkFPToFP(z3.mkFPRoundNearestTiesToEven(), (RealExpr) e, z3.mkFPSort64());
         } else {
-            f = null;
-            System.out.println("Not implemented!!");
+            throw new NotImplementedException();
         }
         return f;
     }
@@ -263,7 +264,6 @@ public class TranslatorToZ3 {
     public Expr<?> makeIte(Expr<?> c, Expr<?> t, Expr<?> e) {
         if (c instanceof BoolExpr)
             return z3.mkITE((BoolExpr) c, t, e);
-        System.out.println("Condition is not a boolean expression");
-        return null;
+        throw new RuntimeException("Condition is not a boolean expression");
     }
 }

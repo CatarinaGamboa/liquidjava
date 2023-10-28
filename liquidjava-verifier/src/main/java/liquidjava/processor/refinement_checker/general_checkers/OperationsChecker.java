@@ -3,6 +3,9 @@ package liquidjava.processor.refinement_checker.general_checkers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.lang3.NotImplementedException;
+
 import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
 import liquidjava.processor.context.Variable;
@@ -87,7 +90,7 @@ public class OperationsChecker {
         } else if (types.contains(type)) {
             operator.putMetadata(rtc.REFINE_KEY, Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), oper));
         } else {
-            System.out.println("Literal type not implemented");
+            throw new NotImplementedException("Literal type not implemented");
         }
         // TODO ADD TYPES
     }
@@ -128,7 +131,7 @@ public class OperationsChecker {
                     }
                 }
             } catch (ParentNotInitializedException e) {
-                System.out.println("Parent not initialized");
+                throw new RuntimeException("Parent not initialized");
             }
         }
 

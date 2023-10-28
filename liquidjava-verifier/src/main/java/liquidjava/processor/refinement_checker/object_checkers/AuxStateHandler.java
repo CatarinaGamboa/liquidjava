@@ -290,7 +290,6 @@ public class AuxStateHandler {
         String stateChangeRefinementFrom = "true";
 
         // extracting target from assignment
-        System.out.println("Target for field writw: " + fw.getTarget());
 
         // only works for things in form of this.field_name = 1
         // does not work thor thins like `void method(){otherMethod();}`

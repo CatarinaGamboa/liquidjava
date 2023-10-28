@@ -4,6 +4,9 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.commons.lang3.NotImplementedException;
+
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
@@ -53,7 +56,6 @@ public class RefinementTypeChecker extends TypeChecker {
         super(context, factory, errorEmitter);
         otc = new OperationsChecker(this);
         mfc = new MethodsFunctionsChecker(this);
-        System.out.println("In RefinementTypeChecker");
     }
 
     // --------------------- Visitors -----------------------------------
@@ -221,7 +223,6 @@ public class RefinementTypeChecker extends TypeChecker {
             checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), assignement, varDecl);
 
         } else if (ex instanceof CtFieldWrite) {
-            System.out.println("Got field write: " + assignement);
             CtFieldWrite<?> fw = ((CtFieldWrite<?>) ex);
             CtFieldReference<?> cr = fw.getVariable();
             CtField<?> f = fw.getVariable().getDeclaration();
@@ -268,7 +269,8 @@ public class RefinementTypeChecker extends TypeChecker {
         } else if (lit.getType().getQualifiedName().contentEquals("java.lang.String")) {
             // Only taking care of strings inside refinements
         } else {
-            System.out.println(String.format("Literal of type %s not implemented:", lit.getType().getQualifiedName()));
+            throw new NotImplementedException(
+                    String.format("Literal of type %s not implemented:", lit.getType().getQualifiedName()));
         }
     }
 
@@ -386,7 +388,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
         super.visitCtInvocation(invocation);
         mfc.getInvocationRefinements(invocation);
-        System.out.println();
     }
 
     @Override
@@ -503,7 +504,6 @@ public class RefinementTypeChecker extends TypeChecker {
         }
 
         super.visitCtNewClass(newClass);
-        System.out.println("new class");
     }
 
     // ############################### Inner Visitors

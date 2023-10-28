@@ -54,7 +54,6 @@ public class RefinementsParser {
         RJParser parser = new RJParser(tokens);
         parser.setBuildParseTree(true);
         parser.removeErrorListeners();
-        // parser.addParseListener(new RJListener());
         parser.addErrorListener(err);
 
         RuleContext rc = parser.prog();
@@ -103,7 +102,6 @@ public class RefinementsParser {
         RJParser parser = new RJParser(tokens);
         parser.setBuildParseTree(true);
         parser.removeErrorListeners();
-        // parser.addParseListener(new RJListener());
         parser.addErrorListener(err);
         parser.start(); // all consumed
         if (err.getErrors() > 0)
