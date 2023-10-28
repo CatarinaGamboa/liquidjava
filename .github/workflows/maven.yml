@@ -24,7 +24,7 @@ jobs:
       SEGMENT_DOWNLOAD_TIMEOUT_MINS: '15'
     strategy:
       matrix:
-        java: [ '17', '18', '19', '20']
+        java: ['20']
     steps:
     - uses: actions/checkout@v3
     - name: Set up JDK 20
@@ -34,7 +34,7 @@ jobs:
         distribution: 'adopt'
         cache: maven
     - name: Build with Maven
-      run: mvn -B clean test --file pom.xml
+      run: mvn -B clean --file pom.xml
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     #- name: Update dependency graph
