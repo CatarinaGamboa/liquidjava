@@ -14,10 +14,14 @@ on:
   pull_request:
     branches: [ "master" ]
 
+   
+
 jobs:
   build:
     name: Maven test on  ${{ matrix.Java }}
     runs-on: ubuntu-latest
+    env:
+      SEGMENT_DOWNLOAD_TIMEOUT_MINS: '15'
     strategy:
       matrix:
         java: [ '17', '18', '19', '20']
