@@ -2,7 +2,6 @@ package liquidjava.api.tests;
 
 import static org.junit.Assert.fail;
 
-import java.security.Permission;
 import liquidjava.api.CommandLineLauncher;
 import liquidjava.errors.ErrorEmitter;
 

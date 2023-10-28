@@ -119,7 +119,6 @@ public class OperationsChecker {
             try {
                 CtAssignment<?, ?> assign = operator.getParent(CtAssignment.class);
                 if (assign != null && assign.getAssigned() instanceof CtVariableWrite<?>) {
-                    @SuppressWarnings("unchecked")
                     CtVariableWrite<T> w = (CtVariableWrite<T>) assign.getAssigned();
                     String parentName = w.getVariable().getSimpleName();
                     if (name.equals(parentName)) {
