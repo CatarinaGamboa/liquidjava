@@ -1,8 +1,5 @@
 package liquidjava.processor.refinement_checker.object_checkers;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.fail;
-
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -62,7 +59,8 @@ public class AuxStateHandler {
                         Predicate.createLit("0", Utils.INT));
                 c = Predicate.createConjunction(c, p);
             } else {
-                fail("Ghost Functions not implemented for other types than int -> implement in"
+                // TODO: Implement other stuff
+                throw new RuntimeException("Ghost Functions not implemented for other types than int -> implement in"
                         + " AuxStateHandler defaultState");
             }
         }
@@ -235,7 +233,8 @@ public class AuxStateHandler {
             ctConstructorCall.putMetadata(refKey, c);
             // add maping to oc.get(0)-HERE
         } else if (oc.size() > 1) {
-            assertFalse("Constructor can only have one to state, not multiple", true);
+            // TODO: Proper Exception
+            throw new RuntimeException("Constructor can only have one to state, not multiple.");
         }
     }
 

@@ -1,7 +1,5 @@
 package liquidjava.processor.refinement_checker.general_checkers;
 
-import static org.junit.Assert.assertFalse;
-
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -426,11 +424,9 @@ public class MethodsFunctionsChecker {
                 for (Variable v : lv)
                     rtc.getContext().addVarToContext(v);
             } else {
-                assertFalse(
-                        "Method should already be in context. Should not arrive this point in refinement" + " checker.",
-                        true);
-                // getMethodRefinements(method); //should be irrelevant -should never need to
-                // get here
+                assert false;
+                // Method should already be in context. Should not arrive this point in
+                // refinement checker.
             }
         }
     }

@@ -1,7 +1,5 @@
 package liquidjava.rj_language.visitors;
 
-import static org.junit.Assert.fail;
-
 import java.util.ArrayList;
 import java.util.List;
 import liquidjava.rj_language.ast.AliasInvocation;
@@ -17,6 +15,8 @@ import liquidjava.rj_language.ast.LiteralString;
 import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.commons.lang3.NotImplementedException;
+
 import rj.grammar.RJParser.AliasCallContext;
 import rj.grammar.RJParser.ArgsContext;
 import rj.grammar.RJParser.ExpBoolContext;
@@ -132,8 +132,7 @@ public class CreateASTVisitor {
             return new UnaryExpression("!", create(((OpNotContext) rc).operand()));
         else if (rc instanceof OpGroupContext)
             return new GroupExpression(create(((OpGroupContext) rc).operand()));
-
-        fail("Error achieved case not covered in operandEvaluate");
+        assert false;
         return null;
     }
 
@@ -182,7 +181,6 @@ public class CreateASTVisitor {
             return new LiteralInt(literalContext.INT().getText());
         else if (literalContext.REAL() != null)
             return new LiteralReal(literalContext.REAL().getText());
-        fail("Error got to unexistant literal.");
-        return null;
+        throw new NotImplementedException("Error got to unexistant literal.");
     }
 }

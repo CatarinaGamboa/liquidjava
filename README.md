@@ -28,13 +28,8 @@ You can find out more about LiquidJava in the following resources:
 
 ## Setup the project
 1. Clone the repository;
-<<<<<<< HEAD
 2. Open Eclipse and do `Ìmport...\ Existing Maven Project` selecting the current folder and waiting for the build process to finish (bottom right update bar)
 3. Select the current folder, right click it and select `Run as...\Maven install...`
-=======
-2. Open Eclipse and do `Ìmport...\ Existing Maven Project` selecting the project folder `liquidjava` and waiting for the build process to finish (bottom right update bar)
-3. Select the `liquidjava-umbrella` folder, right click it and select `Run as...\Maven install...`
->>>>>>> 8f871c3c15eaf408a01354a867e71466d45115be
 4. If inside the `liquidjava-verifier` build path there is not a `target/generated-sources/antr4`: Select `liquidjava-verifier`, on right-click, go to `Build Path\Link Source...` and browse for `liquidjava-verifier\target\generated-sources\antlr4` and select `Finish`
 
 ## Run verification

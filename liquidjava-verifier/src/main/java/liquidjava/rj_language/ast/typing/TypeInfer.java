@@ -1,8 +1,9 @@
 package liquidjava.rj_language.ast.typing;
 
-import static org.junit.Assert.fail;
-
 import java.util.Optional;
+
+import org.apache.commons.lang3.NotImplementedException;
+
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
 import liquidjava.rj_language.ast.AliasInvocation;
@@ -89,7 +90,8 @@ public class TypeInfer {
             if (t1.get().equals(t2.get()))
                 return t1;
             // TODO if the types are different ex: double, int
-            fail("To implement in TypeInfer: Binary type, arithmetic with different arg types");
+            throw new NotImplementedException(
+                    "To implement in TypeInfer: Binary type, arithmetic with different arg types");
         }
         return null;
     }

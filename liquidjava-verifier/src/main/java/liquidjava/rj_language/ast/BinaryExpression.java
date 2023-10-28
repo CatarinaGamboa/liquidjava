@@ -1,7 +1,5 @@
 package liquidjava.rj_language.ast;
 
-import static org.junit.Assert.fail;
-
 import com.microsoft.z3.Expr;
 import java.util.List;
 import liquidjava.smt.TranslatorToZ3;
@@ -79,8 +77,7 @@ public class BinaryExpression extends Expression {
         case "%":
             return ctx.makeMod(e1, e2);
         default: // last case %
-            fail("Reached unkown operation " + op);
-            return null;
+            throw new RuntimeException("Operation " + op + "not supported by z3");
         }
     }
 

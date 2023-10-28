@@ -37,30 +37,6 @@
 					<compilerTargetPlatform>1.8</compilerTargetPlatform>
 				</configuration>
 			</plugin>
-			<!-- <plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-checkstyle-plugin</artifactId>
-				<version>3.2.0</version>
-				<configuration>
-					<configLocation>checkstyle.xml</configLocation>
-				</configuration>
-				<executions>
-					<execution>
-					  <id>validate</id>
-					  <phase>validate</phase>
-					  <goals>
-						<goal>check</goal>
-					  </goals>
-					</execution>
-				  </executions>
-				<dependencies>
-					<dependency>
-					  <groupId>com.puppycrawl.tools</groupId>
-					  <artifactId>checkstyle</artifactId>
-					  <version>10.3.4</version>
-					</dependency>
-				  </dependencies>
-			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -96,14 +72,14 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<!-- versions -->
-		<version.junit>4.13.1</version.junit>
+		<version.junit>5.10.0</version.junit>
 		<version.memcompiler>1.3.0</version.memcompiler>
 		<version.spoon>10.4.2</version.spoon>
 		<version.z3>4.8.17</version.z3>
 		<version.liquidjava>1.0</version.liquidjava>
 		<!-- plugin versions -->
 		<pVersion.compiler>3.8.0</pVersion.compiler>
-		<pVersion.surefire>2.22.1</pVersion.surefire>
+		<pVersion.surefire>3.1.2</pVersion.surefire>
 	</properties>
 
 	<repositories>
@@ -119,6 +95,28 @@
 		</repository>
 	</repositories>
 	<dependencies>
+		<!-- Only needed to run tests in a version of IntelliJ IDEA that bundles older versions -->
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.vintage</groupId>
+			<artifactId>junit-vintage-engine</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-params</artifactId>
+			<scope>test</scope>
+		</dependency>
+
 		<dependency>
 			<groupId>org.mdkt.compiler</groupId>
 			<artifactId>InMemoryJavaCompiler</artifactId>
@@ -135,11 +133,7 @@
 			<artifactId>z3-turnkey</artifactId>
 			<version>${version.z3}</version>
 		</dependency>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>${version.junit}</version>
-		</dependency>
+
 		<dependency>
 			<groupId>liquidjava-api</groupId>
 			<artifactId>liquidjava-api</artifactId>
@@ -152,8 +146,6 @@
 			<artifactId>antlr4</artifactId>
 			<version>4.7.1</version>
 		</dependency>
-
-
 		<dependency>
 			<groupId>org.antlr</groupId>
 			<artifactId>antlr4-runtime</artifactId>
@@ -161,4 +153,15 @@
 		</dependency>
 
 	</dependencies>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.junit</groupId>
+				<artifactId>junit-bom</artifactId>
+				<version>5.10.0</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 </project>
