@@ -20,6 +20,7 @@ public class CommandLineLauncher {
         ErrorEmitter ee = launch(file);
         if (ee.foundError()) {
             System.out.println(ee.getFullMessage());
+            System.out.println("Before exit");
             System.exit(ee.getErrorStatus());
         }
     }
