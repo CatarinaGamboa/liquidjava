@@ -55,6 +55,7 @@
 					<reuseForks>false</reuseForks>
 					<argLine>-Xmx1024m</argLine>
 					<testFailureIgnore>true</testFailureIgnore>
+					<useSystemClassLoader>false</useSystemClassLoader>
 				</configuration>
 			</plugin>
 
