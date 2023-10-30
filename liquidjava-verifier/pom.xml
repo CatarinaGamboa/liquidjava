@@ -51,9 +51,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>3.2.1</version>
 				<configuration>
-					<forkCount>3</forkCount>
-					<reuseForks>false</reuseForks>
-					<argLine>-Xmx1024m</argLine>
+					<forkCount>0</forkCount>
 					<testFailureIgnore>true</testFailureIgnore>
 					<useSystemClassLoader>false</useSystemClassLoader>
 				</configuration>
