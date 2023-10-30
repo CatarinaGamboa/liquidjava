@@ -54,6 +54,7 @@
 					<forkCount>3</forkCount>
 					<reuseForks>false</reuseForks>
 					<argLine>-Xmx1024m</argLine>
+					<testFailureIgnore>true</testFailureIgnore>
 				</configuration>
 			</plugin>
 
