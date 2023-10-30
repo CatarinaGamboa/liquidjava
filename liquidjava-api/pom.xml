@@ -18,7 +18,7 @@
 	<build>
 		<pluginManagement>
 			<plugins>
-				<plugin>
+				<!-- <plugin>
 					<groupId>fr.inria.gforge.spoon</groupId>
 					<artifactId>spoon-maven-plugin</artifactId>
 					<version>3.3</version>
@@ -30,14 +30,14 @@
 							</goals>
 						</execution>
 					</executions>
-				</plugin>
+				</plugin> -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
 					<version>3.8.1</version>
 					<configuration>
-						<source>1.8</source>
-						<target>1.8</target>
+						<source>20</source>
+						<target>20</target>
 					</configuration>
 				</plugin>
 			</plugins>
@@ -45,8 +45,8 @@
 	</build>
 
 	<properties>
-		<javaVersion>1.8</javaVersion>
-		<maven.compiler.source>1.8</maven.compiler.source>
-		<maven.compiler.target>1.8</maven.compiler.target>
+		<javaVersion>20</javaVersion>
+		<maven.compiler.source>20</maven.compiler.source>
+		<maven.compiler.target>20</maven.compiler.target>
 	</properties>
 </project>
