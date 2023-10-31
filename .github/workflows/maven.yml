@@ -36,7 +36,7 @@ jobs:
         distribution: 'adopt'
         cache: maven
     - name: Maven Tests
-      run: mvn  -B -X -e cleancompile --file pom.xml  --batch-mode --fail-fast
+      run: mvn  -B -X -e clean compile --file pom.xml  --batch-mode --fail-fast
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
