@@ -24,7 +24,7 @@ jobs:
       SEGMENT_DOWNLOAD_TIMEOUT_MINS: '15'
     strategy:
       matrix:
-        java: ['20']
+        java: ['17', '18', '19', '20']
     steps:                  
     - name: Workflow Telemetry          
       uses: runforesight/workflow-telemetry-action@v1.8.7
@@ -37,7 +37,3 @@ jobs:
         cache: maven
     - name: Maven Tests
       run: mvn  -B -X -e clean compile --file pom.xml  --batch-mode --fail-fast
-
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
-    - name: Update dependency graph
-      uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
