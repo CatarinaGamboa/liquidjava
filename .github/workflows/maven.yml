@@ -25,7 +25,9 @@ jobs:
     strategy:
       matrix:
         java: ['20']
-    steps:
+    steps:                  
+    - name: Workflow Telemetry          
+      uses: runforesight/workflow-telemetry-action@v1.8.7
     - uses: actions/checkout@v3
     - name: Set up JDK 20
       uses: actions/setup-java@v3
