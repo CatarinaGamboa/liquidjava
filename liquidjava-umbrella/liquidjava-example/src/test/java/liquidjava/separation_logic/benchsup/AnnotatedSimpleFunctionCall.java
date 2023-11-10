@@ -1,4 +1,4 @@
-package liquidjava.separation_logic;
+package liquidjava.separation_logic.benchsup;
 
 import liquidjava.specification.HeapPostcondition;
 import liquidjava.specification.HeapPrecondition;
