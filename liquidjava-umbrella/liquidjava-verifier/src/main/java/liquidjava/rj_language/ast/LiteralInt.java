@@ -21,7 +21,7 @@ public class LiteralInt extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {
+    public void accept(ExpressionVisitor v) throws Exception {
         v.visitLiteralInt(this);
     }
 

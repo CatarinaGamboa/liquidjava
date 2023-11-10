@@ -3,11 +3,21 @@ grammar RJ;
 
 prog: start | ;
 start:
-		pred	#startPred
+        sep     #startSep
+	|	pred	#startPred
 	|	alias	#startAlias
 	|	ghost	#startGhost 
 	;
 
+sep:
+        empty                      #emptyHeap
+    |   pto                        #singlePointer
+    |   pto   '|*' sep             #complexHeap
+    |   empty '|*' sep             #heap
+    ;
+
+pto:    ID '|->' SEPUNIT;
+empty : 'sep.emp';
 
 pred:
 		'(' pred ')'				#predGroup
@@ -83,9 +93,9 @@ type:
 	|	OBJECT_TYPE
 	|	type '[]';
 
-
+SEPUNIT    : 'sep.()';
 LOGOP   : '&&'|'||'| '-->';
-BOOLOP	 : '=='|'!='|'>='|'>'|'<='|'<';
+BOOLOP	: '=='|'!='|'>='|'>'|'<='|'<';
 ARITHOP : '+'|'*'|'/'|'%';//|'-';
 
 BOOL    : 'true' | 'false';

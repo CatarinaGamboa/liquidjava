@@ -32,7 +32,7 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
         if (!visitedPackages.contains(pkg)) {
             visitedPackages.add(pkg);
             Context c = Context.getInstance();
-            c.reinitializeAllContext();
+            c.reinitializeForPkg();
 
             pkg.accept(new FieldGhostsGeneration(c, factory, errorEmitter)); // generate annotations for field ghosts
 

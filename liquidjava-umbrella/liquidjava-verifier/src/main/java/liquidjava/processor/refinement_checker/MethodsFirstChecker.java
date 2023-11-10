@@ -19,14 +19,14 @@ import spoon.reflect.reference.CtTypeReference;
  * First visit to Spoon AST to get the method's refinements
  */
 public class MethodsFirstChecker extends TypeChecker {
-    MethodsFunctionsChecker mfc;
+    final MethodsFunctionsChecker mfc;
     List<String> visitedClasses;
 
     public MethodsFirstChecker(Context c, Factory fac, ErrorEmitter errorEmitter) {
         super(c, fac, errorEmitter);
         mfc = new MethodsFunctionsChecker(this);
         visitedClasses = new ArrayList<>();
-        System.out.println("In Methids First Checker");
+        System.out.println("In Methods First Checker");
     }
 
     @Override
@@ -35,7 +35,7 @@ public class MethodsFirstChecker extends TypeChecker {
             return;
 
         System.out.println("CTCLASS:" + ctClass.getSimpleName());
-        context.reinitializeContext();
+        context.reinitializeForClass();
         if (visitedClasses.contains(ctClass.getQualifiedName()))
             return;
         else
@@ -89,6 +89,7 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
+        System.out.println("MF: Found constructor: " + c.getSignature());
         if (errorEmitter.foundError())
             return;
 

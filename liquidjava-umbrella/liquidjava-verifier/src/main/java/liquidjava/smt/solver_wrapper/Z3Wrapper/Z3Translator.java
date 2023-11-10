@@ -38,7 +38,7 @@ public class Z3Translator extends AbstractExpressionVisitor {
     private Expr<?> result;
 
     public Z3Translator(liquidjava.processor.context.Context c) {
-        ContextTranslator.translateVariables(z3, c.getContext(), varTranslation);
+        ContextTranslator.translateVariables(z3, c.getTypeContext(), varTranslation);
         ContextTranslator.storeVariablesSubtypes(z3, c.getAllVariablesWithSupertypes(), varSuperTypes);
         ContextTranslator.addAlias(z3, c.getAlias(), aliasTranslation);
         ContextTranslator.addGhostFunctions(z3, c.getGhosts(), funcTranslation);
@@ -228,6 +228,10 @@ public class Z3Translator extends AbstractExpressionVisitor {
                 result = z3.mkRem((IntExpr) left, (IntExpr) right);
             }
             break;
+        case "|->":
+            throw new Exception("Z3 does not support separation logic: |->");
+        case "|*":
+            throw new Exception("Z3 does not support separation logic: |*");
         }
         if (result == null) {
             fail("Reached unknown operation `" + be.getOperator() + "`");
@@ -306,6 +310,16 @@ public class Z3Translator extends AbstractExpressionVisitor {
     @Override
     public void visitVar(Var v) throws Exception {
         result = makeVariable(v.getName());
+    }
+
+    @Override
+    public void visitUnit(SepUnit unit) throws Exception {
+        throw new Exception("Z3 solver does not support separation logic!");
+    }
+
+    @Override
+    public void visitSepEmp(SepEmp sepEmp) throws Exception {
+        throw new Exception("Z3 solver does not support separation logic!");
     }
 }
 

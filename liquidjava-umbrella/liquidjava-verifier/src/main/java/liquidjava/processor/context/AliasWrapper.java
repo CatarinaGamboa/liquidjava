@@ -55,7 +55,7 @@ public class AliasWrapper {
     public Expression getNewExpression(List<String> newNames) {
         Predicate expr = getClonedPredicate();
         for (int i = 0; i < newNames.size(); i++) {
-            expr = expr.substituteVariable(varNames.get(i), newNames.get(i));
+            expr = expr.makeSubstitution(varNames.get(i), newNames.get(i));
         }
         return expr.getExpression().clone();
     }

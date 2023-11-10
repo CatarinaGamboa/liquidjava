@@ -1,8 +1,11 @@
 package liquidjava.processor.context;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -17,10 +20,14 @@ public class Context {
     private Map<String, List<GhostState>> classStates;
     private List<AliasWrapper> alias;
 
+    private HeapContext heapCtx;
+
     public int counter;
     private static Context instance;
 
     private Context() {
+        heapCtx = HeapContext.empty();
+
         ctxVars = new Stack<>();
         ctxVars.add(new ArrayList<>());
         ctxFunctions = new ArrayList<>();
@@ -43,7 +50,7 @@ public class Context {
         return instance;
     }
 
-    public void reinitializeContext() {
+    public void reinitializeForClass() {
         ctxVars = new Stack<>();
         ctxVars.add(new ArrayList<>());// global vars
         // ctxFunctions = new ArrayList<>();
@@ -51,10 +58,11 @@ public class Context {
         // alias = new ArrayList<>();
         // ghosts = new ArrayList<>();
         // counter = 0;
+        heapCtx = HeapContext.empty();
     }
 
-    public void reinitializeAllContext() {
-        reinitializeContext();
+    public void reinitializeForPkg() {
+        reinitializeForClass();
         ctxFunctions = new ArrayList<>();
         alias = new ArrayList<>();
         ghosts = new ArrayList<>();
@@ -70,6 +78,7 @@ public class Context {
             if (vi instanceof Variable)
                 ((Variable) vi).enterContext();
 
+        heapCtx.enterContext();
     }
 
     public void exitContext() {
@@ -78,13 +87,19 @@ public class Context {
         for (RefinedVariable vi : getAllVariables())
             if (vi instanceof Variable)
                 ((Variable) vi).exitContext();
+
+        heapCtx.exitContext();
+    }
+
+    public HeapContext getHeapCtx() {
+        return heapCtx;
     }
 
     public int getCounter() {
         return counter++;
     }
 
-    public Map<String, CtTypeReference<?>> getContext() {
+    public Map<String, CtTypeReference<?>> getTypeContext() {
         Map<String, CtTypeReference<?>> ret = new HashMap<>();
         for (List<RefinedVariable> l : ctxVars) {
             for (RefinedVariable var : l) {
@@ -188,13 +203,8 @@ public class Context {
     }
 
     public String allVariablesToString() {
-        StringBuilder sb = new StringBuilder();
-        for (List<RefinedVariable> l : ctxVars) {
-            for (RefinedVariable var : l) {
-                sb.append(var.toString() + "; ");
-            }
-        }
-        return sb.toString();
+        return ctxVars.stream().flatMap(Collection::stream).map(var -> var.toString() + "; ")
+                .collect(Collectors.joining());
     }
 
     /**
@@ -203,25 +213,13 @@ public class Context {
      * @return
      */
     public List<RefinedVariable> getAllVariables() {
-        List<RefinedVariable> lvi = new ArrayList<>();
-        for (List<RefinedVariable> l : ctxVars) {
-            for (RefinedVariable var : l) {
-                lvi.add(var);
-            }
-        }
-        return lvi;
+        return ctxVars.stream().flatMap(Collection::stream).collect(Collectors.toList());
     }
 
     public List<RefinedVariable> getAllVariablesWithSupertypes() {
-        List<RefinedVariable> lvi = new ArrayList<>();
-        for (RefinedVariable rv : getAllVariables()) {
-            if (rv.getSuperTypes().size() > 0)
-                lvi.add(rv);
-        }
-        for (RefinedVariable rv : ctxSpecificVars) {
-            if (rv.getSuperTypes().size() > 0)
-                lvi.add(rv);
-        }
+        List<RefinedVariable> lvi = getAllVariables().stream().filter(rv -> rv.getSuperTypes().size() > 0)
+                .collect(Collectors.toList());
+        ctxSpecificVars.stream().filter(rv -> rv.getSuperTypes().size() > 0).forEach(lvi::add);
         return lvi;
     }
 
@@ -317,9 +315,12 @@ public class Context {
     }
 
     public RefinedFunction getFunction(String name, String target, int size) {
+
         for (RefinedFunction fi : ctxFunctions) {
-            if (fi.getTargetClass() != null && fi.getName().equals(name) && fi.getTargetClass().equals(target)
-                    && fi.getArguments().size() == size)
+            boolean hasVarargs = fi.hasVarargs();
+            boolean fitargs = hasVarargs || fi.getArguments().size() == size;
+            boolean fitname = fi.getName().equals(name);
+            if (fi.getTargetClass() != null && fitname && fi.getTargetClass().equals(target) && fitargs)
                 return fi;
         }
         return null;
@@ -419,4 +420,11 @@ public class Context {
         // return null;
     }
 
+    public void setHeapFromPredicate(Predicate newHeap) throws ParsingException {
+        this.heapCtx = HeapContext.fromPredicate(newHeap);
+    }
+
+    public void setHeapCtx(HeapContext oldHeap) {
+        this.heapCtx = oldHeap;
+    }
 }

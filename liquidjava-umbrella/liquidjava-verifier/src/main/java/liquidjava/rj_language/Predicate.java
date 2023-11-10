@@ -1,27 +1,16 @@
 package liquidjava.rj_language;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
+import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.context.GhostState;
 import liquidjava.processor.facade.AliasDTO;
-import liquidjava.rj_language.ast.BinaryExpression;
-import liquidjava.rj_language.ast.Expression;
-import liquidjava.rj_language.ast.FunctionInvocation;
-import liquidjava.rj_language.ast.GroupExpression;
-import liquidjava.rj_language.ast.Ite;
-import liquidjava.rj_language.ast.LiteralBoolean;
-import liquidjava.rj_language.ast.LiteralInt;
-import liquidjava.rj_language.ast.LiteralReal;
-import liquidjava.rj_language.ast.UnaryExpression;
-import liquidjava.rj_language.ast.Var;
+import liquidjava.rj_language.ast.*;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
@@ -63,6 +52,22 @@ public class Predicate {
         }
     }
 
+    public static Optional<Predicate> tryFromExpression(String ref, CtElement element, ErrorEmitter e) {
+        try {
+            return Optional.of(new Predicate(ref, element, e));
+        } catch (ParsingException ex) {
+            return Optional.empty();
+        }
+    }
+
+    public static Predicate emptyHeap() {
+        return new Predicate(new SepEmp());
+    }
+
+    public static Predicate booleanTrue() {
+        return new Predicate();
+    }
+
     /**
      * Create a predicate with the expression true
      */
@@ -70,13 +75,17 @@ public class Predicate {
         exp = e;
     }
 
-    protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+    protected static Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
         try {
             return RefinementsParser.createAST(ref);
         } catch (ParsingException e1) {
             ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
             throw e1;
         }
+    }
+
+    public static Predicate booleanFalse() {
+        return new Predicate(new LiteralBoolean(false));
     }
 
     protected Expression innerParse(String ref, ErrorEmitter e) {
@@ -104,10 +113,14 @@ public class Predicate {
         return new Predicate(new UnaryExpression("!", exp));
     }
 
-    public Predicate substituteVariable(String from, String to) {
+    public Predicate makeSubstitution(String from, String to) {
         Expression ec = exp.clone();
         ec = ec.substitute(new Var(from), new Var(to));
         return new Predicate(ec);
+    }
+
+    public void substituteInPlace(String from, String to) {
+        exp = exp.substitute(new Var(from), new Var(to));
     }
 
     public List<String> getVariableNames() {
@@ -119,7 +132,7 @@ public class Predicate {
     public List<GhostState> getStateInvocations(List<GhostState> lgs) {
         if (lgs == null)
             return new ArrayList<>();
-        List<String> all = lgs.stream().map(p -> p.getName()).collect(Collectors.toList());
+        List<String> all = lgs.stream().map(GhostFunction::getName).collect(Collectors.toList());
         List<String> toAdd = new ArrayList<>();
         exp.getStateInvocations(toAdd, all);
 
@@ -176,6 +189,14 @@ public class Predicate {
 
     public static Predicate createConjunction(Predicate c1, Predicate c2) {
         return new Predicate(new BinaryExpression(c1.getExpression(), Utils.AND, c2.getExpression()));
+    }
+
+    public static Predicate createSepConjunction(Predicate c1, Predicate c2) {
+        return new Predicate(new BinaryExpression(c1.getExpression(), "|*", c2.getExpression()));
+    }
+
+    public static Predicate createPto(Predicate c1, Predicate c2) {
+        return new Predicate(new BinaryExpression(c1.getExpression(), "|->", c2.getExpression()));
     }
 
     public static Predicate createDisjunction(Predicate c1, Predicate c2) {

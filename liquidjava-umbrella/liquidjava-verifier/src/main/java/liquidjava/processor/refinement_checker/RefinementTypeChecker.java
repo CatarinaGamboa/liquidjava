@@ -2,20 +2,21 @@ package liquidjava.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.*;
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.processor.refinement_checker.general_checkers.OperationsChecker;
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.BuiltinFunctionPredicate;
 import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.ast.BinaryExpression;
+import liquidjava.rj_language.ast.Var;
 import liquidjava.rj_language.parsing.ParsingException;
-import liquidjava.specification.StateRefinement;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
 import spoon.reflect.code.CtAssignment;
@@ -69,7 +70,7 @@ public class RefinementTypeChecker extends TypeChecker {
         }
 
         // System.out.println("CTCLASS:"+ctClass.getSimpleName());
-        context.reinitializeContext();
+        context.reinitializeForClass();
         super.visitCtClass(ctClass);
     }
 
@@ -94,6 +95,13 @@ public class RefinementTypeChecker extends TypeChecker {
         super.visitCtAnnotationType(annotationType);
     }
 
+    /**
+     * Loads constructor data obtained from mfc pass earlier to context Mainly arguments refinements
+     * 
+     * @param c
+     *            Spoon's constructor representation
+     */
+
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
         if (errorEmitter.foundError()) {
@@ -105,6 +113,13 @@ public class RefinementTypeChecker extends TypeChecker {
         super.visitCtConstructor(c);
         context.exitContext();
     }
+
+    /**
+     * Loads method data obtained from mfc pass earlier to context Mainly arguments refinements
+     * 
+     * @param method
+     *            Spoon's constructor representation
+     */
 
     public <R> void visitCtMethod(CtMethod<R> method) {
         if (errorEmitter.foundError()) {
@@ -120,8 +135,17 @@ public class RefinementTypeChecker extends TypeChecker {
 
     }
 
+    /**
+     * Handles declaration with or without assignment and adds new variable to context Checks if right hand side of
+     * assignment satisfies refinement if present
+     * 
+     * @param localVariable
+     *            Spoon's representation of local variable creation
+     */
+
     @Override
     public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
+        System.out.println("Visiting " + localVariable);
         if (errorEmitter.foundError()) {
             return;
         }
@@ -145,6 +169,22 @@ public class RefinementTypeChecker extends TypeChecker {
             if (refinementFound == null) {
                 refinementFound = new Predicate();
             }
+
+            // to link assigned variable to variable returned from the right-hand-side of the assignment
+            // var x = creteX(); there will be `createX#somthing` variable and `x`. They should be connected vai `==`
+
+            Object targetMetaData = e.getMetadata(TARGET_KEY);
+            if (targetMetaData instanceof VariableInstance) {
+                VariableInstance vi = (VariableInstance) targetMetaData;
+                String viName = vi.getName();
+                Predicate vif = vi.getRefinement();
+                Predicate updRef = Predicate.createConjunction(vif,
+                        new Predicate(new BinaryExpression(new Var(varName), "==", new Var(viName))));
+                vi.setRefinement(updRef);
+            }
+
+            // Why there is `new Predicate` instead of found refinement?
+            // Because check refinements adds instance with refinemnt to context
             context.addVarToContext(varName, localVariable.getType(), new Predicate(), e);
 
             try {
@@ -176,7 +216,7 @@ public class RefinementTypeChecker extends TypeChecker {
             }
             String name = String.format(freshFormat, context.getCounter());
             if (c.getVariableNames().contains(WILD_VAR)) {
-                c = c.substituteVariable(WILD_VAR, name);
+                c = c.makeSubstitution(WILD_VAR, name);
             } else {
                 c = Predicate.createEquals(Predicate.createVar(name), c);
             }
@@ -193,6 +233,13 @@ public class RefinementTypeChecker extends TypeChecker {
         }
     }
 
+    /**
+     * Handles {@code return this} by creating connection with wildcard
+     * 
+     * @param thisAccess
+     *            Spoon's internal representation of {@code this} as in read
+     */
+
     @Override
     public <T> void visitCtThisAccess(CtThisAccess<T> thisAccess) {
         if (errorEmitter.foundError()) {
@@ -207,38 +254,43 @@ public class RefinementTypeChecker extends TypeChecker {
             thisAccess.putMetadata(REFINE_KEY,
                     Predicate.createEquals(Predicate.createVar(WILD_VAR), Predicate.createVar(thisName)));
         }
-
     }
 
+    /**
+     * Calls SMT to check refinements of the assignment. Updates ghost function if left hand side is a field
+     * 
+     * @param assignment
+     *            Spoon's internal representation of {@code x = y}
+     */
     @SuppressWarnings("unchecked")
     @Override
-    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignement) {
+    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignment) {
         if (errorEmitter.foundError()) {
             return;
         }
 
-        super.visitCtAssignment(assignement);
-        CtExpression<T> ex = assignement.getAssigned();
+        super.visitCtAssignment(assignment);
+        CtExpression<T> ex = assignment.getAssigned();
 
         if (ex instanceof CtVariableWriteImpl) {
             CtVariableReference<?> var = ((CtVariableAccess<?>) ex).getVariable();
             CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
-            String name = var.getSimpleName();
-            checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), assignement, varDecl);
+            String assigneeName = var.getSimpleName();
+            checkAssignment(assigneeName, varDecl.getType(), ex, assignment.getAssignment(), assignment, varDecl);
 
         } else if (ex instanceof CtFieldWrite) {
-            System.out.println("Got field write: " + assignement);
+            System.out.println("Got field write: " + assignment);
             CtFieldWrite<?> fw = ((CtFieldWrite<?>) ex);
             CtFieldReference<?> cr = fw.getVariable();
             CtField<?> f = fw.getVariable().getDeclaration();
             String updatedVarName = String.format(thisFormat, cr.getSimpleName());
-            checkAssignment(updatedVarName, cr.getType(), ex, assignement.getAssignment(), assignement, f);
+            checkAssignment(updatedVarName, cr.getType(), ex, assignment.getAssignment(), assignment, f);
 
             // corresponding ghost function update
             try {
                 AuxStateHandler.updateGhostField(fw, this);
             } catch (ParsingException e) {
-                ErrorHandler.printCostumeError(assignement, "ParsingException in `" + assignement + "` in class `"
+                ErrorHandler.printCostumeError(assignment, "ParsingException in `" + assignment + "` in class `"
                         + f.getDeclaringType() + "` : " + e.getMessage(), errorEmitter);
 
                 return;
@@ -265,6 +317,12 @@ public class RefinementTypeChecker extends TypeChecker {
         // TODO predicate for now is always TRUE
     }
 
+    /**
+     * Creates refinement for constant literal: "lifts" it to the refinement level.
+     * 
+     * @param lit
+     *            Spoon's internal representation of a literal
+     */
     @Override
     public <T> void visitCtLiteral(CtLiteral<T> lit) {
         if (errorEmitter.foundError()) {
@@ -284,6 +342,12 @@ public class RefinementTypeChecker extends TypeChecker {
         }
     }
 
+    /**
+     * Adds field and its refienment to context for the future use in methods
+     * 
+     * @param f
+     *            Spoon's internal representation of field declaration
+     */
     @Override
     public <T> void visitCtField(CtField<T> f) {
         if (errorEmitter.foundError()) {
@@ -302,7 +366,7 @@ public class RefinementTypeChecker extends TypeChecker {
         String nname = String.format(thisFormat, f.getSimpleName());
         Predicate ret = new Predicate();
         if (c.isPresent()) {
-            ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
+            ret = c.get().makeSubstitution(WILD_VAR, nname).makeSubstitution(f.getSimpleName(), nname);
         }
         RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, f);
         if (v instanceof Variable) {
@@ -311,6 +375,10 @@ public class RefinementTypeChecker extends TypeChecker {
 
     }
 
+    /**
+     *
+     * @param fieldRead
+     */
     @Override
     public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
         if (errorEmitter.foundError()) {
@@ -320,6 +388,8 @@ public class RefinementTypeChecker extends TypeChecker {
         String fieldName = fieldRead.getVariable().getSimpleName();
         if (context.hasVariable(fieldName)) {
             RefinedVariable rv = context.getVariableByName(fieldName);
+            // if rv is a variable not an instance, and it has known location in code.
+            // check if this location is the same as ??
             if (rv instanceof Variable && ((Variable) rv).getLocation().isPresent()
                     && ((Variable) rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
                 fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
@@ -397,7 +467,7 @@ public class RefinementTypeChecker extends TypeChecker {
         if (errorEmitter.foundError()) {
             return;
         }
-
+        System.out.println("Found invocation: " + invocation);
         super.visitCtInvocation(invocation);
         mfc.getInvocationRefinements(invocation);
         System.out.println();
@@ -429,7 +499,7 @@ public class RefinementTypeChecker extends TypeChecker {
             return;// error already in ErrorEmitter
         }
         String freshVarName = String.format(freshFormat, context.getCounter());
-        expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
+        expRefs = expRefs.makeSubstitution(WILD_VAR, freshVarName);
         Predicate lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
         expRefs = Predicate.createConjunction(expRefs, lastExpRefs);
 
@@ -444,6 +514,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
         context.variablesNewIfCombination();
         context.variablesSetBeforeIf();
+
+        HeapContext oldHeap = context.getHeapCtx();
+
         context.enterContext();
 
         // VISIT THEN
@@ -451,6 +524,12 @@ public class RefinementTypeChecker extends TypeChecker {
         visitCtBlock(ifElement.getThenStatement());
         context.variablesSetThenIf();
         context.exitContext();
+
+        HeapContext ifHeapCtx = context.getHeapCtx();
+
+        context.setHeapCtx(oldHeap);
+
+        HeapContext elseHeapCtx = HeapContext.empty();
 
         // VISIT ELSE
         if (ifElement.getElseStatement() != null) {
@@ -462,12 +541,29 @@ public class RefinementTypeChecker extends TypeChecker {
             visitCtBlock(ifElement.getElseStatement());
             context.variablesSetElseIf();
             context.exitContext();
+
+            elseHeapCtx = context.getHeapCtx();
         }
         // end
         vcChecker.removePathVariable(freshRV);
         context.exitContext();
         context.variablesCombineFromIf(expRefs);
         context.variablesFinishIfCombination();
+
+        // checks if merged heap holds. If not - reduces knowledge for it to hold.
+        HeapContext heapPile = oldHeap.merge(ifHeapCtx).merge(elseHeapCtx);
+        if (vcChecker.doesHeapHold(Predicate.booleanTrue(), heapPile, ifElement)) {
+            context.setHeapCtx(heapPile);
+            return;
+        }
+
+        Predicate newHeap = vcChecker.reduceHeapKnowledge(Predicate.booleanTrue(), heapPile, ifElement);
+        try {
+            context.setHeapFromPredicate(newHeap);
+        } catch (ParsingException e) {
+            System.out.println(
+                    "Something has gone very wrong. Reconstructed heap after if is invalid: " + e.getMessage());
+        }
     }
 
     @Override
@@ -505,6 +601,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
+        System.out.println("RTcH: Found constructor call: " + ctConstructorCall);
         if (errorEmitter.foundError()) {
             return;
         }
@@ -524,29 +621,52 @@ public class RefinementTypeChecker extends TypeChecker {
     }
 
     // ############################### Inner Visitors ##########################################
-    private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, CtExpression<?> assignment,
-            CtElement parentElem, CtElement varDecl) {
-        getPutVariableMetadada(ex, name);
+    private void checkAssignment(String assigneeName, CtTypeReference<?> type, CtExpression<?> ex,
+            CtExpression<?> assignment, CtElement parentElem, CtElement varDecl) {
+        getPutVariableMetadada(ex, assigneeName);
 
         Predicate refinementFound = getRefinement(assignment);
         if (refinementFound == null) {
-            RefinedVariable rv = context.getVariableByName(name);
+            RefinedVariable rv = context.getVariableByName(assigneeName);
             if (rv instanceof Variable) {
                 refinementFound = rv.getMainRefinement();
             } else {
                 refinementFound = new Predicate();
             }
         }
-        Optional<VariableInstance> r = context.getLastVariableInstance(name);
+        Optional<VariableInstance> r = context.getLastVariableInstance(assigneeName);
         // AQUI!!
+        // TODO(ask)
         r.ifPresent(variableInstance -> vcChecker.removePathVariableThatIncludes(variableInstance.getName()));
 
-        vcChecker.removePathVariableThatIncludes(name);// AQUI!!
+        vcChecker.removePathVariableThatIncludes(assigneeName);// AQUI!! what..?
         try {
-            checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
+            Predicate substRef = checkVariableRefinements(refinementFound, assigneeName, type, parentElem, varDecl);
+
+            vcChecker.doesHeapHold(substRef, context.getHeapCtx(), parentElem);
+            Predicate newHeap = vcChecker.reduceHeapKnowledge(substRef, context.getHeapCtx(), parentElem);
+            // can throw, but never should throw
+            // @Refinement("_ > 0")
+            // int x = 1 @Refinement("x == 1")
+
+            // HeapPrecondition(this -> ())
+            // HeapPostcondition(_ -> ())
+            // Stream map(..)
+
+            // HeapPrecondition(file -> ())
+            // HeapStrictPostcondition(file -> ())
+            // void writeToFile(File file){ f.close();}
+
+            // int y = x; && y == x
+            context.setHeapFromPredicate(newHeap);
+
         } catch (ParsingException e) {
+            System.out.println("if this is heap predicate parsing related, then you are in trouble: " + e.getMessage());
             return;// error already in ErrorEmitter
         }
+
+        // TODO(sep logic) if does not hold, remove things that are aliased.
+        // at worst we will go to empty heap
 
     }
 
@@ -580,7 +700,7 @@ public class RefinementTypeChecker extends TypeChecker {
             Optional<VariableInstance> rv = context.getLastVariableInstance(s);
             if (rv.isPresent()) {
                 VariableInstance vi = rv.get();
-                ret = ret.substituteVariable(s, vi.getName());
+                ret = ret.makeSubstitution(s, vi.getName());
             }
         }
         return ret;

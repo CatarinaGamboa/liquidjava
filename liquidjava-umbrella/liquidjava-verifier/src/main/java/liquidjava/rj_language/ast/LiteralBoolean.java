@@ -20,7 +20,7 @@ public class LiteralBoolean extends Expression {
     }
 
     @Override
-    public void accept(ExpressionVisitor v) {
+    public void accept(ExpressionVisitor v) throws Exception {
         v.visitLiteralBoolean(this);
     }
 

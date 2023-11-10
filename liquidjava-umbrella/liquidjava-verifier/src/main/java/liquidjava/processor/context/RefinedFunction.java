@@ -4,29 +4,46 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction extends Refined {
 
-    private List<Variable> argRefinements;
+    private final List<Variable> argRefinements;
     private String targetClass;
     private List<ObjectState> stateChange;
+
+    private HeapContext.Transition heapChange;
+    private Optional<CtTypeReference<?>> varargsType = Optional.empty();
 
     public RefinedFunction() {
         argRefinements = new ArrayList<>();
         stateChange = new ArrayList<>();
+        heapChange = HeapContext.Transition.id();
     }
 
     public List<Variable> getArguments() {
         return argRefinements;
     }
 
+    public void setVarargs(CtTypeReference<?> t) {
+        varargsType = Optional.of(t);
+    }
+
+    public void setHeapChange(HeapContext.Transition tr) {
+        heapChange = tr;
+    }
+
+    public HeapContext.Transition getHeapChange() {
+        return heapChange;
+    }
+
     public void addArgRefinements(String varName, CtTypeReference<?> type, Predicate refinement) {
         Variable v = new Variable(varName, type, refinement);
         this.argRefinements.add(v);
-
     }
 
     public void addArgRefinements(Variable vi) {
@@ -64,7 +81,7 @@ public class RefinedFunction extends Refined {
                 c = p.getRenamedRefinements(varName);
             }
             context.addVarToContext(varName, p.getType(), c, element);
-            update = update.substituteVariable(p.getName(), varName);
+            update = update.makeSubstitution(p.getName(), varName);
         }
         return update;
     }
@@ -169,4 +186,11 @@ public class RefinedFunction extends Refined {
         return true;
     }
 
+    public boolean hasVarargs() {
+        return varargsType.isPresent();
+    }
+
+    public Optional<CtTypeReference<?>> getVarargType() {
+        return varargsType;
+    }
 }

@@ -16,6 +16,7 @@ import liquidjava.processor.context.GhostState;
 import liquidjava.processor.context.RefinedVariable;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.processor.facade.GhostDTO;
+import liquidjava.processor.heap.HeapContext;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
@@ -32,19 +33,19 @@ import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 
 public abstract class TypeChecker extends CtScanner {
-    public final String REFINE_KEY = "refinement";
-    public final String TARGET_KEY = "target";
+    static public final String REFINE_KEY = "refinement";
+    static public final String TARGET_KEY = "target";
     // public final String STATE_KEY = "state";
-    public final String THIS = "this";
-    public final String WILD_VAR = "_";
-    public final String freshFormat = "#fresh_%d";
-    public final String instanceFormat = "#%s_%d";
-    public final String thisFormat = "this#%s";
-    public String[] implementedTypes = { "boolean", "int", "short", "long", "float", "double" }; // TODO add
-                                                                                                 // types e.g., "int[]"
+    static public final String THIS = "this";
+    static public final String WILD_VAR = "_";
+    static public final String freshFormat = "#fresh_%d";
+    static public final String instanceFormat = "#%s_%d";
+    static public final String thisFormat = "this#%s";
+    static public String[] implementedTypes = { "boolean", "int", "short", "long", "float", "double" }; // TODO add
+    // types e.g., "int[]"
 
     Context context;
-    Factory factory;
+    final Factory factory;
     VCChecker vcChecker;
     ErrorEmitter errorEmitter;
 
@@ -97,6 +98,41 @@ public abstract class TypeChecker extends CtScanner {
             constr = Optional.of(p);
         }
         return constr;
+    }
+
+    public Optional<HeapContext.Transition> getHeapRefinementFromAnnotation(CtElement element) throws ParsingException {
+        Optional<String> pre = Optional.empty();
+        Optional<String> post = Optional.empty();
+        for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
+            String qAnName = ann.getActualAnnotation().annotationType().getCanonicalName();
+            if (qAnName.contentEquals("liquidjava.specification.HeapPrecondition")) {
+                String st = TypeCheckingUtils.getStringFromAnnotation(ann.getValue("value"));
+                pre = Optional.ofNullable(st);
+            } else if (qAnName.contentEquals("liquidjava.specification.HeapPostcondition")) {
+                String st = TypeCheckingUtils.getStringFromAnnotation(ann.getValue("value"));
+                post = Optional.ofNullable(st);
+            }
+        }
+        if (!pre.isPresent() && !post.isPresent()) {
+            return Optional.empty();
+        }
+
+        Predicate preP = pre.flatMap(s -> Predicate.tryFromExpression(s, element, errorEmitter))
+                .orElseGet(Predicate::emptyHeap);
+
+        if (errorEmitter.foundError())
+            return Optional.empty();
+
+        HeapContext precondition = HeapContext.fromPredicate(preP);
+
+        Predicate postP = post.flatMap(s -> Predicate.tryFromExpression(s, element, errorEmitter))
+                .orElseGet(Predicate::emptyHeap);
+        if (errorEmitter.foundError())
+            return Optional.empty();
+
+        HeapContext postcondition = HeapContext.fromPredicate(postP);
+
+        return Optional.of(HeapContext.Transition.fromPrePostCond(precondition, postcondition));
     }
 
     @SuppressWarnings("unchecked")
@@ -263,28 +299,53 @@ public abstract class TypeChecker extends CtScanner {
         return ref;
     }
 
-    public void checkVariableRefinements(Predicate refinementFound, String simpleName, CtTypeReference<?> type,
+    /**
+     * Function that checks if found refinement holds against refinement from annotation. Usually found refinement have
+     * wildcard for given variable, so some substitutions take place. Used in variable declaration, variable assignment
+     * and when unary operation performs write (x++)
+     *
+     * @param refinementFound
+     *            usually obtained from getRefinement call for some CtElement
+     * @param simpleName
+     *            name of the given variable
+     * @param type
+     *            Spoon's type for given variable
+     * @param usage
+     *            Some piece of code where everything takes place
+     * @param variable
+     *            Source of annotation
+     * 
+     * @return
+     * 
+     * @throws ParsingException
+     *             if parsing of annotation on variable throws
+     */
+    public Predicate checkVariableRefinements(Predicate refinementFound, String simpleName, CtTypeReference<?> type,
             CtElement usage, CtElement variable) throws ParsingException {
         Optional<Predicate> expectedType = getRefinementFromAnnotation(variable);
-        Predicate cEt;
+        Predicate cEt = expectedType.orElseGet(Predicate::booleanTrue);
         RefinedVariable mainRV = null;
-        if (context.hasVariable(simpleName))
+
+        if (context.hasVariable(simpleName)) {
             mainRV = context.getVariableByName(simpleName);
+            if (!context.getVariableByName(simpleName).getRefinement().isBooleanTrue()) {
+                cEt = mainRV.getMainRefinement();
+            }
+        }
+        cEt.substituteInPlace(WILD_VAR, simpleName);
 
-        if (context.hasVariable(simpleName) && !context.getVariableByName(simpleName).getRefinement().isBooleanTrue())
-            cEt = mainRV.getMainRefinement();
-        else if (expectedType.isPresent())
-            cEt = expectedType.get();
-        else
-            cEt = new Predicate();
-
-        cEt = cEt.substituteVariable(WILD_VAR, simpleName);
-        Predicate cet = cEt.substituteVariable(WILD_VAR, simpleName);
+        // TODO(sep logic): I need also to substitute in heapContext
+        // For the first prototype I should focus on methods
+        // Now no annotations on variables allowed
+        Predicate cet = cEt.makeSubstitution(WILD_VAR, simpleName);
 
         String newName = String.format(instanceFormat, simpleName, context.getCounter());
-        Predicate correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
-        correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
-        cEt = cEt.substituteVariable(simpleName, newName);
+        Predicate correctNewRefinement = refinementFound.makeSubstitution(WILD_VAR, newName);
+        // `this` here must be replaced
+        // a.method(): old(this) -> new(this)
+        correctNewRefinement = correctNewRefinement.makeSubstitution(THIS, newName);
+        // why `this` is replaced by new variable name? YES
+        cEt.substituteInPlace(simpleName, newName);
 
         // Substitute variable in verification
         RefinedVariable rv = context.addInstanceToContext(newName, type, correctNewRefinement, usage);
@@ -294,6 +355,46 @@ public abstract class TypeChecker extends CtScanner {
         // smt check
         checkSMT(cEt, usage);// TODO CHANGE
         context.addRefinementToVariableInContext(simpleName, type, cet, usage);
+
+        return cEt;
+    }
+
+    public void changeHeap(Predicate booleanCtx, HeapContext.Transition tr, CtElement element) {
+        System.out.println("-------------------- Applying heap transition for heap:");
+        System.out.println(booleanCtx + " && " + context.getHeapCtx());
+        System.out.println("via transition:");
+        System.out.println();
+        System.out.println(tr.getPre());
+        System.out.println("v------v------v");
+        System.out.println(tr.getPost());
+        System.out.println();
+
+        vcChecker.checkHeapPrecondition(booleanCtx, context.getHeapCtx().toSepConjunctions(), tr, element);
+
+        if (errorEmitter.foundError()) {
+            return;
+        }
+
+        Predicate newHeap = vcChecker.applyHeapTransition(booleanCtx, context.getHeapCtx(), tr, element);
+
+        if (errorEmitter.foundError()) {
+            return;
+        }
+
+        // TODO(sep logic): postcondition is SAT. Or in definition
+        try {
+            context.setHeapFromPredicate(newHeap);
+        } catch (ParsingException e) {
+            System.err.println("Failed to use predicate as heap: " + newHeap + ". This happened during transition from "
+                    + booleanCtx + " && " + context.getHeapCtx() + " via transition: ");
+            System.err.println(tr.getPre());
+            System.err.println("---------------");
+            System.err.println(tr.getPost());
+        }
+
+        System.out.println("Updated heap:");
+        System.out.println(context.getHeapCtx());
+        System.out.println("--------------------");
     }
 
     public void checkSMT(Predicate expectedType, CtElement element) {
