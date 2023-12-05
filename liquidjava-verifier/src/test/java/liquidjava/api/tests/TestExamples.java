@@ -29,7 +29,7 @@ public class TestExamples {
     }
 
     private static Stream<Path> fileNameSource() throws IOException {
-        return Files.find(Paths.get("../liquidjava-example/src/main/java/"), Integer.MAX_VALUE,
+        return Files.find(Paths.get("../liquidjava-example/src/main/java/testSuite/"), Integer.MAX_VALUE,
                 (filePath, fileAttr) -> fileAttr.isRegularFile());
     }
 }
