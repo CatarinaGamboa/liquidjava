@@ -1,4 +1,4 @@
-package test.project;
+package test.currentlyTesting;
 
 // import liquidjava.specification.Ghost;
 // import liquidjava.specification.StateRefinement;

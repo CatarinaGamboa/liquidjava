@@ -1,4 +1,4 @@
-package test.project;
+package test.currentlyTesting;
 
 import liquidjava.specification.Refinement;
 
@@ -6,7 +6,7 @@ class SimpleTest {
 
   @Refinement("return > 0")
   public int test() {
-    return -10;
+    return 10;
   }
 }
 
