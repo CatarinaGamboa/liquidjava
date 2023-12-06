@@ -1,3 +1,4 @@
+package testingInProgress;
 import liquidjava.specification.Refinement;
 import liquidjava.specification.RefinementAlias;
 import liquidjava.specification.StateRefinement;

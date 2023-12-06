@@ -6,7 +6,7 @@ class SimpleTest {
 
   @Refinement("return > 0")
   public int test() {
-    return 10;
+    return -10;
   }
 }
 
