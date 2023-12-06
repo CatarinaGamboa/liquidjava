@@ -22,7 +22,10 @@ public class CommandLineLauncher {
             System.out.println(ee.getFullMessage());
             System.out.println("Before exit");
             System.exit(ee.getErrorStatus());
+        } else {        
+            System.err.println("Passed verification!");
         }
+
     }
 
     public static ErrorEmitter launchTest(String file) {
