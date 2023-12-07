@@ -48,7 +48,6 @@ public class AuxStateHandler {
         }
     }
 
-
     /**
      * Creates the list of states and adds them to the function
      *
@@ -67,7 +66,7 @@ public class AuxStateHandler {
             Map<String, CtExpression> m = an.getAllValues();
             String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
             ObjectState state = new ObjectState();
-            if (to != null) 
+            if (to != null)
                 state.setTo(new Predicate(to, element, tc.getErrorEmitter()));
             l.add(state);
         }
@@ -80,7 +79,7 @@ public class AuxStateHandler {
 
         Predicate[] s = { Predicate.createVar(tc.THIS) };
         Predicate c = new Predicate();
-        List<GhostFunction> sets = getDifferentSets(tc, klass);//??
+        List<GhostFunction> sets = getDifferentSets(tc, klass);// ??
         for (GhostFunction sg : sets) {
             if (sg.getReturnType().toString().equals("int")) {
                 Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s),
@@ -178,10 +177,6 @@ public class AuxStateHandler {
         }
         return state;
     }
-
-
-
-
 
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */
             String targetClass, TypeChecker tc, CtElement e, boolean isTo) throws ParsingException {
@@ -448,7 +443,7 @@ public class AuxStateHandler {
                 for (String s : map.keySet()) {
                     transitionedState = transitionedState.substituteVariable(s, map.get(s));
                 }
-                transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);      
+                transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
                 // update of stata of new instance of this#n#(whatever it was + 1)
                 addInstanceWithState(tc, name, newInstanceName, vi, transitionedState, invocation);
                 return transitionedState;
@@ -466,19 +461,20 @@ public class AuxStateHandler {
         return new Predicate();
     }
 
-
     /**
      * Method prepared to change all old vars in a predicate, however it has not been needed yet
+     * 
      * @param pred
      * @param tc
+     * 
      * @return
      */
     private static Predicate changeVarsFields(Predicate pred, TypeChecker tc) {
         Predicate noOld = pred;
         List<String> listVarsInOld = pred.getOldVariableNames();
-        for (String varInOld : listVarsInOld){
+        for (String varInOld : listVarsInOld) {
             Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(varInOld);
-            if(ovi.isPresent())
+            if (ovi.isPresent())
                 noOld = noOld.changeOldMentions(varInOld, ovi.get().getName(), tc.getErrorEmitter());
         }
         return noOld;

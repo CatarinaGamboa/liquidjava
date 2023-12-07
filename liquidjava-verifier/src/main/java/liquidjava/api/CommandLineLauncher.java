@@ -18,7 +18,7 @@ public class CommandLineLauncher {
         // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
         String file = args.length == 0 ? allPath : args[0];
         ErrorEmitter ee = launch(file);
-        System.out.println(ee.foundError()? (ee.getFullMessage()):("Correct! Passed Verification."));
+        System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
 
     }
 

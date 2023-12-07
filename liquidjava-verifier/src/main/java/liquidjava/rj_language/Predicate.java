@@ -137,31 +137,29 @@ public class Predicate {
         return new Predicate(e);
     }
 
-
-    public List<String> getOldVariableNames(){
+    public List<String> getOldVariableNames() {
         List<String> ls = new ArrayList<>();
         expressionGetOldVariableNames(this.exp, ls);
         return ls;
     }
 
-    private void expressionGetOldVariableNames(Expression exp, List<String> ls){
-        if(exp instanceof FunctionInvocation){
+    private void expressionGetOldVariableNames(Expression exp, List<String> ls) {
+        if (exp instanceof FunctionInvocation) {
             FunctionInvocation fi = (FunctionInvocation) exp;
-           if (fi.getName().equals(Utils.OLD)){
+            if (fi.getName().equals(Utils.OLD)) {
                 List<Expression> le = fi.getArgs();
-                for(Expression e: le){
-                    if (e instanceof Var) 
-                       ls.add(((Var) e).getName());
+                for (Expression e : le) {
+                    if (e instanceof Var)
+                        ls.add(((Var) e).getName());
                 }
-           }
-        } 
-        if(exp.hasChildren()){
+            }
+        }
+        if (exp.hasChildren()) {
             for (var ch : exp.getChildren())
                 expressionGetOldVariableNames(ch, ls);
-            
+
         }
     }
-    
 
     public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, ErrorEmitter ee) {
         Map<String, Expression> nameRefinementMap = new HashMap<>();
