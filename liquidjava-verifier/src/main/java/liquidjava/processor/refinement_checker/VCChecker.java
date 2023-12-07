@@ -100,7 +100,7 @@ public class VCChecker {
         return smtChecks(premises, et, p);
     }
 
-    private /* Predicate */ VCImplication joinPredicates(Predicate expectedType, List<RefinedVariable> mainVars,
+    private VCImplication joinPredicates(Predicate expectedType, List<RefinedVariable> mainVars,
             List<RefinedVariable> vars, HashMap<String, PlacementInCode> map) {
 
         VCImplication firstSi = null;
@@ -135,7 +135,7 @@ public class VCChecker {
         if (firstSi != null && lastSi != null) {
             cSMT = firstSi.clone();
             lastSi.setNext(new VCImplication(expectedType));
-            // printVCs(firstSi.toString(), cSMT.toConjunctions().toString(), expectedType);
+            // printVCs(firstSi.toString(), cSMT.toConjunctions().toString(), expectedType); //DEBUG: UNCOMMENT
         }
 
         return cSMT; // firstSi != null ? firstSi : new VCImplication(new Predicate());
