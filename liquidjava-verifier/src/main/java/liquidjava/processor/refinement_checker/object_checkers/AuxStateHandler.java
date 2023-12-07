@@ -3,6 +3,8 @@ package liquidjava.processor.refinement_checker.object_checkers;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
@@ -40,10 +42,36 @@ public class AuxStateHandler {
                     return;
                 }
             }
-            setFunctionStates(f, an, tc, c); // f.setState(an, context.getGhosts(), c);
+            setConstructorStates(f, an, tc, c); // f.setState(an, context.getGhosts(), c);
         } else {
             setDefaultState(f, tc);
         }
+    }
+
+
+    /**
+     * Creates the list of states and adds them to the function
+     *
+     * @param f
+     * @param anns
+     * @param tc
+     * @param element
+     * 
+     * @throws ParsingException
+     */
+    @SuppressWarnings({ "rawtypes" })
+    private static void setConstructorStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
+            TypeChecker tc, CtElement element) throws ParsingException {
+        List<ObjectState> l = new ArrayList<>();
+        for (CtAnnotation<? extends Annotation> an : anns) {
+            Map<String, CtExpression> m = an.getAllValues();
+            String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
+            ObjectState state = new ObjectState();
+            if (to != null) 
+                state.setTo(new Predicate(to, element, tc.getErrorEmitter()));
+            l.add(state);
+        }
+        f.setAllStates(l);
     }
 
     public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
@@ -52,7 +80,7 @@ public class AuxStateHandler {
 
         Predicate[] s = { Predicate.createVar(tc.THIS) };
         Predicate c = new Predicate();
-        List<GhostFunction> sets = getDifferentSets(tc, klass);
+        List<GhostFunction> sets = getDifferentSets(tc, klass);//??
         for (GhostFunction sg : sets) {
             if (sg.getReturnType().toString().equals("int")) {
                 Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s),
@@ -150,6 +178,10 @@ public class AuxStateHandler {
         }
         return state;
     }
+
+
+
+
 
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */
             String targetClass, TypeChecker tc, CtElement e, boolean isTo) throws ParsingException {
@@ -416,7 +448,7 @@ public class AuxStateHandler {
                 for (String s : map.keySet()) {
                     transitionedState = transitionedState.substituteVariable(s, map.get(s));
                 }
-                transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
+                transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);      
                 // update of stata of new instance of this#n#(whatever it was + 1)
                 addInstanceWithState(tc, name, newInstanceName, vi, transitionedState, invocation);
                 return transitionedState;
@@ -432,6 +464,24 @@ public class AuxStateHandler {
             // states);
         }
         return new Predicate();
+    }
+
+
+    /**
+     * Method prepared to change all old vars in a predicate, however it has not been needed yet
+     * @param pred
+     * @param tc
+     * @return
+     */
+    private static Predicate changeVarsFields(Predicate pred, TypeChecker tc) {
+        Predicate noOld = pred;
+        List<String> listVarsInOld = pred.getOldVariableNames();
+        for (String varInOld : listVarsInOld){
+            Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(varInOld);
+            if(ovi.isPresent())
+                noOld = noOld.changeOldMentions(varInOld, ovi.get().getName(), tc.getErrorEmitter());
+        }
+        return noOld;
     }
 
     private static Predicate checkOldMentions(Predicate transitionedState, String instanceName, String newInstanceName,
