@@ -34,8 +34,17 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'adopt'
+          distribution: 'temurin'
           cache: maven
+
+      # Cache Maven dependencies (adjust cache key to optimize)
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}  # Cache dependencies based on pom.xml changes
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       # Build the project (compiles and packages the code)
       - name: Build the project
