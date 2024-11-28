@@ -45,5 +45,6 @@ public class ErrorTrafficLightRGB {
 		ErrorTrafficLightRGB tl = new ErrorTrafficLightRGB();
 		tl.transitionToAmber();
 		tl.transitionToRed();
+		tl.transitionToAmber();
 	}
 }

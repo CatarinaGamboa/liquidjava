@@ -18,8 +18,12 @@ public class TestExamples {
 
     @ParameterizedTest
     @MethodSource("fileNameSource")
-    public void testFile(final Path fileName) {
-        ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(fileName.toAbsolutePath().toString());
+    public void testFile(final Path filePath) {
+        String fileName = filePath.getFileName().toString();
+        ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
+        System.out.println(
+                errorEmitter.foundError() ? (errorEmitter.getFullMessage()) : ("Correct! Passed Verification."));
+
         if (fileName.startsWith("Correct") && errorEmitter.foundError()) {
             fail();
         }
