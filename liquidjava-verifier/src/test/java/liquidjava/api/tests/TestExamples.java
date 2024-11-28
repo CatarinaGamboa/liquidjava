@@ -20,20 +20,52 @@ public class TestExamples {
     @MethodSource("fileNameSource")
     public void testFile(final Path filePath) {
         String fileName = filePath.getFileName().toString();
-        ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
-        System.out.println(
-                errorEmitter.foundError() ? (errorEmitter.getFullMessage()) : ("Correct! Passed Verification."));
+        System.out.println("Testing file: " + fileName);
 
-        if (fileName.startsWith("Correct") && errorEmitter.foundError()) {
-            fail();
+        // For Regular Files in the root directory check their name
+        if (Files.isRegularFile(filePath)) {
+            ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
+            System.out.println(
+                    errorEmitter.foundError() ? (errorEmitter.getFullMessage()) : ("Correct! Passed Verification."));
+
+            if (fileName.startsWith("Correct") && errorEmitter.foundError()) {
+                fail();
+            }
+            if (fileName.startsWith("Error") && !errorEmitter.foundError()) {
+                fail();
+            }
         }
-        if (fileName.startsWith("Error") && !errorEmitter.foundError()) {
-            fail();
+
+        // For Directories and subdirectories check if they contain "error" or "correct" in their name
+        if (Files.isDirectory(filePath) && (fileName.contains("error") || fileName.contains("correct"))) {
+            System.out.println("Inside directory " + fileName);
+            ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
+            System.out.println(
+                    errorEmitter.foundError() ? (errorEmitter.getFullMessage()) : ("Correct! Passed Verification."));
+
+            if (fileName.contains("correct") && errorEmitter.foundError()) {
+                fail();
+            }
+            if (fileName.contains("error") && !errorEmitter.foundError()) {
+                fail();
+            }
         }
     }
 
     private static Stream<Path> fileNameSource() throws IOException {
         return Files.find(Paths.get("../liquidjava-example/src/main/java/testSuite/"), Integer.MAX_VALUE,
-                (filePath, fileAttr) -> fileAttr.isRegularFile());
+                (filePath, fileAttr) -> {
+                    // Get the parent directory path (root directory)
+                    Path rootDir = Paths.get("../liquidjava-example/src/main/java/testSuite/");
+
+                    // 1. Files only in the root directory
+                    boolean isFileInRootDir = fileAttr.isRegularFile() && filePath.getParent().equals(rootDir);
+
+                    // 2. Directories and subdirectories (recursive search for directories)
+                    boolean isDirectory = fileAttr.isDirectory();
+
+                    // Return true if either condition matches
+                    return isFileInRootDir || isDirectory;
+                });
     }
 }
