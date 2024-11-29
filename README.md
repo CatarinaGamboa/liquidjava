@@ -37,11 +37,17 @@ You can find out more about LiquidJava in the following resources:
 Run the file `liquidjava-verifier\api\CommandLineLaucher` with the path to the target project for verification.
 If there are no arguments given, the application verifies the project on the path `liquidjava-example\src\main\java`.
 
-#### JUnit tests
-Inside the folder `liquidjava-verifier\api\tests` are three classes that test several examples available at `liquidjava-example\src\test\java`.
-To run the JUnit tests in one of the files, select it, right-click it and `Run as...\JUnit tests`.
-To run the all test suit, select the package `tests` (`liquidjava-verifier\api\tests`), right-click it, and do `Run as...\JUnit tests`.
-Make sure to run these tests after making changes in the verification code.
+
+## Testing
+Run `mvn test` to run all the tests in liquidjava.
+
+The starter test file is `TestExamples.java` which uses the test suite under the `liquidjava-examples/testSuite`. 
+
+Paths in the testSuite are considered test cases if:
+1. File that start with `Correct` or `Error` (e.g, "CorrectRecursion.java")
+2. Package/Folder that contains the word `correct` or `error`.
+
+Therefore, files/folders that do not pass this description are not verified.
 
 ## Project structure
 - **docs**: documents used for the design of the language. The folder includes a readme to a full artifact used in the design process, here are some initial documents used to prepare the design of the refinements language at its evaluation
@@ -56,3 +62,5 @@ Make sure to run these tests after making changes in the verification code.
     - *smt*: package that handles the translation to the smt solver and the processing of the results the smt solver produces.
     - *utils*: includes useful methods for all the previous packages.
     - *test/java/liquidjava/api/tests* contains the `TestExamples` class used for running the testSuite
+
+
