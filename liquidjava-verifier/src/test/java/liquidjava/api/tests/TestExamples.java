@@ -29,24 +29,25 @@ public class TestExamples {
                     errorEmitter.foundError() ? (errorEmitter.getFullMessage()) : ("Correct! Passed Verification."));
 
             if (fileName.startsWith("Correct") && errorEmitter.foundError()) {
+                System.out.println("Error in directory: " + fileName + " --- should be correct but an error was found");
                 fail();
             }
             if (fileName.startsWith("Error") && !errorEmitter.foundError()) {
+                System.out.println("Error in directory: " + fileName + " --- should be an error but passed verification");
                 fail();
             }
-        }
-
-        // For Directories and subdirectories check if they contain "error" or "correct" in their name
-        if (Files.isDirectory(filePath) && (fileName.contains("error") || fileName.contains("correct"))) {
-            System.out.println("Inside directory " + fileName);
+        } else // For Directories and subdirectories check if they contain "error" or "correct" in their name
+            if (Files.isDirectory(filePath) && (fileName.contains("error") || fileName.contains("correct"))) {
             ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
             System.out.println(
                     errorEmitter.foundError() ? (errorEmitter.getFullMessage()) : ("Correct! Passed Verification."));
 
             if (fileName.contains("correct") && errorEmitter.foundError()) {
+                System.out.println("Error in directory: " + fileName + " --- should be correct but an error was found");
                 fail();
             }
             if (fileName.contains("error") && !errorEmitter.foundError()) {
+                System.out.println("Error in directory: " + fileName + " --- should be an error but passed verification");
                 fail();
             }
         }
