@@ -1,4 +1,4 @@
-package testSuite.classes.car1;
+package testSuite.classes.car_correct;
 
 import liquidjava.specification.Refinement;
 import liquidjava.specification.RefinementAlias;
