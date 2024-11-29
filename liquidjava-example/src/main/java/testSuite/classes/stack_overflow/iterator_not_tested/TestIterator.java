@@ -1,4 +1,4 @@
-package testSuite.classes.stack_overflow.iterator;
+package testSuite.classes.stack_overflow.iterator_not_tested;
 
 import java.util.Deque;
 import java.util.Iterator;
