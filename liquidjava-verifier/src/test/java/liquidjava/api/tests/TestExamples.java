@@ -16,57 +16,58 @@ import liquidjava.errors.ErrorEmitter;
 
 public class TestExamples {
 
+    /**
+     * Test the file at the given path by launching the verifier and checking for errors. The file/directory is expected
+     * to be either correct or contain an error based on its name.
+     * 
+     * @param filePath
+     *            path to the file to test
+     */
     @ParameterizedTest
     @MethodSource("fileNameSource")
     public void testFile(final Path filePath) {
         String fileName = filePath.getFileName().toString();
-        System.out.println("Testing file: " + fileName);
+        
+        // 1. Run the verifier on the file or package
+        ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
 
-        // For Regular Files in the root directory check their name
-        if (Files.isRegularFile(filePath)) {
-            ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
-            System.out.println(
-                    errorEmitter.foundError() ? (errorEmitter.getFullMessage()) : ("Correct! Passed Verification."));
-
-            if (fileName.startsWith("Correct") && errorEmitter.foundError()) {
-                System.out.println("Error in directory: " + fileName + " --- should be correct but an error was found");
-                fail();
-            }
-            if (fileName.startsWith("Error") && !errorEmitter.foundError()) {
-                System.out.println("Error in directory: " + fileName + " --- should be an error but passed verification");
-                fail();
-            }
-        } else // For Directories and subdirectories check if they contain "error" or "correct" in their name
-            if (Files.isDirectory(filePath) && (fileName.contains("error") || fileName.contains("correct"))) {
-            ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
-            System.out.println(
-                    errorEmitter.foundError() ? (errorEmitter.getFullMessage()) : ("Correct! Passed Verification."));
-
-            if (fileName.contains("correct") && errorEmitter.foundError()) {
-                System.out.println("Error in directory: " + fileName + " --- should be correct but an error was found");
-                fail();
-            }
-            if (fileName.contains("error") && !errorEmitter.foundError()) {
-                System.out.println("Error in directory: " + fileName + " --- should be an error but passed verification");
-                fail();
-            }
+        // 2. Check if the file is correct or contains an error
+        if ((fileName.startsWith("Correct") && errorEmitter.foundError())
+                || (fileName.contains("correct") && errorEmitter.foundError())) {
+            System.out.println("Error in directory: " + fileName + " --- should be correct but an error was found");
+            fail();
+        }
+        // 3. Check if the file has an error but passed verification
+        if ((fileName.startsWith("Error") && !errorEmitter.foundError())
+                || (fileName.contains("error") && !errorEmitter.foundError())) {
+            System.out.println("Error in directory: " + fileName + " --- should be an error but passed verification");
+            fail();
         }
     }
 
+    /**
+     * Returns a Stream of paths to test files in the testSuite directory. These include files with names starting with
+     * "Correct" or "Error", and directories containing "correct" or "error".
+     * 
+     * @return Stream of paths to test files
+     * 
+     * @throws IOException
+     *             if an I/O error occurs or the path does not exist
+     */
     private static Stream<Path> fileNameSource() throws IOException {
         return Files.find(Paths.get("../liquidjava-example/src/main/java/testSuite/"), Integer.MAX_VALUE,
                 (filePath, fileAttr) -> {
-                    // Get the parent directory path (root directory)
-                    Path rootDir = Paths.get("../liquidjava-example/src/main/java/testSuite/");
+                    String name = filePath.getFileName().toString();
+                    // 1. Files that start with "Correct" or "Error"
+                    boolean isFileStartingWithCorrectOrError = fileAttr.isRegularFile()
+                            && (name.startsWith("Correct") || name.startsWith("Error"));
 
-                    // 1. Files only in the root directory
-                    boolean isFileInRootDir = fileAttr.isRegularFile() && filePath.getParent().equals(rootDir);
-
-                    // 2. Directories and subdirectories (recursive search for directories)
-                    boolean isDirectory = fileAttr.isDirectory();
+                    // 2. Folders (directories) that contain "correct" or "error"
+                    boolean isDirectoryWithCorrectOrError = fileAttr.isDirectory()
+                            && (name.contains("correct") || name.contains("error"));
 
                     // Return true if either condition matches
-                    return isFileInRootDir || isDirectory;
+                    return isFileStartingWithCorrectOrError || isDirectoryWithCorrectOrError;
                 });
     }
 }

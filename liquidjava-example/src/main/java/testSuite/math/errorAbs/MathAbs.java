@@ -1,9 +1,9 @@
-package testSuite.math.errorMax;
+package testSuite.math.errorAbs;
 
 import liquidjava.specification.Refinement;
 
 @SuppressWarnings("unused")
-public class ErrorMathAbs {
+public class MathAbs {
   public static void main(String[] args) {
     @Refinement("true")
     int ab = Math.abs(-9);

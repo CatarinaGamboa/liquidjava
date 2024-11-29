@@ -3,7 +3,7 @@ package testSuite.math.errorMultiplyExact;
 import liquidjava.specification.Refinement;
 
 @SuppressWarnings("unused")
-public class ErrorMathMultiplyExact {
+public class MathMultiplyExact {
   public static void main(String[] args) {
     @Refinement("_ == 40")
     int mul = Math.multiplyExact(5, 8);
