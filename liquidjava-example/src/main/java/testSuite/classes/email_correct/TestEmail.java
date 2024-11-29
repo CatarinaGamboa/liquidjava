@@ -1,4 +1,4 @@
-package testSuite.classes.email2;
+package testSuite.classes.email_correct;
 
 public class TestEmail {
 
@@ -6,7 +6,9 @@ public class TestEmail {
 
     Email e = new Email();
     e.from("me");
-    // missing to
+    e.to("you");
+    e.to("you2");
+    e.to("you3");
     e.subject("not important");
     e.body("body");
     e.build();

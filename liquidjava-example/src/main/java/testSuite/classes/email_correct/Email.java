@@ -1,4 +1,4 @@
-package testSuite.classes.email1;
+package testSuite.classes.email_correct;
 
 import java.util.ArrayList;
 import java.util.List;

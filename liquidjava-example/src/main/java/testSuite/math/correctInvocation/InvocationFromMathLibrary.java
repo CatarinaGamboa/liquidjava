@@ -3,7 +3,7 @@ package testSuite.math.correctInvocation;
 import liquidjava.specification.Refinement;
 
 @SuppressWarnings("unused")
-public class CorrectInvocationFromMathLibrary {
+public class InvocationFromMathLibrary {
   public static void main(String[] args) {
 
     // Math.abs(...)

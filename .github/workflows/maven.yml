@@ -48,7 +48,7 @@ jobs:
 
       # Build the project (compiles and packages the code)
       - name: Build the project
-        run: mvn -B -X -e clean package --file pom.xml --batch-mode --fail-fast
+        run: mvn -B -X -e clean install --file pom.xml --batch-mode --fail-fast
 
       # Run tests
       - name: Run tests

@@ -1,4 +1,4 @@
-package testSuite.classes.state_multiple_cases;
+package testSuite.classes.state_multiple_cases_correct;
 
 import java.io.InputStream;
 import liquidjava.specification.ExternalRefinementsFor;

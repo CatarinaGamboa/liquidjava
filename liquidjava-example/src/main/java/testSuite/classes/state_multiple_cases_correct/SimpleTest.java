@@ -1,18 +1,19 @@
-package testSuite.classes.traffic_light_1;
+package testSuite.classes.state_multiple_cases_correct;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
+import liquidjava.specification.Refinement;
 
+@SuppressWarnings("unused")
 public class SimpleTest {
 
   public static void main(String[] args) throws IOException {
+    InputStreamReader isr = new InputStreamReader(System.in);
+    @Refinement("a > -90")
+    int a = isr.read();
+    isr.close();
+    //		isr.close();
 
-    TrafficLight tl = new TrafficLight();
-    tl.transitionToAmber(); // correct
-    tl.transitionToRed(); // correct
-    tl.transitionToFlashingAmber();
-
-    TrafficLight tl2 = tl.getTrafficLightStartingRed();
-    tl2.transitionToFlashingAmber();
   }
 
   //	InputStreamReader isr = new InputStreamReader(System.in);

@@ -1,4 +1,4 @@
-package testSuite.classes.traffic_light_1;
+package testSuite.classes.traffic_light_correct;
 
 import liquidjava.specification.Refinement;
 import liquidjava.specification.StateRefinement;

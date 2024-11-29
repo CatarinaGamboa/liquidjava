@@ -1,4 +1,4 @@
-package testSuite.classes.email1;
+package testSuite.classes.email_error;
 
 public class TestEmail {
 
@@ -6,9 +6,7 @@ public class TestEmail {
 
     Email e = new Email();
     e.from("me");
-    e.to("you");
-    e.to("you2");
-    e.to("you3");
+    // missing to
     e.subject("not important");
     e.body("body");
     e.build();
