@@ -1,4 +1,4 @@
-package testSuite.classes.email2;
+package testSuite.classes.email_error;
 
 public class TestEmail {
 
