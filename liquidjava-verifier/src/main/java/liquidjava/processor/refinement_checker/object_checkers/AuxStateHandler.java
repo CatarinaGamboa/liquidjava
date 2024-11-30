@@ -20,8 +20,7 @@ public class AuxStateHandler {
     // ########### Get State from StateRefinement declaration #############
 
     /**
-     * Handles the passage of the written state annotations to the context for
-     * Constructors
+     * Handles the passage of the written state annotations to the context for Constructors
      *
      * @param c
      * @param f
@@ -89,8 +88,7 @@ public class AuxStateHandler {
     }
 
     /**
-     * Handles the passage of the written state annotations to the context for
-     * regular Methods
+     * Handles the passage of the written state annotations to the context for regular Methods
      *
      * @param method
      * @param f
@@ -193,8 +191,7 @@ public class AuxStateHandler {
     }
 
     /**
-     * Create predicate with the equalities with previous versions of the object
-     * e.g., ghostfunction1(this) ==
+     * Create predicate with the equalities with previous versions of the object e.g., ghostfunction1(this) ==
      * ghostfunction1(old(this))
      *
      * @param p
@@ -243,8 +240,7 @@ public class AuxStateHandler {
     }
 
     /**
-     * If an expression has a state in metadata, then its state is passed to the
-     * last instance of the variable with
+     * If an expression has a state in metadata, then its state is passed to the last instance of the variable with
      * varName
      *
      * @param tc
@@ -511,8 +507,7 @@ public class AuxStateHandler {
     }
 
     /**
-     * Gets the name of the parent target and adds the closest target to the elem
-     * TARGET metadata
+     * Gets the name of the parent target and adds the closest target to the elem TARGET metadata
      *
      * @param invocation
      * 

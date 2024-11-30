@@ -8,11 +8,8 @@ import java.util.Optional;
 import org.apache.commons.lang3.NotImplementedException;
 
 import liquidjava.errors.ErrorEmitter;
-<<<<<<< HEAD:liquidjava-verifier/src/main/java/liquidjava/processor/refinement_checker/RefinementTypeChecker.java
-=======
 import liquidjava.errors.ErrorHandler;
 import liquidjava.logging.LogElement;
->>>>>>> efcaaf1d (LogElement introduction):liquidjava-umbrella/liquidjava-verifier/src/main/java/liquidjava/processor/refinement_checker/RefinementTypeChecker.java
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.processor.refinement_checker.general_checkers.OperationsChecker;

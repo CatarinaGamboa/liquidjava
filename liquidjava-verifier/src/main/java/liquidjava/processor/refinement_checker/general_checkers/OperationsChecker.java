@@ -158,8 +158,7 @@ public class OperationsChecker {
     }
 
     /**
-     * Retrieves all the refinements for the Operation including the refinements of
-     * all operands for expressions without
+     * Retrieves all the refinements for the Operation including the refinements of all operands for expressions without
      * a variable as parent
      *
      * @param operator
@@ -261,11 +260,12 @@ public class OperationsChecker {
             String newName = String.format(rtc.freshFormat, rtc.getContext().getCounter());
 
             innerRefs = innerRefs.substituteVariable(rtc.WILD_VAR, newName);
-            rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
-            return new Predicate(newName, inv, rtc.getErrorEmitter()); // Return variable that represents the invocation
+            rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, elementForLogging);
+            return new Predicate(newName, elementForLogging, rtc.getErrorEmitter());// Return variable that represents
         }
         return rtc.getRefinement(element);
         // TODO Maybe add cases
+    }
 
     private Predicate getOperationRefinementFromExternalLib(CtInvocation<?> inv, CtBinaryOperator<?> operator)
             throws ParsingException {
@@ -343,69 +343,69 @@ public class OperationsChecker {
      */
     private String getOperatorFromKind(BinaryOperatorKind kind) {
         switch (kind) {
-            case PLUS:
-                return Utils.PLUS;
-            case MINUS:
-                return Utils.MINUS;
-            case MUL:
-                return Utils.MUL;
-            case DIV:
-                return Utils.DIV;
-            case MOD:
-                return Utils.MOD;
+        case PLUS:
+            return Utils.PLUS;
+        case MINUS:
+            return Utils.MINUS;
+        case MUL:
+            return Utils.MUL;
+        case DIV:
+            return Utils.DIV;
+        case MOD:
+            return Utils.MOD;
 
-            case AND:
-                return Utils.AND;
-            case OR:
-                return Utils.OR;
+        case AND:
+            return Utils.AND;
+        case OR:
+            return Utils.OR;
 
-            case EQ:
-                return Utils.EQ;
-            case NE:
-                return Utils.NEQ;
-            case GE:
-                return Utils.GE;
-            case GT:
-                return Utils.GT;
-            case LE:
-                return Utils.LE;
-            case LT:
-                return Utils.LT;
-            default:
-                return null;
-            // TODO COMPLETE WITH MORE OPERANDS
+        case EQ:
+            return Utils.EQ;
+        case NE:
+            return Utils.NEQ;
+        case GE:
+            return Utils.GE;
+        case GT:
+            return Utils.GT;
+        case LE:
+            return Utils.LE;
+        case LT:
+            return Utils.LT;
+        default:
+            return null;
+        // TODO COMPLETE WITH MORE OPERANDS
         }
     }
 
     private Predicate getOperatorFromKind(UnaryOperatorKind kind, LogElement elem) throws ParsingException {
         String ret = null;
         switch (kind) {
-            case POSTINC:
-                ret = rtc.WILD_VAR + " + 1";
-                break;
-            case POSTDEC:
-                ret = rtc.WILD_VAR + " - 1";
-                break;
-            case PREINC:
-                ret = rtc.WILD_VAR + " + 1";
-                break;
-            case PREDEC:
-                ret = rtc.WILD_VAR + " - 1";
-                break;
-            case COMPL:
-                ret = "(32 & " + rtc.WILD_VAR + ")";
-                break;
-            case NOT:
-                ret = "!" + rtc.WILD_VAR;
-                break;
-            case POS:
-                ret = "0 + " + rtc.WILD_VAR;
-                break;
-            case NEG:
-                ret = "-" + rtc.WILD_VAR;
-                break;
-            default:
-                throw new ParsingException(kind + "operation not supported");
+        case POSTINC:
+            ret = rtc.WILD_VAR + " + 1";
+            break;
+        case POSTDEC:
+            ret = rtc.WILD_VAR + " - 1";
+            break;
+        case PREINC:
+            ret = rtc.WILD_VAR + " + 1";
+            break;
+        case PREDEC:
+            ret = rtc.WILD_VAR + " - 1";
+            break;
+        case COMPL:
+            ret = "(32 & " + rtc.WILD_VAR + ")";
+            break;
+        case NOT:
+            ret = "!" + rtc.WILD_VAR;
+            break;
+        case POS:
+            ret = "0 + " + rtc.WILD_VAR;
+            break;
+        case NEG:
+            ret = "-" + rtc.WILD_VAR;
+            break;
+        default:
+            throw new ParsingException(kind + "operation not supported");
         }
         return new Predicate(ret, elem, rtc.getErrorEmitter());
     }

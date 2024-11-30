@@ -220,8 +220,7 @@ public class VCChecker {
     }
 
     /**
-     * Checks the expectedType against the cSMT constraint. If the types do not
-     * check and error is sent and the program
+     * Checks the expectedType against the cSMT constraint. If the types do not check and error is sent and the program
      * ends
      *
      * @param cSMT
