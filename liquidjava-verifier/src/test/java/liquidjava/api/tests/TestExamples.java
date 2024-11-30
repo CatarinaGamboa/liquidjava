@@ -27,7 +27,7 @@ public class TestExamples {
     @MethodSource("fileNameSource")
     public void testFile(final Path filePath) {
         String fileName = filePath.getFileName().toString();
-        
+
         // 1. Run the verifier on the file or package
         ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
 
