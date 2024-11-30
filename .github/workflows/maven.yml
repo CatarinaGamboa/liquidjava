@@ -18,22 +18,38 @@ on:
 
 jobs:
   build:
-    name: Maven test on  Java ${{ matrix.Java }}
+    name: Maven test on Java ${{ matrix.java }}
     runs-on: ubuntu-latest
     env:
       SEGMENT_DOWNLOAD_TIMEOUT_MINS: '15'
     strategy:
       matrix:
         java: ['20']
-    steps:                  
-    # - name: Workflow Telemetry          
-    #   uses: runforesight/workflow-telemetry-action@v1.8.7
-    - uses: actions/checkout@v3
-    - name: Set up JDK 20
-      uses: actions/setup-java@v3
-      with:
-        java-version: ${{ matrix.java }}
-        distribution: 'adopt'
-        cache: maven
-    - name: Maven Tests
-      run: mvn  -B -X -e clean compile --file pom.xml  --batch-mode --fail-fast
+    steps:
+      # Checkout the repository code
+      - uses: actions/checkout@v3
+
+      # Set up JDK 20
+      - name: Set up JDK 20
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: 'temurin'
+          cache: maven
+
+      # Cache Maven dependencies (adjust cache key to optimize)
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}  # Cache dependencies based on pom.xml changes
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      # Build the project (compiles and packages the code)
+      - name: Build the project
+        run: mvn -B -X -e clean install --file pom.xml --batch-mode --fail-fast
+
+      # Run tests
+      - name: Run tests
+        run: mvn test -B -X -e --file pom.xml --batch-mode --fail-fast

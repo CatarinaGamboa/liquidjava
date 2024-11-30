@@ -10,7 +10,7 @@ import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
     public static void main(String[] args) {
-        String allPath = "../liquidjava-example/src/main/java/test/project";
+        String allPath = "./liquidjava-example/src/main/java/test/currentlyTesting";
 
         // String allPath = "C://Regen/test-projects/src/Main.java";
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
@@ -18,11 +18,8 @@ public class CommandLineLauncher {
         // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
         String file = args.length == 0 ? allPath : args[0];
         ErrorEmitter ee = launch(file);
-        if (ee.foundError()) {
-            System.out.println(ee.getFullMessage());
-            System.out.println("Before exit");
-            System.exit(ee.getErrorStatus());
-        }
+        System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
+
     }
 
     public static ErrorEmitter launchTest(String file) {

@@ -3,6 +3,8 @@ package liquidjava.processor.refinement_checker.object_checkers;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.logging.LogElement;
 import liquidjava.processor.context.*;
@@ -47,13 +49,38 @@ public class AuxStateHandler {
         }
     }
 
+    /**
+     * Creates the list of states and adds them to the function
+     *
+     * @param f
+     * @param anns
+     * @param tc
+     * @param element
+     * 
+     * @throws ParsingException
+     */
+    @SuppressWarnings({ "rawtypes" })
+    private static void setConstructorStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
+            TypeChecker tc, CtElement element) throws ParsingException {
+        List<ObjectState> l = new ArrayList<>();
+        for (CtAnnotation<? extends Annotation> an : anns) {
+            Map<String, CtExpression> m = an.getAllValues();
+            String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
+            ObjectState state = new ObjectState();
+            if (to != null)
+                state.setTo(new Predicate(to, new LogElement(element), tc.getErrorEmitter()));
+            l.add(state);
+        }
+        f.setAllStates(l);
+    }
+
     public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
         String[] path = f.getTargetClass().split("\\.");
         String klass = path[path.length - 1];
 
         Predicate[] s = { Predicate.createVar(tc.THIS) };
         Predicate c = new Predicate();
-        List<GhostFunction> sets = getDifferentSets(tc, klass);
+        List<GhostFunction> sets = getDifferentSets(tc, klass);// ??
         for (GhostFunction sg : sets) {
             if (sg.getReturnType().toString().equals("int")) {
                 Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s),
@@ -436,6 +463,25 @@ public class AuxStateHandler {
             // states);
         }
         return new Predicate();
+    }
+
+    /**
+     * Method prepared to change all old vars in a predicate, however it has not been needed yet
+     * 
+     * @param pred
+     * @param tc
+     * 
+     * @return
+     */
+    private static Predicate changeVarsFields(Predicate pred, TypeChecker tc) {
+        Predicate noOld = pred;
+        List<String> listVarsInOld = pred.getOldVariableNames();
+        for (String varInOld : listVarsInOld) {
+            Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(varInOld);
+            if (ovi.isPresent())
+                noOld = noOld.changeOldMentions(varInOld, ovi.get().getName(), tc.getErrorEmitter());
+        }
+        return noOld;
     }
 
     private static Predicate checkOldMentions(Predicate transitionedState, String instanceName, String newInstanceName,

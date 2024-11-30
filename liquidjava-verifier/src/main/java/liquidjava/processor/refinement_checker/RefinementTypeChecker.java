@@ -210,26 +210,26 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignement) {
+    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignment) {
         if (errorEmitter.foundError()) {
             return;
         }
 
-        super.visitCtAssignment(assignement);
-        CtExpression<T> ex = assignement.getAssigned();
+        super.visitCtAssignment(assignment);
+        CtExpression<T> ex = assignment.getAssigned();
 
         if (ex instanceof CtVariableWriteImpl) {
             CtVariableReference<?> var = ((CtVariableAccess<?>) ex).getVariable();
             CtVariable<T> varDecl = (CtVariable<T>) var.getDeclaration();
             String name = var.getSimpleName();
-            checkAssignment(name, varDecl.getType(), ex, assignement.getAssignment(), assignement, varDecl);
+            checkAssignment(name, varDecl.getType(), ex, assignment.getAssignment(), assignment, varDecl);
 
         } else if (ex instanceof CtFieldWrite) {
             CtFieldWrite<?> fw = ((CtFieldWrite<?>) ex);
             CtFieldReference<?> cr = fw.getVariable();
             CtField<?> f = fw.getVariable().getDeclaration();
             String updatedVarName = String.format(thisFormat, cr.getSimpleName());
-            checkAssignment(updatedVarName, cr.getType(), ex, assignement.getAssignment(), assignement, f);
+            checkAssignment(updatedVarName, cr.getType(), ex, assignment.getAssignment(), assignment, f);
 
             // corresponding ghost function update
             if (fw.getVariable().getType().toString().equals("int")) {
