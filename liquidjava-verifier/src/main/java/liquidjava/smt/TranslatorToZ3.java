@@ -21,7 +21,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import liquidjava.processor.context.AliasWrapper;
 
-public class TranslatorToZ3 {
+public class TranslatorToZ3 implements AutoCloseable {
 
     private com.microsoft.z3.Context z3 = new com.microsoft.z3.Context();
     private Map<String, Expr<?>> varTranslation = new HashMap<>();
@@ -37,7 +37,6 @@ public class TranslatorToZ3 {
         TranslatorContextToZ3.addGhostStates(z3, c.getGhostState(), funcTranslation);
     }
 
-    @SuppressWarnings("unchecked")
     public Status verifyExpression(Expr<?> e) throws Exception {
         Solver s = z3.mkSolver();
         // s.add((BoolExpr) e.eval(this));
@@ -265,5 +264,10 @@ public class TranslatorToZ3 {
         if (c instanceof BoolExpr)
             return z3.mkITE((BoolExpr) c, t, e);
         throw new RuntimeException("Condition is not a boolean expression");
+    }
+
+    @Override
+    public void close() throws Exception {
+        z3.close();
     }
 }
