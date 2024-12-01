@@ -47,7 +47,7 @@ public class Predicate {
      * @param ref
      * @param element
      * @param e
-     * 
+     *
      * @throws ParsingException
      */
     public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {

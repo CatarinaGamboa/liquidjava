@@ -224,7 +224,7 @@ public class VCChecker {
      *
      * @param cSMT
      * @param expectedType
-     * 
+     *
      * @throws Exception
      * @throws GhostFunctionError
      * @throws TypeCheckError
@@ -239,7 +239,7 @@ public class VCChecker {
      *
      * @param c
      * @param map
-     * 
+     *
      * @return
      */
     @SuppressWarnings("unused")

@@ -79,7 +79,7 @@ public class RefinedFunction extends Refined {
      * Gives the Predicate for a certain parameter index and regards all the previous parameters' Predicates
      *
      * @param index
-     * 
+     *
      * @return
      */
     public Predicate getRefinementsForParamIndex(int index) {

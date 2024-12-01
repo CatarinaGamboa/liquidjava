@@ -5,7 +5,7 @@ import liquidjava.specification.StateRefinement;
 import liquidjava.specification.StateSet;
 @StateSet({"green", "amber", "red"})
 public class CorrectTrafficLightRGB {
-    
+
 	@Refinement("r >= 0 && r <= 255") int r;
 
 	@Refinement("g >= 0 && g <= 255") int g;

@@ -8,7 +8,7 @@ import liquidjava.specification.Refinement;
 public class Test {
   public static void main(String[] args) throws Exception {
     // Arrays are not well supported in LiquidJava
-    
+
     // InputStreamReader isr = new InputStreamReader(new FileInputStream("test1.txt"));
     // @Refinement("_ > -9")
     // int a = isr.read();

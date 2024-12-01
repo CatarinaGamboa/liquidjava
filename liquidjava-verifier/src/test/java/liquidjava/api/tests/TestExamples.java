@@ -19,7 +19,7 @@ public class TestExamples {
     /**
      * Test the file at the given path by launching the verifier and checking for errors. The file/directory is expected
      * to be either correct or contain an error based on its name.
-     * 
+     *
      * @param filePath
      *            path to the file to test
      */
@@ -48,9 +48,9 @@ public class TestExamples {
     /**
      * Returns a Stream of paths to test files in the testSuite directory. These include files with names starting with
      * "Correct" or "Error", and directories containing "correct" or "error".
-     * 
+     *
      * @return Stream of paths to test files
-     * 
+     *
      * @throws IOException
      *             if an I/O error occurs or the path does not exist
      */
