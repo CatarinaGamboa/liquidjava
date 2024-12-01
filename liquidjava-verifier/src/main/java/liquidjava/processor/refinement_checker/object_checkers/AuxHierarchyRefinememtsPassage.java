@@ -185,7 +185,7 @@ public class AuxHierarchyRefinememtsPassage {
      * @param superFunction
      * @param subFunction
      * @param c
-     * 
+     *
      * @return
      */
     private static Predicate matchVariableNames(String fromName, String thisName, RefinedFunction superFunction,

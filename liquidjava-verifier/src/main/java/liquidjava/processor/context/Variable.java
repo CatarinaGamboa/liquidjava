@@ -137,7 +137,7 @@ public class Variable extends RefinedVariable {
      * @param counter
      *            A number to create a new variable name
      * @param cond
-     * 
+     *
      * @return A new VariableInfo created by the combination of refinements or an empty Optional
      */
     Optional<VariableInstance> getIfInstanceCombination(int counter, Predicate cond) {
@@ -181,7 +181,7 @@ public class Variable extends RefinedVariable {
      * @param nName
      * @param cond
      * @param ifThen
-     * 
+     *
      * @return
      */
     private Predicate createITEConstraint(String nName, Predicate cond, VariableInstance then) {

@@ -135,9 +135,9 @@ public class MethodsFunctionsChecker {
      * @param f
      * @param methodRef
      * @param params
-     * 
+     *
      * @return Conjunction of all
-     * 
+     *
      * @throws ParsingException
      */
     private Predicate handleFunctionRefinements(RefinedFunction f, CtElement method, List<CtParameter<?>> params)

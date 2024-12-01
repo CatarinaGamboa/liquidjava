@@ -26,9 +26,9 @@ public class RefinementsParser {
      * The triple information of the ghost declaration in the order <type, name, list<type,name>>
      *
      * @param s
-     * 
+     *
      * @return
-     * 
+     *
      * @throws ParsingException
      */
     public static GhostDTO getGhostDeclaration(String s) throws ParsingException {
@@ -86,7 +86,7 @@ public class RefinementsParser {
      * First passage to check if there are syntax errors
      *
      * @param toParse
-     * 
+     *
      * @return
      */
     private static Optional<String> getErrors(String toParse) {

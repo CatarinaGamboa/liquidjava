@@ -55,7 +55,7 @@ public class OperationsChecker {
      *
      * @param <T>
      * @param operator
-     * 
+     *
      * @throws ParsingException
      */
     public <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) throws ParsingException {
@@ -100,7 +100,7 @@ public class OperationsChecker {
      *
      * @param <T>
      * @param operator
-     * 
+     *
      * @throws ParsingException
      */
     @SuppressWarnings({ "unchecked" })
@@ -162,9 +162,9 @@ public class OperationsChecker {
      *
      * @param operator
      * @param element
-     * 
+     *
      * @return String with the operation refinements
-     * 
+     *
      * @throws ParsingException
      */
     private Predicate getOperationRefinements(CtBinaryOperator<?> operator, CtExpression<?> element)
@@ -181,9 +181,9 @@ public class OperationsChecker {
      *            Parent of Binary Operator, usually a CtAssignment or CtLocalVariable
      * @param element
      *            CtExpression that represent an Binary Operation or one of the operands
-     * 
+     *
      * @return Predicate with the operation refinements
-     * 
+     *
      * @throws ParsingException
      */
     private Predicate getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWrite<?> parentVar,
@@ -305,9 +305,9 @@ public class OperationsChecker {
      * @param operator
      * @param w
      * @param name
-     * 
+     *
      * @return String with the refinements
-     * 
+     *
      * @throws ParsingException
      */
     private <T> Predicate getRefinementUnaryVariableWrite(CtExpression<T> ex, CtUnaryOperator<T> operator,
@@ -332,7 +332,7 @@ public class OperationsChecker {
      * Get the String value of the operator from the enum
      *
      * @param kind
-     * 
+     *
      * @return
      */
     private String getOperatorFromKind(BinaryOperatorKind kind) {

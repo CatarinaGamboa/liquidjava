@@ -26,7 +26,7 @@ public class AuxStateHandler {
      * @param c
      * @param f
      * @param tc
-     * 
+     *
      * @throws ParsingException
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -55,7 +55,7 @@ public class AuxStateHandler {
      * @param anns
      * @param tc
      * @param element
-     * 
+     *
      * @throws ParsingException
      */
     @SuppressWarnings({ "rawtypes" })
@@ -119,7 +119,7 @@ public class AuxStateHandler {
      * @param method
      * @param f
      * @param tc
-     * 
+     *
      * @throws ParsingException
      */
     public static void handleMethodState(CtMethod<?> method, RefinedFunction f, TypeChecker tc)
@@ -139,7 +139,7 @@ public class AuxStateHandler {
      * @param anns
      * @param tc
      * @param element
-     * 
+     *
      * @throws ParsingException
      */
     private static void setFunctionStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
@@ -224,7 +224,7 @@ public class AuxStateHandler {
      * @param th
      * @param sets
      * @param tc
-     * 
+     *
      * @return
      */
     private static Predicate addOldStates(Predicate p, Predicate th, List<GhostFunction> sets, TypeChecker tc) {
@@ -401,7 +401,7 @@ public class AuxStateHandler {
      * @param name
      * @param map
      * @param invocation
-     * 
+     *
      * @return
      */
     private static Predicate changeState(TypeChecker tc, VariableInstance vi,
@@ -463,10 +463,10 @@ public class AuxStateHandler {
 
     /**
      * Method prepared to change all old vars in a predicate, however it has not been needed yet
-     * 
+     *
      * @param pred
      * @param tc
-     * 
+     *
      * @return
      */
     private static Predicate changeVarsFields(Predicate pred, TypeChecker tc) {
@@ -492,7 +492,7 @@ public class AuxStateHandler {
      * @param variableInstance
      * @param name
      * @param invocation
-     * 
+     *
      * @return
      */
     private static Predicate sameState(TypeChecker tc, VariableInstance variableInstance, String name,
@@ -521,7 +521,7 @@ public class AuxStateHandler {
      * @param prevInstance
      * @param transitionedState
      * @param invocation
-     * 
+     *
      * @return
      */
     private static String addInstanceWithState(TypeChecker tc, String superName, String name2,
@@ -552,7 +552,7 @@ public class AuxStateHandler {
      * Gets the name of the parent target and adds the closest target to the elem TARGET metadata
      *
      * @param invocation
-     * 
+     *
      * @return
      */
     static String searchFistVariableTarget(TypeChecker tc, CtElement target2, CtElement invocation) {

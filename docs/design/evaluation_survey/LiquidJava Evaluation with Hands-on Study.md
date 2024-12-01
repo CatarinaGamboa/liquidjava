@@ -65,7 +65,7 @@ For each write the line with the error, the error and how to fix it
 
 Share registration survey
 
-- Background data ~~ to 1st survey 
+- Background data ~~ to 1st survey
   - only accept people familiar/very familiar with Java
   - Did you contact with LiquidJava before?
 - Send available date and time for 1h of synchronized study-session, via zoom
@@ -89,44 +89,44 @@ Make a correct and an incorrect use of the annotated code.
   int x;
   ```
 
-  
 
-- Method annotated - parameters and return. *(Average with parameters dependency)* 
+
+- Method annotated - parameters and return. *(Average with parameters dependency)*
   Write a correct and an incorrect invocation of function1.
 
   ```java
   @Refinement("_ >= 0")
   public static double function1(
-  	@Refinement("a >= 0") double a, 
+  	@Refinement("a >= 0") double a,
   	@Refinement("b >= a") double b){
   	return (a + b)/2;
   }
   ```
-  
+
 - Object State - Vending Machine idea: showing products -> product selected -> pay -> show products
 Write a correct and incorrect sequence of invocations on the object MyObj
-  
+
   ```java
   @StateSet({"sX", "sY", "sZ"})
   public class MyObj {
-  
+
    	@StateRefinement(to="sY(this)")
 		public MyObj() {}
-		
+
 		@StateRefinement(from="sY(this)", to="sX(this)")
 		public void select(int number) {}
-		
+
 		@StateRefinement(from="sX(this)", to="sZ(this)")
 		public void pay(int account) {	}
-		
+
 		@StateRefinement(from="sY(this)", to="sX(this)")
 		@StateRefinement(from="sZ(this)", to="sX(this)")
 		public void show() { }
   }
-  
+
   ```
 
-  
+
 ## PART 2 : Overview
 
 Brief introduction to LiquidJava and how to use Refinements in Java.
@@ -143,7 +143,7 @@ Off-video:
 
 ### 3.1 Plain Java Code
 
-Open project without liquid Java. 
+Open project without liquid Java.
 
 Each file contains a bug, try to locate it without running the code.
 
@@ -155,7 +155,7 @@ For each file answer:
 
 ### 3.2 Liquid Java Code
 
-Open project that contains the liquid-java-api jar and the files already annotated. 
+Open project that contains the liquid-java-api jar and the files already annotated.
 
 Each file contains a bug, try to locate it without running the code.
 
@@ -194,11 +194,11 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     			  return n + t1;
     		  }
       	}
-        
+
     }
     ```
 
-    
+
 
   * Pair 2/2 - *Fibonacci*
 
@@ -208,7 +208,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
         /**
         * Computes the fibonacci of index n
         * @param n The index of the required fibonnaci number
-        * @return The fibonacci nth number. The fibonacci sequence follows the formula Fn = Fn-1 + Fn-2 and has the starting values of F0 = 1 and F1 = 1 
+        * @return The fibonacci nth number. The fibonacci sequence follows the formula Fn = Fn-1 + Fn-2 and has the starting values of F0 = 1 and F1 = 1
         */
         @Refinement( "_ >= 1 && GreaterEqualThan(_, n)")
         public static int fibonacci(@Refinement("Nat(n)") int n){
@@ -220,7 +220,7 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     }
     ```
 
-    
+
 
 * **3** - State error (using external libs annotated)
 
@@ -228,11 +228,11 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
 
     ```java
     class Test3 {
-    
+
       public void createSocket(InetSocketAddress addr) throws IOException{
             int port = 5000;
-            InetAddress inetAddress = InetAddress.getByName("localhost");    
-    		
+            InetAddress inetAddress = InetAddress.getByName("localhost");
+
             Socket socket = new Socket();
             socket.bind(new InetSocketAddress(inetAddress, port));
             //missing socket.connect(addr);
@@ -246,30 +246,30 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     @ExternalRefinementsFor("java.net.Socket")
     @StateSet({"unconnected", "binded", "connected", "closed"})
     public interface SocketRefinements {
-        
+
     	@StateRefinement(to="unconnected(this)")
     	public void Socket();
-    	
+
     	@StateRefinement(from="unconnected(this)",to="binded(this)")
     	public void bind(SocketAddress add);
-    	
+
     	@StateRefinement(from="binded(this)", to="connected(this)")
     	public void connect(SocketAddress add);
-    	
+
     	@StateRefinement(from="connected(this)")
     	public void sendUrgentData(int n);
-    	
+
     	@StateRefinement(to="closed(this)")
     	public void close();
-    
+
     }
     ```
-  	
+
    * Pair 2/2 - ArrayDeque - To use ghost field size to model the object state (https://docs.oracle.com/javase/7/docs/api/java/util/ArrayDeque.html)
 
     ```java
     class Test3 {
-    
+
       public static void main(String[] args) throws IOException{
           ArrayDeque<Integer> p = new ArrayDeque<>();
           p.add(2);
@@ -286,42 +286,42 @@ This exercises will be grouped in pairs. For each participant, one of the exerci
     ```
 
     ```java
-  
+
   @ExternalRefinementsFor("java.util.ArrayDeque")
   @Ghost("int size")
   public interface ArrayDequeRefinements<E> {
-  
+
   	public void ArrayDeque();
-  
+
   	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
   	public boolean add(E elem);
-  
+
   	@StateRefinement(to="size(this) == (size(old(this)) + 1)")
   	public boolean offerFirst(E elem);
-  
+
   	@StateRefinement(from="size(this) > 0", to = "size(this) == (size(old(this)))")
   	public E getFirst();
-  
+
   	@StateRefinement(from="size(this) > 0", to = "size(this) == (size(old(this)))")
   	public E getLast();
-  
+
   	@StateRefinement(from="size(this)> 0", to="size(this) == (size(old(this)) - 1)")
   	public void remove();
-  
+
   	@StateRefinement(from="size(this)> 0", to="size(this) == (size(old(this)) - 1)")
   	public E pop();
-  
+
   	@Refinement("_ == size(this)")
   	public int size();
-  
+
   	@Refinement("_ == (size(this) <= 0)")
   	public boolean isEmpty();
-  
+
   }
-  
+
     ```
 
-    
+
 
 
 
@@ -337,7 +337,7 @@ Each package contains a program to annotate and 2 files with tests (one that sho
   ```java
   /* A month needs to have a value between 1 and 12*/
   int currentMonth;
-  
+
   currentMonth = 13;
   currentMonth = 5;
   ```
@@ -355,7 +355,7 @@ Each package contains a program to annotate and 2 files with tests (one that sho
       public static int inRange(int a, int b){
           return a + 1;
       }
-  
+
       public static void main(String[] args) {
           inRange(10, 11); //Correct
           inRange(10, 9); //Error
@@ -369,27 +369,27 @@ Each package contains a program to annotate and 2 files with tests (one that sho
 
   ```java
   public class TrafficLight {
-  	
-  	int r; 	
-  	int g; 	
+
+  	int r;
+  	int g;
   	int b;
-  	
+
   	public TrafficLight() {
-  		r = 255; g = 0; b = 0; 
+  		r = 255; g = 0; b = 0;
   	}
-  	
+
   	public void transitionToAmber() {
   		r = 255; g = 120; b = 0;
   	}
-  	
+
   	public void transitionToGreen() {
-  		r = 76; g = 187; b = 23; 
+  		r = 76; g = 187; b = 23;
   	}
-  	
+
   	public void transitionToRed() {
-  		r = 230; g = 0; b = -1; 
+  		r = 230; g = 0; b = -1;
   	}
-  
+
   }
   ```
 
@@ -399,9 +399,9 @@ Each package contains a program to annotate and 2 files with tests (one that sho
   - [Optional] What did you dislike the most while using LiquidJava?
   - Would you use LiquidJava in your projects?
 
-    
-        
-        
+
+
+
 ## EXTRA METHODS - NOT USED
 
 * **1** - Incorrect Invocation Simple Arithmetics
@@ -410,13 +410,13 @@ Each package contains a program to annotate and 2 files with tests (one that sho
 
     ```java
     public class Test3 {
-        public static double divide(double numerator, 
+        public static double divide(double numerator,
                        @Refinement("denominator != 0")double denominator){
     		return numerator/denominator;
     	}
-    
+
     	public static void main(String[] args) {
-    		double a; 
+    		double a;
     		a = divide(10, 5);
     		a = divide(50, -10+5);
     		a = divide(800, 2*30-60);
@@ -426,29 +426,29 @@ Each package contains a program to annotate and 2 files with tests (one that sho
     }
     ```
 
-    
+
 
   * Part 2/2 - *Average Price - only positives*
 
     ```java
     public class Test3 {
     	public static double averagePrice(
-    		@Refinement("price1 >= 0") double price1, 
+    		@Refinement("price1 >= 0") double price1,
     		@Refinement("price2 >= 0") double price2){
     		return (price1 + price2)/2;
     	}
     	public static void main(String[] args) {
-    		double b; 
+    		double b;
     		b = averagePrice(10, 5);
     		b = averagePrice(50, -10+15);
     		b = averagePrice(800, 2*30-60);
         b = averagePrice(1952*-2, 20-10);
-    		b = averagePrice(5*5*5, -5*-1);	
+    		b = averagePrice(5*5*5, -5*-1);
     	}
     }
     ```
-  
-  
+
+
   * Pair 1/2 - *Absolute*
 
   ```java
@@ -483,11 +483,7 @@ Each package contains a program to annotate and 2 files with tests (one that sho
             if(a > b) //correct: change signal
                 return b;
             else
-                return a; 
+                return a;
         }
     }
     ```
-
-    
-
-    
