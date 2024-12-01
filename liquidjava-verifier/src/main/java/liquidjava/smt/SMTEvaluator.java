@@ -20,13 +20,16 @@ public class SMTEvaluator {
 
         try {
             Expression exp = toVerify.getExpression();
-            TranslatorToZ3 tz3 = new TranslatorToZ3(c);
-            // com.microsoft.z3.Expr
-            Expr<?> e = exp.eval(tz3);
-            Status s = tz3.verifyExpression(e);
-            if (s.equals(Status.SATISFIABLE)) {
-                // System.out.println("result of SMT: Not Ok!");
-                throw new TypeCheckError(subRef + " not a subtype of " + supRef);
+            Status s;
+            try (TranslatorToZ3 tz3 = new TranslatorToZ3(c)) {
+                // com.microsoft.z3.Expr
+                Expr<?> e = exp.eval(tz3);
+                s = tz3.verifyExpression(e);
+
+                if (s.equals(Status.SATISFIABLE)) {
+                    // System.out.println("result of SMT: Not Ok!");
+                    throw new TypeCheckError(subRef + " not a subtype of " + supRef);
+                }
             }
             // System.out.println("result of SMT: Ok!");
 
