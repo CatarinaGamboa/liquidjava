@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 @Repeatable(RefinementPredicateMultiple.class)
 public @interface RefinementPredicate {
-  public String value();
+    public String value();
 }

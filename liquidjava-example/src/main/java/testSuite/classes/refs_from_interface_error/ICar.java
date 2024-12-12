@@ -5,5 +5,5 @@ import liquidjava.specification.RefinementAlias;
 
 @RefinementAlias("IntBetween(int val, int lo, int hi) { lo <= val && val <= hi}")
 public interface ICar {
-  public void setYear(@Refinement("IntBetween(_, 1600, 2050)") int y);
+    public void setYear(@Refinement("IntBetween(_, 1600, 2050)") int y);
 }

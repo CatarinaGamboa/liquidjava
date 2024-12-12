@@ -16,7 +16,6 @@ import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.NotImplementedException;
-
 import rj.grammar.RJParser.AliasCallContext;
 import rj.grammar.RJParser.ArgsContext;
 import rj.grammar.RJParser.ExpBoolContext;
@@ -57,59 +56,52 @@ import rj.grammar.RJParser.VarContext;
 public class CreateASTVisitor {
 
     public static Expression create(ParseTree rc) {
-        if (rc instanceof ProgContext)
-            return progCreate((ProgContext) rc);
-        else if (rc instanceof StartContext)
-            return startCreate(rc);
-        else if (rc instanceof PredContext)
-            return predCreate(rc);
-        else if (rc instanceof ExpContext)
-            return expCreate(rc);
-        else if (rc instanceof OperandContext)
-            return operandCreate(rc);
-        else if (rc instanceof LiteralExpressionContext)
-            return literalExpressionCreate(rc);
-        else if (rc instanceof FunctionCallContext)
-            return functionCallCreate((FunctionCallContext) rc);
-        else if (rc instanceof LiteralContext)
-            return literalCreate((LiteralContext) rc);
+        if (rc instanceof ProgContext) return progCreate((ProgContext) rc);
+        else if (rc instanceof StartContext) return startCreate(rc);
+        else if (rc instanceof PredContext) return predCreate(rc);
+        else if (rc instanceof ExpContext) return expCreate(rc);
+        else if (rc instanceof OperandContext) return operandCreate(rc);
+        else if (rc instanceof LiteralExpressionContext) return literalExpressionCreate(rc);
+        else if (rc instanceof FunctionCallContext) return functionCallCreate((FunctionCallContext) rc);
+        else if (rc instanceof LiteralContext) return literalCreate((LiteralContext) rc);
 
         return null;
     }
 
     private static Expression progCreate(ProgContext rc) {
-        if (rc.start() != null)
-            return create(rc.start());
+        if (rc.start() != null) return create(rc.start());
         return null;
     }
 
     private static Expression startCreate(ParseTree rc) {
-        if (rc instanceof StartPredContext)
-            return create(((StartPredContext) rc).pred());
+        if (rc instanceof StartPredContext) return create(((StartPredContext) rc).pred());
         // alias and ghost do not have evaluation
         return null;
     }
 
     private static Expression predCreate(ParseTree rc) {
-        if (rc instanceof PredGroupContext)
-            return new GroupExpression(create(((PredGroupContext) rc).pred()));
+        if (rc instanceof PredGroupContext) return new GroupExpression(create(((PredGroupContext) rc).pred()));
         else if (rc instanceof PredNegateContext)
             return new UnaryExpression("!", create(((PredNegateContext) rc).pred()));
         else if (rc instanceof PredLogicContext)
-            return new BinaryExpression(create(((PredLogicContext) rc).pred(0)),
-                    ((PredLogicContext) rc).LOGOP().getText(), create(((PredLogicContext) rc).pred(1)));
+            return new BinaryExpression(
+                    create(((PredLogicContext) rc).pred(0)),
+                    ((PredLogicContext) rc).LOGOP().getText(),
+                    create(((PredLogicContext) rc).pred(1)));
         else if (rc instanceof IteContext)
-            return new Ite(create(((IteContext) rc).pred(0)), create(((IteContext) rc).pred(1)),
+            return new Ite(
+                    create(((IteContext) rc).pred(0)),
+                    create(((IteContext) rc).pred(1)),
                     create(((IteContext) rc).pred(2)));
-        else
-            return create(((PredExpContext) rc).exp());
+        else return create(((PredExpContext) rc).exp());
     }
 
     private static Expression expCreate(ParseTree rc) {
-        if (rc instanceof ExpGroupContext)
-            return new GroupExpression(create(((ExpGroupContext) rc).exp()));
+        if (rc instanceof ExpGroupContext) return new GroupExpression(create(((ExpGroupContext) rc).exp()));
         else if (rc instanceof ExpBoolContext) {
-            return new BinaryExpression(create(((ExpBoolContext) rc).exp(0)), ((ExpBoolContext) rc).BOOLOP().getText(),
+            return new BinaryExpression(
+                    create(((ExpBoolContext) rc).exp(0)),
+                    ((ExpBoolContext) rc).BOOLOP().getText(),
                     create(((ExpBoolContext) rc).exp(1)));
         } else {
             ExpOperandContext eoc = (ExpOperandContext) rc;
@@ -118,20 +110,18 @@ public class CreateASTVisitor {
     }
 
     private static Expression operandCreate(ParseTree rc) {
-        if (rc instanceof OpLiteralContext)
-            return create(((OpLiteralContext) rc).literalExpression());
+        if (rc instanceof OpLiteralContext) return create(((OpLiteralContext) rc).literalExpression());
         else if (rc instanceof OpArithContext)
-            return new BinaryExpression(create(((OpArithContext) rc).operand(0)),
-                    ((OpArithContext) rc).ARITHOP().getText(), create(((OpArithContext) rc).operand(1)));
+            return new BinaryExpression(
+                    create(((OpArithContext) rc).operand(0)),
+                    ((OpArithContext) rc).ARITHOP().getText(),
+                    create(((OpArithContext) rc).operand(1)));
         else if (rc instanceof OpSubContext)
-            return new BinaryExpression(create(((OpSubContext) rc).operand(0)), "-",
-                    create(((OpSubContext) rc).operand(1)));
-        else if (rc instanceof OpMinusContext)
-            return new UnaryExpression("-", create(((OpMinusContext) rc).operand()));
-        else if (rc instanceof OpNotContext)
-            return new UnaryExpression("!", create(((OpNotContext) rc).operand()));
-        else if (rc instanceof OpGroupContext)
-            return new GroupExpression(create(((OpGroupContext) rc).operand()));
+            return new BinaryExpression(
+                    create(((OpSubContext) rc).operand(0)), "-", create(((OpSubContext) rc).operand(1)));
+        else if (rc instanceof OpMinusContext) return new UnaryExpression("-", create(((OpMinusContext) rc).operand()));
+        else if (rc instanceof OpNotContext) return new UnaryExpression("!", create(((OpNotContext) rc).operand()));
+        else if (rc instanceof OpGroupContext) return new GroupExpression(create(((OpGroupContext) rc).operand()));
         assert false;
         return null;
     }
@@ -139,8 +129,7 @@ public class CreateASTVisitor {
     private static Expression literalExpressionCreate(ParseTree rc) {
         if (rc instanceof LitGroupContext)
             return new GroupExpression(create(((LitGroupContext) rc).literalExpression()));
-        else if (rc instanceof LitContext)
-            return create(((LitContext) rc).literal());
+        else if (rc instanceof LitContext) return create(((LitContext) rc).literal());
         else if (rc instanceof VarContext) {
             return new Var(((VarContext) rc).ID().getText());
         } else if (rc instanceof TargetInvocationContext) {

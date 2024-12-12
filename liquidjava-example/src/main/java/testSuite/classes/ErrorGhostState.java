@@ -8,6 +8,6 @@ import liquidjava.specification.StateSet;
 @Ghost("int totalPrice(int x)") // Should have no parameters
 public class ErrorGhostState {
 
-  @StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
-  public ErrorGhostState() {}
+    @StateRefinement(to = "(totalPrice(this) == 0) && empty(this)")
+    public ErrorGhostState() {}
 }

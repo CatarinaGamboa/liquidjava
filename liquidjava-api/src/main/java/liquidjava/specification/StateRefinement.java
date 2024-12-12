@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.CONSTRUCTOR})
 @Repeatable(StateRefinementMultiple.class)
 public @interface StateRefinement {
-  public String from() default "";
+    public String from() default "";
 
-  public String to() default "";
+    public String to() default "";
 }

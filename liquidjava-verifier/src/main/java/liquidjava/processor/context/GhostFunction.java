@@ -24,8 +24,13 @@ public class GhostFunction {
         }
     }
 
-    public GhostFunction(String name, List<String> param_types, CtTypeReference<?> return_type, Factory factory,
-            String path, String klass) {
+    public GhostFunction(
+            String name,
+            List<String> param_types,
+            CtTypeReference<?> return_type,
+            Factory factory,
+            String path,
+            String klass) {
         this.name = name;
         this.return_type = Utils.getType(return_type.toString().equals(klass) ? path : return_type.toString(), factory);
         this.param_types = new ArrayList<>();

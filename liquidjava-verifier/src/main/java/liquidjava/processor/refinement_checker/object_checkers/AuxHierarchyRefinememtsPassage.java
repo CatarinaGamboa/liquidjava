@@ -18,8 +18,8 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class AuxHierarchyRefinememtsPassage {
 
-    public static <R> void checkFunctionInSupertypes(CtClass<?> klass, CtMethod<R> method, RefinedFunction f,
-            TypeChecker tc) {
+    public static <R> void checkFunctionInSupertypes(
+            CtClass<?> klass, CtMethod<R> method, RefinedFunction f, TypeChecker tc) {
         String name = method.getSimpleName();
         int size = method.getParameters().size();
         if (klass.getSuperInterfaces().size() > 0) { // implemented interfaces
@@ -37,25 +37,30 @@ public class AuxHierarchyRefinememtsPassage {
         }
     }
 
-    static void transferRefinements(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method,
-            TypeChecker tc) {
+    static void transferRefinements(
+            RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method, TypeChecker tc) {
         HashMap<String, String> super2function = getParametersMap(superFunction, function, tc, method);
         transferReturnRefinement(superFunction, function, method, tc, super2function);
         transferArgumentsRefinements(superFunction, function, method, tc, super2function);
         transferStateRefinements(superFunction, function, method, tc);
     }
 
-    private static HashMap<String, String> getParametersMap(RefinedFunction superFunction, RefinedFunction function,
-            TypeChecker tc, CtMethod<?> method) {
+    private static HashMap<String, String> getParametersMap(
+            RefinedFunction superFunction, RefinedFunction function, TypeChecker tc, CtMethod<?> method) {
         List<Variable> superArgs = superFunction.getArguments();
         List<Variable> fArgs = function.getArguments();
         HashMap<String, String> m = new HashMap<String, String>();
         for (int i = 0; i < fArgs.size(); i++) {
-            String newName = String.format(tc.instanceFormat, fArgs.get(i).getName(), tc.getContext().getCounter());
+            String newName = String.format(
+                    tc.instanceFormat, fArgs.get(i).getName(), tc.getContext().getCounter());
             m.put(superArgs.get(i).getName(), newName);
             m.put(fArgs.get(i).getName(), newName);
-            RefinedVariable rv = tc.getContext().addVarToContext(newName, superArgs.get(i).getType(), new Predicate(),
-                    method.getParameters().get(i));
+            RefinedVariable rv = tc.getContext()
+                    .addVarToContext(
+                            newName,
+                            superArgs.get(i).getType(),
+                            new Predicate(),
+                            method.getParameters().get(i));
             for (CtTypeReference<?> t : fArgs.get(i).getSuperTypes()) {
                 rv.addSuperType(t);
             }
@@ -63,8 +68,12 @@ public class AuxHierarchyRefinememtsPassage {
         return m;
     }
 
-    static void transferArgumentsRefinements(RefinedFunction superFunction, RefinedFunction function,
-            CtMethod<?> method, TypeChecker tc, HashMap<String, String> super2function) {
+    static void transferArgumentsRefinements(
+            RefinedFunction superFunction,
+            RefinedFunction function,
+            CtMethod<?> method,
+            TypeChecker tc,
+            HashMap<String, String> super2function) {
         List<Variable> superArgs = superFunction.getArguments();
         List<Variable> args = function.getArguments();
         List<CtParameter<?>> params = method.getParameters();
@@ -82,19 +91,21 @@ public class AuxHierarchyRefinememtsPassage {
                 boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i).getPosition());
                 if (!f) {
                     // ErrorPrinter.printError(method, argRef, superArgRef);
-                    if (!tc.getErrorEmitter().foundError())
-                        tc.createError(method, argRef, superArgRef, "");
+                    if (!tc.getErrorEmitter().foundError()) tc.createError(method, argRef, superArgRef, "");
                 }
             }
         }
     }
 
-    static void transferReturnRefinement(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method,
-            TypeChecker tc, HashMap<String, String> super2function) {
+    static void transferReturnRefinement(
+            RefinedFunction superFunction,
+            RefinedFunction function,
+            CtMethod<?> method,
+            TypeChecker tc,
+            HashMap<String, String> super2function) {
         Predicate functionRef = function.getRefinement();
         Predicate superRef = superFunction.getRefinement();
-        if (functionRef.isBooleanTrue())
-            function.setRefinement(superRef);
+        if (functionRef.isBooleanTrue()) function.setRefinement(superRef);
         else {
             String name = String.format(tc.freshFormat, tc.getContext().getCounter());
             tc.getContext().addVarToContext(name, superFunction.getType(), new Predicate(), method);
@@ -102,12 +113,14 @@ public class AuxHierarchyRefinememtsPassage {
             // functionRef)
             functionRef = functionRef.substituteVariable(tc.WILD_VAR, name);
             superRef = superRef.substituteVariable(tc.WILD_VAR, name);
-            for (String m : super2function.keySet())
-                superRef = superRef.substituteVariable(m, super2function.get(m));
+            for (String m : super2function.keySet()) superRef = superRef.substituteVariable(m, super2function.get(m));
             for (String m : super2function.keySet())
                 functionRef = functionRef.substituteVariable(m, super2function.get(m));
 
-            tc.checkStateSMT(functionRef, superRef, method,
+            tc.checkStateSMT(
+                    functionRef,
+                    superRef,
+                    method,
                     "Return Refinement of Subclass must be subtype of the Return Refinement of the" + " Superclass");
             // boolean f = tc.checkStateSMT(functionRef, superRef, method);
             // if(!f)
@@ -115,24 +128,23 @@ public class AuxHierarchyRefinememtsPassage {
         }
     }
 
-    static Optional<RefinedFunction> functionInInterface(CtClass<?> klass, String simpleName, int size,
-            TypeChecker tc) {
+    static Optional<RefinedFunction> functionInInterface(
+            CtClass<?> klass, String simpleName, int size, TypeChecker tc) {
         List<RefinedFunction> lrf = tc.getContext().getAllMethodsWithNameSize(simpleName, size);
-        List<String> st = klass.getSuperInterfaces().stream().map(p -> p.getQualifiedName())
+        List<String> st = klass.getSuperInterfaces().stream()
+                .map(p -> p.getQualifiedName())
                 .collect(Collectors.toList());
         for (RefinedFunction rf : lrf) {
-            if (st.contains(rf.getTargetClass()))
-                return Optional.of(rf); // TODO only works for 1 interface
+            if (st.contains(rf.getTargetClass())) return Optional.of(rf); // TODO only works for 1 interface
         }
         return Optional.empty();
     }
 
-    private static void transferStateRefinements(RefinedFunction superFunction, RefinedFunction subFunction,
-            CtMethod<?> method, TypeChecker tc) {
+    private static void transferStateRefinements(
+            RefinedFunction superFunction, RefinedFunction subFunction, CtMethod<?> method, TypeChecker tc) {
         if (superFunction.hasStateChange()) {
             if (!subFunction.hasStateChange()) {
-                for (ObjectState o : superFunction.getAllStates())
-                    subFunction.addStates(o.clone());
+                for (ObjectState o : superFunction.getAllStates()) subFunction.addStates(o.clone());
             } else {
                 List<ObjectState> superStates = superFunction.getAllStates();
                 List<ObjectState> subStates = subFunction.getAllStates();
@@ -140,15 +152,24 @@ public class AuxHierarchyRefinememtsPassage {
                     ObjectState superState = superStates.get(i);
                     ObjectState subState = subStates.get(i);
 
-                    String thisName = String.format(tc.freshFormat, tc.getContext().getCounter());
-                    createVariableInContext(thisName, tc, subFunction, superFunction, method.getParameters().get(i));
+                    String thisName =
+                            String.format(tc.freshFormat, tc.getContext().getCounter());
+                    createVariableInContext(
+                            thisName,
+                            tc,
+                            subFunction,
+                            superFunction,
+                            method.getParameters().get(i));
 
                     Predicate superConst = matchVariableNames(tc.THIS, thisName, superState.getFrom());
-                    Predicate subConst = matchVariableNames(tc.THIS, thisName, superFunction, subFunction,
-                            subState.getFrom());
+                    Predicate subConst =
+                            matchVariableNames(tc.THIS, thisName, superFunction, subFunction, subState.getFrom());
 
                     // fromSup <: fromSub <==> fromSup is sub type and fromSub is expectedType
-                    tc.checkStateSMT(superConst, subConst, method,
+                    tc.checkStateSMT(
+                            superConst,
+                            subConst,
+                            method,
                             "FROM State from Superclass must be subtype of FROM State from Subclass");
                     // boolean correct = tc.checkStateSMT(superConst, subConst, method);
                     // if(!correct) ErrorPrinter.printError(method, subState.getFrom(),
@@ -157,7 +178,10 @@ public class AuxHierarchyRefinememtsPassage {
                     superConst = matchVariableNames(tc.THIS, thisName, superState.getTo());
                     subConst = matchVariableNames(tc.THIS, thisName, superFunction, subFunction, subState.getTo());
                     // toSub <: toSup <==> ToSub is sub type and toSup is expectedType
-                    tc.checkStateSMT(subConst, superConst, method,
+                    tc.checkStateSMT(
+                            subConst,
+                            superConst,
+                            method,
                             "TO State from Subclass must be subtype of TO State from Superclass");
                     // boolean correct = tc.checkStateSMT(subConst, superConst, method);
                     // if(!correct) ErrorPrinter.printError(method, subState.getTo(),
@@ -167,10 +191,18 @@ public class AuxHierarchyRefinememtsPassage {
         }
     }
 
-    private static void createVariableInContext(String thisName, TypeChecker tc, RefinedFunction subFunction,
-            RefinedFunction superFunction, CtParameter<?> ctParameter) {
-        RefinedVariable rv = tc.getContext().addVarToContext(thisName,
-                Utils.getType(subFunction.getTargetClass(), tc.getFactory()), new Predicate(), ctParameter);
+    private static void createVariableInContext(
+            String thisName,
+            TypeChecker tc,
+            RefinedFunction subFunction,
+            RefinedFunction superFunction,
+            CtParameter<?> ctParameter) {
+        RefinedVariable rv = tc.getContext()
+                .addVarToContext(
+                        thisName,
+                        Utils.getType(subFunction.getTargetClass(), tc.getFactory()),
+                        new Predicate(),
+                        ctParameter);
         rv.addSuperType(Utils.getType(superFunction.getTargetClass(), tc.getFactory())); // TODO: change: this only
         // works
         // for one superclass
@@ -188,8 +220,8 @@ public class AuxHierarchyRefinememtsPassage {
      *
      * @return
      */
-    private static Predicate matchVariableNames(String fromName, String thisName, RefinedFunction superFunction,
-            RefinedFunction subFunction, Predicate c) {
+    private static Predicate matchVariableNames(
+            String fromName, String thisName, RefinedFunction superFunction, RefinedFunction subFunction, Predicate c) {
         Predicate nc = c.substituteVariable(fromName, thisName);
         List<Variable> superArgs = superFunction.getArguments();
         List<Variable> subArgs = subFunction.getArguments();
