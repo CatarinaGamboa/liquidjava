@@ -11398,15 +11398,15 @@
 
     /* Flexible box model classes */
     /* Taken from Alex Russell http://infrequently.org/2009/08/css-3-progress/ */
-    /* This file is a compatability layer.  It allows the usage of flexible box 
+    /* This file is a compatability layer.  It allows the usage of flexible box
 model layouts accross multiple browsers, including older browsers.  The newest,
 universal implementation of the flexible box model is used when available (see
-`Modern browsers` comments below).  Browsers that are known to implement this 
+`Modern browsers` comments below).  Browsers that are known to implement this
 new spec completely include:
 
     Firefox 28.0+
     Chrome 29.0+
-    Internet Explorer 11+ 
+    Internet Explorer 11+
     Opera 17.0+
 
 Browsers not listed, including Safari, are supported via the styling under the
@@ -15411,7 +15411,7 @@ Adapted from GitHub theme
       background: #f7f7f7;
       border-top: 1px solid #cfcfcf;
       border-bottom: 1px solid #cfcfcf;
-      /* This injects handle bars (a short, wide = symbol) for 
+      /* This injects handle bars (a short, wide = symbol) for
         the resize handle. */
     }
 
@@ -16518,7 +16518,7 @@ Adapted from GitHub theme
 
         <span class="n">ans</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">)</span>
         <span class="c1">#only get answers and not lines with the final comment</span>
-        <span class="k">if</span><span class="p">(</span><span class="n">ans</span> <span class="o">!=</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">ans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span> 
+        <span class="k">if</span><span class="p">(</span><span class="n">ans</span> <span class="o">!=</span> <span class="p">[]</span> <span class="ow">and</span> <span class="n">ans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">!=</span> <span class="s2">&quot;&quot;</span> <span class="ow">and</span>
            <span class="p">(</span><span class="n">ans</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;2020&quot;</span> <span class="ow">or</span> <span class="n">ans</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;2021&quot;</span><span class="p">)):</span>
             <span class="n">ans</span> <span class="o">=</span> <span class="n">ans</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">18</span><span class="p">]</span> <span class="c1">#remove timestamp, comments and email</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ans</span><span class="p">))</span> <span class="p">:</span>
@@ -16546,7 +16546,7 @@ Adapted from GitHub theme
 
 
               <div class="output_subarea output_stream output_stdout output_text">
-                <pre>Number of answers: 53 
+                <pre>Number of answers: 53
 
 </pre>
               </div>
@@ -16789,28 +16789,28 @@ Adapted from GitHub theme
     <span class="n">fig</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">)</span>
     <span class="c1"># Set aspect ratio to be equal so that pie is drawn as a circle.</span>
     <span class="n">plt</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;equal&#39;</span><span class="p">)</span>
-    
 
-<span class="k">def</span> <span class="nf">horizontalBarsPlot</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">colName</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;rocket&quot;</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span> 
+
+<span class="k">def</span> <span class="nf">horizontalBarsPlot</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">colName</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;rocket&quot;</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
     <span class="n">lSize</span> <span class="o">=</span> <span class="n">getFamiliaritySize</span><span class="p">(</span><span class="n">pd</span><span class="p">,</span> <span class="n">colName</span><span class="p">)</span>
     <span class="n">maxY</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lSize</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="mi">8</span> <span class="k">if</span> <span class="n">maxY</span> <span class="o">&gt;</span> <span class="mi">10</span> <span class="k">else</span> <span class="mi">4</span>
     <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
     <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;talk&quot;</span><span class="p">)</span>
-    
+
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;Not Familiar&quot;</span><span class="p">,</span> <span class="s2">&quot;Vaguely Familiar&quot;</span><span class="p">,</span><span class="s2">&quot;Familiar&quot;</span><span class="p">,</span><span class="s2">&quot;Very Familiar&quot;</span><span class="p">][::</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">y1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">lSize</span><span class="p">)</span>
     <span class="n">splot</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">y1</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">x</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="n">palette</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">axs</span><span class="p">)</span>
-    
-    
+
+
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">splot</span><span class="o">.</span><span class="n">patches</span><span class="p">:</span>
         <span class="n">height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">lSize</span><span class="p">[</span><span class="n">i</span><span class="p">])</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">percentage</span> <span class="k">else</span><span class="s1">&#39;</span><span class="si">{:.1f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">lSize</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">lSize</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;%&quot;</span>
-        <span class="n">splot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> 
-               <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span><span class="o">+</span><span class="n">lSize</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="o">+</span><span class="n">i</span><span class="o">-</span><span class="mf">0.7</span><span class="p">),</span> 
-               <span class="n">ha</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> 
-               <span class="n">xytext</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> 
+        <span class="n">splot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">height</span><span class="p">,</span>
+               <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span><span class="o">+</span><span class="n">lSize</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span> <span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="o">+</span><span class="n">i</span><span class="o">-</span><span class="mf">0.7</span><span class="p">),</span>
+               <span class="n">ha</span> <span class="o">=</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span>
+               <span class="n">xytext</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span>
                <span class="n">textcoords</span> <span class="o">=</span> <span class="s1">&#39;offset points&#39;</span><span class="p">)</span>
         <span class="n">i</span><span class="o">+=</span><span class="mi">1</span>
     <span class="n">axs</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxY</span><span class="o">+</span><span class="mi">5</span><span class="p">])</span>
@@ -17214,7 +17214,7 @@ Adapted from GitHub theme
             <div class="input_area">
               <div class=" highlight hl-ipython3">
                 <pre><span></span><span class="n">refinements_pd</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">answers_pd</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">answers_pd</span><span class="p">[</span><span class="n">fRefs</span><span class="p">]</span><span class="o">==</span> <span class="n">veryFamiliar</span><span class="p">],</span> <span class="n">answers_pd</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">answers_pd</span><span class="p">[</span><span class="n">fRefs</span><span class="p">]</span><span class="o">==</span> <span class="n">familiar</span><span class="p">]])</span>
-<span class="n">horizontalBarsPlot</span><span class="p">(</span><span class="s2">&quot;Familiar with Functional Languages given Familiarity with Refinements&quot;</span><span class="p">,</span> 
+<span class="n">horizontalBarsPlot</span><span class="p">(</span><span class="s2">&quot;Familiar with Functional Languages given Familiarity with Refinements&quot;</span><span class="p">,</span>
                    <span class="n">refinements_pd</span><span class="p">,</span> <span class="n">fFun</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;tab10&quot;</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1">#trocar titulo</span>
 </pre>
@@ -17271,7 +17271,7 @@ Adapted from GitHub theme
 
 <span class="k">def</span> <span class="nf">barsPlot</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">labelNames</span><span class="p">,</span> <span class="n">pd</span><span class="p">,</span> <span class="n">column_prefix</span><span class="p">,</span> <span class="n">indexes</span><span class="p">,</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;rocket&quot;</span><span class="p">,</span> <span class="n">zoomX</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">zoomY</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">percentage</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="n">size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indexes</span><span class="p">)</span>
-    <span class="n">figXsize</span> <span class="o">=</span> <span class="mi">7</span><span class="o">*</span><span class="n">size</span> <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="mi">6</span><span class="o">*</span><span class="n">size</span><span class="p">;</span> 
+    <span class="n">figXsize</span> <span class="o">=</span> <span class="mi">7</span><span class="o">*</span><span class="n">size</span> <span class="k">if</span> <span class="n">size</span> <span class="o">&lt;</span> <span class="mi">3</span> <span class="k">else</span> <span class="mi">6</span><span class="o">*</span><span class="n">size</span><span class="p">;</span>
     <span class="n">f</span><span class="p">,</span> <span class="n">axs</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">size</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">figXsize</span><span class="o">+</span><span class="n">zoomX</span><span class="p">,</span> <span class="mi">5</span><span class="o">+</span><span class="n">zoomY</span><span class="p">),</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
     <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;talk&quot;</span><span class="p">)</span>
@@ -17285,16 +17285,16 @@ Adapted from GitHub theme
         <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">labelNames</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">15</span><span class="o">+</span><span class="n">zoomX</span><span class="p">)</span>
         <span class="n">maxY</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">lSize</span><span class="p">)</span> <span class="k">if</span> <span class="nb">max</span><span class="p">(</span><span class="n">lSize</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">maxY</span> <span class="k">else</span> <span class="n">maxY</span>
         <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">splot</span><span class="o">.</span><span class="n">patches</span><span class="p">:</span>
-            <span class="n">height</span> <span class="o">=</span>  <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">())</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">percentage</span> <span class="k">else</span> <span class="s1">&#39;</span><span class="si">{:.1f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">lSize</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;%&quot;</span> 
-            <span class="n">splot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">height</span><span class="p">,</span> 
-                   <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">()),</span> 
-                   <span class="n">ha</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> 
-                   <span class="n">xytext</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> 
+            <span class="n">height</span> <span class="o">=</span>  <span class="nb">int</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">())</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">percentage</span> <span class="k">else</span> <span class="s1">&#39;</span><span class="si">{:.1f}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">((</span><span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">()</span><span class="o">/</span><span class="nb">sum</span><span class="p">(</span><span class="n">lSize</span><span class="p">))</span><span class="o">*</span><span class="mi">100</span><span class="p">)</span><span class="o">+</span><span class="s2">&quot;%&quot;</span>
+            <span class="n">splot</span><span class="o">.</span><span class="n">annotate</span><span class="p">(</span><span class="n">height</span><span class="p">,</span>
+                   <span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">get_x</span><span class="p">()</span> <span class="o">+</span> <span class="n">p</span><span class="o">.</span><span class="n">get_width</span><span class="p">()</span> <span class="o">/</span> <span class="mf">2.</span><span class="p">,</span> <span class="n">p</span><span class="o">.</span><span class="n">get_height</span><span class="p">()),</span>
+                   <span class="n">ha</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">va</span> <span class="o">=</span> <span class="s1">&#39;center&#39;</span><span class="p">,</span>
+                   <span class="n">xytext</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span>
                    <span class="n">textcoords</span> <span class="o">=</span> <span class="s1">&#39;offset points&#39;</span><span class="p">)</span>
-    
+
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">size</span><span class="p">):</span>
         <span class="n">axs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">maxY</span><span class="o">+</span><span class="mi">4</span><span class="p">])</span>
-        
+
 </pre>
               </div>
 
@@ -17376,7 +17376,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">answers_pd2</span> <span class="o">=</span> <span class="n">answers_pd</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> 
+                <pre><span></span><span class="n">answers_pd2</span> <span class="o">=</span> <span class="n">answers_pd</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 <span class="n">answers_pd2</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">answers_pd2</span> <span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">answers_pd2</span><span class="p">[</span><span class="s2">&quot;wildcard_0&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">pref</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">labelNames</span> <span class="o">=</span> <span class="n">labelNames</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 <span class="n">barsPlot</span><span class="p">(</span><span class="s1">&#39;Wildcard Variables excluding marked as &quot;Preferable&quot; in 1st&#39;</span><span class="p">,</span> <span class="n">labelNames</span><span class="p">,</span> <span class="n">answers_pd2</span><span class="p">,</span> <span class="n">wildC</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
@@ -17437,7 +17437,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">labelNames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;@Refinement(&quot;negativeGrade &lt; 10&quot;)</span><span class="se">\n</span><span class="s1">int negativeGrade = 8;&#39;</span><span class="p">,</span> 
+                <pre><span></span><span class="n">labelNames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;@Refinement(&quot;negativeGrade &lt; 10&quot;)</span><span class="se">\n</span><span class="s1">int negativeGrade = 8;&#39;</span><span class="p">,</span>
               <span class="s2">&quot;&quot;</span><span class="s1">&#39;@Refinement(&quot;{x | x &lt; 10}&quot;)</span><span class="se">\n</span><span class="s1">int negativeGrade = 8;&#39;</span><span class="p">]</span>
 <span class="n">barsPlot</span><span class="p">(</span><span class="s2">&quot;Variable Refinements&quot;</span><span class="p">,</span> <span class="n">labelNames</span><span class="p">,</span> <span class="n">answers_pd</span><span class="p">,</span> <span class="n">var</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span> <span class="n">palette</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">)</span>
 </pre>
@@ -17499,7 +17499,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">labelNames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;@Refinement(&quot;</span><span class="se">\\</span><span class="s1">v &gt;= 0 &amp;&amp; </span><span class="se">\\</span><span class="s1">v &lt;= 100&quot;) </span><span class="se">\n</span><span class="s1"> static int percentageFromGrade(        </span><span class="se">\n</span><span class="s1">           @Refinement(&quot;grade &gt;= 0&quot;) int grade,</span><span class="se">\n</span><span class="s1">              @Refinement(&quot;scale &gt; 0&quot;)  int scale){...}&#39;</span><span class="p">,</span> 
+                <pre><span></span><span class="n">labelNames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;@Refinement(&quot;</span><span class="se">\\</span><span class="s1">v &gt;= 0 &amp;&amp; </span><span class="se">\\</span><span class="s1">v &lt;= 100&quot;) </span><span class="se">\n</span><span class="s1"> static int percentageFromGrade(        </span><span class="se">\n</span><span class="s1">           @Refinement(&quot;grade &gt;= 0&quot;) int grade,</span><span class="se">\n</span><span class="s1">              @Refinement(&quot;scale &gt; 0&quot;)  int scale){...}&#39;</span><span class="p">,</span>
               <span class="s1">&#39;@Refinement(&quot;{grade &gt;= 0} -&gt; {scale &gt; 0} -&gt; {</span><span class="se">\\</span><span class="s1">v &gt;= 0 &amp;&amp; </span><span class="se">\\</span><span class="s1">v &lt;= 100}&quot;)</span><span class="se">\n</span><span class="s1"> static int percentageFromGrade(int grade, int scale){...}&#39;</span><span class="p">]</span>
 <span class="n">barsPlot</span><span class="p">(</span><span class="s2">&quot;Refinements in Methods&quot;</span><span class="p">,</span> <span class="n">labelNames</span><span class="p">,</span> <span class="n">answers_pd</span><span class="p">,</span> <span class="n">mets</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
 </pre>
@@ -17620,8 +17620,8 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">labelNames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Above the class&#39;</span><span class="p">,</span> 
-              <span class="s1">&#39;Above any method&#39;</span><span class="p">,</span> 
+                <pre><span></span><span class="n">labelNames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Above the class&#39;</span><span class="p">,</span>
+              <span class="s1">&#39;Above any method&#39;</span><span class="p">,</span>
               <span class="s1">&#39;Above class attributes&#39;</span><span class="p">]</span>
 <span class="n">barsPlot</span><span class="p">(</span><span class="s2">&quot;Ghost Functions&quot;</span><span class="p">,</span> <span class="n">labelNames</span><span class="p">,</span> <span class="n">answers_pd</span><span class="p">,</span> <span class="n">alias</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
 </pre>
@@ -17743,7 +17743,7 @@ Adapted from GitHub theme
     <span class="n">colorBot</span> <span class="o">=</span> <span class="s1">&#39;#e35430&#39;</span>
     <span class="n">colorUp</span> <span class="o">=</span> <span class="s2">&quot;#ff8630&quot;</span>
     <span class="n">sns</span><span class="o">.</span><span class="n">set_theme</span><span class="p">(</span><span class="n">style</span><span class="o">=</span><span class="s2">&quot;white&quot;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="s2">&quot;talk&quot;</span><span class="p">)</span>
-         
+
     <span class="c1">#Plot 1 - background - &quot;total&quot; (top) series</span>
     <span class="n">lSize</span> <span class="o">=</span> <span class="n">getListSizes</span><span class="p">(</span><span class="n">pd1</span><span class="p">,</span> <span class="n">colName</span><span class="p">)</span>
     <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="s2">&quot;Not Accept.&quot;</span><span class="p">,</span> <span class="s2">&quot;Acceptable&quot;</span><span class="p">,</span><span class="s2">&quot;Preferable&quot;</span><span class="p">])</span>
@@ -17949,7 +17949,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">labelNames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;@Refinement(&quot;</span><span class="se">\\</span><span class="s1">v &gt;= 0&quot;) </span><span class="se">\n</span><span class="s1"> static int percentageFromGrade(        </span><span class="se">\n</span><span class="s1">           @Refinement(&quot;grade &gt;= 0&quot;) int grade,</span><span class="se">\n</span><span class="s1">              @Refinement(&quot;scale &gt; 0&quot;)  int scale){...}&#39;</span><span class="p">,</span> 
+                <pre><span></span><span class="n">labelNames</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;@Refinement(&quot;</span><span class="se">\\</span><span class="s1">v &gt;= 0&quot;) </span><span class="se">\n</span><span class="s1"> static int percentageFromGrade(        </span><span class="se">\n</span><span class="s1">           @Refinement(&quot;grade &gt;= 0&quot;) int grade,</span><span class="se">\n</span><span class="s1">              @Refinement(&quot;scale &gt; 0&quot;)  int scale){...}&#39;</span><span class="p">,</span>
               <span class="s1">&#39;@Refinement(&quot;{grade &gt;= 0} -&gt; {scale &gt; 0} -&gt; {</span><span class="se">\\</span><span class="s1">v &gt;= 0 &amp;&amp; </span><span class="se">\\</span><span class="s1">v &lt;= 100}&quot;)</span><span class="se">\n</span><span class="s1"> static int percentageFromGrade(int grade, int scale){...}&#39;</span><span class="p">]</span>
 <span class="n">stackPlot</span><span class="p">(</span><span class="n">answers_pd</span><span class="p">,</span> <span class="n">functional_pd</span><span class="p">,</span> <span class="n">mets</span><span class="o">+</span><span class="s2">&quot;0&quot;</span><span class="p">,</span> <span class="s2">&quot;Refinements in Methods - option 1&quot;</span><span class="p">,</span> <span class="n">labelNames</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
@@ -18044,11 +18044,11 @@ Adapted from GitHub theme
 <span class="n">listPreferenceCat</span> <span class="o">=</span> <span class="p">[</span><span class="n">notAccept</span><span class="p">,</span> <span class="n">accept</span><span class="p">,</span> <span class="n">pref</span><span class="p">]</span>
 
 <span class="k">def</span> <span class="nf">setCategorical</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">column_names</span><span class="p">,</span> <span class="n">cats</span><span class="p">,</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> 
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">cat</span> <span class="ow">in</span> <span class="n">column_names</span><span class="p">:</span>
         <span class="n">df</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">cat</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">api</span><span class="o">.</span><span class="n">types</span><span class="o">.</span><span class="n">CategoricalDtype</span><span class="p">(</span><span class="n">categories</span> <span class="o">=</span> <span class="n">cats</span><span class="p">,</span> <span class="n">ordered</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
         <span class="n">cat_columns</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">select_dtypes</span><span class="p">([</span><span class="s1">&#39;category&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">columns</span>
-        
+
     <span class="n">df</span><span class="p">[</span><span class="n">cat_columns</span><span class="p">]</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">cat_columns</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">jitter</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">-</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">x</span><span class="o">.</span><span class="n">cat</span><span class="o">.</span><span class="n">codes</span><span class="o">+</span><span class="mf">0.15</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">df</span>
 
@@ -18259,7 +18259,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">allCat_pd</span> <span class="o">=</span> <span class="n">setCategorical</span><span class="p">(</span><span class="n">answersCat_pd</span><span class="p">,</span> <span class="p">[</span><span class="n">fFun</span><span class="p">,</span> <span class="n">fJML</span><span class="p">,</span> <span class="n">fRefs</span><span class="p">],</span> 
+                <pre><span></span><span class="n">allCat_pd</span> <span class="o">=</span> <span class="n">setCategorical</span><span class="p">(</span><span class="n">answersCat_pd</span><span class="p">,</span> <span class="p">[</span><span class="n">fFun</span><span class="p">,</span> <span class="n">fJML</span><span class="p">,</span> <span class="n">fRefs</span><span class="p">],</span>
                                    <span class="p">[</span><span class="n">notFamiliar</span><span class="p">,</span> <span class="n">vagFamiliar</span><span class="p">,</span> <span class="n">familiar</span><span class="p">,</span> <span class="n">veryFamiliar</span><span class="p">],</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pairPlot</span><span class="p">(</span><span class="n">allCat_pd</span><span class="p">,</span> <span class="n">fJava</span><span class="p">,</span> <span class="n">column_names</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
 </pre>
@@ -18350,7 +18350,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">all_pd</span> <span class="o">=</span> <span class="n">setCategorical</span><span class="p">(</span><span class="n">answersCat_pd</span><span class="p">,</span> <span class="p">[</span><span class="n">fJava</span><span class="p">,</span> <span class="n">fJML</span><span class="p">,</span> <span class="n">fRefs</span><span class="p">],</span> 
+                <pre><span></span><span class="n">all_pd</span> <span class="o">=</span> <span class="n">setCategorical</span><span class="p">(</span><span class="n">answersCat_pd</span><span class="p">,</span> <span class="p">[</span><span class="n">fJava</span><span class="p">,</span> <span class="n">fJML</span><span class="p">,</span> <span class="n">fRefs</span><span class="p">],</span>
                                    <span class="p">[</span><span class="n">notFamiliar</span><span class="p">,</span> <span class="n">vagFamiliar</span><span class="p">,</span> <span class="n">familiar</span><span class="p">,</span> <span class="n">veryFamiliar</span><span class="p">],</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pairPlot</span><span class="p">(</span><span class="n">all_pd</span><span class="p">,</span> <span class="n">fFun</span><span class="p">,</span> <span class="p">[</span><span class="n">column_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">+</span><span class="n">column_names</span><span class="p">[</span><span class="mi">2</span><span class="p">:</span><span class="mi">4</span><span class="p">])</span>
 </pre>
@@ -18440,7 +18440,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">all_pd</span> <span class="o">=</span> <span class="n">setCategorical</span><span class="p">(</span><span class="n">answersCat_pd</span><span class="p">,</span> <span class="p">[</span><span class="n">fJava</span><span class="p">,</span> <span class="n">fFun</span><span class="p">,</span> <span class="n">fRefs</span><span class="p">],</span> 
+                <pre><span></span><span class="n">all_pd</span> <span class="o">=</span> <span class="n">setCategorical</span><span class="p">(</span><span class="n">answersCat_pd</span><span class="p">,</span> <span class="p">[</span><span class="n">fJava</span><span class="p">,</span> <span class="n">fFun</span><span class="p">,</span> <span class="n">fRefs</span><span class="p">],</span>
                                    <span class="p">[</span><span class="n">notFamiliar</span><span class="p">,</span> <span class="n">vagFamiliar</span><span class="p">,</span> <span class="n">familiar</span><span class="p">,</span> <span class="n">veryFamiliar</span><span class="p">],</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pairPlot</span><span class="p">(</span><span class="n">all_pd</span><span class="p">,</span> <span class="n">fJML</span><span class="p">,</span> <span class="n">column_names</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span><span class="o">+</span><span class="p">[</span><span class="n">column_names</span><span class="p">[</span><span class="mi">3</span><span class="p">]])</span>
 </pre>
@@ -18531,7 +18531,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span><span class="n">all_pd</span> <span class="o">=</span> <span class="n">setCategorical</span><span class="p">(</span><span class="n">answersCat_pd</span><span class="p">,</span> <span class="p">[</span><span class="n">fJava</span><span class="p">,</span> <span class="n">fFun</span><span class="p">,</span> <span class="n">fJML</span><span class="p">],</span> 
+                <pre><span></span><span class="n">all_pd</span> <span class="o">=</span> <span class="n">setCategorical</span><span class="p">(</span><span class="n">answersCat_pd</span><span class="p">,</span> <span class="p">[</span><span class="n">fJava</span><span class="p">,</span> <span class="n">fFun</span><span class="p">,</span> <span class="n">fJML</span><span class="p">],</span>
                                    <span class="p">[</span><span class="n">notFamiliar</span><span class="p">,</span> <span class="n">vagFamiliar</span><span class="p">,</span> <span class="n">familiar</span><span class="p">,</span> <span class="n">veryFamiliar</span><span class="p">],</span> <span class="n">jitter</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">pairPlot</span><span class="p">(</span><span class="n">all_pd</span><span class="p">,</span> <span class="n">fRefs</span><span class="p">,</span> <span class="n">column_names</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
 </pre>
@@ -18636,7 +18636,7 @@ Adapted from GitHub theme
           <div class="inner_cell">
             <div class="input_area">
               <div class=" highlight hl-ipython3">
-                <pre><span></span> 
+                <pre><span></span>
 </pre>
               </div>
 

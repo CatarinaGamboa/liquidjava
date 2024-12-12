@@ -7,19 +7,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
-
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
-
 import liquidjava.api.CommandLineLauncher;
 import liquidjava.errors.ErrorEmitter;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 
 public class TestExamples {
 
     /**
      * Test the file at the given path by launching the verifier and checking for errors. The file/directory is expected
      * to be either correct or contain an error based on its name.
-     * 
+     *
      * @param filePath
      *            path to the file to test
      */
@@ -29,7 +27,8 @@ public class TestExamples {
         String fileName = filePath.getFileName().toString();
 
         // 1. Run the verifier on the file or package
-        ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
+        ErrorEmitter errorEmitter =
+                CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
 
         // 2. Check if the file is correct or contains an error
         if ((fileName.startsWith("Correct") && errorEmitter.foundError())
@@ -48,23 +47,25 @@ public class TestExamples {
     /**
      * Returns a Stream of paths to test files in the testSuite directory. These include files with names starting with
      * "Correct" or "Error", and directories containing "correct" or "error".
-     * 
+     *
      * @return Stream of paths to test files
-     * 
+     *
      * @throws IOException
      *             if an I/O error occurs or the path does not exist
      */
     private static Stream<Path> fileNameSource() throws IOException {
-        return Files.find(Paths.get("../liquidjava-example/src/main/java/testSuite/"), Integer.MAX_VALUE,
+        return Files.find(
+                Paths.get("../liquidjava-example/src/main/java/testSuite/"),
+                Integer.MAX_VALUE,
                 (filePath, fileAttr) -> {
                     String name = filePath.getFileName().toString();
                     // 1. Files that start with "Correct" or "Error"
-                    boolean isFileStartingWithCorrectOrError = fileAttr.isRegularFile()
-                            && (name.startsWith("Correct") || name.startsWith("Error"));
+                    boolean isFileStartingWithCorrectOrError =
+                            fileAttr.isRegularFile() && (name.startsWith("Correct") || name.startsWith("Error"));
 
                     // 2. Folders (directories) that contain "correct" or "error"
-                    boolean isDirectoryWithCorrectOrError = fileAttr.isDirectory()
-                            && (name.contains("correct") || name.contains("error"));
+                    boolean isDirectoryWithCorrectOrError =
+                            fileAttr.isDirectory() && (name.contains("correct") || name.contains("error"));
 
                     // Return true if either condition matches
                     return isFileStartingWithCorrectOrError || isDirectoryWithCorrectOrError;

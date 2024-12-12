@@ -26,12 +26,14 @@ public class Ite extends Expression {
 
     @Override
     public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        return ctx.makeIte(getCondition().eval(ctx), getThen().eval(ctx), getElse().eval(ctx));
+        return ctx.makeIte(
+                getCondition().eval(ctx), getThen().eval(ctx), getElse().eval(ctx));
     }
 
     @Override
     public String toString() {
-        return getCondition().toString() + "?" + getThen().toString() + ":" + getElse().toString();
+        return getCondition().toString() + "?" + getThen().toString() + ":"
+                + getElse().toString();
     }
 
     @Override
@@ -55,7 +57,9 @@ public class Ite extends Expression {
 
     @Override
     public boolean isBooleanTrue() {
-        return getCondition().isBooleanTrue() && getThen().isBooleanTrue() && getElse().isBooleanTrue();
+        return getCondition().isBooleanTrue()
+                && getThen().isBooleanTrue()
+                && getElse().isBooleanTrue();
     }
 
     @Override
@@ -70,28 +74,19 @@ public class Ite extends Expression {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         Ite other = (Ite) obj;
         if (getCondition() == null) {
-            if (other.getCondition() != null)
-                return false;
-        } else if (!getCondition().equals(other.getCondition()))
-            return false;
+            if (other.getCondition() != null) return false;
+        } else if (!getCondition().equals(other.getCondition())) return false;
         if (getElse() == null) {
-            if (other.getElse() != null)
-                return false;
-        } else if (!getElse().equals(other.getElse()))
-            return false;
+            if (other.getElse() != null) return false;
+        } else if (!getElse().equals(other.getElse())) return false;
         if (getThen() == null) {
-            if (other.getThen() != null)
-                return false;
-        } else if (!getThen().equals(other.getThen()))
-            return false;
+            if (other.getThen() != null) return false;
+        } else if (!getThen().equals(other.getThen())) return false;
         return true;
     }
 }

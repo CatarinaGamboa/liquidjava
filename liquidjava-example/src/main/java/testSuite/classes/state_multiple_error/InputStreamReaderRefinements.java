@@ -12,14 +12,14 @@ import liquidjava.specification.StateSet;
 @StateSet({"alreadyRead", "nothingRead"})
 public interface InputStreamReaderRefinements {
 
-  @StateRefinement(to = "open(this) && close(this)")
-  public void InputStreamReader(InputStream in);
+    @StateRefinement(to = "open(this) && close(this)")
+    public void InputStreamReader(InputStream in);
 
-  @StateRefinement(from = "open(this)", to = "open(this) && alreadyRead(this)")
-  @Refinement("(_ >= -1) && (_ <= 127)")
-  public int read();
+    @StateRefinement(from = "open(this)", to = "open(this) && alreadyRead(this)")
+    @Refinement("(_ >= -1) && (_ <= 127)")
+    public int read();
 
-  @StateRefinement(from = "close(this)", to = "close(this)")
-  @StateRefinement(from = "open(this)", to = "close(this)")
-  public void close();
+    @StateRefinement(from = "close(this)", to = "close(this)")
+    @StateRefinement(from = "open(this)", to = "close(this)")
+    public void close();
 }

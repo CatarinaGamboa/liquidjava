@@ -18,8 +18,7 @@ public abstract class RefinedVariable extends Refined {
     public abstract Predicate getMainRefinement();
 
     public void addSuperType(CtTypeReference<?> t) {
-        if (!supertypes.contains(t))
-            supertypes.add(t);
+        if (!supertypes.contains(t)) supertypes.add(t);
     }
 
     public List<CtTypeReference<?>> getSuperTypes() {
@@ -27,11 +26,8 @@ public abstract class RefinedVariable extends Refined {
     }
 
     public void addSuperTypes(CtTypeReference<?> ts, Set<CtTypeReference<?>> sts) {
-        if (ts != null && !supertypes.contains(ts))
-            supertypes.add(ts);
-        for (CtTypeReference<?> ct : sts)
-            if (ct != null && !supertypes.contains(ct))
-                supertypes.add(ct);
+        if (ts != null && !supertypes.contains(ts)) supertypes.add(ts);
+        for (CtTypeReference<?> ct : sts) if (ct != null && !supertypes.contains(ct)) supertypes.add(ct);
     }
 
     public void addPlacementInCode(PlacementInCode s) {
@@ -52,18 +48,13 @@ public abstract class RefinedVariable extends Refined {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (!super.equals(obj)) return false;
+        if (getClass() != obj.getClass()) return false;
         RefinedVariable other = (RefinedVariable) obj;
         if (supertypes == null) {
-            if (other.supertypes != null)
-                return false;
-        } else if (!supertypes.equals(other.supertypes))
-            return false;
+            if (other.supertypes != null) return false;
+        } else if (!supertypes.equals(other.supertypes)) return false;
         return true;
     }
 }

@@ -27,29 +27,24 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        if (errorEmitter.foundError())
-            return;
+        if (errorEmitter.foundError()) return;
 
         context.reinitializeContext();
-        if (visitedClasses.contains(ctClass.getQualifiedName()))
-            return;
-        else
-            visitedClasses.add(ctClass.getQualifiedName());
+        if (visitedClasses.contains(ctClass.getQualifiedName())) return;
+        else visitedClasses.add(ctClass.getQualifiedName());
         // visitInterfaces
         if (!ctClass.getSuperInterfaces().isEmpty())
             for (CtTypeReference<?> t : ctClass.getSuperInterfaces()) {
                 if (t.isInterface()) {
                     CtType<?> ct = t.getDeclaration();
-                    if (ct instanceof CtInterface)
-                        visitCtInterface((CtInterface<?>) ct);
+                    if (ct instanceof CtInterface) visitCtInterface((CtInterface<?>) ct);
                 }
             }
         // visitSubclasses
         CtTypeReference<?> sup = ctClass.getSuperclass();
         if (sup != null && sup.isClass()) {
             CtType<?> ct = sup.getDeclaration();
-            if (ct instanceof CtClass)
-                visitCtClass((CtClass<?>) ct);
+            if (ct instanceof CtClass) visitCtClass((CtClass<?>) ct);
         }
         try {
             getRefinementFromAnnotation(ctClass);
@@ -62,15 +57,11 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (errorEmitter.foundError())
-            return;
+        if (errorEmitter.foundError()) return;
 
-        if (visitedClasses.contains(intrface.getQualifiedName()))
-            return;
-        else
-            visitedClasses.add(intrface.getQualifiedName());
-        if (getExternalRefinement(intrface).isPresent())
-            return;
+        if (visitedClasses.contains(intrface.getQualifiedName())) return;
+        else visitedClasses.add(intrface.getQualifiedName());
+        if (getExternalRefinement(intrface).isPresent()) return;
 
         try {
             getRefinementFromAnnotation(intrface);
@@ -83,8 +74,7 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
-        if (errorEmitter.foundError())
-            return;
+        if (errorEmitter.foundError()) return;
 
         context.enterContext();
         try {
@@ -98,8 +88,7 @@ public class MethodsFirstChecker extends TypeChecker {
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (errorEmitter.foundError())
-            return;
+        if (errorEmitter.foundError()) return;
 
         context.enterContext();
         try {

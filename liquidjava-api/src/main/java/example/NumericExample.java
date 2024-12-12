@@ -20,15 +20,15 @@ package example;
 
 public class NumericExample {
 
-  public static int test(int a, int b) {
-    int c = a / (b + a - 2);
-    if (c > 0) System.out.println(">0");
-    else System.out.println("<=0");
+    public static int test(int a, int b) {
+        int c = a / (b + a - 2);
+        if (c > 0) System.out.println(">0");
+        else System.out.println("<=0");
 
-    return c;
-  }
+        return c;
+    }
 
-  public static void main(String[] args) {
-    test(0, 0);
-  }
+    public static void main(String[] args) {
+        test(0, 0);
+    }
 }

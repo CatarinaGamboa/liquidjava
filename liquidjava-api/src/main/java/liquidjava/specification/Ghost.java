@@ -14,8 +14,8 @@ import java.lang.annotation.Target;
  * @author catarina gamboa
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
+@Target({ElementType.TYPE})
 @Repeatable(GhostMultiple.class)
 public @interface Ghost {
-  public String value();
+    public String value();
 }

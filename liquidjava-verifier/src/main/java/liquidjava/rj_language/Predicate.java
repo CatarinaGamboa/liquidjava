@@ -47,13 +47,12 @@ public class Predicate {
      * @param ref
      * @param element
      * @param e
-     * 
+     *
      * @throws ParsingException
      */
     public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
         exp = parse(ref, element, e);
-        if (e.foundError())
-            return;
+        if (e.foundError()) return;
         if (!(exp instanceof GroupExpression)) {
             exp = new GroupExpression(exp);
         }
@@ -111,17 +110,14 @@ public class Predicate {
     }
 
     public List<GhostState> getStateInvocations(List<GhostState> lgs) {
-        if (lgs == null)
-            return new ArrayList<>();
+        if (lgs == null) return new ArrayList<>();
         List<String> all = lgs.stream().map(p -> p.getName()).collect(Collectors.toList());
         List<String> toAdd = new ArrayList<>();
         exp.getStateInvocations(toAdd, all);
 
         List<GhostState> gh = new ArrayList<>();
         for (String n : toAdd) {
-            for (GhostState g : lgs)
-                if (g.getName().equals(n))
-                    gh.add(g);
+            for (GhostState g : lgs) if (g.getName().equals(n)) gh.add(g);
         }
 
         return gh;
@@ -149,15 +145,12 @@ public class Predicate {
             if (fi.getName().equals(Utils.OLD)) {
                 List<Expression> le = fi.getArgs();
                 for (Expression e : le) {
-                    if (e instanceof Var)
-                        ls.add(((Var) e).getName());
+                    if (e instanceof Var) ls.add(((Var) e).getName());
                 }
             }
         }
         if (exp.hasChildren()) {
-            for (var ch : exp.getChildren())
-                expressionGetOldVariableNames(ch, ls);
-
+            for (var ch : exp.getChildren()) expressionGetOldVariableNames(ch, ls);
         }
     }
 
@@ -165,7 +158,7 @@ public class Predicate {
         Map<String, Expression> nameRefinementMap = new HashMap<>();
         for (GhostState gs : ghostState)
             if (gs.getRefinement() != null) // is a state and not a ghost state
-                nameRefinementMap.put(gs.getName(), innerParse(gs.getRefinement().toString(), ee));
+            nameRefinementMap.put(gs.getName(), innerParse(gs.getRefinement().toString(), ee));
 
         Expression e = exp.substituteState(nameRefinementMap, toChange);
         return new Predicate(e);
@@ -208,18 +201,13 @@ public class Predicate {
 
     public static Predicate createLit(String value, String type) {
         Expression ex;
-        if (type.equals(Utils.BOOLEAN))
-            ex = new LiteralBoolean(value);
-        else if (type.equals(Utils.INT))
-            ex = new LiteralInt(value);
-        else if (type.equals(Utils.DOUBLE))
-            ex = new LiteralReal(value);
-        else if (type.equals(Utils.SHORT))
-            ex = new LiteralInt(value);
-        else if (type.equals(Utils.LONG))
-            ex = new LiteralReal(value);
+        if (type.equals(Utils.BOOLEAN)) ex = new LiteralBoolean(value);
+        else if (type.equals(Utils.INT)) ex = new LiteralInt(value);
+        else if (type.equals(Utils.DOUBLE)) ex = new LiteralReal(value);
+        else if (type.equals(Utils.SHORT)) ex = new LiteralInt(value);
+        else if (type.equals(Utils.LONG)) ex = new LiteralReal(value);
         else // if(type.equals(Utils.DOUBLE))
-            ex = new LiteralReal(value);
+        ex = new LiteralReal(value);
         return new Predicate(ex);
     }
 
@@ -233,8 +221,7 @@ public class Predicate {
 
     public static Predicate createInvocation(String name, Predicate... Predicates) {
         List<Expression> le = new ArrayList<>();
-        for (Predicate c : Predicates)
-            le.add(c.getExpression());
+        for (Predicate c : Predicates) le.add(c.getExpression());
         return new Predicate(new FunctionInvocation(name, le));
     }
 }

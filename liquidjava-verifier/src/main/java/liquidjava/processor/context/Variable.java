@@ -74,8 +74,7 @@ public class Variable extends RefinedVariable {
     }
 
     public void removeLastInstance() {
-        if (instances.size() > 0)
-            instances.peek().remove(instances.size() - 1);
+        if (instances.size() > 0) instances.peek().remove(instances.size() - 1);
     }
 
     public Optional<VariableInstance> getLastInstance() {
@@ -94,15 +93,11 @@ public class Variable extends RefinedVariable {
     }
 
     private void reloadFromBackup(Stack<List<VariableInstance>> backup) {
-        while (backup.size() > 0)
-            instances.add(backup.pop());
+        while (backup.size() > 0) instances.add(backup.pop());
     }
 
     public boolean hasInstance(VariableInstance vi) {
-        for (List<VariableInstance> lv : instances)
-            for (VariableInstance v : lv)
-                if (v.equals(vi))
-                    return true;
+        for (List<VariableInstance> lv : instances) for (VariableInstance v : lv) if (v.equals(vi)) return true;
         return false;
     }
 
@@ -137,7 +132,7 @@ public class Variable extends RefinedVariable {
      * @param counter
      *            A number to create a new variable name
      * @param cond
-     * 
+     *
      * @return A new VariableInfo created by the combination of refinements or an empty Optional
      */
     Optional<VariableInstance> getIfInstanceCombination(int counter, Predicate cond) {
@@ -149,16 +144,15 @@ public class Variable extends RefinedVariable {
 
         if (!has(ifelseIndex)) {
             if (has(ifbeforeIndex) && has(ifthenIndex)) // value before if and inside then
-                ref = createITEConstraint(nName, cond, get(ifthenIndex), get(ifbeforeIndex));
+            ref = createITEConstraint(nName, cond, get(ifthenIndex), get(ifbeforeIndex));
             else if (!has(ifbeforeIndex)) // only value inside then
-                ref = createITEConstraint(nName, cond, get(ifthenIndex));
+            ref = createITEConstraint(nName, cond, get(ifthenIndex));
         } else {
             if (has(ifthenIndex)) // value in then and in else
-                ref = createITEConstraint(nName, cond, get(ifthenIndex), get(ifelseIndex));
+            ref = createITEConstraint(nName, cond, get(ifthenIndex), get(ifelseIndex));
             else if (has(ifbeforeIndex)) // value before and in else
-                ref = createITEConstraint(nName, cond, get(ifbeforeIndex), get(ifelseIndex));
-            else
-                ref = createITEConstraint(nName, cond.negate(), get(ifelseIndex));
+            ref = createITEConstraint(nName, cond, get(ifbeforeIndex), get(ifelseIndex));
+            else ref = createITEConstraint(nName, cond.negate(), get(ifelseIndex));
         }
         VariableInstance jointReturn = new VariableInstance(nName, super.getType(), ref, this);
         jointReturn.addPlacementInCode(getPlacementInCode());
@@ -181,7 +175,7 @@ public class Variable extends RefinedVariable {
      * @param nName
      * @param cond
      * @param ifThen
-     * 
+     *
      * @return
      */
     private Predicate createITEConstraint(String nName, Predicate cond, VariableInstance then) {

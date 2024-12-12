@@ -8,12 +8,12 @@ import liquidjava.specification.RefinementAlias;
 @RefinementAlias("type PtGrade(double x) { x >= 0 && x <= 20}")
 public class ErrorAliasTypeMismatch {
 
-  public static void main(String[] args) {
-    @Refinement("PtGrade(_)")
-    double positiveGrade2 = 20 * 0.5 + 20 * 0.5;
+    public static void main(String[] args) {
+        @Refinement("PtGrade(_)")
+        double positiveGrade2 = 20 * 0.5 + 20 * 0.5;
 
-    @Refinement("Positive(_)")
-    double positive = positiveGrade2;
-    // Positive(_)   fica   positive > 0
-  }
+        @Refinement("Positive(_)")
+        double positive = positiveGrade2;
+        // Positive(_)   fica   positive > 0
+    }
 }

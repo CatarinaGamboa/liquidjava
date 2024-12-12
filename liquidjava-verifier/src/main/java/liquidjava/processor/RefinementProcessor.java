@@ -39,8 +39,7 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
             pkg.accept(new MethodsFirstChecker(c, factory, errorEmitter)); // double passing idea (instead of headers)
 
             pkg.accept(new RefinementTypeChecker(c, factory, errorEmitter));
-            if (errorEmitter.foundError())
-                return;
+            if (errorEmitter.foundError()) return;
         }
     }
 }

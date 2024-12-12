@@ -5,12 +5,12 @@ import java.io.InputStreamReader;
 
 public class Test {
 
-  public static void main(String[] args) throws IOException {
-    // java.io.InputStreamReader.InputStreamReader
-    InputStreamReader is = new InputStreamReader(System.in);
-    is.read();
-    is.read();
-    is.close();
-    is.read(); // should not be able to read
-  }
+    public static void main(String[] args) throws IOException {
+        // java.io.InputStreamReader.InputStreamReader
+        InputStreamReader is = new InputStreamReader(System.in);
+        is.read();
+        is.read();
+        is.close();
+        is.read(); // should not be able to read
+    }
 }

@@ -7,8 +7,7 @@ public class ObjectState {
     Predicate from;
     Predicate to;
 
-    public ObjectState() {
-    }
+    public ObjectState() {}
 
     public ObjectState(Predicate from, Predicate to) {
         this.from = from;

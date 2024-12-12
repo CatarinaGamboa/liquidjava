@@ -14,10 +14,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface ExternalRefinementsFor {
-  /**
-   * The prefix of the external method
-   *
-   * @return
-   */
-  public String value();
+    /**
+     * The prefix of the external method
+     *
+     * @return
+     */
+    public String value();
 }

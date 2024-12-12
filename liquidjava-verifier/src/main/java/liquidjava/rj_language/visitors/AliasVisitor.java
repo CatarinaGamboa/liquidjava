@@ -26,9 +26,9 @@ public class AliasVisitor {
      * Gets information about the alias
      *
      * @param rc
-     * 
+     *
      * @return
-     * 
+     *
      * @throws ParsingException
      */
     public AliasDTO getAlias(ParseTree rc) throws ParsingException {
@@ -55,7 +55,7 @@ public class AliasVisitor {
      * Returns text with whitespaces
      *
      * @param pred
-     * 
+     *
      * @return
      */
     private String getText(PredContext pred) {
@@ -75,7 +75,6 @@ public class AliasVisitor {
         String type = argDeclID.type().getText();
         String name = argDeclID.ID().getText();
         l.add(new Pair<>(type, name));
-        if (argDeclID.argDeclID() != null)
-            auxGetArgsDecl(argDeclID.argDeclID(), l);
+        if (argDeclID.argDeclID() != null) auxGetArgsDecl(argDeclID.argDeclID(), l);
     }
 }

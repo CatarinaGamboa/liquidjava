@@ -1,9 +1,6 @@
 package liquidjava.rj_language.ast.typing;
 
 import java.util.Optional;
-
-import org.apache.commons.lang3.NotImplementedException;
-
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
 import liquidjava.rj_language.ast.AliasInvocation;
@@ -19,6 +16,7 @@ import liquidjava.rj_language.ast.LiteralString;
 import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
 import liquidjava.utils.Utils;
+import org.apache.commons.lang3.NotImplementedException;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -37,58 +35,42 @@ public class TypeInfer {
     }
 
     public static Optional<CtTypeReference<?>> getType(Context ctx, Factory factory, Expression e) {
-        if (e instanceof LiteralString)
-            return Optional.of(Utils.getType("String", factory));
-        else if (e instanceof LiteralInt)
-            return Optional.of(Utils.getType("int", factory));
-        else if (e instanceof LiteralReal)
-            return Optional.of(Utils.getType("double", factory));
-        else if (e instanceof LiteralBoolean)
-            return boolType(factory);
-        else if (e instanceof Var)
-            return varType(ctx, factory, (Var) e);
-        else if (e instanceof UnaryExpression)
-            return unaryType(ctx, factory, (UnaryExpression) e);
-        else if (e instanceof Ite)
-            return boolType(factory);
-        else if (e instanceof BinaryExpression)
-            return binaryType(ctx, factory, (BinaryExpression) e);
-        else if (e instanceof GroupExpression)
-            return getType(ctx, factory, ((GroupExpression) e).getExpression());
-        else if (e instanceof FunctionInvocation)
-            return functionType(ctx, factory, (FunctionInvocation) e);
-        else if (e instanceof AliasInvocation)
-            return boolType(factory);
+        if (e instanceof LiteralString) return Optional.of(Utils.getType("String", factory));
+        else if (e instanceof LiteralInt) return Optional.of(Utils.getType("int", factory));
+        else if (e instanceof LiteralReal) return Optional.of(Utils.getType("double", factory));
+        else if (e instanceof LiteralBoolean) return boolType(factory);
+        else if (e instanceof Var) return varType(ctx, factory, (Var) e);
+        else if (e instanceof UnaryExpression) return unaryType(ctx, factory, (UnaryExpression) e);
+        else if (e instanceof Ite) return boolType(factory);
+        else if (e instanceof BinaryExpression) return binaryType(ctx, factory, (BinaryExpression) e);
+        else if (e instanceof GroupExpression) return getType(ctx, factory, ((GroupExpression) e).getExpression());
+        else if (e instanceof FunctionInvocation) return functionType(ctx, factory, (FunctionInvocation) e);
+        else if (e instanceof AliasInvocation) return boolType(factory);
 
         return Optional.empty();
     }
 
     private static Optional<CtTypeReference<?>> varType(Context ctx, Factory factory, Var v) {
         String name = v.getName();
-        if (!ctx.hasVariable(name))
-            return Optional.empty();
+        if (!ctx.hasVariable(name)) return Optional.empty();
         return Optional.of(ctx.getVariableByName(name).getType());
     }
 
     private static Optional<CtTypeReference<?>> unaryType(Context ctx, Factory factory, UnaryExpression e) {
-        if (e.getOp().equals("!"))
-            return boolType(factory);
+        if (e.getOp().equals("!")) return boolType(factory);
         return getType(ctx, factory, e.getExpression());
     }
 
     private static Optional<CtTypeReference<?>> binaryType(Context ctx, Factory factory, BinaryExpression e) {
-        if (e.isLogicOperation())
-            return boolType(factory); // &&, ||, -->
+        if (e.isLogicOperation()) return boolType(factory); // &&, ||, -->
         else if (e.isBooleanOperation()) { // >, >=, <, <=, ==, !=
             return boolType(factory);
 
         } else if (e.isArithmeticOperation()) {
             Optional<CtTypeReference<?>> t1 = getType(ctx, factory, e.getFirstOperand());
             Optional<CtTypeReference<?>> t2 = getType(ctx, factory, e.getSecondOperand());
-            if (!t1.isPresent() || !t2.isPresent())
-                return Optional.empty();
-            if (t1.get().equals(t2.get()))
-                return t1;
+            if (!t1.isPresent() || !t2.isPresent()) return Optional.empty();
+            if (t1.get().equals(t2.get())) return t1;
             // TODO if the types are different ex: double, int
             throw new NotImplementedException(
                     "To implement in TypeInfer: Binary type, arithmetic with different arg types");
@@ -97,7 +79,9 @@ public class TypeInfer {
     }
 
     private static Optional<CtTypeReference<?>> functionType(Context ctx, Factory factory, FunctionInvocation e) {
-        Optional<GhostFunction> gh = ctx.getGhosts().stream().filter(g -> g.getName().equals(e.getName())).findAny();
+        Optional<GhostFunction> gh = ctx.getGhosts().stream()
+                .filter(g -> g.getName().equals(e.getName()))
+                .findAny();
         return gh.map(i -> i.getReturnType());
     }
 

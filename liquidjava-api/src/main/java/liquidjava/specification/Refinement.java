@@ -12,14 +12,8 @@ import java.lang.annotation.Target;
  * @author catarina gamboa
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({
-  ElementType.METHOD,
-  ElementType.FIELD,
-  ElementType.LOCAL_VARIABLE,
-  ElementType.PARAMETER,
-  ElementType.TYPE
-})
+@Target({ElementType.METHOD, ElementType.FIELD, ElementType.LOCAL_VARIABLE, ElementType.PARAMETER, ElementType.TYPE})
 public @interface Refinement {
 
-  public String value();
+    public String value();
 }

@@ -16,10 +16,8 @@ import com.microsoft.z3.Status;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.NotImplementedException;
-
 import liquidjava.processor.context.AliasWrapper;
+import org.apache.commons.lang3.NotImplementedException;
 
 public class TranslatorToZ3 implements AutoCloseable {
 
@@ -73,13 +71,10 @@ public class TranslatorToZ3 implements AutoCloseable {
     }
 
     private Expr<?> getVariableTranslation(String name) throws Exception {
-        if (!varTranslation.containsKey(name))
-            throw new NotFoundError("Variable '" + name.toString() + "' not found");
+        if (!varTranslation.containsKey(name)) throw new NotFoundError("Variable '" + name.toString() + "' not found");
         Expr<?> e = varTranslation.get(name);
-        if (e == null)
-            e = varTranslation.get(String.format("this#%s", name));
-        if (e == null)
-            throw new SyntaxException("Unknown variable:" + name);
+        if (e == null) e = varTranslation.get(String.format("this#%s", name));
+        if (e == null) throw new SyntaxException("Unknown variable:" + name);
         return e;
     }
 
@@ -88,13 +83,10 @@ public class TranslatorToZ3 implements AutoCloseable {
     }
 
     public Expr<?> makeFunctionInvocation(String name, Expr<?>[] params) throws Exception {
-        if (name.equals("addToIndex"))
-            return makeStore(name, params);
-        if (name.equals("getFromIndex"))
-            return makeSelect(name, params);
+        if (name.equals("addToIndex")) return makeStore(name, params);
+        if (name.equals("getFromIndex")) return makeSelect(name, params);
 
-        if (!funcTranslation.containsKey(name))
-            throw new NotFoundError("Function '" + name + "' not found");
+        if (!funcTranslation.containsKey(name)) throw new NotFoundError("Function '" + name + "' not found");
 
         FuncDecl<?> fd = funcTranslation.get(name);
         Sort[] s = fd.getDomain();
@@ -103,10 +95,7 @@ public class TranslatorToZ3 implements AutoCloseable {
             if (!s[i].equals(param.getSort())) {
                 // Look if the function type is a supertype of this
                 List<Expr<?>> le = varSuperTypes.get(param.toString().replace("|", ""));
-                if (le != null)
-                    for (Expr<?> e : le)
-                        if (e.getSort().equals(s[i]))
-                            params[i] = e;
+                if (le != null) for (Expr<?> e : le) if (e.getSort().equals(s[i])) params[i] = e;
             }
             // System.out.println("Expected sort"+s[i]+"; Final sort->"
             // +params[i].toString() +":"+
@@ -116,14 +105,13 @@ public class TranslatorToZ3 implements AutoCloseable {
         return z3.mkApp(fd, params);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private Expr<?> makeSelect(String name, Expr<?>[] params) {
-        if (params.length == 2 && params[0] instanceof ArrayExpr)
-            return z3.mkSelect((ArrayExpr) params[0], params[1]);
+        if (params.length == 2 && params[0] instanceof ArrayExpr) return z3.mkSelect((ArrayExpr) params[0], params[1]);
         return null;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private Expr<?> makeStore(String name, Expr<?>[] params) {
         if (params.length == 3 && params[0] instanceof ArrayExpr)
             return z3.mkStore((ArrayExpr) params[0], params[1], params[2]);
@@ -132,40 +120,35 @@ public class TranslatorToZ3 implements AutoCloseable {
 
     // #####################Boolean Operations#####################
     public Expr<?> makeEquals(Expr<?> e1, Expr<?> e2) {
-        if (e1 instanceof FPExpr || e2 instanceof FPExpr)
-            return z3.mkFPEq(toFP(e1), toFP(e2));
+        if (e1 instanceof FPExpr || e2 instanceof FPExpr) return z3.mkFPEq(toFP(e1), toFP(e2));
 
         return z3.mkEq(e1, e2);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeLt(Expr<?> e1, Expr<?> e2) {
-        if (e1 instanceof FPExpr || e2 instanceof FPExpr)
-            return z3.mkFPLt(toFP(e1), toFP(e2));
+        if (e1 instanceof FPExpr || e2 instanceof FPExpr) return z3.mkFPLt(toFP(e1), toFP(e2));
 
         return z3.mkLt((ArithExpr) e1, (ArithExpr) e2);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeLtEq(Expr<?> e1, Expr<?> e2) {
-        if (e1 instanceof FPExpr || e2 instanceof FPExpr)
-            return z3.mkFPLEq(toFP(e1), toFP(e2));
+        if (e1 instanceof FPExpr || e2 instanceof FPExpr) return z3.mkFPLEq(toFP(e1), toFP(e2));
 
         return z3.mkLe((ArithExpr) e1, (ArithExpr) e2);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeGt(Expr<?> e1, Expr<?> e2) {
-        if (e1 instanceof FPExpr || e2 instanceof FPExpr)
-            return z3.mkFPGt(toFP(e1), toFP(e2));
+        if (e1 instanceof FPExpr || e2 instanceof FPExpr) return z3.mkFPGt(toFP(e1), toFP(e2));
 
         return z3.mkGt((ArithExpr) e1, (ArithExpr) e2);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeGtEq(Expr<?> e1, Expr<?> e2) {
-        if (e1 instanceof FPExpr || e2 instanceof FPExpr)
-            return z3.mkFPGEq(toFP(e1), toFP(e2));
+        if (e1 instanceof FPExpr || e2 instanceof FPExpr) return z3.mkFPGEq(toFP(e1), toFP(e2));
 
         return z3.mkGe((ArithExpr) e1, (ArithExpr) e2);
     }
@@ -196,15 +179,14 @@ public class TranslatorToZ3 implements AutoCloseable {
     // }
 
     // ##################### Unary Operations #####################
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeMinus(Expr<?> eval) {
-        if (eval instanceof FPExpr)
-            return z3.mkFPNeg((FPExpr) eval);
+        if (eval instanceof FPExpr) return z3.mkFPNeg((FPExpr) eval);
         return z3.mkUnaryMinus((ArithExpr) eval);
     }
 
     // #####################Arithmetic Operations#####################
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeAdd(Expr<?> eval, Expr<?> eval2) {
         if (eval instanceof FPExpr || eval2 instanceof FPExpr)
             return z3.mkFPAdd(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
@@ -212,7 +194,7 @@ public class TranslatorToZ3 implements AutoCloseable {
         return z3.mkAdd((ArithExpr) eval, (ArithExpr) eval2);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeSub(Expr<?> eval, Expr<?> eval2) {
         if (eval instanceof FPExpr || eval2 instanceof FPExpr)
             return z3.mkFPSub(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
@@ -220,7 +202,7 @@ public class TranslatorToZ3 implements AutoCloseable {
         return z3.mkSub((ArithExpr) eval, (ArithExpr) eval2);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeMul(Expr<?> eval, Expr<?> eval2) {
         if (eval instanceof FPExpr || eval2 instanceof FPExpr)
             return z3.mkFPMul(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
@@ -228,7 +210,7 @@ public class TranslatorToZ3 implements AutoCloseable {
         return z3.mkMul((ArithExpr) eval, (ArithExpr) eval2);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Expr<?> makeDiv(Expr<?> eval, Expr<?> eval2) {
         if (eval instanceof FPExpr || eval2 instanceof FPExpr)
             return z3.mkFPDiv(z3.mkFPRoundNearestTiesToEven(), toFP(eval), toFP(eval2));
@@ -237,8 +219,7 @@ public class TranslatorToZ3 implements AutoCloseable {
     }
 
     public Expr<?> makeMod(Expr<?> eval, Expr<?> eval2) {
-        if (eval instanceof FPExpr || eval2 instanceof FPExpr)
-            return z3.mkFPRem(toFP(eval), toFP(eval2));
+        if (eval instanceof FPExpr || eval2 instanceof FPExpr) return z3.mkFPRem(toFP(eval), toFP(eval2));
         return z3.mkMod((IntExpr) eval, (IntExpr) eval2);
     }
 
@@ -246,8 +227,7 @@ public class TranslatorToZ3 implements AutoCloseable {
         FPExpr f;
         if (e instanceof FPExpr) {
             f = (FPExpr) e;
-        } else if (e instanceof IntNum)
-            f = z3.mkFP(((IntNum) e).getInt(), z3.mkFPSort64());
+        } else if (e instanceof IntNum) f = z3.mkFP(((IntNum) e).getInt(), z3.mkFPSort64());
         else if (e instanceof IntExpr) {
             IntExpr ee = (IntExpr) e;
             RealExpr re = z3.mkInt2Real(ee);
@@ -261,8 +241,7 @@ public class TranslatorToZ3 implements AutoCloseable {
     }
 
     public Expr<?> makeIte(Expr<?> c, Expr<?> t, Expr<?> e) {
-        if (c instanceof BoolExpr)
-            return z3.mkITE((BoolExpr) c, t, e);
+        if (c instanceof BoolExpr) return z3.mkITE((BoolExpr) c, t, e);
         throw new RuntimeException("Condition is not a boolean expression");
     }
 
