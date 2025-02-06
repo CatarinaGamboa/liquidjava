@@ -1,4 +1,4 @@
-package testSuite.classes.stack_overflow.file_input_stream;
+package testSuite.in_progress.stack_overflow.file_input_stream_not_tested;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,6 +18,8 @@ import java.io.IOException;
  * Idea from: https://stackoverflow.com/questions/5900435/blackberry-fileconnection-illegalstateexception
  * I am not sure we can handle this case since testFile does not need to know about FileInputStream, it is only used as a parameter. 
  * Can we still relate them? Does it make sense?
+ * 
+ * In a way similar to https://stackoverflow.com/questions/15609033/causes-for-illegalstateexception
  */
 @SuppressWarnings("unused")
 public class Test {
@@ -33,12 +35,9 @@ public class Test {
             // Open the file
             inputStream = new FileInputStream(testFile);
             System.out.println("Reading the file...");
-            
-            // Simulate a long operation without closing the file
-            // Note: Normally, you'd process the file here, but we're just mimicking the issue
+
             Thread.sleep(500);  // Simulating a delay
             
-            // We forget to close the file here, mimicking the problem
             // inputStream.close(); // Error: Should be here to fix the issue
             
         } catch (IOException | InterruptedException e) {

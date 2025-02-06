@@ -1,4 +1,4 @@
-package testSuite.classes.stack_overflow.iterator_not_tested;
+package testSuite.in_progress.stack_overflow.iterator_not_tested;
 
 import java.util.Iterator;
 
