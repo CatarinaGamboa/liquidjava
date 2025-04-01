@@ -34,7 +34,7 @@ You can find out more about LiquidJava in the following resources:
 
 ## Run verification
 #### In a specific project
-Run the file `liquidjava-verifier\api\CommandLineLaucher` with the path to the target project for verification.
+Run the file `liquidjava-verifier\api\CommandLineLauncher` with the path to the target project for verification.
 If there are no arguments given, the application verifies the project on the path `liquidjava-example\src\main\java`.
 
 

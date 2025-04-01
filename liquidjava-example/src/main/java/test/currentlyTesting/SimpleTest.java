@@ -4,11 +4,23 @@ import liquidjava.specification.Refinement;
 
 class SimpleTest {
 
-  @Refinement("return > 0")
+  @Refinement("return < 0")
   public int test() {
     return 10;
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
 
 // @RefinementAlias("Percentage(int x) { 0 <= x && x <= 100 }")
 // @Refinement("Percentage(_)")

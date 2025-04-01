@@ -1,4 +1,4 @@
-package test.currentlyTesting;
+package testingInProgress;
 
 // @StateSet({"active", "inactive"})
 public class AccountClient {

@@ -10,7 +10,8 @@ import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
     public static void main(String[] args) {
-        String allPath = "./liquidjava-example/src/main/java/test/currentlyTesting";
+        String allPath //= "./liquidjava-example/src/main/java/test/currentlyTesting";
+        = "/Users/cgamboa/git/liquidjava-examples/part3-liquidJava/together1/src";
 
         // String allPath = "C://Regen/test-projects/src/Main.java";
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
