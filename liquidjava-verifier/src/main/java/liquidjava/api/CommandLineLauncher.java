@@ -12,7 +12,7 @@ import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
     public static void main(String[] args) {
-        String allPath  = "./liquidjava-example/src/main/java/test/currentlyTesting";
+        String allPath = "./liquidjava-example/src/main/java/test/currentlyTesting";
 
         // String allPath = "C://Regen/test-projects/src/Main.java";
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
@@ -32,11 +32,11 @@ public class CommandLineLauncher {
         System.out.println("Running LiquidJava on: " + file);
         Launcher launcher = new Launcher();
         launcher.addInputResource(file);
-        // launcher.getEnvironment().setNoClasspath(true);
+        launcher.getEnvironment().setNoClasspath(true);
 
         // Get the current classpath from the system
-        String classpath = System.getProperty("java.class.path");
-        launcher.getEnvironment().setSourceClasspath(classpath.split(File.pathSeparator));
+        // String classpath = System.getProperty("java.class.path");
+        // launcher.getEnvironment().setSourceClasspath(classpath.split(File.pathSeparator));
 
         // optional
         // launcher.getEnvironment().setSourceClasspath(
@@ -54,10 +54,9 @@ public class CommandLineLauncher {
 
         try {
             // To only search the last package - less time spent
-            CtPackage v = factory.Package().getAll().stream()
-                    .reduce((first, second) -> second)
-                    .orElse(null);
-            if (v != null) processingManager.process(v);
+            CtPackage v = factory.Package().getAll().stream().reduce((first, second) -> second).orElse(null);
+            if (v != null)
+                processingManager.process(v);
             // To search all previous packages
             // processingManager.process(factory.Package().getRootPackage());
         } catch (Exception e) {
