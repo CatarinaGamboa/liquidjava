@@ -134,7 +134,7 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter-engine</artifactId>
-			<scope>test</scope>
+			<scope>compile</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.junit.vintage</groupId>
@@ -171,7 +171,7 @@
 		<dependency>
 			<groupId>liquidjava-api</groupId>
 			<artifactId>liquidjava-api</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<version>0.0.2-SNAPSHOT</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.antlr/antlr4 -->

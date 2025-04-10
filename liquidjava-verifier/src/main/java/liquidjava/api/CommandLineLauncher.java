@@ -29,6 +29,7 @@ public class CommandLineLauncher {
     }
 
     public static ErrorEmitter launch(String file) {
+        System.out.println("Running LiquidJava on: " + file);
         Launcher launcher = new Launcher();
         launcher.addInputResource(file);
         // launcher.getEnvironment().setNoClasspath(true);
