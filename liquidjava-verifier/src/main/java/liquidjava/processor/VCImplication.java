@@ -30,31 +30,32 @@ public class VCImplication {
         if (name != null && type != null) {
             String qualType = type.getQualifiedName();
             String simpleType = qualType.contains(".") ? qualType.substring(qualType.lastIndexOf(".") + 1) : qualType;
-            return String.format(
-                    "%-20s %s %s",
-                    "∀" + name + ":" + simpleType + ",",
-                    refinement.toString(),
+            return String.format("%-20s %s %s", "∀" + name + ":" + simpleType + ",", refinement.toString(),
                     next != null ? " => \n" + next.toString() : "");
-        } else return String.format("%-20s %s", "", refinement.toString());
+        } else
+            return String.format("%-20s %s", "", refinement.toString());
     }
 
     public Predicate toConjunctions() {
         Predicate c = new Predicate();
-        if (name == null && type == null && next == null) return c;
+        if (name == null && type == null && next == null)
+            return c;
         c = auxConjunction(c);
         return c;
     }
 
     private Predicate auxConjunction(Predicate c) {
         Predicate t = Predicate.createConjunction(c, refinement);
-        if (next == null) return t;
+        if (next == null)
+            return t;
         t = next.auxConjunction(t);
         return t;
     }
 
     public VCImplication clone() {
         VCImplication vc = new VCImplication(this.name, this.type, this.refinement.clone());
-        if (this.next != null) vc.next = this.next.clone();
+        if (this.next != null)
+            vc.next = this.next.clone();
         return vc;
     }
 }

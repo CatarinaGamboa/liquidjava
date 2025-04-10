@@ -33,8 +33,7 @@ public class FieldGhostsGeneration extends CtScanner {
             return;
         }
 
-        ctClass.getDeclaredFields().stream()
-                .filter(fld -> fld.getType().getQualifiedName().equals("int"))
+        ctClass.getDeclaredFields().stream().filter(fld -> fld.getType().getQualifiedName().equals("int"))
                 .forEach(fld -> {
                     CtTypeReference<?> fld_type = fld.getType();
                     CtAnnotation<?> gen_ann = factory.createAnnotation(factory.createCtTypeReference(Ghost.class));

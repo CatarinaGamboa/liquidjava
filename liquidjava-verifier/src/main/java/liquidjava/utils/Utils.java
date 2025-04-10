@@ -37,21 +37,21 @@ public class Utils {
     public static CtTypeReference<?> getType(String type, Factory factory) {
         // TODO complete
         switch (type) {
-            case INT:
-                return factory.Type().INTEGER_PRIMITIVE;
-            case DOUBLE:
-                return factory.Type().DOUBLE_PRIMITIVE;
-            case BOOLEAN:
-                return factory.Type().BOOLEAN_PRIMITIVE;
-            case INT_LIST:
-                return factory.createArrayReference(getType("int", factory));
-            case STRING:
-                return factory.Type().STRING;
-            case LIST:
-                return factory.Type().LIST;
-            default:
-                // return factory.Type().OBJECT;
-                return factory.createReference(type);
+        case INT:
+            return factory.Type().INTEGER_PRIMITIVE;
+        case DOUBLE:
+            return factory.Type().DOUBLE_PRIMITIVE;
+        case BOOLEAN:
+            return factory.Type().BOOLEAN_PRIMITIVE;
+        case INT_LIST:
+            return factory.createArrayReference(getType("int", factory));
+        case STRING:
+            return factory.Type().STRING;
+        case LIST:
+            return factory.Type().LIST;
+        default:
+            // return factory.Type().OBJECT;
+            return factory.createReference(type);
         }
     }
 }

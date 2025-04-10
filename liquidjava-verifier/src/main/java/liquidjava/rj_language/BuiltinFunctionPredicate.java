@@ -16,8 +16,8 @@ public class BuiltinFunctionPredicate extends Predicate {
         return new BuiltinFunctionPredicate(ee, elem, "length", param);
     }
 
-    public static BuiltinFunctionPredicate builtin_addToIndex(
-            String array, String index, String value, CtElement elem, ErrorEmitter ee) throws ParsingException {
+    public static BuiltinFunctionPredicate builtin_addToIndex(String array, String index, String value, CtElement elem,
+            ErrorEmitter ee) throws ParsingException {
         return new BuiltinFunctionPredicate(ee, elem, "addToIndex", index, value);
     }
 
@@ -25,7 +25,8 @@ public class BuiltinFunctionPredicate extends Predicate {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < params.length; i++) {
             sb.append(params[i]);
-            if (i < params.length - 1) sb.append(", ");
+            if (i < params.length - 1)
+                sb.append(", ");
         }
         return sb.toString();
     }

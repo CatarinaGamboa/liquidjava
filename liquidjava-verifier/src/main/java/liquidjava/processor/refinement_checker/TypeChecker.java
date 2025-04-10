@@ -38,7 +38,7 @@ public abstract class TypeChecker extends CtScanner {
     public final String freshFormat = "#fresh_%d";
     public final String instanceFormat = "#%s_%d";
     public final String thisFormat = "this#%s";
-    public String[] implementedTypes = {"boolean", "int", "short", "long", "float", "double"}; // TODO add
+    public String[] implementedTypes = { "boolean", "int", "short", "long", "float", "double" }; // TODO add
     // types e.g., "int[]"
 
     Context context;
@@ -87,7 +87,8 @@ public abstract class TypeChecker extends CtScanner {
         }
         if (ref.isPresent()) {
             Predicate p = new Predicate(ref.get(), element, errorEmitter);
-            if (errorEmitter.foundError()) return Optional.empty();
+            if (errorEmitter.foundError())
+                return Optional.empty();
             constr = Optional.of(p);
         }
         return constr;
@@ -126,13 +127,12 @@ public abstract class TypeChecker extends CtScanner {
                 @SuppressWarnings("unchecked")
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
-                GhostState gs = new GhostState(
-                        f, g.getParametersTypes(), factory.Type().BOOLEAN_PRIMITIVE, g.getParentClassName());
+                GhostState gs = new GhostState(f, g.getParametersTypes(), factory.Type().BOOLEAN_PRIMITIVE,
+                        g.getParentClassName());
                 gs.setGhostParent(g);
                 gs.setRefinement(
                         /* new OperationPredicate(new InvocationPredicate(f, THIS), "<-->", */
-                        Predicate.createEquals(
-                                ip, Predicate.createLit(Integer.toString(order), Utils.INT))); // open(THIS)
+                        Predicate.createEquals(ip, Predicate.createLit(Integer.toString(order), Utils.INT))); // open(THIS)
                 // ->
                 // state1(THIS)
                 // == 1
@@ -151,11 +151,8 @@ public abstract class TypeChecker extends CtScanner {
             return;
         }
         if (gd.getParam_types().size() > 0) {
-            ErrorHandler.printCostumeError(
-                    ann,
-                    "Ghost States have the class as parameter " + "by default, no other parameters are allowed in '"
-                            + string + "'",
-                    errorEmitter);
+            ErrorHandler.printCostumeError(ann, "Ghost States have the class as parameter "
+                    + "by default, no other parameters are allowed in '" + string + "'", errorEmitter);
             return;
         }
         // Set class as parameter of Ghost
@@ -198,12 +195,8 @@ public abstract class TypeChecker extends CtScanner {
             CtTypeReference<?> ret = factory.Type().INTEGER_PRIMITIVE;
             List<String> params = Arrays.asList(klass.getSimpleName());
             GhostFunction gh = new GhostFunction(
-                    String.format("%s_state%d", klass.getSimpleName().toLowerCase(), order),
-                    params,
-                    ret,
-                    factory,
-                    klass.getQualifiedName(),
-                    klass.getSimpleName());
+                    String.format("%s_state%d", klass.getSimpleName().toLowerCase(), order), params, ret, factory,
+                    klass.getQualifiedName(), klass.getSimpleName());
             return Optional.of(gh);
         }
         return Optional.empty();
@@ -218,8 +211,8 @@ public abstract class TypeChecker extends CtScanner {
                 context.addGhostFunction(gh);
             }
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(
-                    element, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
+            ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function" + e.getMessage(),
+                    errorEmitter);
             // e.printStackTrace();
             return;
         }
@@ -254,9 +247,7 @@ public abstract class TypeChecker extends CtScanner {
     Optional<String> getExternalRefinement(CtInterface<?> intrface) {
         Optional<String> ref = Optional.empty();
         for (CtAnnotation<? extends Annotation> ann : intrface.getAnnotations())
-            if (ann.getActualAnnotation()
-                    .annotationType()
-                    .getCanonicalName()
+            if (ann.getActualAnnotation().annotationType().getCanonicalName()
                     .contentEquals("liquidjava.specification.ExternalRefinementsFor")) {
                 @SuppressWarnings("unchecked")
                 CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
@@ -265,19 +256,20 @@ public abstract class TypeChecker extends CtScanner {
         return ref;
     }
 
-    public void checkVariableRefinements(
-            Predicate refinementFound, String simpleName, CtTypeReference<?> type, CtElement usage, CtElement variable)
-            throws ParsingException {
+    public void checkVariableRefinements(Predicate refinementFound, String simpleName, CtTypeReference<?> type,
+            CtElement usage, CtElement variable) throws ParsingException {
         Optional<Predicate> expectedType = getRefinementFromAnnotation(variable);
         Predicate cEt;
         RefinedVariable mainRV = null;
-        if (context.hasVariable(simpleName)) mainRV = context.getVariableByName(simpleName);
+        if (context.hasVariable(simpleName))
+            mainRV = context.getVariableByName(simpleName);
 
-        if (context.hasVariable(simpleName)
-                && !context.getVariableByName(simpleName).getRefinement().isBooleanTrue())
+        if (context.hasVariable(simpleName) && !context.getVariableByName(simpleName).getRefinement().isBooleanTrue())
             cEt = mainRV.getMainRefinement();
-        else if (expectedType.isPresent()) cEt = expectedType.get();
-        else cEt = new Predicate();
+        else if (expectedType.isPresent())
+            cEt = expectedType.get();
+        else
+            cEt = new Predicate();
 
         cEt = cEt.substituteVariable(WILD_VAR, simpleName);
         Predicate cet = cEt.substituteVariable(WILD_VAR, simpleName);
@@ -289,7 +281,8 @@ public abstract class TypeChecker extends CtScanner {
 
         // Substitute variable in verification
         RefinedVariable rv = context.addInstanceToContext(newName, type, correctNewRefinement, usage);
-        for (CtTypeReference<?> t : mainRV.getSuperTypes()) rv.addSuperType(t);
+        for (CtTypeReference<?> t : mainRV.getSuperTypes())
+            rv.addSuperType(t);
         context.addRefinementInstanceToVariable(simpleName, newName);
         // smt check
         checkSMT(cEt, usage); // TODO CHANGE
@@ -302,13 +295,13 @@ public abstract class TypeChecker extends CtScanner {
     }
 
     public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String string) {
-        vcChecker.processSubtyping(
-                prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target, string, factory);
+        vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target, string,
+                factory);
     }
 
     public boolean checksStateSMT(Predicate prevState, Predicate expectedState, SourcePosition p) {
-        return vcChecker.canProcessSubtyping(
-                prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, p, factory);
+        return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, p,
+                factory);
     }
 
     public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customeMessage) {

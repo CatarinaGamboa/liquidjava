@@ -47,20 +47,24 @@ public class GroupExpression extends Expression {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-                + ((getExpression() == null) ? 0 : getExpression().hashCode());
+        result = prime * result + ((getExpression() == null) ? 0 : getExpression().hashCode());
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
         GroupExpression other = (GroupExpression) obj;
         if (getExpression() == null) {
-            if (other.getExpression() != null) return false;
-        } else if (!getExpression().equals(other.getExpression())) return false;
+            if (other.getExpression() != null)
+                return false;
+        } else if (!getExpression().equals(other.getExpression()))
+            return false;
         return true;
     }
 }

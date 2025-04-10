@@ -35,7 +35,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (errorEmitter.foundError()) return;
+        if (errorEmitter.foundError())
+            return;
 
         Optional<String> externalRefinements = getExternalRefinement(intrface);
         if (externalRefinements.isPresent()) {
@@ -52,7 +53,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtField(CtField<T> f) {
-        if (errorEmitter.foundError()) return;
+        if (errorEmitter.foundError())
+            return;
 
         Optional<Predicate> oc;
         try {
@@ -66,7 +68,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (errorEmitter.foundError()) return;
+        if (errorEmitter.foundError())
+            return;
 
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
         try {
@@ -93,8 +96,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
 
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(
-                    element, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
+            ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function" + e.getMessage(),
+                    errorEmitter);
             // e.printStackTrace();
         }
     }
@@ -106,8 +109,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (klass != null) {
             CtTypeReference<?> ret = factory.Type().INTEGER_PRIMITIVE;
             List<String> params = Arrays.asList(klass);
-            GhostFunction gh = new GhostFunction(
-                    String.format("%s_state%d", klass.toLowerCase(), order), params, ret, factory, prefix, klass);
+            GhostFunction gh = new GhostFunction(String.format("%s_state%d", klass.toLowerCase(), order), params, ret,
+                    factory, prefix, klass);
             return Optional.of(gh);
         }
         return Optional.empty();

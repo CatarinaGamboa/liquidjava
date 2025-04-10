@@ -36,7 +36,8 @@ public class Context {
 
     // SINGLETON
     public static Context getInstance() {
-        if (instance == null) instance = new Context();
+        if (instance == null)
+            instance = new Context();
         return instance;
     }
 
@@ -62,13 +63,17 @@ public class Context {
     public void enterContext() {
         ctxVars.push(new ArrayList<>());
         // make each variable enter context
-        for (RefinedVariable vi : getAllVariables()) if (vi instanceof Variable) ((Variable) vi).enterContext();
+        for (RefinedVariable vi : getAllVariables())
+            if (vi instanceof Variable)
+                ((Variable) vi).enterContext();
     }
 
     public void exitContext() {
         ctxVars.pop();
         // make each variable exit context
-        for (RefinedVariable vi : getAllVariables()) if (vi instanceof Variable) ((Variable) vi).exitContext();
+        for (RefinedVariable vi : getAllVariables())
+            if (vi instanceof Variable)
+                ((Variable) vi).exitContext();
     }
 
     public int getCounter() {
@@ -82,8 +87,10 @@ public class Context {
                 ret.put(var.getName(), var.getType());
             }
         }
-        for (RefinedVariable var : ctxSpecificVars) ret.put(var.getName(), var.getType());
-        for (RefinedVariable var : ctxGlobalVars) ret.put(var.getName(), var.getType());
+        for (RefinedVariable var : ctxSpecificVars)
+            ret.put(var.getName(), var.getType());
+        for (RefinedVariable var : ctxGlobalVars)
+            ret.put(var.getName(), var.getType());
         return ret;
     }
 
@@ -108,8 +115,8 @@ public class Context {
         var.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
     }
 
-    public RefinedVariable addVarToContext(
-            String simpleName, CtTypeReference<?> type, Predicate c, CtElement placementInCode) {
+    public RefinedVariable addVarToContext(String simpleName, CtTypeReference<?> type, Predicate c,
+            CtElement placementInCode) {
         RefinedVariable vi = new Variable(simpleName, type, c);
         vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
         vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
@@ -117,16 +124,17 @@ public class Context {
         return vi;
     }
 
-    public RefinedVariable addInstanceToContext(
-            String simpleName, CtTypeReference<?> type, Predicate c, CtElement placementInCode) {
+    public RefinedVariable addInstanceToContext(String simpleName, CtTypeReference<?> type, Predicate c,
+            CtElement placementInCode) {
         RefinedVariable vi = new VariableInstance(simpleName, type, c);
         vi.addPlacementInCode(PlacementInCode.createPlacement(placementInCode));
-        if (!ctxSpecificVars.contains(vi)) addSpecificVariable(vi);
+        if (!ctxSpecificVars.contains(vi))
+            addSpecificVariable(vi);
         return vi;
     }
 
-    public void addRefinementToVariableInContext(
-            String name, CtTypeReference<?> type, Predicate et, CtElement placementInCode) {
+    public void addRefinementToVariableInContext(String name, CtTypeReference<?> type, Predicate et,
+            CtElement placementInCode) {
         if (hasVariable(name)) {
             RefinedVariable vi = getVariableByName(name);
             vi.setRefinement(et);
@@ -156,14 +164,17 @@ public class Context {
     public RefinedVariable getVariableByName(String name) {
         for (List<RefinedVariable> l : ctxVars) {
             for (RefinedVariable var : l) {
-                if (var.getName().equals(name)) return var;
+                if (var.getName().equals(name))
+                    return var;
             }
         }
         for (RefinedVariable var : ctxSpecificVars) {
-            if (var.getName().equals(name)) return var;
+            if (var.getName().equals(name))
+                return var;
         }
         for (RefinedVariable var : ctxGlobalVars) {
-            if (var.getName().equals(name)) return var;
+            if (var.getName().equals(name))
+                return var;
         }
         return null;
     }
@@ -200,10 +211,12 @@ public class Context {
     public List<RefinedVariable> getAllVariablesWithSupertypes() {
         List<RefinedVariable> lvi = new ArrayList<>();
         for (RefinedVariable rv : getAllVariables()) {
-            if (rv.getSuperTypes().size() > 0) lvi.add(rv);
+            if (rv.getSuperTypes().size() > 0)
+                lvi.add(rv);
         }
         for (RefinedVariable rv : ctxSpecificVars) {
-            if (rv.getSuperTypes().size() > 0) lvi.add(rv);
+            if (rv.getSuperTypes().size() > 0)
+                lvi.add(rv);
         }
         return lvi;
     }
@@ -211,9 +224,9 @@ public class Context {
     public void addRefinementInstanceToVariable(String name, String instanceName) {
         RefinedVariable vi1 = getVariableByName(name);
         RefinedVariable vi2 = getVariableByName(instanceName);
-        if (!hasVariable(name)
-                || !hasVariable(instanceName)
-                || !(vi1 instanceof Variable && vi2 instanceof VariableInstance)) return;
+        if (!hasVariable(name) || !hasVariable(instanceName)
+                || !(vi1 instanceof Variable && vi2 instanceof VariableInstance))
+            return;
 
         ((Variable) vi1).addInstance((VariableInstance) vi2);
         ((VariableInstance) vi2).setParent((Variable) vi1);
@@ -222,7 +235,8 @@ public class Context {
 
     public Optional<VariableInstance> getLastVariableInstance(String name) {
         RefinedVariable rv = getVariableByName(name);
-        if (!hasVariable(name) || !(rv instanceof Variable)) return Optional.empty();
+        if (!hasVariable(name) || !(rv instanceof Variable))
+            return Optional.empty();
         return ((Variable) rv).getLastInstance();
     }
 
@@ -236,23 +250,33 @@ public class Context {
 
     // ---------------------- Variables - if information storing ----------------------
     public void variablesSetBeforeIf() {
-        for (RefinedVariable vi : getAllVariables()) if (vi instanceof Variable) ((Variable) vi).saveInstanceBeforeIf();
+        for (RefinedVariable vi : getAllVariables())
+            if (vi instanceof Variable)
+                ((Variable) vi).saveInstanceBeforeIf();
     }
 
     public void variablesSetThenIf() {
-        for (RefinedVariable vi : getAllVariables()) if (vi instanceof Variable) ((Variable) vi).saveInstanceThen();
+        for (RefinedVariable vi : getAllVariables())
+            if (vi instanceof Variable)
+                ((Variable) vi).saveInstanceThen();
     }
 
     public void variablesSetElseIf() {
-        for (RefinedVariable vi : getAllVariables()) if (vi instanceof Variable) ((Variable) vi).saveInstanceElse();
+        for (RefinedVariable vi : getAllVariables())
+            if (vi instanceof Variable)
+                ((Variable) vi).saveInstanceElse();
     }
 
     public void variablesNewIfCombination() {
-        for (RefinedVariable vi : getAllVariables()) if (vi instanceof Variable) ((Variable) vi).newIfCombination();
+        for (RefinedVariable vi : getAllVariables())
+            if (vi instanceof Variable)
+                ((Variable) vi).newIfCombination();
     }
 
     public void variablesFinishIfCombination() {
-        for (RefinedVariable vi : getAllVariables()) if (vi instanceof Variable) ((Variable) vi).finishIfCombination();
+        for (RefinedVariable vi : getAllVariables())
+            if (vi instanceof Variable)
+                ((Variable) vi).finishIfCombination();
     }
 
     public void variablesCombineFromIf(Predicate cond) {
@@ -270,14 +294,14 @@ public class Context {
 
     // ---------------------- Functions ----------------------
     public void addFunctionToContext(RefinedFunction f) {
-        if (!ctxFunctions.contains(f)) ctxFunctions.add(f);
+        if (!ctxFunctions.contains(f))
+            ctxFunctions.add(f);
     }
 
     public RefinedFunction getFunction(String name, String target) {
         for (RefinedFunction fi : ctxFunctions) {
-            if (fi.getTargetClass() != null
-                    && fi.getName().equals(name)
-                    && fi.getTargetClass().equals(target)) return fi;
+            if (fi.getTargetClass() != null && fi.getName().equals(name) && fi.getTargetClass().equals(target))
+                return fi;
         }
         // for(RefinedFunction fi: ctxGlobalFunctions) {
         // if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
@@ -288,10 +312,9 @@ public class Context {
 
     public RefinedFunction getFunction(String name, String target, int size) {
         for (RefinedFunction fi : ctxFunctions) {
-            if (fi.getTargetClass() != null
-                    && fi.getName().equals(name)
-                    && fi.getTargetClass().equals(target)
-                    && fi.getArguments().size() == size) return fi;
+            if (fi.getTargetClass() != null && fi.getName().equals(name) && fi.getTargetClass().equals(target)
+                    && fi.getArguments().size() == size)
+                return fi;
         }
         return null;
     }
@@ -299,7 +322,8 @@ public class Context {
     public List<RefinedFunction> getAllMethodsWithNameSize(String name, int size) {
         List<RefinedFunction> l = new ArrayList<>();
         for (RefinedFunction fi : ctxFunctions) {
-            if (fi.getName().equals(name) && fi.getArguments().size() == size) l.add(fi);
+            if (fi.getName().equals(name) && fi.getArguments().size() == size)
+                l.add(fi);
         }
         return l;
     }
@@ -311,7 +335,8 @@ public class Context {
 
     public boolean hasGhost(String name) {
         for (GhostFunction g : ghosts) {
-            if (g.getName().equals(name)) return true;
+            if (g.getName().equals(name))
+                return true;
         }
         return false;
     }
@@ -321,12 +346,14 @@ public class Context {
     }
 
     public void addGhostClass(String klass) {
-        if (!classStates.containsKey(klass)) classStates.put(klass, new ArrayList<>());
+        if (!classStates.containsKey(klass))
+            classStates.put(klass, new ArrayList<>());
     }
 
     public void addToGhostClass(String klass, GhostState gs) {
         List<GhostState> l = classStates.get(klass);
-        if (!l.contains(gs)) l.add(gs);
+        if (!l.contains(gs))
+            l.add(gs);
     }
 
     public List<GhostState> getGhostState(String s) {
@@ -335,13 +362,15 @@ public class Context {
 
     public List<GhostState> getGhostState() {
         List<GhostState> lgs = new ArrayList<>();
-        for (List<GhostState> l : classStates.values()) lgs.addAll(l);
+        for (List<GhostState> l : classStates.values())
+            lgs.addAll(l);
         return lgs;
     }
 
     // ---------------------- Alias ----------------------
     public void addAlias(AliasWrapper aw) {
-        if (!alias.contains(aw)) alias.add(aw);
+        if (!alias.contains(aw))
+            alias.add(aw);
     }
 
     public List<AliasWrapper> getAlias() {
@@ -352,7 +381,8 @@ public class Context {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("\n############Global Variables:############\n");
-        for (RefinedVariable f : ctxGlobalVars) sb.append(f.toString());
+        for (RefinedVariable f : ctxGlobalVars)
+            sb.append(f.toString());
         sb.append("\n###########Variables############");
         for (List<RefinedVariable> l : ctxVars) {
             sb.append("{");
@@ -365,10 +395,12 @@ public class Context {
         // for(RefinedFunction f : ctxGlobalFunctions)
         // sb.append(f.toString());
         sb.append("\n############Functions:############\n");
-        for (RefinedFunction f : ctxFunctions) sb.append(f.toString());
+        for (RefinedFunction f : ctxFunctions)
+            sb.append(f.toString());
 
         sb.append("\n############Ghost Functions:############\n");
-        for (GhostFunction f : ghosts) sb.append(f.toString());
+        for (GhostFunction f : ghosts)
+            sb.append(f.toString());
         return sb.toString();
     }
 

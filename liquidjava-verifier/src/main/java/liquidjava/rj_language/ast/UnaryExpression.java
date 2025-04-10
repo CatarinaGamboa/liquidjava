@@ -24,10 +24,10 @@ public class UnaryExpression extends Expression {
     @Override
     public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
         switch (op) {
-            case "-":
-                return ctx.makeMinus(getExpression().eval(ctx));
-            case "!":
-                return ctx.mkNot(getExpression().eval(ctx));
+        case "-":
+            return ctx.makeMinus(getExpression().eval(ctx));
+        case "!":
+            return ctx.mkNot(getExpression().eval(ctx));
         }
         return null;
     }
@@ -61,24 +61,30 @@ public class UnaryExpression extends Expression {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result
-                + ((getExpression() == null) ? 0 : getExpression().hashCode());
+        result = prime * result + ((getExpression() == null) ? 0 : getExpression().hashCode());
         result = prime * result + ((op == null) ? 0 : op.hashCode());
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null) return false;
-        if (getClass() != obj.getClass()) return false;
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
         UnaryExpression other = (UnaryExpression) obj;
         if (getExpression() == null) {
-            if (other.getExpression() != null) return false;
-        } else if (!getExpression().equals(other.getExpression())) return false;
+            if (other.getExpression() != null)
+                return false;
+        } else if (!getExpression().equals(other.getExpression()))
+            return false;
         if (op == null) {
-            if (other.op != null) return false;
-        } else if (!op.equals(other.op)) return false;
+            if (other.op != null)
+                return false;
+        } else if (!op.equals(other.op))
+            return false;
         return true;
     }
 }

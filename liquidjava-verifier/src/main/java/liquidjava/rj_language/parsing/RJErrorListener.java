@@ -23,19 +23,15 @@ public class RJErrorListener implements ANTLRErrorListener {
     }
 
     @Override
-    public void syntaxError(
-            Recognizer<?, ?> recognizer,
-            Object offendingSymbol,
-            int line,
-            int charPositionInLine,
-            String msg,
-            RecognitionException e) {
+    public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine,
+            String msg, RecognitionException e) {
         // Hint for == instead of =
         String hint = null;
         if (e instanceof LexerNoViableAltException) {
             LexerNoViableAltException l = (LexerNoViableAltException) e;
             char c = l.getInputStream().toString().charAt(charPositionInLine);
-            if (c == '=') hint = "Predicates must be compared with == instead of =";
+            if (c == '=')
+                hint = "Predicates must be compared with == instead of =";
         }
         errors++;
         String ms = "Error in " + msg + ", in the position " + charPositionInLine;
@@ -43,22 +39,19 @@ public class RJErrorListener implements ANTLRErrorListener {
     }
 
     @Override
-    public void reportAmbiguity(
-            Parser recognizer,
-            DFA dfa,
-            int startIndex,
-            int stopIndex,
-            boolean exact,
-            BitSet ambigAlts,
-            ATNConfigSet configs) {}
+    public void reportAmbiguity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, boolean exact,
+            BitSet ambigAlts, ATNConfigSet configs) {
+    }
 
     @Override
-    public void reportAttemptingFullContext(
-            Parser recognizer, DFA dfa, int startIndex, int stopIndex, BitSet conflictingAlts, ATNConfigSet configs) {}
+    public void reportAttemptingFullContext(Parser recognizer, DFA dfa, int startIndex, int stopIndex,
+            BitSet conflictingAlts, ATNConfigSet configs) {
+    }
 
     @Override
-    public void reportContextSensitivity(
-            Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction, ATNConfigSet configs) {}
+    public void reportContextSensitivity(Parser recognizer, DFA dfa, int startIndex, int stopIndex, int prediction,
+            ATNConfigSet configs) {
+    }
 
     public int getErrors() {
         return errors;
@@ -68,7 +61,8 @@ public class RJErrorListener implements ANTLRErrorListener {
         StringBuilder sb = new StringBuilder();
         String pl = errors == 1 ? "" : "s";
         sb.append("Found ").append(errors).append(" error" + pl).append(", with the message" + pl + ":\n");
-        for (String s : msgs) sb.append("* " + s + "\n");
+        for (String s : msgs)
+            sb.append("* " + s + "\n");
         return sb.toString();
     }
 }
