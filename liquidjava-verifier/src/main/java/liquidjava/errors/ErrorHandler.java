@@ -20,13 +20,22 @@ public class ErrorHandler {
      * @param expectedType
      * @param cSMT
      */
-    public static <T> void printError(CtElement var, Predicate expectedType, Predicate cSMT,
-            HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+    public static <T> void printError(
+            CtElement var,
+            Predicate expectedType,
+            Predicate cSMT,
+            HashMap<String, PlacementInCode> map,
+            ErrorEmitter ee) {
         printError(var, null, expectedType, cSMT, map, ee);
     }
 
-    public static <T> void printError(CtElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
-            HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+    public static <T> void printError(
+            CtElement var,
+            String moreInfo,
+            Predicate expectedType,
+            Predicate cSMT,
+            HashMap<String, PlacementInCode> map,
+            ErrorEmitter errorl) {
         String resumeMessage = "Type expected:" + expectedType.toString(); // + "; " +"Refinement found:" +
         // cSMT.toString();
 
@@ -35,8 +44,7 @@ public class ErrorHandler {
         // title
         StringBuilder sbtitle = new StringBuilder();
         sbtitle.append("Failed to check refinement at: \n\n");
-        if (moreInfo != null)
-            sbtitle.append(moreInfo + "\n");
+        if (moreInfo != null) sbtitle.append(moreInfo + "\n");
         sbtitle.append(var.toString());
         // all message
         sb.append(sbtitle.toString() + "\n\n");
@@ -49,8 +57,13 @@ public class ErrorHandler {
         errorl.addError(resumeMessage, sb.toString(), var.getPosition(), 1, map);
     }
 
-    public static void printStateMismatch(CtElement element, String method, VCImplication constraintForErrorMsg,
-            String states, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+    public static void printStateMismatch(
+            CtElement element,
+            String method,
+            VCImplication constraintForErrorMsg,
+            String states,
+            HashMap<String, PlacementInCode> map,
+            ErrorEmitter errorl) {
 
         String resumeMessage = "Failed to check state transitions. " + "Expected possible states:" + states; // + ";
         // Found
@@ -78,8 +91,12 @@ public class ErrorHandler {
         errorl.addError(resumeMessage, sb.toString(), element.getPosition(), 1, map);
     }
 
-    public static <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement,
-            HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+    public static <T> void printErrorUnknownVariable(
+            CtElement var,
+            String et,
+            String correctRefinement,
+            HashMap<String, PlacementInCode> map,
+            ErrorEmitter errorl) {
 
         String resumeMessage = "Encountered unknown variable";
 
@@ -97,8 +114,13 @@ public class ErrorHandler {
         errorl.addError(resumeMessage, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static <T> void printNotFound(CtElement var, Predicate constraint, Predicate constraint2, String msg,
-            HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+    public static <T> void printNotFound(
+            CtElement var,
+            Predicate constraint,
+            Predicate constraint2,
+            String msg,
+            HashMap<String, PlacementInCode> map,
+            ErrorEmitter errorl) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
@@ -114,8 +136,12 @@ public class ErrorHandler {
         errorl.addError(msg, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static <T> void printErrorArgs(CtElement var, Predicate expectedType, String msg,
-            HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+    public static <T> void printErrorArgs(
+            CtElement var,
+            Predicate expectedType,
+            String msg,
+            HashMap<String, PlacementInCode> map,
+            ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
         String title = "Error in ghost invocation: " + msg + "\n";
@@ -128,8 +154,12 @@ public class ErrorHandler {
         errorl.addError(title, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static void printErrorTypeMismatch(CtElement element, Predicate expectedType, String message,
-            HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+    public static void printErrorTypeMismatch(
+            CtElement element,
+            Predicate expectedType,
+            String message,
+            HashMap<String, PlacementInCode> map,
+            ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
         sb.append(message + "\n\n");
@@ -141,8 +171,8 @@ public class ErrorHandler {
         errorl.addError(message, sb.toString(), element.getPosition(), 2, map);
     }
 
-    public static void printSameStateSetError(CtElement element, Predicate p, String name,
-            HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
+    public static void printSameStateSetError(
+            CtElement element, Predicate p, String name, HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
         String resume = "Error found multiple disjoint states from a State Set in a refinement";
 
         StringBuilder sb = new StringBuilder();
@@ -219,8 +249,7 @@ public class ErrorHandler {
 
     private static String printLine() {
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 130; i++)
-            sb.append("-"); // -----------
+        for (int i = 0; i < 130; i++) sb.append("-"); // -----------
         return sb.toString();
     }
 
@@ -238,7 +267,9 @@ public class ErrorHandler {
         formatter.format(printLine() + "\n");
         // data
         for (String s : map.keySet())
-            formatter.format("| %-32s | %-60s | %-1s \n", s, map.get(s).getText(), map.get(s).getSimplePosition());
+            formatter.format(
+                    "| %-32s | %-60s | %-1s \n",
+                    s, map.get(s).getText(), map.get(s).getSimplePosition());
         // end
         formatter.format(printLine() + "\n\n");
         String s = formatter.toString();

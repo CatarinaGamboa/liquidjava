@@ -16,5 +16,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Repeatable(RefinementAliasMultiple.class)
 public @interface RefinementAlias {
-  public String value();
+    public String value();
 }

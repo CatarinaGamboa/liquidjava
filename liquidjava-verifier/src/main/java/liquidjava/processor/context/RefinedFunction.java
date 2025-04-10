@@ -69,8 +69,7 @@ public class RefinedFunction extends Refined {
 
     public Predicate getAllRefinements() {
         Predicate c = new Predicate();
-        for (RefinedVariable p : argRefinements)
-            c = Predicate.createConjunction(c, p.getRefinement()); // joinArgs
+        for (RefinedVariable p : argRefinements) c = Predicate.createConjunction(c, p.getRefinement()); // joinArgs
         c = Predicate.createConjunction(c, super.getRefinement()); // joinReturn
         return c;
     }
@@ -79,7 +78,7 @@ public class RefinedFunction extends Refined {
      * Gives the Predicate for a certain parameter index and regards all the previous parameters' Predicates
      *
      * @param index
-     * 
+     *
      * @return
      */
     public Predicate getRefinementsForParamIndex(int index) {
@@ -118,15 +117,13 @@ public class RefinedFunction extends Refined {
 
     public List<Predicate> getFromStates() {
         List<Predicate> lc = new ArrayList<>();
-        for (ObjectState os : stateChange)
-            lc.add(os.getFrom());
+        for (ObjectState os : stateChange) lc.add(os.getFrom());
         return lc;
     }
 
     public List<Predicate> getToStates() {
         List<Predicate> lc = new ArrayList<>();
-        for (ObjectState os : stateChange)
-            lc.add(os.getTo());
+        for (ObjectState os : stateChange) lc.add(os.getTo());
         return lc;
     }
 
@@ -147,23 +144,16 @@ public class RefinedFunction extends Refined {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (!super.equals(obj))
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (!super.equals(obj)) return false;
+        if (getClass() != obj.getClass()) return false;
         RefinedFunction other = (RefinedFunction) obj;
         if (argRefinements == null) {
-            if (other.argRefinements != null)
-                return false;
-        } else if (argRefinements.size() != other.argRefinements.size())
-            return false;
+            if (other.argRefinements != null) return false;
+        } else if (argRefinements.size() != other.argRefinements.size()) return false;
         if (targetClass == null) {
-            if (other.targetClass != null)
-                return false;
-        } else if (!targetClass.equals(other.targetClass))
-            return false;
+            if (other.targetClass != null) return false;
+        } else if (!targetClass.equals(other.targetClass)) return false;
         return true;
     }
 }

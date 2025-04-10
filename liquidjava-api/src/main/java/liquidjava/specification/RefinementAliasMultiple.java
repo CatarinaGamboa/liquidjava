@@ -13,5 +13,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE})
 public @interface RefinementAliasMultiple {
-  RefinementAlias[] value();
+    RefinementAlias[] value();
 }

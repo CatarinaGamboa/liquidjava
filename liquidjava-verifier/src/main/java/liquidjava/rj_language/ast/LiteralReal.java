@@ -59,15 +59,11 @@ public class LiteralReal extends Expression {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         LiteralReal other = (LiteralReal) obj;
-        if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value))
-            return false;
+        if (Double.doubleToLongBits(value) != Double.doubleToLongBits(other.value)) return false;
         return true;
     }
 }

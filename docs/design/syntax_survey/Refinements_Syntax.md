@@ -1,4 +1,4 @@
-# Java Refinements 
+# Java Refinements
 
 ## Refinements in Java - Syntax
 ## Introduction
@@ -41,7 +41,7 @@ This section serves as assessment of the knowledge ground on the different techn
 (If vaguely or not familiar with Refinement Types goes to next section, otherwise steps to the following section)
 
 ### Introduction to Refinement Types
-Refinement Types extend a language with predicates (boolean expressions) over the basic types. 
+Refinement Types extend a language with predicates (boolean expressions) over the basic types.
 A popular syntax is {v : T | p(v) }, of which {x : Integer | x > 0} is an instance.
 
 The example bellow represents a way to apply refinements in Java, where the variable y has the type int and a refinement that only allows y to have positive values which are lesser than 50. When the variable is assigned the value 10 no errors will be shown, but if the assigned value is 100 the compiler will send a refinement type error to the developer.
@@ -145,7 +145,7 @@ Analyse each of the examples bellow.
 
 ```java
 @Refinement("\\v >= 0 && \\v <= 100")
-public static int percentageFromGrade(@Refinement("grade >= 0") int grade, 
+public static int percentageFromGrade(@Refinement("grade >= 0") int grade,
                                       @Refinement("scale > 0")  int scale){...}
 ```
 
@@ -165,7 +165,7 @@ Which of the above syntaxes would you use? (possibility for multiple answers)
 
 ### **Alias**
 
-Several implementations of refinement types include alias for a group of predicates. 
+Several implementations of refinement types include alias for a group of predicates.
 In this section we present possible syntaxes for the creation of the alias and their usage in variable refinements.
 
 PtGrade is a refinement alias that describes an int between 0 and 20 - grade range used in the Portuguese higher education system.
@@ -214,8 +214,8 @@ File *PtGrade.java*
 ```java
 @Refinement(" int x | x >= 0 && x <= 20 ")
 @Retention(RetentionPolicy.CLASS)
-@Target({ ElementType.METHOD, ElementType.FIELD, 
-	  ElementType.LOCAL_VARIABLE, 
+@Target({ ElementType.METHOD, ElementType.FIELD,
+	  ElementType.LOCAL_VARIABLE,
           ElementType.PARAMETER, ElementType.TYPE })
 public @interface PtGrade {}
 ```
@@ -225,7 +225,7 @@ File *MyClass.java*
 ```java
 class MyClass{
     ...
-    @PtGrade @Refinement("positiveGrade >= 10") 
+    @PtGrade @Refinement("positiveGrade >= 10")
     int positiveGrade = 12;
 }
 ```
@@ -239,7 +239,7 @@ Which of the above syntaxes would you use? (possibility for multiple answers)
 
 ### Uninterpreted Functions
 
-To invoke functions inside the Refinements, these functions must be declared in the program as ghost functions, that are only relevant for the specification of the program properties. These functions work as uninterpreted functions, which means that only their signature is needed and not their implementation. 
+To invoke functions inside the Refinements, these functions must be declared in the program as ghost functions, that are only relevant for the specification of the program properties. These functions work as uninterpreted functions, which means that only their signature is needed and not their implementation.
 
 In this section we present possible syntaxes for the declaration and usage of ghost functions inside the class MyList.
 
@@ -256,10 +256,10 @@ Analyse the following syntax examples.
 @Refinement("ghost int len(List xs)")
 class MyList{
     static final int MAX_VALUE = 50;
-    
+
     @Refinement("len(\\v) == 0")
     public List createList(){...}
-    
+
     @Refinement("len(\\v) == 1 + len(xs)")
     public List append(List xs, int k){...}
 }
@@ -270,11 +270,11 @@ class MyList{
 ```java
 class MyList{
     static final int MAX_VALUE = 50;
-    
+
     @Refinement("ghost int len(List xs)")
     @Refinement("len(\\v) == 0")
     public List createList(){...}
-    
+
     @Refinement("len(\\v) == 1 + len(xs)")
     public List append(List xs, int k){...}
 }
@@ -287,10 +287,10 @@ class MyList{
 class MyList{
     @Refinement("ghost int len(List xs)")
     static final int MAX_VALUE = 50;
-    
+
     @Refinement("len(\\v) == 0")
     public List createList(){...}
-    
+
     @Refinement("len(\\v) == 1 + len(xs)")
     public List append(List xs, int k){...}
 }

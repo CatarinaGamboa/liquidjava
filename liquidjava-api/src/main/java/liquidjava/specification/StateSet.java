@@ -17,5 +17,5 @@ import java.lang.annotation.Target;
 @Target({ElementType.TYPE})
 @Repeatable(StateSets.class)
 public @interface StateSet {
-  public String[] value();
+    public String[] value();
 }

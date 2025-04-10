@@ -14,11 +14,10 @@ public class ErrorEmitter {
     private int errorStatus;
     private HashMap<String, PlacementInCode> map;
 
-    public ErrorEmitter() {
-    }
+    public ErrorEmitter() {}
 
-    public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus,
-            HashMap<String, PlacementInCode> map) {
+    public void addError(
+            String titleMessage, String msg, SourcePosition p, int errorStatus, HashMap<String, PlacementInCode> map) {
         this.titleMessage = titleMessage;
         fullMessage = msg;
         try {

@@ -4,15 +4,12 @@ import liquidjava.specification.StateRefinement;
 
 public class Bus extends Car {
 
-  @StateRefinement(to = "close(this)")
-  public Bus() {
-  }
+    @StateRefinement(to = "close(this)")
+    public Bus() {}
 
-  @Override
-  public void open() {
-  }
+    @Override
+    public void open() {}
 
-  @Override
-  public void close() {
-  }
+    @Override
+    public void close() {}
 }

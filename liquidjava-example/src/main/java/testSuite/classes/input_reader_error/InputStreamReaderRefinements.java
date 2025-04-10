@@ -8,18 +8,18 @@ import liquidjava.specification.StateRefinement;
 // https://docs.oracle.com/javase/7/docs/api/java/io/InputStreamReader.html
 @ExternalRefinementsFor("java.io.InputStreamReader")
 public interface InputStreamReaderRefinements {
-  @RefinementPredicate("boolean open(InputStreamReader i)")
-  @StateRefinement(to = "open(this)")
-  public void InputStreamReader(InputStream in);
+    @RefinementPredicate("boolean open(InputStreamReader i)")
+    @StateRefinement(to = "open(this)")
+    public void InputStreamReader(InputStream in);
 
-  @StateRefinement(from = "open(this)", to = "open(this)")
-  public int read();
+    @StateRefinement(from = "open(this)", to = "open(this)")
+    public int read();
 
-  @StateRefinement(from = "open(this)", to = "!open(this)")
-  public void close();
+    @StateRefinement(from = "open(this)", to = "!open(this)")
+    public void close();
 
-  // faster
-  //	@StateRefinement(from="open(this)", to="open(this)")
-  //	public int read(char[] cbuf, int offset, int length);
+    // faster
+    //	@StateRefinement(from="open(this)", to="open(this)")
+    //	public int read(char[] cbuf, int offset, int length);
 
 }

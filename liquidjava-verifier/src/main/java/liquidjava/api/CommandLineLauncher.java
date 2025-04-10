@@ -21,7 +21,6 @@ public class CommandLineLauncher {
         String file = args.length == 0 ? allPath : args[0];
         ErrorEmitter ee = launch(file);
         System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
-
     }
 
     public static ErrorEmitter launchTest(String file) {
@@ -54,9 +53,10 @@ public class CommandLineLauncher {
 
         try {
             // To only search the last package - less time spent
-            CtPackage v = factory.Package().getAll().stream().reduce((first, second) -> second).orElse(null);
-            if (v != null)
-                processingManager.process(v);
+            CtPackage v = factory.Package().getAll().stream()
+                    .reduce((first, second) -> second)
+                    .orElse(null);
+            if (v != null) processingManager.process(v);
             // To search all previous packages
             // processingManager.process(factory.Package().getRootPackage());
         } catch (Exception e) {

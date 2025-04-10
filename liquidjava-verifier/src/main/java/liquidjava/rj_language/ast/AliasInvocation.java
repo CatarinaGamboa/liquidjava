@@ -11,8 +11,7 @@ public class AliasInvocation extends Expression {
 
     public AliasInvocation(String name, List<Expression> args) {
         this.name = name;
-        for (Expression e : args)
-            addChild(e);
+        for (Expression e : args) addChild(e);
     }
 
     public String getName() {
@@ -39,21 +38,18 @@ public class AliasInvocation extends Expression {
 
     @Override
     public void getVariableNames(List<String> toAdd) {
-        for (Expression e : getArgs())
-            e.getVariableNames(toAdd);
+        for (Expression e : getArgs()) e.getVariableNames(toAdd);
     }
 
     @Override
     public void getStateInvocations(List<String> toAdd, List<String> all) {
-        for (Expression e : getArgs())
-            e.getStateInvocations(toAdd, all);
+        for (Expression e : getArgs()) e.getStateInvocations(toAdd, all);
     }
 
     @Override
     public Expression clone() {
         List<Expression> le = new ArrayList<>();
-        for (Expression e : getArgs())
-            le.add(e.clone());
+        for (Expression e : getArgs()) le.add(e.clone());
         return new AliasInvocation(name, le);
     }
 
@@ -73,23 +69,16 @@ public class AliasInvocation extends Expression {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
         AliasInvocation other = (AliasInvocation) obj;
         if (getArgs() == null) {
-            if (other.getArgs() != null)
-                return false;
-        } else if (!getArgs().equals(other.getArgs()))
-            return false;
+            if (other.getArgs() != null) return false;
+        } else if (!getArgs().equals(other.getArgs())) return false;
         if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
+            if (other.name != null) return false;
+        } else if (!name.equals(other.name)) return false;
         return true;
     }
 }
