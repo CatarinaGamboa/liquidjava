@@ -64,8 +64,8 @@ public class AliasWrapper {
         List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem, ee);
         Predicate prem = new Predicate();
         for (int i = 0; i < invocationPredicates.size(); i++) {
-            prem = Predicate.createConjunction(
-                    prem, Predicate.createEquals(Predicate.createVar(newNames.get(i)), invocationPredicates.get(i)));
+            prem = Predicate.createConjunction(prem,
+                    Predicate.createEquals(Predicate.createVar(newNames.get(i)), invocationPredicates.get(i)));
         }
         return prem.clone();
     }
@@ -73,7 +73,8 @@ public class AliasWrapper {
     private List<Predicate> getPredicatesFromExpression(List<String> list, CtElement elem, ErrorEmitter ee)
             throws ParsingException {
         List<Predicate> lp = new ArrayList<>();
-        for (String e : list) lp.add(new Predicate(e, elem, ee));
+        for (String e : list)
+            lp.add(new Predicate(e, elem, ee));
 
         return lp;
     }

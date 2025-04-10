@@ -75,6 +75,7 @@ public class AliasVisitor {
         String type = argDeclID.type().getText();
         String name = argDeclID.ID().getText();
         l.add(new Pair<>(type, name));
-        if (argDeclID.argDeclID() != null) auxGetArgsDecl(argDeclID.argDeclID(), l);
+        if (argDeclID.argDeclID() != null)
+            auxGetArgsDecl(argDeclID.argDeclID(), l);
     }
 }

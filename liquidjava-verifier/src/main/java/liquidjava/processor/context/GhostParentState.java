@@ -9,13 +9,8 @@ public class GhostParentState extends GhostFunction {
 
     private ArrayList<GhostState> states;
 
-    public GhostParentState(
-            String name,
-            List<String> params,
-            CtTypeReference<?> ret,
-            Factory factory,
-            String qualifiedName,
-            String simpleName) {
+    public GhostParentState(String name, List<String> params, CtTypeReference<?> ret, Factory factory,
+            String qualifiedName, String simpleName) {
         super(name, params, ret, factory, qualifiedName, simpleName);
         states = new ArrayList<>();
     }

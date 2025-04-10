@@ -11,7 +11,8 @@ public class TypeCheckingUtils {
         if (ce instanceof CtLiteral<?>) {
             CtLiteral<?> cl = (CtLiteral<?>) ce;
             CtTypeReference<?> r = ce.getType();
-            if (r.getSimpleName().equals("String")) return (String) cl.getValue();
+            if (r.getSimpleName().equals("String"))
+                return (String) cl.getValue();
 
         } else if (ce instanceof CtBinaryOperator) {
             CtBinaryOperator<?> cbo = (CtBinaryOperator<?>) ce;

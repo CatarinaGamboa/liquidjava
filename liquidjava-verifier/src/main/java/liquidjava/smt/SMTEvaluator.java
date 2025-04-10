@@ -40,7 +40,8 @@ public class SMTEvaluator {
             if (e.getLocalizedMessage().substring(0, 24).equals("Wrong number of argument")
                     || e.getLocalizedMessage().substring(0, 13).equals("Sort mismatch"))
                 throw new GhostFunctionError(e.getLocalizedMessage());
-            else throw new Z3Exception(e.getLocalizedMessage());
+            else
+                throw new Z3Exception(e.getLocalizedMessage());
         }
     }
 }

@@ -56,7 +56,8 @@ public abstract class Expression {
      */
     public Expression substitute(Expression from, Expression to) {
         Expression e = clone();
-        if (this.equals(from)) e = to;
+        if (this.equals(from))
+            e = to;
         e.auxSubstitute(from, to);
         return e;
     }
@@ -65,7 +66,8 @@ public abstract class Expression {
         if (hasChildren()) {
             for (int i = 0; i < children.size(); i++) {
                 Expression exp = children.get(i);
-                if (exp.equals(from)) setChild(i, to);
+                if (exp.equals(from))
+                    setChild(i, to);
                 exp.auxSubstitute(from, to);
             }
         }
@@ -117,9 +119,7 @@ public abstract class Expression {
                 Expression exp = children.get(i);
                 if (exp instanceof FunctionInvocation) {
                     FunctionInvocation fi = (FunctionInvocation) exp;
-                    if (subMap.containsKey(fi.name)
-                            && fi.children.size() == 1
-                            && fi.children.get(0) instanceof Var) { // object
+                    if (subMap.containsKey(fi.name) && fi.children.size() == 1 && fi.children.get(0) instanceof Var) { // object
                         // state
                         Var v = (Var) fi.children.get(0);
                         Expression sub = subMap.get(fi.name).clone();
@@ -167,7 +167,8 @@ public abstract class Expression {
             for (int i = 0; i < children.size(); i++) {
                 if (children.get(i) instanceof AliasInvocation) {
                     AliasInvocation ai = (AliasInvocation) children.get(i);
-                    if (!alias.containsKey(ai.name)) throw new Exception("Alias '" + ai.getName() + "' not found");
+                    if (!alias.containsKey(ai.name))
+                        throw new Exception("Alias '" + ai.getName() + "' not found");
                     AliasDTO dto = alias.get(ai.name);
                     Expression sub = dto.getExpression().clone();
                     if (ai.hasChildren())
@@ -180,10 +181,7 @@ public abstract class Expression {
                             if (!checks)
                                 throw new Exception(
                                         "Type Mismatch: Cannot substitute " + varExp + ":" + varType + " by " + aliasExp
-                                                + ":"
-                                                + TypeInfer.getType(ctx, f, aliasExp)
-                                                        .get()
-                                                        .getQualifiedName()
+                                                + ":" + TypeInfer.getType(ctx, f, aliasExp).get().getQualifiedName()
                                                 + " in alias '" + ai.name + "'");
 
                             sub = sub.substitute(varExp, aliasExp);
