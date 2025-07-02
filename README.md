@@ -17,6 +17,7 @@ a = -8; // type error!
 This project has the LiquidJava verifier, the API and some examples for testing.
 You can find out more about LiquidJava in the following resources:
 
+* [Try it](https://github.com/CatarinaGamboa/liquidjava-examples) with Codespaces or locally following these steps
 * [Website](https://catarinagamboa.github.io/liquidjava.html)
 * [Examples of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-examples)
 * [LiquidJava Specification of the Java Standard Library](https://github.com/CatarinaGamboa/liquid-java-external-libs)
