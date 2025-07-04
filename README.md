@@ -26,6 +26,12 @@ You can find out more about LiquidJava in the following resources:
 
 # Setup the project
 
+## Prerequisites
+Before setting up LiquidJava, ensure you have the following installed:
+
+- Java 20 or newer - The project is configured to use Java 20;
+- Maven 3.6+ - For building and dependency management.
+
 ## Installation Steps
 
 1. Clone the repository: `git clone https://github.com/CatarinaGamboa/liquidjava.git`;
