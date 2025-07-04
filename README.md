@@ -24,12 +24,35 @@ You can find out more about LiquidJava in the following resources:
 * [VSCode plugin for LiquidJava](https://github.com/CatarinaGamboa/vscode-liquidjava)
 <!-- * [Formalization of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-formalization) - not opensource yet -->
 
-## Setup the project
+# Setup the project
 
-1. Clone the repository;
-2. Run `setup.sh`, some dependencies include using `Java 20` or newer and using `Maven`.
-3. Open the project in your favorite IDE (we have used Eclipse and VSCode)
-4. Use the `pom.xml` in the root directory (which your IDE may have renamed to`liquidjava-umbrella`) to compile and run the tests.
+## Installation Steps
+
+1. Clone the repository: `git clone https://github.com/CatarinaGamboa/liquidjava.git`;
+2. Build the project `mvn clean compile`;
+3. Run tests to verify installation: `mvn test`;
+4. If importing into an IDE, import the project as a Maven project using the root `pom.xml`.
+
+## Verify Installation
+
+To verify that everything is working correctly:
+
+1. **Build the verifier JAR**:
+   ```bash
+   mvn package
+   ```
+
+2. **Run verification on examples**:
+   ```bash
+   java -jar liquidjava-verifier/target/liquidjava-verifier-5.2-SNAPSHOT.jar liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java
+   ```
+   This should output: `Correct! Passed Verification.`
+
+3. **Test an error case**:
+   ```bash
+   java -jar liquidjava-verifier/target/liquidjava-verifier-5.2-SNAPSHOT.jar liquidjava-example/src/main/java/testSuite/ErrorSimpleAssignment.java
+   ```
+   This should output an error message describing the refinement violation.
 
 ## Run verification
 
