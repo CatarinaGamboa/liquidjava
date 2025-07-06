@@ -41,24 +41,17 @@ Before setting up LiquidJava, ensure you have the following installed:
 
 ## Verify Installation
 
-To generate an executable to check your refinements using LiquidJava*:
-
-1. **Build the jar**:
-```bash
-mvn package -Djar.finalName=liquidjava
-```
-*Warning: Any change to LiquidJava requires rebuilding the jar.*
-
+To check your refinements using LiquidJava:
 
 2. **Run verification on examples**:
 ```bash
-java -jar liquidjava-verifier/target/liquidjava.jar liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java
+mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java"
 ```
    This should output: `Correct! Passed Verification`.
 
 3. **Test an error case**:
 ```bash
-java -jar liquidjava-verifier/target/liquidjava.jar liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java
+mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="liquidjava-example/src/main/java/testSuite/ErrorSimpleAssignment.java"
 ```
    This should output an error message describing the refinement violation.
 
