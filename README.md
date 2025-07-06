@@ -35,29 +35,30 @@ Before setting up LiquidJava, ensure you have the following installed:
 ## Installation Steps
 
 1. Clone the repository: `git clone https://github.com/CatarinaGamboa/liquidjava.git`;
-2. Build the project `mvn clean compile`;
+2. Build the project `mvn clean install`;
 3. Run tests to verify installation: `mvn test`;
 4. If importing into an IDE, import the project as a Maven project using the root `pom.xml`.
 
 ## Verify Installation
 
-To verify that everything is working correctly:
+To generate an executable to check your refinements using LiquidJava, do as follows:To verify that you can execute LiquidJava:
+*Warning: Any change to LiquidJava requires rebuilding the jar.*
 
-1. **Build the verifier JAR**:
-   ```bash
-   mvn package
-   ```
+1. **Build the jar**:
+```bash
+mvn package -Djar.finalName=liquidjava
+```
 
 2. **Run verification on examples**:
-   ```bash
-   java -jar liquidjava-verifier/target/liquidjava-verifier-5.2-SNAPSHOT.jar liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java
-   ```
-   This should output: `Correct! Passed Verification.`
+```bash
+java -jar liquidjava-verifier/target/liquidjava.jar liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java
+```
+   This should output: `Correct! Passed Verification`.
 
 3. **Test an error case**:
-   ```bash
-   java -jar liquidjava-verifier/target/liquidjava-verifier-5.2-SNAPSHOT.jar liquidjava-example/src/main/java/testSuite/ErrorSimpleAssignment.java
-   ```
+```bash
+java -jar liquidjava-verifier/target/liquidjava.jar liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java
+```
    This should output an error message describing the refinement violation.
 
 ## Run verification
