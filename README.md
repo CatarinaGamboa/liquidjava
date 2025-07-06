@@ -55,6 +55,8 @@ To run LiquidJava, use the Maven command below, replacing `/path/to/your/project
 ```bash
 mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="/path/to/your/project"
 ```
+*Warning: Any change to LiquidJava requires rebuilding the jar.*
+
 
 If you're on Linux/macOS, you can use the `liquidjava` script (from the repository root) to simplify the process.
 
