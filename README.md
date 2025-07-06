@@ -43,13 +43,13 @@ Before setting up LiquidJava, ensure you have the following installed:
 
 To check your refinements using LiquidJava:
 
-2. **Run verification on examples**:
+**Run verification on examples**:
 ```bash
 mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java"
 ```
    This should output: `Correct! Passed Verification`.
 
-3. **Test an error case**:
+**Test an error case**:
 ```bash
 mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="liquidjava-example/src/main/java/testSuite/ErrorSimpleAssignment.java"
 ```
