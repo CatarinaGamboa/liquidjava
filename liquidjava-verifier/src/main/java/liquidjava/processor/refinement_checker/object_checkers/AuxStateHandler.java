@@ -81,9 +81,13 @@ public class AuxStateHandler {
                 Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getQualifiedName(), s),
                         Predicate.createLit("0", Utils.INT));
                 c = Predicate.createConjunction(c, p);
+            } else if (sg.getReturnType().toString().equals("boolean")) {
+                Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s),
+                        Predicate.createLit("false", Utils.BOOLEAN));
+                c = Predicate.createConjunction(c, p);
             } else {
                 // TODO: Implement other stuff
-                throw new RuntimeException("Ghost Functions not implemented for other types than int -> implement in"
+                throw new RuntimeException("Ghost Functions not implemented for other types than int/boolean -> implement in"
                         + " AuxStateHandler defaultState");
             }
         }
