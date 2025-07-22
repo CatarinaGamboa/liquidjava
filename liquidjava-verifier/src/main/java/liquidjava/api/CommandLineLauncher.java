@@ -1,6 +1,8 @@
 package liquidjava.api;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.processor.RefinementProcessor;
@@ -12,14 +14,21 @@ import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
     public static void main(String[] args) {
-        String allPath = "./liquidjava-example/src/main/java/test/currentlyTesting";
-
         // String allPath = "C://Regen/test-projects/src/Main.java";
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
         // In VSCode needs:
         // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
-        String path = args.length == 0 ? allPath : args[0];
-        ErrorEmitter ee = launch(path);
+        
+        if (args.length == 0) {
+            System.out.println("No input files or directories provided");
+            System.out.println("\nUsage: ./liquidjava <...paths>");
+            System.out.println("  <...paths>: Paths to files or directories to be verified by LiquidJava");
+            System.out.println(
+                    "\nExample: ./liquidjava liquidjava-example/src/main/java/test/currentlyTesting liquidjava-example/src/main/java/testingInProgress/Account.java");
+            return;
+        }
+        List<String> paths = Arrays.asList(args);
+        ErrorEmitter ee = launch(paths.toArray(new String[0]));
         System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
     }
 
@@ -28,19 +37,18 @@ public class CommandLineLauncher {
         return ee;
     }
 
-    public static ErrorEmitter launch(String path) {
-        System.out.println("Running LiquidJava on: " + path);
+    public static ErrorEmitter launch(String... paths) {
+        System.out.println("Running LiquidJava on: " + Arrays.toString(paths).replaceAll("[\\[\\]]", ""));
+
         ErrorEmitter ee = new ErrorEmitter();
-
-        // check if the path exists
-        File f = new File(path);
-        if (!f.exists()) {
-            ee.addError("Path not found", "The path " + path + " does not exist", 1);
-            return ee;
-        }
-
         Launcher launcher = new Launcher();
-        launcher.addInputResource(path);
+        for (String path : paths) {
+            if (!new File(path).exists()) {
+                ee.addError("Path not found", "The path " + path + " does not exist", 1);
+                return ee;
+            }
+            launcher.addInputResource(path);
+        }
         launcher.getEnvironment().setNoClasspath(true);
 
         // Get the current classpath from the system
