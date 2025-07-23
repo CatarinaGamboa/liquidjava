@@ -17,6 +17,7 @@
 	<packaging>jar</packaging>
 
 	<build>
+		<finalName>${jar.finalName}</finalName>
 		<plugins>
 			<plugin>
 				<groupId>net.revelc.code.formatter</groupId>
@@ -110,6 +111,8 @@
 		<!-- plugin versions -->
 		<pVersion.compiler>3.8.0</pVersion.compiler>
 		<pVersion.surefire>3.1.2</pVersion.surefire>
+		<!-- name of the generated plugin -->
+		<jar.finalName>${project.artifactId}-${project.version}</jar.finalName>
 	</properties>
 
 	<repositories>

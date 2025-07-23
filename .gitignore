@@ -10,6 +10,7 @@ spooned
 .springBeans
 .sts4-cache
 
+.idea
 
 # Created by https://www.gitignore.io/api/git,java,maven,eclipse,windows
 
