@@ -18,7 +18,7 @@ public class CommandLineLauncher {
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
         // In VSCode needs:
         // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
-        
+
         if (args.length == 0) {
             System.out.println("No input files or directories provided");
             System.out.println("\nUsage: ./liquidjava <...paths>");
