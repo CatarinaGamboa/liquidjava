@@ -528,18 +528,21 @@ public class AuxStateHandler {
                 prevInstance.getRefinement(), invocation);
         // vi2.setState(transitionedState);
         vi2.setRefinement(transitionedState);
-        RefinedVariable rv = tc.getContext().getVariableByName(superName);
-        for (CtTypeReference<?> t : rv.getSuperTypes()) {
-            vi2.addSuperType(t);
-        }
+        Context ctx = tc.getContext();
+        if (ctx.hasVariable(superName)) {
+            RefinedVariable rv = ctx.getVariableByName(superName);
+            for (CtTypeReference<?> t : rv.getSuperTypes()) {
+                vi2.addSuperType(t);
+            }
 
-        // if the variable is a parent (not a VariableInstance) we need to check that
-        // this refinement
-        // is a subtype of the variable's main refinement
-        if (rv instanceof Variable) {
-            Predicate superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
-            tc.checkSMT(superC, invocation);
-            tc.getContext().addRefinementInstanceToVariable(superName, name2);
+            // if the variable is a parent (not a VariableInstance) we need to check that
+            // this refinement
+            // is a subtype of the variable's main refinement
+            if (rv instanceof Variable) {
+                Predicate superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
+                tc.checkSMT(superC, invocation);
+                tc.getContext().addRefinementInstanceToVariable(superName, name2);
+            }
         }
 
         invocation.putMetadata(tc.TARGET_KEY, vi2);

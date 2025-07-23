@@ -57,11 +57,12 @@ public class CommandLineLauncher {
 
         try {
             // To only search the last package - less time spent
-            CtPackage v = factory.Package().getAll().stream().reduce((first, second) -> second).orElse(null);
-            if (v != null)
-                processingManager.process(v);
+            // CtPackage v = factory.Package().getAll().stream().reduce((first, second) ->
+            // second).orElse(null);
+            // if (v != null)
+            // processingManager.process(v);
             // To search all previous packages
-            // processingManager.process(factory.Package().getRootPackage());
+            processingManager.process(factory.Package().getRootPackage());
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
