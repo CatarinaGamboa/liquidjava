@@ -24,12 +24,36 @@ You can find out more about LiquidJava in the following resources:
 * [VSCode plugin for LiquidJava](https://github.com/CatarinaGamboa/vscode-liquidjava)
 <!-- * [Formalization of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-formalization) - not opensource yet -->
 
-## Setup the project
+# Setup the project
 
-1. Clone the repository;
-2. Run `setup.sh`, some dependencies include using `Java 20` or newer and using `Maven`.
-3. Open the project in your favorite IDE (we have used Eclipse and VSCode)
-4. Use the `pom.xml` in the root directory (which your IDE may have renamed to`liquidjava-umbrella`) to compile and run the tests.
+## Prerequisites
+Before setting up LiquidJava, ensure you have the following installed:
+
+- Java 20 or newer - The project is configured to use Java 20;
+- Maven 3.6+ - For building and dependency management.
+
+## Installation Steps
+
+1. Clone the repository: `git clone https://github.com/CatarinaGamboa/liquidjava.git`;
+2. Build the project `mvn clean install`;
+3. Run tests to verify installation: `mvn test`;
+4. If importing into an IDE, import the project as a Maven project using the root `pom.xml`.
+
+## Verify Installation
+
+To check your refinements using LiquidJava:
+
+**Run verification on examples**:
+```bash
+mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java"
+```
+   This should output: `Correct! Passed Verification`.
+
+**Test an error case**:
+```bash
+mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="liquidjava-example/src/main/java/testSuite/ErrorSimpleAssignment.java"
+```
+   This should output an error message describing the refinement violation.
 
 ## Run verification
 

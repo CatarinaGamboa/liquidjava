@@ -1,6 +1,7 @@
 package liquidjava.api;
 
-import java.io.File;
+import java.util.Arrays;
+import java.util.List;
 
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.processor.RefinementProcessor;
@@ -18,8 +19,8 @@ public class CommandLineLauncher {
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
         // In VSCode needs:
         // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
-        String file = args.length == 0 ? allPath : args[0];
-        ErrorEmitter ee = launch(file);
+        List<String> files = args.length == 0 ? Arrays.asList(allPath) : Arrays.asList(args);
+        ErrorEmitter ee = launch(files.toArray(new String[0]));
         System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
     }
 
@@ -28,10 +29,12 @@ public class CommandLineLauncher {
         return ee;
     }
 
-    public static ErrorEmitter launch(String file) {
-        System.out.println("Running LiquidJava on: " + file);
+    public static ErrorEmitter launch(String... files) {
+        System.out.println("Running LiquidJava on: " + Arrays.toString(files));
         Launcher launcher = new Launcher();
-        launcher.addInputResource(file);
+        for (String file : files) {
+            launcher.addInputResource(file);
+        }
         launcher.getEnvironment().setNoClasspath(true);
 
         // Get the current classpath from the system
@@ -54,11 +57,12 @@ public class CommandLineLauncher {
 
         try {
             // To only search the last package - less time spent
-            CtPackage v = factory.Package().getAll().stream().reduce((first, second) -> second).orElse(null);
-            if (v != null)
-                processingManager.process(v);
+            // CtPackage v = factory.Package().getAll().stream().reduce((first, second) ->
+            // second).orElse(null);
+            // if (v != null)
+            // processingManager.process(v);
             // To search all previous packages
-            // processingManager.process(factory.Package().getRootPackage());
+            processingManager.process(factory.Package().getRootPackage());
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
