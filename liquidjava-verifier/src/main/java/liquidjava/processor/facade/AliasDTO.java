@@ -26,7 +26,7 @@ public class AliasDTO {
         this.name = name2;
         this.varTypes = varTypes2;
         this.varNames = varNames2;
-        this.expression = RefinementsParser.createAST(ref);
+        this.expression = RefinementsParser.createAST(ref, null); // is the parent class needed here?
     }
 
     public String getName() {

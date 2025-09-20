@@ -17,9 +17,10 @@ import rj.grammar.RJParser;
 
 public class RefinementsParser {
 
-    public static Expression createAST(String toParse) throws ParsingException {
+    public static Expression createAST(String toParse, String parentClass) throws ParsingException {
         ParseTree pt = compile(toParse);
-        return CreateASTVisitor.create(pt);
+        CreateASTVisitor visitor = new CreateASTVisitor(parentClass);
+        return visitor.create(pt);
     }
 
     /**

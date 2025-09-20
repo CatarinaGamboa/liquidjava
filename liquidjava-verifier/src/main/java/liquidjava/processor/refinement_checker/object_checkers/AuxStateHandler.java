@@ -72,15 +72,13 @@ public class AuxStateHandler {
     }
 
     public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
-        String[] path = f.getTargetClass().split("\\.");
-        String klass = path[path.length - 1];
-
+        String klass = Utils.getSimpleName(f.getTargetClass());
         Predicate[] s = { Predicate.createVar(tc.THIS) };
         Predicate c = new Predicate();
         List<GhostFunction> sets = getDifferentSets(tc, klass); // ??
         for (GhostFunction sg : sets) {
             if (sg.getReturnType().toString().equals("int")) {
-                Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s),
+                Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getQualifiedName(), s),
                         Predicate.createLit("0", Utils.INT));
                 c = Predicate.createConjunction(c, p);
             } else {
@@ -120,11 +118,11 @@ public class AuxStateHandler {
      *
      * @throws ParsingException
      */
-    public static void handleMethodState(CtMethod<?> method, RefinedFunction f, TypeChecker tc)
+    public static void handleMethodState(CtMethod<?> method, RefinedFunction f, TypeChecker tc, String prefix)
             throws ParsingException {
         List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
         if (!an.isEmpty()) {
-            setFunctionStates(f, an, tc, method);
+            setFunctionStates(f, an, tc, method, prefix);
         }
         // f.setState(an, context.getGhosts(), method);
 
@@ -141,33 +139,33 @@ public class AuxStateHandler {
      * @throws ParsingException
      */
     private static void setFunctionStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
-            TypeChecker tc, CtElement element) throws ParsingException {
+            TypeChecker tc, CtElement element, String prefix) throws ParsingException {
         List<ObjectState> l = new ArrayList<>();
         for (CtAnnotation<? extends Annotation> an : anns) {
-            l.add(getStates(an, f, tc, element));
+            l.add(getStates(an, f, tc, element, prefix));
         }
         f.setAllStates(l);
     }
 
     @SuppressWarnings({ "rawtypes" })
     private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, RefinedFunction f,
-            TypeChecker tc, CtElement e) throws ParsingException {
+            TypeChecker tc, CtElement e, String prefix) throws ParsingException {
         Map<String, CtExpression> m = ctAnnotation.getAllValues();
         String from = TypeCheckingUtils.getStringFromAnnotation(m.get("from"));
         String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
         ObjectState state = new ObjectState();
         if (from != null) // has From
         {
-            state.setFrom(createStatePredicate(from, f.getTargetClass(), tc, e, false));
+            state.setFrom(createStatePredicate(from, f.getTargetClass(), tc, e, false, prefix));
         }
         if (to != null) // has To
         {
-            state.setTo(createStatePredicate(to, f.getTargetClass(), tc, e, true));
+            state.setTo(createStatePredicate(to, f.getTargetClass(), tc, e, true, prefix));
         }
 
         if (from != null && to == null) // has From but not To -> the state remains the same
         {
-            state.setTo(createStatePredicate(from, f.getTargetClass(), tc, e, true));
+            state.setTo(createStatePredicate(from, f.getTargetClass(), tc, e, true, prefix));
         }
         if (from == null && to != null) // has To but not From -> enters with true and exists with a specific state
         {
@@ -177,8 +175,8 @@ public class AuxStateHandler {
     }
 
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
-            TypeChecker tc, CtElement e, boolean isTo) throws ParsingException {
-        Predicate p = new Predicate(value, e, tc.getErrorEmitter());
+            TypeChecker tc, CtElement e, boolean isTo, String prefix) throws ParsingException {
+        Predicate p = new Predicate(value, e, tc.getErrorEmitter(), prefix);
         String t = targetClass; // f.getTargetClass();
         CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
 
@@ -200,8 +198,7 @@ public class AuxStateHandler {
     }
 
     private static Predicate getMissingStates(String t, TypeChecker tc, Predicate p) {
-        String[] temp = t.split("\\.");
-        String simpleT = temp[temp.length - 1];
+        String simpleT = Utils.getSimpleName(t);
         List<GhostState> gs = p.getStateInvocations(tc.getContext().getGhostState(simpleT));
         List<GhostFunction> sets = getDifferentSets(tc, simpleT);
         for (GhostState g : gs) {
@@ -229,8 +226,8 @@ public class AuxStateHandler {
         Predicate c = p;
         for (GhostFunction gf : sets) {
             Predicate eq = Predicate.createEquals( // gf.name == old(gf.name(this))
-                    Predicate.createInvocation(gf.getName(), th),
-                    Predicate.createInvocation(gf.getName(), Predicate.createInvocation(Utils.OLD, th)));
+                    Predicate.createInvocation(gf.getQualifiedName(), th),
+                    Predicate.createInvocation(gf.getQualifiedName(), Predicate.createInvocation(Utils.OLD, th)));
             c = Predicate.createConjunction(c, eq);
         }
         return c;
@@ -330,7 +327,6 @@ public class AuxStateHandler {
         }
 
         VariableInstance vi = invocation_callee.get();
-
         String instanceName = vi.getName();
         Predicate prevState = vi.getRefinement().substituteVariable(tc.WILD_VAR, instanceName)
                 .substituteVariable(parentTargetName, instanceName);
@@ -340,8 +336,10 @@ public class AuxStateHandler {
 
         ObjectState stateChange = new ObjectState();
         try {
-            Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false);
-            Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true);
+            String prefix = field.getDeclaringType().getQualifiedName();
+            Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false,
+                    prefix);
+            Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true, prefix);
             stateChange.setFrom(fromPredicate);
             stateChange.setTo(toPredicate);
         } catch (ParsingException e) {

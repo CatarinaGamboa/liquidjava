@@ -1,5 +1,7 @@
 package liquidjava.utils;
 
+import java.util.Set;
+
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -34,6 +36,8 @@ public class Utils {
     public static final String LONG = "long";
     public static final String FLOAT = "float";
 
+    private static final Set<String> defaultNames = Set.of("old", "length", "addToIndex", "getFromIndex");
+
     public static CtTypeReference<?> getType(String type, Factory factory) {
         // TODO complete
         switch (type) {
@@ -53,5 +57,16 @@ public class Utils {
             // return factory.Type().OBJECT;
             return factory.createReference(type);
         }
+    }
+
+    public static String getSimpleName(String qualifiedName) {
+        String[] parts = qualifiedName.split("\\.");
+        return parts[parts.length - 1];
+    }
+
+    public static String qualifyName(String prefix, String name) {
+        if (defaultNames.contains(name))
+            return name;
+        return String.format("%s.%s", prefix, name);
     }
 }
