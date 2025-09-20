@@ -25,10 +25,8 @@ import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
-import spoon.reflect.reference.CtTypeReference;
 
 /**
  * Acts as a wrapper for Expression AST
@@ -38,7 +36,7 @@ import spoon.reflect.reference.CtTypeReference;
 public class Predicate {
 
     protected Expression exp;
-    protected String parentClass;
+    protected String prefix;
 
     /** Create a predicate with the expression true */
     public Predicate() {
@@ -69,7 +67,7 @@ public class Predicate {
      * @throws ParsingException
      */
     public Predicate(String ref, CtElement element, ErrorEmitter e, String prefix) throws ParsingException {
-        this.parentClass = prefix;
+        this.prefix = prefix;
         exp = parse(ref, element, e);
         if (e.foundError()) {
             return;
@@ -86,16 +84,16 @@ public class Predicate {
 
     protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
         try {
-            return RefinementsParser.createAST(ref, parentClass);
+            return RefinementsParser.createAST(ref, prefix);
         } catch (ParsingException e1) {
             ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
             throw e1;
         }
     }
 
-    protected Expression innerParse(String ref, ErrorEmitter e, String parentClass) {
+    protected Expression innerParse(String ref, ErrorEmitter e, String prefix) {
         try {
-            return RefinementsParser.createAST(ref, parentClass);
+            return RefinementsParser.createAST(ref, prefix);
         } catch (ParsingException e1) {
             ErrorHandler.printSyntaxError(e1.getMessage(), ref, e);
         }

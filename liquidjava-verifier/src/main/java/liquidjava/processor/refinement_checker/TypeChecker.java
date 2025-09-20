@@ -232,6 +232,7 @@ public abstract class TypeChecker extends CtScanner {
                     path = ((CtInterface<?>) element).getQualifiedName();
                 }
                 if (klass != null && path != null) {
+                    a.parse(path);
                     AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
                     context.addAlias(aw);
                 }

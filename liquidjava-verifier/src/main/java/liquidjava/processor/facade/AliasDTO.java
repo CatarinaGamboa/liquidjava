@@ -12,6 +12,7 @@ public class AliasDTO {
     private List<String> varTypes;
     private List<String> varNames;
     private Expression expression;
+    private String ref;
 
     public AliasDTO(String name, List<CtTypeReference<?>> varTypes, List<String> varNames, Expression expression) {
         super();
@@ -26,7 +27,15 @@ public class AliasDTO {
         this.name = name2;
         this.varTypes = varTypes2;
         this.varNames = varNames2;
-        this.expression = RefinementsParser.createAST(ref, null); // is the parent class needed here?
+        this.ref = ref;
+    }
+
+    // Parse the alias expression using the given the prefix to ensure ghost names are qualified consistently with
+    // where the alias is declared or used
+    public void parse(String prefix) throws ParsingException {
+        if (ref != null) {
+            this.expression = RefinementsParser.createAST(ref, prefix);
+        }
     }
 
     public String getName() {

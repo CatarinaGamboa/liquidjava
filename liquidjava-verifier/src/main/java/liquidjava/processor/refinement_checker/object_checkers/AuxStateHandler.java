@@ -154,12 +154,10 @@ public class AuxStateHandler {
         String from = TypeCheckingUtils.getStringFromAnnotation(m.get("from"));
         String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
         ObjectState state = new ObjectState();
-        if (from != null) // has From
-        {
+        if (from != null) { // has From
             state.setFrom(createStatePredicate(from, f.getTargetClass(), tc, e, false, prefix));
         }
-        if (to != null) // has To
-        {
+        if (to != null) { // has To
             state.setTo(createStatePredicate(to, f.getTargetClass(), tc, e, true, prefix));
         }
 

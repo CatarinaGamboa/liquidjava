@@ -57,10 +57,10 @@ import rj.grammar.RJParser.VarContext;
  */
 public class CreateASTVisitor {
 
-    String parentClass;
+    String prefix;
 
-    public CreateASTVisitor(String parentClass) {
-        this.parentClass = parentClass;
+    public CreateASTVisitor(String prefix) {
+        this.prefix = prefix;
     }
 
     public Expression create(ParseTree rc) {
@@ -162,7 +162,7 @@ public class CreateASTVisitor {
         if (rc.ghostCall() != null) {
             GhostCallContext gc = rc.ghostCall();
             List<Expression> le = getArgs(gc.args());
-            String name = Utils.qualifyName(parentClass, gc.ID().getText());
+            String name = Utils.qualifyName(prefix, gc.ID().getText());
             return new FunctionInvocation(name, le);
         } else {
             AliasCallContext gc = rc.aliasCall();

@@ -28,9 +28,9 @@ public class GhostFunction {
     public GhostFunction(String name, List<String> param_types, CtTypeReference<?> return_type, Factory factory,
             String prefix) {
         String klass = this.getParentClassName(prefix);
+        String type = return_type.toString().equals(klass) ? prefix : return_type.toString();
         this.name = name;
-        this.return_type = Utils.getType(return_type.toString().equals(klass) ? prefix : return_type.toString(),
-                factory);
+        this.return_type = Utils.getType(type, factory);
         this.param_types = new ArrayList<>();
         this.prefix = prefix;
         for (int i = 0; i < param_types.size(); i++) {
