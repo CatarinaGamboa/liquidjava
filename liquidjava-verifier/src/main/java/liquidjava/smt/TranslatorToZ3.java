@@ -93,8 +93,9 @@ public class TranslatorToZ3 implements AutoCloseable {
         if (name.equals("getFromIndex"))
             return makeSelect(name, params);
         FuncDecl<?> fd = funcTranslation.get(name);
-        if (fd == null) fd = resolveFunctionDeclFallback(name, params);
-        
+        if (fd == null)
+            fd = resolveFunctionDeclFallback(name, params);
+
         Sort[] s = fd.getDomain();
         for (int i = 0; i < s.length; i++) {
             Expr<?> param = params[i];
@@ -116,8 +117,8 @@ public class TranslatorToZ3 implements AutoCloseable {
 
     /**
      * Fallback resolver for function declarations when an exact qualified name lookup fails. Tries to match by simple
-     * name and number of parameters, preferring an exact qualified-name match if found among candidates; otherwise returns the first
-     * compatible candidate and relies on later coercion via var supertypes.
+     * name and number of parameters, preferring an exact qualified-name match if found among candidates; otherwise
+     * returns the first compatible candidate and relies on later coercion via var supertypes.
      */
     private FuncDecl<?> resolveFunctionDeclFallback(String name, Expr<?>[] params) throws Exception {
         String simple = Utils.getSimpleName(name);

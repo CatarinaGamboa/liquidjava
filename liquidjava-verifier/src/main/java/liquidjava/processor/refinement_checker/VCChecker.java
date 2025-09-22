@@ -2,7 +2,6 @@ package liquidjava.processor.refinement_checker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -113,38 +112,37 @@ public class VCChecker {
      */
     private List<GhostState> filterGhostStatesForVariables(List<GhostState> list, List<RefinedVariable> mainVars,
             List<RefinedVariable> vars) {
-        if (list.isEmpty()) return list;
+        if (list.isEmpty())
+            return list;
 
         // Collect all relevant qualified type names from involved variables and their supertypes
-        Set<String> allowedPrefixes = new HashSet<>();
+        if (list == null || list.isEmpty())
+            return list;
+
+        // Collect all relevant qualified type names (types + supertypes), keeping order and deduping
+        Set<String> allowedPrefixes = new java.util.LinkedHashSet<>();
         Consumer<RefinedVariable> collect = rv -> {
-            if (rv.getType() != null)
+            if (rv.getType() != null) {
                 allowedPrefixes.add(rv.getType().getQualifiedName());
+            }
             for (CtTypeReference<?> st : rv.getSuperTypes()) {
-                if (st != null) allowedPrefixes.add(st.getQualifiedName());
+                if (st != null) {
+                    allowedPrefixes.add(st.getQualifiedName());
+                }
             }
         };
         mainVars.forEach(collect);
         vars.forEach(collect);
 
-        // If we couldn't determine any types, return the original list
-        if (allowedPrefixes.isEmpty()) return list;
+        if (allowedPrefixes.isEmpty())
+            return list; // avoid over-filtering when types are unknown
 
-        // Otherwise filter the list
-        List<GhostState> filtered = new ArrayList<>();
-        for (GhostState g : list) {
-            String prefix;
-            if (g.getParent() != null) {
-                prefix = g.getParent().getPrefix();
-            } else {
-                // Standalone ghosts use their own prefix
-                prefix = g.getPrefix();
-            }
-            if (allowedPrefixes.contains(prefix)) {
-                filtered.add(g);
-            }
-        }
-        // Fallback to original if filtering removed everything
+        List<GhostState> filtered = list.stream().filter(g -> {
+            String prefix = (g.getParent() != null) ? g.getParent().getPrefix() : g.getPrefix();
+            return allowedPrefixes.contains(prefix);
+        }).collect(Collectors.toList());
+
+        // If nothing matched, keep original to avoid accidental empties
         return filtered.isEmpty() ? list : filtered;
     }
 

@@ -212,24 +212,26 @@ public class AuxStateHandler {
      * Collect ghost states for the given qualified class name and its immediate supertypes (superclass and interfaces).
      */
     private static List<GhostState> getGhostStatesFor(String qualifiedClass, TypeChecker tc) {
-        List<GhostState> res = new ArrayList<>();
-        String simpleT = Utils.getSimpleName(qualifiedClass);
-        List<GhostState> base = tc.getContext().getGhostState(simpleT);
-        if (base != null)
-            res.addAll(base);
+        // Keep order: class, then superclass, then interfaces; avoid duplicates
+        java.util.LinkedHashSet<String> typeNames = new java.util.LinkedHashSet<>();
+        typeNames.add(Utils.getSimpleName(qualifiedClass));
+
         CtTypeReference<?> ref = tc.getFactory().Type().createReference(qualifiedClass);
         if (ref != null) {
             CtTypeReference<?> sup = ref.getSuperclass();
-            if (sup != null) {
-                List<GhostState> supStates = tc.getContext().getGhostState(Utils.getSimpleName(sup.getQualifiedName()));
-                if (supStates != null)
-                    res.addAll(supStates);
-            }
+            if (sup != null)
+                typeNames.add(Utils.getSimpleName(sup.getQualifiedName()));
             for (CtTypeReference<?> itf : ref.getSuperInterfaces()) {
-                List<GhostState> ifStates = tc.getContext().getGhostState(Utils.getSimpleName(itf.getQualifiedName()));
-                if (ifStates != null)
-                    res.addAll(ifStates);
+                if (itf != null)
+                    typeNames.add(Utils.getSimpleName(itf.getQualifiedName()));
             }
+        }
+
+        List<GhostState> res = new ArrayList<>();
+        for (String tn : typeNames) {
+            List<GhostState> states = tc.getContext().getGhostState(tn);
+            if (states != null)
+                res.addAll(states);
         }
         return res;
     }
