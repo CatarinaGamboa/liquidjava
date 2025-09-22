@@ -185,6 +185,9 @@ public class Predicate {
                 String name = gs.getQualifiedName();
                 Expression exp = innerParse(gs.getRefinement().toString(), ee, gs.getPrefix());
                 nameRefinementMap.put(name, exp);
+                // Also allow simple name lookup to enable hierarchy matching
+                String simple = Utils.getSimpleName(name);
+                nameRefinementMap.putIfAbsent(simple, exp);
             }
         }
         Expression e = exp.substituteState(nameRefinementMap, toChange);

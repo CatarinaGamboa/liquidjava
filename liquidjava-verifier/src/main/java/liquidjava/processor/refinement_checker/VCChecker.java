@@ -2,8 +2,11 @@ package liquidjava.processor.refinement_checker;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.Stack;
+import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import liquidjava.errors.ErrorEmitter;
@@ -20,6 +23,7 @@ import spoon.reflect.code.CtInvocation;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
+import spoon.reflect.reference.CtTypeReference;
 
 public class VCChecker {
     private final Context context;
@@ -47,10 +51,11 @@ public class VCChecker {
         Predicate premises = new Predicate();
         Predicate et = new Predicate();
         try {
-            premises = premisesBeforeChange.changeStatesToRefinements(list, s, errorEmitter)
+            List<GhostState> filtered = filterGhostStatesForVariables(list, mainVars, lrv);
+            premises = premisesBeforeChange.changeStatesToRefinements(filtered, s, errorEmitter)
                     .changeAliasToRefinement(context, f);
 
-            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context, f);
+            et = expectedType.changeStatesToRefinements(filtered, s, errorEmitter).changeAliasToRefinement(context, f);
         } catch (Exception e1) {
             printError(premises, expectedType, element, map, e1.getMessage());
             return;
@@ -87,9 +92,10 @@ public class VCChecker {
         Predicate et = new Predicate();
         try {
             premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
-            premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(list, s, errorEmitter)
+            List<GhostState> filtered = filterGhostStatesForVariables(list, mainVars, lrv);
+            premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(filtered, s, errorEmitter)
                     .changeAliasToRefinement(context, f);
-            et = expectedType.changeStatesToRefinements(list, s, errorEmitter).changeAliasToRefinement(context, f);
+            et = expectedType.changeStatesToRefinements(filtered, s, errorEmitter).changeAliasToRefinement(context, f);
         } catch (Exception e) {
             return false;
             // printError(premises, expectedType, element, map, e.getMessage());
@@ -98,6 +104,48 @@ public class VCChecker {
         // System.out.println("premise: " + premises.toString() + "\nexpectation: " +
         // et.toString());
         return smtChecks(premises, et, p);
+    }
+
+    /**
+     * Reduce the ghost states list to those whose declaring class (prefix) matches any of the involved variable types
+     * or their supertypes This prevents ambiguous simple name substitutions across unrelated classes that share state
+     * names
+     */
+    private List<GhostState> filterGhostStatesForVariables(List<GhostState> list, List<RefinedVariable> mainVars,
+            List<RefinedVariable> vars) {
+        if (list.isEmpty()) return list;
+
+        // Collect all relevant qualified type names from involved variables and their supertypes
+        Set<String> allowedPrefixes = new HashSet<>();
+        Consumer<RefinedVariable> collect = rv -> {
+            if (rv.getType() != null)
+                allowedPrefixes.add(rv.getType().getQualifiedName());
+            for (CtTypeReference<?> st : rv.getSuperTypes()) {
+                if (st != null) allowedPrefixes.add(st.getQualifiedName());
+            }
+        };
+        mainVars.forEach(collect);
+        vars.forEach(collect);
+
+        // If we couldn't determine any types, return the original list
+        if (allowedPrefixes.isEmpty()) return list;
+
+        // Otherwise filter the list
+        List<GhostState> filtered = new ArrayList<>();
+        for (GhostState g : list) {
+            String prefix;
+            if (g.getParent() != null) {
+                prefix = g.getParent().getPrefix();
+            } else {
+                // Standalone ghosts use their own prefix
+                prefix = g.getPrefix();
+            }
+            if (allowedPrefixes.contains(prefix)) {
+                filtered.add(g);
+            }
+        }
+        // Fallback to original if filtering removed everything
+        return filtered.isEmpty() ? list : filtered;
     }
 
     private VCImplication joinPredicates(Predicate expectedType, List<RefinedVariable> mainVars,

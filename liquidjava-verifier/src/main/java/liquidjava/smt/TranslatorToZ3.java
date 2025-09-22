@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import liquidjava.processor.context.AliasWrapper;
+import liquidjava.utils.Utils;
+
 import org.apache.commons.lang3.NotImplementedException;
 
 public class TranslatorToZ3 implements AutoCloseable {
@@ -90,11 +92,9 @@ public class TranslatorToZ3 implements AutoCloseable {
             return makeStore(name, params);
         if (name.equals("getFromIndex"))
             return makeSelect(name, params);
-
-        if (!funcTranslation.containsKey(name))
-            throw new NotFoundError("Function '" + name + "' not found");
-
         FuncDecl<?> fd = funcTranslation.get(name);
+        if (fd == null) fd = resolveFunctionDeclFallback(name, params);
+        
         Sort[] s = fd.getDomain();
         for (int i = 0; i < s.length; i++) {
             Expr<?> param = params[i];
@@ -112,6 +112,37 @@ public class TranslatorToZ3 implements AutoCloseable {
         }
 
         return z3.mkApp(fd, params);
+    }
+
+    /**
+     * Fallback resolver for function declarations when an exact qualified name lookup fails. Tries to match by simple
+     * name and number of parameters, preferring an exact qualified-name match if found among candidates; otherwise returns the first
+     * compatible candidate and relies on later coercion via var supertypes.
+     */
+    private FuncDecl<?> resolveFunctionDeclFallback(String name, Expr<?>[] params) throws Exception {
+        String simple = Utils.getSimpleName(name);
+        FuncDecl<?> candidate = null;
+        for (Map.Entry<String, FuncDecl<?>> entry : funcTranslation.entrySet()) {
+            String k = entry.getKey();
+            String simpleK = Utils.getSimpleName(k);
+            if (simple.equals(simpleK)) {
+                FuncDecl<?> fTry = entry.getValue();
+                Sort[] dom = fTry.getDomain();
+                if (dom.length == params.length) {
+                    // Prefer exact qualified name match if available
+                    if (k.equals(name)) {
+                        candidate = fTry;
+                        break;
+                    }
+                    // Otherwise first compatible match
+                    candidate = fTry;
+                }
+            }
+        }
+        if (candidate != null) {
+            return candidate;
+        }
+        throw new NotFoundError("Function '" + name + "' not found");
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

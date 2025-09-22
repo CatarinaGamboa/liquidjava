@@ -59,9 +59,8 @@ public class Utils {
         }
     }
 
-    public static String getSimpleName(String qualifiedName) {
-        String[] parts = qualifiedName.split("\\.");
-        return parts[parts.length - 1];
+    public static String getSimpleName(String name) {
+        return name.contains(".") ? name.substring(name.lastIndexOf('.') + 1) : name;
     }
 
     public static String qualifyName(String prefix, String name) {

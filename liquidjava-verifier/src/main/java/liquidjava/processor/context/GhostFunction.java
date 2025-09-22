@@ -86,7 +86,10 @@ public class GhostFunction {
         return Utils.getSimpleName(pref);
     }
 
+    // Match by fully qualified name, exact simple name or by comparing the simple name of the provided identifier
+    // This allows references written in a different class (different prefix) to still match
     public boolean matches(String name) {
-        return this.name.equals(name) || this.getQualifiedName().equals(name);
+        return this.getQualifiedName().equals(name) || this.name.equals(name)
+                || this.name.equals(Utils.getSimpleName(name));
     }
 }

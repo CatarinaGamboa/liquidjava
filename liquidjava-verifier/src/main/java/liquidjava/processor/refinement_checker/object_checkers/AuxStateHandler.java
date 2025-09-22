@@ -72,7 +72,7 @@ public class AuxStateHandler {
     }
 
     public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
-        String klass = Utils.getSimpleName(f.getTargetClass());
+        String klass = f.getTargetClass();
         Predicate[] s = { Predicate.createVar(tc.THIS) };
         Predicate c = new Predicate();
         List<GhostFunction> sets = getDifferentSets(tc, klass); // ??
@@ -94,9 +94,9 @@ public class AuxStateHandler {
         f.setAllStates(los);
     }
 
-    private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klass) {
+    private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klassQualified) {
         List<GhostFunction> sets = new ArrayList<>();
-        List<GhostState> l = tc.getContext().getGhostState(klass);
+        List<GhostState> l = getGhostStatesFor(klassQualified, tc);
         if (l != null) {
             for (GhostState g : l) {
                 if (g.getParent() == null) {
@@ -196,9 +196,8 @@ public class AuxStateHandler {
     }
 
     private static Predicate getMissingStates(String t, TypeChecker tc, Predicate p) {
-        String simpleT = Utils.getSimpleName(t);
-        List<GhostState> gs = p.getStateInvocations(tc.getContext().getGhostState(simpleT));
-        List<GhostFunction> sets = getDifferentSets(tc, simpleT);
+        List<GhostState> gs = p.getStateInvocations(getGhostStatesFor(t, tc));
+        List<GhostFunction> sets = getDifferentSets(tc, t);
         for (GhostState g : gs) {
             if (g.getParent() == null && sets.contains(g)) {
                 sets.remove(g);
@@ -207,6 +206,32 @@ public class AuxStateHandler {
             }
         }
         return addOldStates(p, Predicate.createVar(tc.THIS), sets, tc);
+    }
+
+    /**
+     * Collect ghost states for the given qualified class name and its immediate supertypes (superclass and interfaces).
+     */
+    private static List<GhostState> getGhostStatesFor(String qualifiedClass, TypeChecker tc) {
+        List<GhostState> res = new ArrayList<>();
+        String simpleT = Utils.getSimpleName(qualifiedClass);
+        List<GhostState> base = tc.getContext().getGhostState(simpleT);
+        if (base != null)
+            res.addAll(base);
+        CtTypeReference<?> ref = tc.getFactory().Type().createReference(qualifiedClass);
+        if (ref != null) {
+            CtTypeReference<?> sup = ref.getSuperclass();
+            if (sup != null) {
+                List<GhostState> supStates = tc.getContext().getGhostState(Utils.getSimpleName(sup.getQualifiedName()));
+                if (supStates != null)
+                    res.addAll(supStates);
+            }
+            for (CtTypeReference<?> itf : ref.getSuperInterfaces()) {
+                List<GhostState> ifStates = tc.getContext().getGhostState(Utils.getSimpleName(itf.getQualifiedName()));
+                if (ifStates != null)
+                    res.addAll(ifStates);
+            }
+        }
+        return res;
     }
 
     /**
