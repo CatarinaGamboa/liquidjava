@@ -72,7 +72,7 @@ public class AuxStateHandler {
     }
 
     public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
-        String klass = Utils.getSimpleName(f.getTargetClass());
+        String klass = f.getTargetClass();
         Predicate[] s = { Predicate.createVar(tc.THIS) };
         Predicate c = new Predicate();
         List<GhostFunction> sets = getDifferentSets(tc, klass); // ??
@@ -94,9 +94,9 @@ public class AuxStateHandler {
         f.setAllStates(los);
     }
 
-    private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klass) {
+    private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klassQualified) {
         List<GhostFunction> sets = new ArrayList<>();
-        List<GhostState> l = tc.getContext().getGhostState(klass);
+        List<GhostState> l = getGhostStatesFor(klassQualified, tc);
         if (l != null) {
             for (GhostState g : l) {
                 if (g.getParent() == null) {
@@ -196,9 +196,8 @@ public class AuxStateHandler {
     }
 
     private static Predicate getMissingStates(String t, TypeChecker tc, Predicate p) {
-        String simpleT = Utils.getSimpleName(t);
-        List<GhostState> gs = p.getStateInvocations(tc.getContext().getGhostState(simpleT));
-        List<GhostFunction> sets = getDifferentSets(tc, simpleT);
+        List<GhostState> gs = p.getStateInvocations(getGhostStatesFor(t, tc));
+        List<GhostFunction> sets = getDifferentSets(tc, t);
         for (GhostState g : gs) {
             if (g.getParent() == null && sets.contains(g)) {
                 sets.remove(g);
@@ -207,6 +206,34 @@ public class AuxStateHandler {
             }
         }
         return addOldStates(p, Predicate.createVar(tc.THIS), sets, tc);
+    }
+
+    /**
+     * Collect ghost states for the given qualified class name and its immediate supertypes (superclass and interfaces).
+     */
+    private static List<GhostState> getGhostStatesFor(String qualifiedClass, TypeChecker tc) {
+        // Keep order: class, then superclass, then interfaces; avoid duplicates
+        java.util.LinkedHashSet<String> typeNames = new java.util.LinkedHashSet<>();
+        typeNames.add(Utils.getSimpleName(qualifiedClass));
+
+        CtTypeReference<?> ref = tc.getFactory().Type().createReference(qualifiedClass);
+        if (ref != null) {
+            CtTypeReference<?> sup = ref.getSuperclass();
+            if (sup != null)
+                typeNames.add(Utils.getSimpleName(sup.getQualifiedName()));
+            for (CtTypeReference<?> itf : ref.getSuperInterfaces()) {
+                if (itf != null)
+                    typeNames.add(Utils.getSimpleName(itf.getQualifiedName()));
+            }
+        }
+
+        List<GhostState> res = new ArrayList<>();
+        for (String tn : typeNames) {
+            List<GhostState> states = tc.getContext().getGhostState(tn);
+            if (states != null)
+                res.addAll(states);
+        }
+        return res;
     }
 
     /**
