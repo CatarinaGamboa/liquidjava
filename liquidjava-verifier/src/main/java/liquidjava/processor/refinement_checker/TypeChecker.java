@@ -111,6 +111,19 @@ public abstract class TypeChecker extends CtScanner {
     }
 
     private void createStateSet(CtNewArray<String> e, int set, CtElement element) {
+
+        // if any of the states starts with uppercase, throw error (reserved for alias)
+        for (CtExpression<?> ce : e.getElements()) {
+            if (ce instanceof CtLiteral<?>) {
+                @SuppressWarnings("unchecked")
+                CtLiteral<String> s = (CtLiteral<String>) ce;
+                String f = s.getValue();
+                if (Character.isUpperCase(f.charAt(0))) {
+                    ErrorHandler.printCostumeError(s, "State name must start with lowercase in '" + f + "'", errorEmitter);
+                }
+            }
+        }
+
         Optional<GhostFunction> og = createStateGhost(set, element);
         if (!og.isPresent()) {
             throw new RuntimeException("Error in creation of GhostFunction");
