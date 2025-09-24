@@ -528,9 +528,15 @@ public class AuxStateHandler {
                 prevInstance.getRefinement(), invocation);
         // vi2.setState(transitionedState);
         vi2.setRefinement(transitionedState);
-        RefinedVariable rv = tc.getContext().getVariableByName(superName);
-        for (CtTypeReference<?> t : rv.getSuperTypes()) {
-            vi2.addSuperType(t);
+        RefinedVariable rv = superName != null ? tc.getContext().getVariableByName(superName) : null;
+        if (rv != null) {
+            // propagate supertypes from the refined variable
+            for (CtTypeReference<?> t : rv.getSuperTypes())
+                vi2.addSuperType(t);
+        } else {
+            // propagate supertypes from the previous instance
+            for (CtTypeReference<?> t : prevInstance.getSuperTypes())
+                vi2.addSuperType(t);
         }
 
         // if the variable is a parent (not a VariableInstance) we need to check that
