@@ -13,6 +13,7 @@ import liquidjava.processor.context.GhostState;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.ast.BinaryExpression;
 import liquidjava.rj_language.ast.Expression;
+import liquidjava.rj_language.ast.LiteralBoolean;
 import liquidjava.rj_language.ast.FunctionInvocation;
 import liquidjava.rj_language.ast.GroupExpression;
 import liquidjava.rj_language.ast.Ite;
@@ -189,11 +190,25 @@ public class Predicate {
         return exp;
     }
 
+    private static boolean isBooleanLiteral(Expression expr, boolean value) {
+        return expr instanceof LiteralBoolean && ((LiteralBoolean) expr).isBooleanTrue() == value;
+    }
+
     public static Predicate createConjunction(Predicate c1, Predicate c2) {
+        // simplification: (true && x) = x, (false && x) = false
+        if (isBooleanLiteral(c1.getExpression(), true)) return c2;
+        if (isBooleanLiteral(c2.getExpression(), true)) return c1;
+        if (isBooleanLiteral(c1.getExpression(), false)) return c1;
+        if (isBooleanLiteral(c2.getExpression(), false)) return c2;
         return new Predicate(new BinaryExpression(c1.getExpression(), Utils.AND, c2.getExpression()));
     }
 
     public static Predicate createDisjunction(Predicate c1, Predicate c2) {
+        // simplification: (false || x) = x, (true || x) = true
+        if (isBooleanLiteral(c1.getExpression(), false)) return c2;
+        if (isBooleanLiteral(c2.getExpression(), false)) return c1;
+        if (isBooleanLiteral(c1.getExpression(), true)) return c1;
+        if (isBooleanLiteral(c2.getExpression(), true)) return c2;
         return new Predicate(new BinaryExpression(c1.getExpression(), Utils.OR, c2.getExpression()));
     }
 

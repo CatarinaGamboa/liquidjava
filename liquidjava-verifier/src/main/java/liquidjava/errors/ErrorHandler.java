@@ -27,21 +27,21 @@ public class ErrorHandler {
 
     public static <T> void printError(CtElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
             HashMap<String, PlacementInCode> map, ErrorEmitter errorl) {
-        String resumeMessage = "Type expected:" + expectedType.toString(); // + "; " +"Refinement found:" +
+        String resumeMessage = "Type expected: " + expectedType.toString(); // + "; " +"Refinement found:" +
         // cSMT.toString();
 
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
         // title
         StringBuilder sbtitle = new StringBuilder();
-        sbtitle.append("Failed to check refinement at: \n\n");
+        sbtitle.append("Failed to check refinement at:\n\n");
         if (moreInfo != null)
             sbtitle.append(moreInfo + "\n");
         sbtitle.append(var.toString());
         // all message
         sb.append(sbtitle.toString() + "\n\n");
-        sb.append("Type expected:" + expectedType.toString() + "\n");
-        sb.append("Refinement found:" + cSMT.toString() + "\n");
+        sb.append("Type expected: " + expectedType.toString() + "\n");
+        sb.append("Refinement found: " + cSMT.toString() + "\n");
         sb.append(printMap(map));
         sb.append("Location: " + var.getPosition() + "\n");
         sb.append("______________________________________________________\n");
@@ -65,7 +65,7 @@ public class ErrorHandler {
         sbtitle.append(element + "\n\n");
 
         sb.append(sbtitle.toString());
-        sb.append("Expected possible states:" + states + "\n");
+        sb.append("Expected possible states: " + states + "\n");
         sb.append("\nState found:\n");
         sb.append(printLine());
         sb.append("\n" + constraintForErrorMsg /* .toConjunctions() */.toString() + "\n");
@@ -120,7 +120,7 @@ public class ErrorHandler {
         sb.append("______________________________________________________\n");
         String title = "Error in ghost invocation: " + msg + "\n";
         sb.append(title);
-        sb.append(var + "\nError in refinement:" + expectedType.toString() + "\n");
+        sb.append(var + "\nError in refinement: " + expectedType.toString() + "\n");
         sb.append(printMap(map));
         sb.append("Location: " + var.getPosition() + "\n");
         sb.append("______________________________________________________\n");
@@ -151,8 +151,8 @@ public class ErrorHandler {
         sbtitle.append("Error found multiple disjoint states from a State Set in a refinement\n\n");
         sbtitle.append(element + "\n\n");
         sb.append(sbtitle.toString());
-        sb.append("In predicate:" + p.toString() + "\n");
-        sb.append("In class:" + name + "\n");
+        sb.append("In predicate: " + p.toString() + "\n");
+        sb.append("In class: " + name + "\n");
         sb.append(printMap(map));
         sb.append("Location: " + element.getPosition() + "\n");
         sb.append("______________________________________________________\n");
@@ -163,10 +163,10 @@ public class ErrorHandler {
     public static void printErrorConstructorFromState(CtElement element, CtLiteral<String> from, ErrorEmitter errorl) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
-        String s = " Error found constructor with FROM state (Constructor's should only have a TO state)\n\n";
+        String s = "Error found constructor with 'from' state (Constructors must only have a 'to' state)\n\n";
         sb.append(s);
         sb.append(element + "\n\n");
-        sb.append("State found:" + from + "\n");
+        sb.append("State found: " + from + "\n");
         sb.append("Location: " + element.getPosition() + "\n");
         sb.append("______________________________________________________\n");
 
