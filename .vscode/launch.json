@@ -1,0 +1,12 @@
+{
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Run LiquidJava",
+      "request": "launch",
+      "mainClass": "liquidjava.api.CommandLineLauncher",
+      "projectName": "liquidjava-verifier",
+      "args": "liquidjava-example/src/main/java/test"
+    }
+  ]
+}
