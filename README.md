@@ -2,11 +2,11 @@
 
 ![LiquidJava Banner](docs/design/figs/banner.gif)
 
-## Welcome to LiquidJava
+## Welcome to LiquidJava!
 
-LiquidJava is an additional type checker for Java that based on liquid types and typestates.
+LiquidJava is an additional type checker for Java, based on **liquid types** and **typestates**, which provides additional safety guarantees to Java programs through **refinements** at compile time.
 
-Simple example:
+**Example:**
 
 ```java
 @Refinement("a > 0")
@@ -14,78 +14,87 @@ int a = 3; // okay
 a = -8; // type error!
 ```
 
-This project has the LiquidJava verifier, the API and some examples for testing.
+This project contains the LiquidJava verifier and its API, as well as some examples for testing.
+
 You can find out more about LiquidJava in the following resources:
 
-* [Try it](https://github.com/CatarinaGamboa/liquidjava-examples) with Codespaces or locally following these steps
-* [Website](https://catarinagamboa.github.io/liquidjava.html)
-* [Examples of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-examples)
-* [LiquidJava Specification of the Java Standard Library](https://github.com/CatarinaGamboa/liquid-java-external-libs)
-* [VSCode plugin for LiquidJava](https://github.com/CatarinaGamboa/vscode-liquidjava)
+* [Try it](https://github.com/CatarinaGamboa/liquidjava-examples) with GitHub Codespaces or locally
+* [VS Code extension for LiquidJava](https://github.com/CatarinaGamboa/vscode-liquidjava)
+* [LiquidJava website](https://catarinagamboa.github.io/liquidjava.html)
+* [LiquidJava specification examples for the Java standard library](https://github.com/CatarinaGamboa/liquid-java-external-libs)
 <!-- * [Formalization of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-formalization) - not opensource yet -->
 
-# Setup the project
+## Getting Started
 
-## Prerequisites
+### VS Code Extension
+
+The easiest way to use LiquidJava is through its [VS Code extension](https://github.com/CatarinaGamboa/vscode-liquidjava), which uses the LiquidJava verifier directly inside VS Code, with error diagnostics and syntax highlighting for refinements.
+
+### Command Line
+
+For development, you may use the LiquidJava verifier from the command line.
+
+#### Prerequisites
+
 Before setting up LiquidJava, ensure you have the following installed:
 
-- Java 20 or newer - The project is configured to use Java 20;
-- Maven 3.6+ - For building and dependency management.
+- Java 20+ - JDK for compiling and running Java programs
+- Maven 3.6+ - For building and dependency management
 
-## Installation Steps
+#### Setup
 
-1. Clone the repository: `git clone https://github.com/CatarinaGamboa/liquidjava.git`;
-2. Build the project `mvn clean install`;
-3. Run tests to verify installation: `mvn test`;
-4. If importing into an IDE, import the project as a Maven project using the root `pom.xml`.
+1. Clone the repository: `git clone https://github.com/CatarinaGamboa/liquidjava.git`
+2. Build the project `mvn clean install`
+3. Run tests to verify installation: `mvn test`
+4. If importing into an IDE, import the project as a Maven project using the root `pom.xml`
 
-## Verify Installation
+#### Run Verification
 
-To check your refinements using LiquidJava:
+To run LiquidJava, use the Maven command below, replacing `/path/to/your/project` with the path to the Java file or directory you want to verify.
 
-**Run verification on examples**:
 ```bash
-mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java"
+mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="/path/to/your/project"
 ```
-   This should output: `Correct! Passed Verification`.
+
+If you're on Linux/macOS, you can use the `liquidjava` script (from the repository root) to simplify the process.
+
+**Test a correct case**:
+```bash
+./liquidjava liquidjava-example/src/main/java/testSuite/CorrectSimpleAssignment.java
+```
+
+This should output: `Correct! Passed Verification`.
 
 **Test an error case**:
 ```bash
-mvn exec:java -pl liquidjava-verifier -Dexec.mainClass="liquidjava.api.CommandLineLauncher" -Dexec.args="liquidjava-example/src/main/java/testSuite/ErrorSimpleAssignment.java"
+./liquidjava liquidjava-example/src/main/java/testSuite/ErrorSimpleAssignment.java
 ```
-   This should output an error message describing the refinement violation.
 
-## Run verification
+This should output an error message describing the refinement violation.
 
-### In a specific project
-
-Run the file `liquidjava-verifier\api\CommandLineLaucher` with the path to the target project for verification.
-If there are no arguments given, the application verifies the project on the path `liquidjava-example\src\main\java`.
-
-## Testing
+#### Testing
 
 Run `mvn test` to run all the tests in LiquidJava.
 
-The starter test file is `TestExamples.java` which uses the test suite under the `liquidjava-examples/testSuite`.
+The starter test file is `TestExamples.java`, which runs the test suite under the `testSuite` directory in `liquidjava-example`.
 
-Paths in the test suite are considered test cases if:
+The test suite considers test cases:
+1. Files that start with `Correct` or `Error` (e.g., `CorrectRecursion.java`)
+2. Packages or folders that contain the word `correct` or `error` (e.g., `arraylist_correct`)
 
-1. File that start with `Correct` or `Error` (e.g, "CorrectRecursion.java")
-2. Package/Folder that contains the word `correct` or `error`.
+Therefore, the files and folders that do not follow this pattern are ignored.
 
-Therefore, files/folders that do not pass this description are not verified.
+## Project Structure
 
-## Project structure
-
-* **docs**: documents used for the design of the language. The folder includes a readme to a full artifact used in the design process, here are some initial documents used to prepare the design of the refinements language at its evaluation
-* **liquidjava-api**: inlcudes the annotations that can be introduced in the Java programs to add the refinements
-* **liquidjava-examples**: includes a main folder with the current example that the verifier is testing; the test suite that is used in maven test is under the `testSuite` folder
-* **liquidjava-verifier**: has the project for verification of the classes
-  * *api*: classes that test the verifier. Includes the `CommandLineLauncher` that runs the verification on a given class or on the main folder of `liquidjava-examples` if no argument is given. This package includes the JUnit tests to verify if the examples in `liquidjava-example/tests` are correctly verified.
-  * *ast*: represents the abstract syntax tree of the refinement's language.
-  * *errors*: package for reporting the errors.
-  * *processor*: package that handles the type checking.
-  * *rj_language*: handles the processing of the strings with refinements.
-  * *smt*: package that handles the translation to the SMT solver and the processing of the results the SMT solver produces.
-  * *utils*: includes useful methods for all the previous packages.
-  * *test/java/liquidjava/api/tests* contains the `TestExamples` class used for running the test suite.
+* **docs**: Contains documents used for the design of the language. This folder includes a [README](./docs/design/README.md) with the link to the full artifact used in the design process. It also contains initial documents used to prepare the design of the refinements language during its evaluation
+* **liquidjava-api**: Includes the annotations that can be introduced in the Java programs to add the refinements
+* **liquidjava-example**: Includes some examples and the test suite used for testing the verifier
+* **liquidjava-verifier**: Includes the implementation of the verifier. Its main packages are:
+  * `api`: Includes the `CommandLineLauncher` that runs the verification on a given class or in the `currentlyTesting` directory if no argument is given
+  * `ast`: Represents the Abstract Syntax Tree (AST) of the Refinements Language (RJ)
+  * `errors`: Package for reporting the errors
+  * `processor`: Package that handles the type checking
+  * `rj_language`: Handles the parsing of the refinement strings to an AST
+  * `smt`: Package that handles the translation to the SMT solver and the processing of the results the SMT solver produces
+  * `utils`: Includes useful methods for all the previous packages
+  * `test/java/liquidjava/api/tests`: Contains the `TestExamples` class used for running the test suite
