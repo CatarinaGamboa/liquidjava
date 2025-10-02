@@ -4,32 +4,33 @@ import liquidjava.rj_language.ast.Expression;
 
 public class ExpressionSimplifier {
 
-    public static Expression simplify(Expression exp) {
-        System.out.println(exp);
-        Expression current = simplifyExp(exp.clone());
-        System.out.println(current);
+    public static DerivationNode simplify(Expression exp) {
+        DerivationNode currentNode = new DerivationNode(exp);
+        Expression currentExp = simplifyExp(exp.clone());
+        currentNode = currentNode.addNode(currentExp);
         boolean changed = true;
 
         while (changed) {
             changed = false;
 
-            Expression propagated = ConstantPropagation.propagate(current.clone());
-            if (!propagated.equals(current)) {
-                current = simplifyExp(propagated);
-                System.out.println(current);
+            Expression propagated = ConstantPropagation.propagate(currentExp.clone());
+            if (!propagated.equals(currentExp)) {
+                currentExp = simplifyExp(propagated);
+                currentNode = currentNode.addNode(currentExp);
                 changed = true;
                 continue;
             }
 
-            Expression folded = ConstantFolding.fold(current.clone());
-            if (!folded.equals(current)) {
-                current = simplifyExp(folded);
-                System.out.println(current);
+            Expression folded = ConstantFolding.fold(currentExp.clone());
+            if (!folded.equals(currentExp)) {
+                currentExp = simplifyExp(folded);
+                currentNode = currentNode.addNode(currentExp);
+                System.out.println(currentExp);
                 changed = true;
                 continue;
             }
         }
-        return current;
+        return currentNode;
     }
 
     private static Expression simplifyExp(Expression exp) {
