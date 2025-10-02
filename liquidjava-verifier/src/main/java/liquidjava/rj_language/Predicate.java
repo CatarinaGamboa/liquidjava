@@ -21,6 +21,8 @@ import liquidjava.rj_language.ast.LiteralInt;
 import liquidjava.rj_language.ast.LiteralReal;
 import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
+import liquidjava.rj_language.opt.ExpressionSimplifier;
+import liquidjava.rj_language.opt.derivation_node.DerivationNode;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
@@ -210,6 +212,12 @@ public class Predicate {
 
     public Expression getExpression() {
         return exp;
+    }
+
+    public Expression simplify() {
+        List<Expression> steps = ExpressionSimplifier.simplify(exp.clone());
+        steps.forEach(System.out::println);
+        return steps.isEmpty() ? exp : steps.get(steps.size() - 1);
     }
 
     public static Predicate createConjunction(Predicate c1, Predicate c2) {

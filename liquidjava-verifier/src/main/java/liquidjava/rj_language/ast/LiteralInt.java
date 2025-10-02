@@ -25,6 +25,10 @@ public class LiteralInt extends Expression {
         return Integer.toString(value);
     }
 
+    public int getValue() {
+        return value;
+    }
+
     @Override
     public void getVariableNames(List<String> toAdd) {
         // end leaf

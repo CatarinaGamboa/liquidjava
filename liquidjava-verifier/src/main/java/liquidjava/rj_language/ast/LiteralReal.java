@@ -25,6 +25,10 @@ public class LiteralReal extends Expression {
         return Double.toString(value);
     }
 
+    public double getValue() {
+        return value;
+    }
+
     @Override
     public void getVariableNames(List<String> toAdd) {
         // end leaf

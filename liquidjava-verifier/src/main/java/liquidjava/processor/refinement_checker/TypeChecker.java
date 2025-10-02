@@ -119,7 +119,8 @@ public abstract class TypeChecker extends CtScanner {
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 if (Character.isUpperCase(f.charAt(0))) {
-                    ErrorHandler.printCostumeError(s, "State name must start with lowercase in '" + f + "'", errorEmitter);
+                    ErrorHandler.printCostumeError(s, "State name must start with lowercase in '" + f + "'",
+                            errorEmitter);
                 }
             }
         }

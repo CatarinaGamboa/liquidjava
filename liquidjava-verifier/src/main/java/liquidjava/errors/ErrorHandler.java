@@ -41,7 +41,7 @@ public class ErrorHandler {
         // all message
         sb.append(sbtitle.toString() + "\n\n");
         sb.append("Type expected:" + expectedType.toString() + "\n");
-        sb.append("Refinement found:" + cSMT.toString() + "\n");
+        sb.append("Refinement found:\n" + cSMT.simplify() + "\n");
         sb.append(printMap(map));
         sb.append("Location: " + var.getPosition() + "\n");
         sb.append("______________________________________________________\n");
@@ -181,7 +181,7 @@ public class ErrorHandler {
         sb.append(element + "\n\n");
         sb.append("Location: " + element.getPosition() + "\n");
         sb.append("______________________________________________________\n");
-        
+
         errorl.addError(s, sb.toString(), element.getPosition(), 1);
     }
 
