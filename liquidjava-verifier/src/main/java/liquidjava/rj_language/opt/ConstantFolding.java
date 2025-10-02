@@ -119,6 +119,17 @@ public class ConstantFolding {
             boolean value = ((LiteralBoolean) operand).isBooleanTrue();
             return new LiteralBoolean(!value);
         }
+        if (operator.equals("-")) {
+            // -(x) = -x
+            if (operand instanceof LiteralInt) {
+                int value = ((LiteralInt) operand).getValue();
+                return new LiteralInt(-value);
+            }
+            if (operand instanceof LiteralReal) {
+                double value = ((LiteralReal) operand).getValue();
+                return new LiteralReal(-value);
+            }
+        }
         return unaryExp;
     }
 }
