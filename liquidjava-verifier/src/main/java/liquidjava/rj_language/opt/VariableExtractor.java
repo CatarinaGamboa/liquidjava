@@ -10,7 +10,7 @@ import liquidjava.rj_language.ast.LiteralInt;
 import liquidjava.rj_language.ast.LiteralReal;
 import liquidjava.rj_language.ast.Var;
 
-public class AssertionExtractor {
+public class VariableExtractor {
 
     public static Map<String, Expression> extract(Expression exp) {
         Map<String, Expression> assertions = new HashMap<>();

@@ -1,44 +1,46 @@
 package liquidjava.rj_language.opt;
 
-import java.util.ArrayList;
-import java.util.List;
 import liquidjava.rj_language.ast.Expression;
 
 public class ExpressionSimplifier {
 
-    public static List<Expression> simplify(Expression exp) {
-        ArrayList<Expression> derivationSteps = new ArrayList<>();
-        Expression current = exp.clone();
+    public static Expression simplify(Expression exp) {
+        System.out.println(exp);
+        Expression current = simplifyExp(exp.clone());
+        System.out.println(current);
         boolean changed = true;
 
-        derivationSteps.add(current);
         while (changed) {
             changed = false;
 
-            Expression simplified = LogicSimplifier.simplify(current.clone());
-            if (!simplified.equals(current)) {
-                // derivationSteps.add(simplified);
-                current = simplified;
-                changed = true;
-                continue;
-            }
-
             Expression propagated = ConstantPropagation.propagate(current.clone());
             if (!propagated.equals(current)) {
-                // derivationSteps.add(propagated);
-                current = propagated;
+                current = simplifyExp(propagated);
+                System.out.println(current);
                 changed = true;
                 continue;
             }
 
             Expression folded = ConstantFolding.fold(current.clone());
             if (!folded.equals(current)) {
-                derivationSteps.add(folded);
-                current = folded;
+                current = simplifyExp(folded);
+                System.out.println(current);
                 changed = true;
                 continue;
             }
         }
-        return derivationSteps;
+        return current;
+    }
+
+    private static Expression simplifyExp(Expression exp) {
+        Expression current = exp.clone();
+        while (true) {
+            Expression simplified = LogicSimplifier.simplify(current.clone());
+            if (simplified.equals(current)) {
+                break;
+            }
+            current = simplified;
+        }
+        return current;
     }
 }
