@@ -7,7 +7,7 @@ import java.util.Map;
 public class ConstantPropagation {
 
     public static Expression propagate(Expression exp) {
-        Map<String, Expression> substitutions = VariableExtractor.extract(exp);
+        Map<String, Expression> substitutions = VariableCollector.collect(exp);
         return propagateRecursive(exp, substitutions);
     }
 

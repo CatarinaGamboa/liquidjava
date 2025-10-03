@@ -10,14 +10,14 @@ import liquidjava.rj_language.ast.LiteralInt;
 import liquidjava.rj_language.ast.LiteralReal;
 import liquidjava.rj_language.ast.Var;
 
-public class VariableExtractor {
+public class VariableCollector {
 
-    public static Map<String, Expression> extract(Expression exp) {
+    public static Map<String, Expression> collect(Expression exp) {
         Map<String, Expression> assertions = new HashMap<>();
 
         // only extract assertions if the expression contains conjunctions (&&)
         if (containsConjunction(exp)) {
-            extractRecursive(exp, assertions);
+            collectRecursive(exp, assertions);
         }
         return assertions;
     }
@@ -41,20 +41,19 @@ public class VariableExtractor {
         return false;
     }
 
-    private static void extractRecursive(Expression exp, Map<String, Expression> assertions) {
+    private static void collectRecursive(Expression exp, Map<String, Expression> assertions) {
         if (exp instanceof BinaryExpression) {
             BinaryExpression binExp = (BinaryExpression) exp;
             String operator = binExp.getOperator();
 
             if (operator.equals("&&")) {
                 // for conjunctions recursively extract from both sides
-                extractRecursive(binExp.getFirstOperand(), assertions);
-                extractRecursive(binExp.getSecondOperand(), assertions);
+                collectRecursive(binExp.getFirstOperand(), assertions);
+                collectRecursive(binExp.getSecondOperand(), assertions);
             } else if (operator.equals("==")) {
                 // for assertions check if one side is a variable and the other is a literal
                 Expression left = binExp.getFirstOperand();
                 Expression right = binExp.getSecondOperand();
-
                 if (left instanceof Var && isLiteral(right)) {
                     assertions.put(((Var) left).getName(), right);
                 } else if (right instanceof Var && isLiteral(left)) {
@@ -65,7 +64,7 @@ public class VariableExtractor {
         // for other expressions, recurse into children
         else if (exp.hasChildren()) {
             for (Expression child : exp.getChildren()) {
-                extractRecursive(child, assertions);
+                collectRecursive(child, assertions);
             }
         }
     }

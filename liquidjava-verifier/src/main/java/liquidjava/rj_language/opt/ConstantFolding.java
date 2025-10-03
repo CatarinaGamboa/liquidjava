@@ -22,7 +22,8 @@ public class ConstantFolding {
         // try to fold the current expression
         if (exp instanceof BinaryExpression) {
             return foldBinaryExpression((BinaryExpression) exp);
-        } else if (exp instanceof UnaryExpression) {
+        }
+        if (exp instanceof UnaryExpression) {
             return foldUnaryExpression((UnaryExpression) exp);
         }
         return exp;
@@ -55,7 +56,7 @@ public class ConstantFolding {
         }
 
         // arithmetic operations with real literals
-        else if (left instanceof LiteralReal && right instanceof LiteralReal) {
+        if (left instanceof LiteralReal && right instanceof LiteralReal) {
             double l = ((LiteralReal) left).getValue();
             double r = ((LiteralReal) right).getValue();
             return switch (op) {
@@ -75,7 +76,7 @@ public class ConstantFolding {
         }
 
         // mixed integer and real operations
-        else if ((left instanceof LiteralInt && right instanceof LiteralReal) || (left instanceof LiteralReal && right instanceof LiteralInt)) {
+        if ((left instanceof LiteralInt && right instanceof LiteralReal) || (left instanceof LiteralReal && right instanceof LiteralInt)) {
             double l = left instanceof LiteralInt ? ((LiteralInt) left).getValue() : ((LiteralReal) left).getValue();
             double r = right instanceof LiteralInt ? ((LiteralInt) right).getValue() : ((LiteralReal) right).getValue();
             return switch (op) {
@@ -95,7 +96,7 @@ public class ConstantFolding {
         }
 
         // boolean operations with boolean literals
-        else if (left instanceof LiteralBoolean && right instanceof LiteralBoolean) {
+        if (left instanceof LiteralBoolean && right instanceof LiteralBoolean) {
             boolean l = ((LiteralBoolean) left).isBooleanTrue();
             boolean r = ((LiteralBoolean) right).isBooleanTrue();
             return switch (op) {
