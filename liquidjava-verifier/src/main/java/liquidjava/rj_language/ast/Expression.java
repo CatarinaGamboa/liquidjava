@@ -1,9 +1,11 @@
 package liquidjava.rj_language.ast;
 
-import com.microsoft.z3.Expr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import com.microsoft.z3.Expr;
+
 import liquidjava.processor.context.Context;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.ast.typing.TypeInfer;
@@ -45,6 +47,10 @@ public abstract class Expression {
 
     public void setChild(int index, Expression element) {
         children.set(index, element);
+    }
+
+    public boolean isLiteral() {
+        return this instanceof LiteralInt || this instanceof LiteralReal || this instanceof LiteralBoolean;
     }
 
     /**

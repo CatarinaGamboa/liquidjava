@@ -1,47 +1,70 @@
 package liquidjava.rj_language.opt;
 
+import liquidjava.rj_language.ast.BinaryExpression;
 import liquidjava.rj_language.ast.Expression;
+import liquidjava.rj_language.ast.LiteralBoolean;
+import liquidjava.rj_language.opt.derivation_node.BinaryDerivationNode;
+import liquidjava.rj_language.opt.derivation_node.DerivationNode;
+import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 
 public class ExpressionSimplifier {
 
-    public static DerivationNode simplify(Expression exp) {
-        DerivationNode currentNode = new DerivationNode(exp);
-        Expression currentExp = simplifyExp(exp.clone());
-        currentNode = currentNode.addNode(currentExp);
-        boolean changed = true;
-
-        while (changed) {
-            changed = false;
-
-            Expression propagated = ConstantPropagation.propagate(currentExp.clone());
-            if (!propagated.equals(currentExp)) {
-                currentExp = simplifyExp(propagated);
-                currentNode = currentNode.addNode(currentExp);
-                changed = true;
-                continue;
-            }
-
-            Expression folded = ConstantFolding.fold(currentExp.clone());
-            if (!folded.equals(currentExp)) {
-                currentExp = simplifyExp(folded);
-                currentNode = currentNode.addNode(currentExp);
-                System.out.println(currentExp);
-                changed = true;
-                continue;
-            }
-        }
-        return currentNode;
+    public static ValDerivationNode simplify(Expression exp) {
+        ValDerivationNode prop = ConstantPropagation.propagate(exp);
+        ValDerivationNode fold = ConstantFolding.fold(prop);
+        return simplifyDerivationTree(fold);
     }
 
-    private static Expression simplifyExp(Expression exp) {
-        Expression current = exp.clone();
-        while (true) {
-            Expression simplified = LogicSimplifier.simplify(current.clone());
-            if (simplified.equals(current)) {
-                break;
+    /**
+     * Recursively simplify the derivation tree by removing redundant conjuncts
+     */
+    private static ValDerivationNode simplifyDerivationTree(ValDerivationNode node) {
+        Expression value = node.getValue();
+        DerivationNode origin = node.getOrigin();
+
+        // binary expression with &&
+        if (value instanceof BinaryExpression) {
+            BinaryExpression binExp = (BinaryExpression) value;
+            if ("&&".equals(binExp.getOperator()) && origin instanceof BinaryDerivationNode) {
+                BinaryDerivationNode binOrigin = (BinaryDerivationNode) origin;
+
+                // recursively simplify children
+                ValDerivationNode leftSimplified = simplifyDerivationTree(binOrigin.getLeft());
+                ValDerivationNode rightSimplified = simplifyDerivationTree(binOrigin.getRight());
+
+                // check if either side is redundant
+                if (isRedundant(leftSimplified.getValue()))
+                    return rightSimplified;
+                if (isRedundant(rightSimplified.getValue()))
+                    return leftSimplified;
+
+                // return the conjunction with simplified children
+                Expression newValue = new BinaryExpression(leftSimplified.getValue(), "&&", rightSimplified.getValue());
+                DerivationNode newOrigin = new BinaryDerivationNode(leftSimplified, rightSimplified, "&&");
+                return new ValDerivationNode(newValue, newOrigin);
             }
-            current = simplified;
         }
-        return current;
+        // no simplification
+        return node;
+    }
+
+    /**
+     * Check if an expression is redundant
+     */
+    private static boolean isRedundant(Expression exp) {
+        // true
+        if (exp instanceof LiteralBoolean && ((LiteralBoolean) exp).isBooleanTrue()) {
+            return true;
+        }
+        // x == x
+        if (exp instanceof BinaryExpression) {
+            BinaryExpression binExp = (BinaryExpression) exp;
+            if ("==".equals(binExp.getOperator())) {
+                Expression left = binExp.getFirstOperand();
+                Expression right = binExp.getSecondOperand();
+                return left.equals(right);
+            }
+        }
+        return false;
     }
 }

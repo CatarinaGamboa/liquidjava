@@ -41,7 +41,7 @@ public class ErrorHandler {
         // all message
         sb.append(sbtitle.toString() + "\n\n");
         sb.append("Type expected:" + expectedType.toString() + "\n");
-        sb.append("Refinement found:\n" + cSMT.simplify() + "\n");
+        sb.append("Refinement found:\n" + cSMT.simplify().getValue() + "\n");
         sb.append(printMap(map));
         sb.append("Location: " + var.getPosition() + "\n");
         sb.append("______________________________________________________\n");
