@@ -1,7 +1,10 @@
 package liquidjava.rj_language.opt;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
 import liquidjava.rj_language.ast.BinaryExpression;
 import liquidjava.rj_language.ast.Expression;
 import liquidjava.rj_language.ast.Var;
@@ -15,9 +18,9 @@ public class VariableResolver {
     }
 
     private static void resolveRecursive(Expression exp, Map<String, Expression> map) {
-        if (!(exp instanceof BinaryExpression)) {
+        if (!(exp instanceof BinaryExpression))
             return;
-        }
+
         BinaryExpression be = (BinaryExpression) exp;
         String op = be.getOperator();
         if ("&&".equals(op)) {
@@ -38,19 +41,24 @@ public class VariableResolver {
     private static Map<String, Expression> resolveTransitive(Map<String, Expression> map) {
         Map<String, Expression> result = new HashMap<>();
         for (Map.Entry<String, Expression> entry : map.entrySet()) {
-            result.put(entry.getKey(), lookup(entry.getValue(), map));
+            result.put(entry.getKey(), lookup(entry.getValue(), map, new HashSet<>()));
         }
         return result;
     }
 
-    private static Expression lookup(Expression exp, Map<String, Expression> map) {
-        if (!(exp instanceof Var)) {
+    private static Expression lookup(Expression exp, Map<String, Expression> map, Set<String> seen) {
+        if (!(exp instanceof Var))
             return exp;
-        }
-        Expression value = map.get(exp.toString());
-        if (value == null) {
+
+        String name = exp.toString();
+        if (seen.contains(name))
+            return exp; // circular reference
+
+        Expression value = map.get(name);
+        if (value == null)
             return exp;
-        }
-        return lookup(value, map);
+
+        seen.add(name);
+        return lookup(value, map, seen);
     }
 }
