@@ -1,8 +1,8 @@
 package liquidjava.rj_language.ast;
 
-import com.microsoft.z3.Expr;
 import java.util.List;
-import liquidjava.smt.TranslatorToZ3;
+
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class LiteralBoolean extends Expression {
 
@@ -16,8 +16,9 @@ public class LiteralBoolean extends Expression {
         this.value = Boolean.parseBoolean(value);
     }
 
-    public Expr<?> eval(TranslatorToZ3 ctx) {
-        return ctx.makeBooleanLiteral(value);
+    @Override
+    public <T> T accept(ExpressionVisitor<T> visitor) throws Exception {
+        return visitor.visitLiteralBoolean(this);
     }
 
     public String toString() {

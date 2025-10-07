@@ -1,8 +1,8 @@
 package liquidjava.rj_language.ast;
 
-import com.microsoft.z3.Expr;
 import java.util.List;
-import liquidjava.smt.TranslatorToZ3;
+
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class Var extends Expression {
 
@@ -17,8 +17,8 @@ public class Var extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) throws Exception {
-        return ctx.makeVariable(name);
+    public <T> T accept(ExpressionVisitor<T> visitor) throws Exception {
+        return visitor.visitVar(this);
     }
 
     public String toString() {

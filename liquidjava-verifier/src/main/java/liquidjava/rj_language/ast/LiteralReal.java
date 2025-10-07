@@ -1,8 +1,8 @@
 package liquidjava.rj_language.ast;
 
-import com.microsoft.z3.Expr;
 import java.util.List;
-import liquidjava.smt.TranslatorToZ3;
+
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class LiteralReal extends Expression {
 
@@ -17,12 +17,16 @@ public class LiteralReal extends Expression {
     }
 
     @Override
-    public Expr<?> eval(TranslatorToZ3 ctx) {
-        return ctx.makeDoubleLiteral(value);
+    public <T> T accept(ExpressionVisitor<T> visitor) throws Exception {
+        return visitor.visitLiteralReal(this);
     }
 
     public String toString() {
         return Double.toString(value);
+    }
+
+    public double getValue() {
+        return value;
     }
 
     @Override

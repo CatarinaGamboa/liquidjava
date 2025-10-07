@@ -22,8 +22,8 @@ public class SMTEvaluator {
             Expression exp = toVerify.getExpression();
             Status s;
             try (TranslatorToZ3 tz3 = new TranslatorToZ3(c)) {
-                // com.microsoft.z3.Expr
-                Expr<?> e = exp.eval(tz3);
+                ExpressionToZ3Visitor visitor = new ExpressionToZ3Visitor(tz3);
+                Expr<?> e = exp.accept(visitor);
                 s = tz3.verifyExpression(e);
 
                 if (s.equals(Status.SATISFIABLE)) {
