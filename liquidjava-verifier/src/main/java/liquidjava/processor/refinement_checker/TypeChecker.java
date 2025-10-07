@@ -119,7 +119,7 @@ public abstract class TypeChecker extends CtScanner {
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 if (Character.isUpperCase(f.charAt(0))) {
-                    ErrorHandler.printCostumeError(s, "State name must start with lowercase in '" + f + "'",
+                    ErrorHandler.printCustomError(s, "State name must start with lowercase in '" + f + "'",
                             errorEmitter);
                 }
             }
@@ -161,11 +161,11 @@ public abstract class TypeChecker extends CtScanner {
         try {
             gd = RefinementsParser.getGhostDeclaration(string);
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(ann, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
+            ErrorHandler.printCustomError(ann, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
             return;
         }
         if (gd.getParam_types().size() > 0) {
-            ErrorHandler.printCostumeError(ann, "Ghost States have the class as parameter "
+            ErrorHandler.printCustomError(ann, "Ghost States have the class as parameter "
                     + "by default, no other parameters are allowed in '" + string + "'", errorEmitter);
             return;
         }
@@ -224,8 +224,7 @@ public abstract class TypeChecker extends CtScanner {
                 context.addGhostFunction(gh);
             }
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function" + e.getMessage(),
-                    errorEmitter);
+            ErrorHandler.printCustomError(element, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
             // e.printStackTrace();
             return;
         }
@@ -252,7 +251,7 @@ public abstract class TypeChecker extends CtScanner {
                 }
             }
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(element, e.getMessage(), errorEmitter);
+            ErrorHandler.printCustomError(element, e.getMessage(), errorEmitter);
             return;
             // e.printStackTrace();
         }

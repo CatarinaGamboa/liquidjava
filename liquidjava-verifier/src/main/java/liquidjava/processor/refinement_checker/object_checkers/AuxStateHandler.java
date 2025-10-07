@@ -369,7 +369,7 @@ public class AuxStateHandler {
             stateChange.setTo(toPredicate);
         } catch (ParsingException e) {
             ErrorHandler
-                    .printCostumeError(fw,
+                    .printCustomError(fw,
                             "ParsingException while constructing assignment update for `" + fw + "` in class `"
                                     + fw.getVariable().getDeclaringType() + "` : " + e.getMessage(),
                             tc.getErrorEmitter());
