@@ -1,31 +1,20 @@
 package liquidjava.rj_language.opt.derivation_node;
 
-import java.util.Map;
-
 public class UnaryDerivationNode extends DerivationNode {
 
+    private final String op;
     private final ValDerivationNode operand;
-    private final String operator;
 
-    public UnaryDerivationNode(ValDerivationNode operand, String operator) {
+    public UnaryDerivationNode(ValDerivationNode operand, String op) {
         this.operand = operand;
-        this.operator = operator;
+        this.op = op;
     }
 
     public ValDerivationNode getOperand() {
         return operand;
     }
 
-    public String getOperator() {
-        return operator;
-    }
-
-    @Override
-    public Map<String, Object> toJson() {
-        Map<String, Object> json = baseJson();
-        json.put("op", operator);
-        if (operand != null)
-            json.put("operand", operand.toJson());
-        return json;
+    public String getOp() {
+        return op;
     }
 }

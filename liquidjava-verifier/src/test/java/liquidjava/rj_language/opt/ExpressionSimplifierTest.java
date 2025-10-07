@@ -331,7 +331,7 @@ class ExpressionSimplifierTest {
         } else if (expected instanceof UnaryDerivationNode) {
             UnaryDerivationNode expectedUnary = (UnaryDerivationNode) expected;
             UnaryDerivationNode actualUnary = (UnaryDerivationNode) actual;
-            assertEquals(expectedUnary.getOperator(), actualUnary.getOperator(), message + ": operators should match");
+            assertEquals(expectedUnary.getOp(), actualUnary.getOp(), message + ": operators should match");
             assertDerivationEquals(expectedUnary.getOperand(), actualUnary.getOperand(), message + " > operand");
         }
     }
