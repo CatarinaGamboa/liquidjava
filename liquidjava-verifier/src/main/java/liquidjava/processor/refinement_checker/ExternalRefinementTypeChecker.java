@@ -95,8 +95,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
 
         } catch (ParsingException e) {
-            ErrorHandler.printCostumeError(element, "Could not parse the Ghost Function" + e.getMessage(),
-                    errorEmitter);
+            ErrorHandler.printCustomError(element, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
             // e.printStackTrace();
         }
     }
