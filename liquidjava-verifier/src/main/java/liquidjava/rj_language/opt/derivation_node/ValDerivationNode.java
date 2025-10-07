@@ -34,6 +34,7 @@ public class ValDerivationNode extends DerivationNode {
         return origin;
     }
 
+    // Custom serializer to handle Expression subclasses properly
     private static class ExpressionSerializer implements JsonSerializer<Expression> {
         @Override
         public JsonElement serialize(Expression exp, Type typeOfSrc, JsonSerializationContext context) {

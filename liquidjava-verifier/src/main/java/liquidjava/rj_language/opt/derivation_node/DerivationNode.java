@@ -5,10 +5,8 @@ import com.google.gson.GsonBuilder;
 
 public abstract class DerivationNode {
 
-    private static final Gson gson = new GsonBuilder()
-        .setPrettyPrinting() // remove later
-        .disableHtmlEscaping() // to not escape characters like &, >, <, =, etc.
-        .create();
+    // disable html escaping to avoid escaping characters like &, >, <, =, etc.
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     @Override
     public String toString() {

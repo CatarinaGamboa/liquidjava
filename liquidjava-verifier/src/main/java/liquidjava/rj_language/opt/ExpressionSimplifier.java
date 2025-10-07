@@ -9,6 +9,10 @@ import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 
 public class ExpressionSimplifier {
 
+    /**
+     * Simplifies an expression by applying constant propagation, constant folding and removing redundant conjuncts
+     * Returns a derivation node representing the tree of simplifications applied
+     */
     public static ValDerivationNode simplify(Expression exp) {
         ValDerivationNode prop = ConstantPropagation.propagate(exp);
         ValDerivationNode fold = ConstantFolding.fold(prop);
@@ -16,7 +20,7 @@ public class ExpressionSimplifier {
     }
 
     /**
-     * Recursively simplify the derivation tree by removing redundant conjuncts
+     * Recursively simplifies the derivation tree by removing redundant conjuncts
      */
     private static ValDerivationNode simplifyDerivationTree(ValDerivationNode node) {
         Expression value = node.getValue();
@@ -49,7 +53,7 @@ public class ExpressionSimplifier {
     }
 
     /**
-     * Check if an expression is redundant
+     * Checks if an expression is redundant (e.g. true or x == x)
      */
     private static boolean isRedundant(Expression exp) {
         // true

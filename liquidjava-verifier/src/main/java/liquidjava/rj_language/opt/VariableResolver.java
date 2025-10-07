@@ -11,12 +11,19 @@ import liquidjava.rj_language.ast.Var;
 
 public class VariableResolver {
 
+    /**
+     * Extracts variables with constant values from an expression Returns a map from variable names to their values
+     */
     public static Map<String, Expression> resolve(Expression exp) {
         Map<String, Expression> map = new HashMap<>();
         resolveRecursive(exp, map);
         return resolveTransitive(map);
     }
 
+    /**
+     * Recursively extracts variable equalities from an expression (e.g. ... && x == 1 && y == 2 => map: x -> 1, y -> 2)
+     * Modifies the given map in place
+     */
     private static void resolveRecursive(Expression exp, Map<String, Expression> map) {
         if (!(exp instanceof BinaryExpression))
             return;
@@ -30,14 +37,16 @@ public class VariableResolver {
             Expression left = be.getFirstOperand();
             Expression right = be.getSecondOperand();
             if (left instanceof Var && (right.isLiteral() || right instanceof Var)) {
-                map.put(left.toString(), right.clone());
+                map.put(((Var) left).getName(), right.clone());
             } else if (right instanceof Var && left.isLiteral()) {
-                map.put(right.toString(), left.clone());
+                map.put(((Var) right).getName(), left.clone());
             }
         }
     }
 
-    // e.g. x == y && y == 1 => x == 1
+    /**
+     * Handles transitive variable equalities in the map (e.g. map: x -> y, y -> 1 => map: x -> 1, y -> 1)
+     */
     private static Map<String, Expression> resolveTransitive(Map<String, Expression> map) {
         Map<String, Expression> result = new HashMap<>();
         for (Map.Entry<String, Expression> entry : map.entrySet()) {
@@ -46,6 +55,10 @@ public class VariableResolver {
         return result;
     }
 
+    /**
+     * Returns the value of a variable by looking up in the map recursively Uses the seen set to avoid circular
+     * references (e.g. x -> y, y -> x) which would cause infinite recursion
+     */
     private static Expression lookup(Expression exp, Map<String, Expression> map, Set<String> seen) {
         if (!(exp instanceof Var))
             return exp;

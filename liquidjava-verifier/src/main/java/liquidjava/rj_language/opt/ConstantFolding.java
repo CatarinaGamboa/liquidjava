@@ -14,14 +14,18 @@ import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 
 public class ConstantFolding {
 
+    /**
+     * Performs constant folding on a derivation node by evaluating nodes with constant values. Returns a new derivation
+     * node representing the folding steps taken
+     */
     public static ValDerivationNode fold(ValDerivationNode node) {
         Expression exp = node.getValue();
-        if (exp instanceof BinaryExpression) {
+        if (exp instanceof BinaryExpression)
             return foldBinary(node);
-        }
-        if (exp instanceof UnaryExpression) {
+
+        if (exp instanceof UnaryExpression)
             return foldUnary(node);
-        }
+
         if (exp instanceof GroupExpression) {
             GroupExpression group = (GroupExpression) exp;
             if (group.getChildren().size() == 1) {
@@ -31,6 +35,9 @@ public class ConstantFolding {
         return node;
     }
 
+    /**
+     * Folds a binary expression node if both children are constant values (e.g. 1 + 2 => 3)
+     */
     private static ValDerivationNode foldBinary(ValDerivationNode node) {
         BinaryExpression binExp = (BinaryExpression) node.getValue();
         DerivationNode parent = node.getOrigin();
@@ -142,6 +149,9 @@ public class ConstantFolding {
         return new ValDerivationNode(binExp, origin);
     }
 
+    /**
+     * Folds a unary expression node if the child (operand) is a constant value (e.g. !true => false)
+     */
     private static ValDerivationNode foldUnary(ValDerivationNode node) {
         UnaryExpression unaryExp = (UnaryExpression) node.getValue();
         DerivationNode parent = node.getOrigin();

@@ -14,11 +14,19 @@ import java.util.Map;
 
 public class ConstantPropagation {
 
+    /**
+     * Performs constant propagation on an expression, by substituting variables with their constant values. Uses the
+     * VariableResolver to extract variable equalities from the expression first. Returns a derivation node representing
+     * the propagation steps taken.
+     */
     public static ValDerivationNode propagate(Expression exp) {
         Map<String, Expression> substitutions = VariableResolver.resolve(exp);
         return propagateRecursive(exp, substitutions);
     }
 
+    /**
+     * Recursively performs constant propagation on an expression (e.g. x + y && x == 1 && y == 2 => 1 + 2)
+     */
     private static ValDerivationNode propagateRecursive(Expression exp, Map<String, Expression> subs) {
 
         // substitute variable
