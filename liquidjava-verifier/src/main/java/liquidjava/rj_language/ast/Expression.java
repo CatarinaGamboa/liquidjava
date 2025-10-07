@@ -1,19 +1,19 @@
 package liquidjava.rj_language.ast;
 
-import com.microsoft.z3.Expr;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
 import liquidjava.processor.context.Context;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.ast.typing.TypeInfer;
-import liquidjava.smt.TranslatorToZ3;
+import liquidjava.rj_language.visitors.ExpressionVisitor;
 import liquidjava.utils.Utils;
 import spoon.reflect.factory.Factory;
 
 public abstract class Expression {
 
-    public abstract Expr<?> eval(TranslatorToZ3 ctx) throws Exception;
+    public abstract <T> T accept(ExpressionVisitor<T> visitor) throws Exception;
 
     public abstract void getVariableNames(List<String> toAdd);
 
