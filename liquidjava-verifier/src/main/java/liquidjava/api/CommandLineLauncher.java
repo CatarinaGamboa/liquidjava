@@ -7,30 +7,45 @@ import liquidjava.errors.ErrorEmitter;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
-import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;
 import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
     public static void main(String[] args) {
-        String allPath = "./liquidjava-example/src/main/java/test/currentlyTesting";
-
         // String allPath = "C://Regen/test-projects/src/Main.java";
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
         // In VSCode needs:
         // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
-        List<String> files = args.length == 0 ? Arrays.asList(allPath) : Arrays.asList(args);
+
+        if (args.length == 0) {
+            System.out.println("No input files or directories provided");
+            System.out.println("\nUsage: ./liquidjava <...paths>");
+            System.out.println("  <...paths>: Paths to files or directories to be verified by LiquidJava");
+            System.out.println("\nExample: ./liquidjava liquidjava-example/src/main/java/test/currentlyTesting liquidjava-example/src/main/java/testingInProgress/Account.java");
+            return;
+        }
+        List<String> files = Arrays.asList(args);
         ErrorEmitter ee = launch(files.toArray(new String[0]));
         System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
     }
 
+    /**
+     * Launch the LiquidJava verifier on the given file (for testing purposes)
+     * @param file Path to the file to be verified
+     * @return ErrorEmitter containing any errors found during verification
+     */
     public static ErrorEmitter launchTest(String file) {
         ErrorEmitter ee = launch(file);
         return ee;
     }
 
+    /**
+     * Launch the LiquidJava verifier on the given files
+     * @param files Array of file paths to be verified
+     * @return ErrorEmitter containing any errors found during verification
+     */
     public static ErrorEmitter launch(String... files) {
-        System.out.println("Running LiquidJava on: " + Arrays.toString(files));
+        System.out.println("Running LiquidJava on: " + Arrays.toString(files).replaceAll("[\\[\\]]", ""));
         Launcher launcher = new Launcher();
         for (String file : files) {
             launcher.addInputResource(file);
