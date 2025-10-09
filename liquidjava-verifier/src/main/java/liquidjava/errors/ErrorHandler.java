@@ -181,7 +181,7 @@ public class ErrorHandler {
         sb.append(element + "\n\n");
         sb.append("Location: " + element.getPosition() + "\n");
         sb.append("______________________________________________________\n");
-        
+
         errorl.addError(s, sb.toString(), element.getPosition(), 1);
     }
 
