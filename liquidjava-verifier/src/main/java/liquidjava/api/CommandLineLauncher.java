@@ -8,7 +8,6 @@ import liquidjava.errors.ErrorEmitter;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
-import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;
 import spoon.support.QueueProcessingManager;
 
