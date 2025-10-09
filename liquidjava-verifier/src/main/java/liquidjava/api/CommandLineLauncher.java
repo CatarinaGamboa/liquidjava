@@ -18,20 +18,29 @@ public class CommandLineLauncher {
         // In eclipse only needed this:"../liquidjava-example/src/main/java/"
         // In VSCode needs:
         // "../liquidjava/liquidjava-umbrella/liquidjava-example/src/main/java/liquidjava/test/project";
-        String file = args.length == 0 ? allPath : args[0];
-        ErrorEmitter ee = launch(file);
+        String path = args.length == 0 ? allPath : args[0];
+        ErrorEmitter ee = launch(path);
         System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
     }
 
-    public static ErrorEmitter launchTest(String file) {
-        ErrorEmitter ee = launch(file);
+    public static ErrorEmitter launchTest(String path) {
+        ErrorEmitter ee = launch(path);
         return ee;
     }
 
-    public static ErrorEmitter launch(String file) {
-        System.out.println("Running LiquidJava on: " + file);
+    public static ErrorEmitter launch(String path) {
+        System.out.println("Running LiquidJava on: " + path);
+        ErrorEmitter ee = new ErrorEmitter();
+
+        // check if the path exists
+        File f = new File(path);
+        if (!f.exists()) {
+            ee.addError("Path not found", "The path " + path + " does not exist", 1);
+            return ee;
+        }
+
         Launcher launcher = new Launcher();
-        launcher.addInputResource(file);
+        launcher.addInputResource(path);
         launcher.getEnvironment().setNoClasspath(true);
 
         // Get the current classpath from the system
@@ -48,17 +57,14 @@ public class CommandLineLauncher {
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);
 
-        ErrorEmitter ee = new ErrorEmitter();
         final RefinementProcessor processor = new RefinementProcessor(factory, ee);
         processingManager.addProcessor(processor);
 
         try {
-            // To only search the last package - less time spent
-            CtPackage v = factory.Package().getAll().stream().reduce((first, second) -> second).orElse(null);
-            if (v != null)
-                processingManager.process(v);
-            // To search all previous packages
-            // processingManager.process(factory.Package().getRootPackage());
+            // analyze all packages
+            CtPackage root = factory.Package().getRootPackage();
+            if (root != null)
+                processingManager.process(root);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

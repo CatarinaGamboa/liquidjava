@@ -335,7 +335,7 @@ public class Context {
 
     public boolean hasGhost(String name) {
         for (GhostFunction g : ghosts) {
-            if (g.getName().equals(name))
+            if (g.matches(name))
                 return true;
         }
         return false;

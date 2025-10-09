@@ -8,6 +8,7 @@ import liquidjava.processor.context.Context;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.ast.typing.TypeInfer;
 import liquidjava.smt.TranslatorToZ3;
+import liquidjava.utils.Utils;
 import spoon.reflect.factory.Factory;
 
 public abstract class Expression {
@@ -98,10 +99,13 @@ public abstract class Expression {
         Expression e = clone();
         if (this instanceof FunctionInvocation) {
             FunctionInvocation fi = (FunctionInvocation) this;
-            if (subMap.containsKey(fi.name) && fi.children.size() == 1 && fi.children.get(0) instanceof Var) { // object
+            String key = fi.name;
+            String simple = Utils.getSimpleName(key);
+            boolean has = subMap.containsKey(key) || subMap.containsKey(simple);
+            if (has && fi.children.size() == 1 && fi.children.get(0) instanceof Var) { // object
                 // state
                 Var v = (Var) fi.children.get(0);
-                Expression sub = subMap.get(fi.name).clone();
+                Expression sub = (subMap.containsKey(key) ? subMap.get(key) : subMap.get(simple)).clone();
                 for (String s : toChange) {
                     sub = sub.substitute(new Var(s), v);
                 }
@@ -119,10 +123,13 @@ public abstract class Expression {
                 Expression exp = children.get(i);
                 if (exp instanceof FunctionInvocation) {
                     FunctionInvocation fi = (FunctionInvocation) exp;
-                    if (subMap.containsKey(fi.name) && fi.children.size() == 1 && fi.children.get(0) instanceof Var) { // object
+                    String key = fi.name;
+                    String simple = Utils.getSimpleName(key);
+                    boolean has = subMap.containsKey(key) || subMap.containsKey(simple);
+                    if (has && fi.children.size() == 1 && fi.children.get(0) instanceof Var) { // object
                         // state
                         Var v = (Var) fi.children.get(0);
-                        Expression sub = subMap.get(fi.name).clone();
+                        Expression sub = (subMap.containsKey(key) ? subMap.get(key) : subMap.get(simple)).clone();
                         for (String s : toChange) {
                             sub = sub.substitute(new Var(s), v);
                         }

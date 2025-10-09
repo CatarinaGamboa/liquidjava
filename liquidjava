@@ -1,0 +1,4 @@
+#!/bin/bash
+mvn exec:java -pl liquidjava-verifier \
+  -Dexec.mainClass="liquidjava.api.CommandLineLauncher" \
+  -Dexec.args="$*"

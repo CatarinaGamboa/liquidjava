@@ -25,6 +25,7 @@ import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
 
 /**
@@ -35,6 +36,7 @@ import spoon.reflect.factory.Factory;
 public class Predicate {
 
     protected Expression exp;
+    protected String prefix;
 
     /** Create a predicate with the expression true */
     public Predicate() {
@@ -51,9 +53,25 @@ public class Predicate {
      * @throws ParsingException
      */
     public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+        this(ref, element, e, element.getParent(CtType.class).getQualifiedName());
+    }
+
+    /**
+     * Create a new predicate with a refinement and a given prefix for the class
+     * 
+     * @param ref
+     * @param element
+     * @param e
+     * @param prefix
+     * 
+     * @throws ParsingException
+     */
+    public Predicate(String ref, CtElement element, ErrorEmitter e, String prefix) throws ParsingException {
+        this.prefix = prefix;
         exp = parse(ref, element, e);
-        if (e.foundError())
+        if (e.foundError()) {
             return;
+        }
         if (!(exp instanceof GroupExpression)) {
             exp = new GroupExpression(exp);
         }
@@ -66,16 +84,16 @@ public class Predicate {
 
     protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
         try {
-            return RefinementsParser.createAST(ref);
+            return RefinementsParser.createAST(ref, prefix);
         } catch (ParsingException e1) {
             ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
             throw e1;
         }
     }
 
-    protected Expression innerParse(String ref, ErrorEmitter e) {
+    protected Expression innerParse(String ref, ErrorEmitter e, String prefix) {
         try {
-            return RefinementsParser.createAST(ref);
+            return RefinementsParser.createAST(ref, prefix);
         } catch (ParsingException e1) {
             ErrorHandler.printSyntaxError(e1.getMessage(), ref, e);
         }
@@ -113,14 +131,14 @@ public class Predicate {
     public List<GhostState> getStateInvocations(List<GhostState> lgs) {
         if (lgs == null)
             return new ArrayList<>();
-        List<String> all = lgs.stream().map(p -> p.getName()).collect(Collectors.toList());
+        List<String> all = lgs.stream().map(p -> p.getQualifiedName()).collect(Collectors.toList());
         List<String> toAdd = new ArrayList<>();
         exp.getStateInvocations(toAdd, all);
 
         List<GhostState> gh = new ArrayList<>();
         for (String n : toAdd) {
             for (GhostState g : lgs)
-                if (g.getName().equals(n))
+                if (g.matches(n))
                     gh.add(g);
         }
 
@@ -162,10 +180,16 @@ public class Predicate {
 
     public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, ErrorEmitter ee) {
         Map<String, Expression> nameRefinementMap = new HashMap<>();
-        for (GhostState gs : ghostState)
-            if (gs.getRefinement() != null) // is a state and not a ghost state
-                nameRefinementMap.put(gs.getName(), innerParse(gs.getRefinement().toString(), ee));
-
+        for (GhostState gs : ghostState) {
+            if (gs.getRefinement() != null) { // is a state and not a ghost state
+                String name = gs.getQualifiedName();
+                Expression exp = innerParse(gs.getRefinement().toString(), ee, gs.getPrefix());
+                nameRefinementMap.put(name, exp);
+                // Also allow simple name lookup to enable hierarchy matching
+                String simple = Utils.getSimpleName(name);
+                nameRefinementMap.putIfAbsent(simple, exp);
+            }
+        }
         Expression e = exp.substituteState(nameRefinementMap, toChange);
         return new Predicate(e);
     }
@@ -181,8 +205,7 @@ public class Predicate {
 
     @Override
     public Predicate clone() {
-        Predicate c = new Predicate(exp.clone());
-        return c;
+        return new Predicate(exp.clone());
     }
 
     public Expression getExpression() {

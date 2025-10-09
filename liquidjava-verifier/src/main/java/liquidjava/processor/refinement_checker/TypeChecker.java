@@ -111,6 +111,19 @@ public abstract class TypeChecker extends CtScanner {
     }
 
     private void createStateSet(CtNewArray<String> e, int set, CtElement element) {
+
+        // if any of the states starts with uppercase, throw error (reserved for alias)
+        for (CtExpression<?> ce : e.getElements()) {
+            if (ce instanceof CtLiteral<?>) {
+                @SuppressWarnings("unchecked")
+                CtLiteral<String> s = (CtLiteral<String>) ce;
+                String f = s.getValue();
+                if (Character.isUpperCase(f.charAt(0))) {
+                    ErrorHandler.printCostumeError(s, "State name must start with lowercase in '" + f + "'", errorEmitter);
+                }
+            }
+        }
+
         Optional<GhostFunction> og = createStateGhost(set, element);
         if (!og.isPresent()) {
             throw new RuntimeException("Error in creation of GhostFunction");
@@ -128,7 +141,7 @@ public abstract class TypeChecker extends CtScanner {
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 GhostState gs = new GhostState(f, g.getParametersTypes(), factory.Type().BOOLEAN_PRIMITIVE,
-                        g.getParentClassName());
+                        g.getPrefix());
                 gs.setGhostParent(g);
                 gs.setRefinement(
                         /* new OperationPredicate(new InvocationPredicate(f, THIS), "<-->", */
@@ -194,9 +207,8 @@ public abstract class TypeChecker extends CtScanner {
         if (klass != null) {
             CtTypeReference<?> ret = factory.Type().INTEGER_PRIMITIVE;
             List<String> params = Arrays.asList(klass.getSimpleName());
-            GhostFunction gh = new GhostFunction(
-                    String.format("%s_state%d", klass.getSimpleName().toLowerCase(), order), params, ret, factory,
-                    klass.getQualifiedName(), klass.getSimpleName());
+            String name = String.format("state%d", order);
+            GhostFunction gh = new GhostFunction(name, params, ret, factory, klass.getQualifiedName());
             return Optional.of(gh);
         }
         return Optional.empty();
@@ -207,7 +219,7 @@ public abstract class TypeChecker extends CtScanner {
             GhostDTO f = RefinementsParser.getGhostDeclaration(value);
             if (f != null && element.getParent() instanceof CtClass<?>) {
                 CtClass<?> klass = (CtClass<?>) element.getParent();
-                GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName(), klass.getSimpleName());
+                GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName());
                 context.addGhostFunction(gh);
             }
         } catch (ParsingException e) {
@@ -233,6 +245,7 @@ public abstract class TypeChecker extends CtScanner {
                     path = ((CtInterface<?>) element).getQualifiedName();
                 }
                 if (klass != null && path != null) {
+                    a.parse(path);
                     AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
                     context.addAlias(aw);
                 }

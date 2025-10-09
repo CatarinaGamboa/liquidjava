@@ -1,6 +1,7 @@
 package liquidjava.processor;
 
 import liquidjava.rj_language.Predicate;
+import liquidjava.utils.Utils;
 import spoon.reflect.reference.CtTypeReference;
 
 /**
@@ -29,7 +30,7 @@ public class VCImplication {
     public String toString() {
         if (name != null && type != null) {
             String qualType = type.getQualifiedName();
-            String simpleType = qualType.contains(".") ? qualType.substring(qualType.lastIndexOf(".") + 1) : qualType;
+            String simpleType = qualType.contains(".") ? Utils.getSimpleName(qualType) : qualType;
             return String.format("%-20s %s %s", "∀" + name + ":" + simpleType + ",", refinement.toString(),
                     next != null ? " => \n" + next.toString() : "");
         } else
