@@ -3,11 +3,11 @@ package liquidjava.api;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
+import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;
 import spoon.support.QueueProcessingManager;
 
@@ -29,11 +29,6 @@ public class CommandLineLauncher {
         List<String> paths = Arrays.asList(args);
         ErrorEmitter ee = launch(paths.toArray(new String[0]));
         System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
-    }
-
-    public static ErrorEmitter launchTest(String path) {
-        ErrorEmitter ee = launch(path);
-        return ee;
     }
 
     public static ErrorEmitter launch(String... paths) {
@@ -63,7 +58,6 @@ public class CommandLineLauncher {
 
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);
-
         final RefinementProcessor processor = new RefinementProcessor(factory, ee);
         processingManager.addProcessor(processor);
 
@@ -78,5 +72,14 @@ public class CommandLineLauncher {
         }
 
         return ee;
+    }
+
+    /**
+     * Launch the LiquidJava verifier on the given file or directory path (for testing purposes)
+     * @param path Path to to be verified
+     * @return ErrorEmitter containing any errors found during verification
+     */
+    public static ErrorEmitter launchTest(String path) {
+        return launch(path);
     }
 }
