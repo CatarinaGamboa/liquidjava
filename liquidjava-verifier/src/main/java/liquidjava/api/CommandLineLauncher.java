@@ -1,12 +1,13 @@
 package liquidjava.api;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
+import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;
 import spoon.support.QueueProcessingManager;
 
@@ -21,34 +22,35 @@ public class CommandLineLauncher {
             System.out.println("No input files or directories provided");
             System.out.println("\nUsage: ./liquidjava <...paths>");
             System.out.println("  <...paths>: Paths to files or directories to be verified by LiquidJava");
-            System.out.println("\nExample: ./liquidjava liquidjava-example/src/main/java/test/currentlyTesting liquidjava-example/src/main/java/testingInProgress/Account.java");
+            System.out.println(
+                    "\nExample: ./liquidjava liquidjava-example/src/main/java/test/currentlyTesting liquidjava-example/src/main/java/testingInProgress/Account.java");
             return;
         }
-        List<String> files = Arrays.asList(args);
-        ErrorEmitter ee = launch(files.toArray(new String[0]));
+        List<String> paths = Arrays.asList(args);
+        ErrorEmitter ee = launch(paths.toArray(new String[0]));
         System.out.println(ee.foundError() ? (ee.getFullMessage()) : ("Correct! Passed Verification."));
     }
 
     /**
-     * Launch the LiquidJava verifier on the given file (for testing purposes)
-     * @param file Path to the file to be verified
+     * Launch the LiquidJava verifier on the given file or directory paths
+     * @param paths Array of paths to be verified
      * @return ErrorEmitter containing any errors found during verification
      */
-    public static ErrorEmitter launchTest(String file) {
-        ErrorEmitter ee = launch(file);
-        return ee;
-    }
+    public static ErrorEmitter launch(String... paths) {
+        ErrorEmitter ee = new ErrorEmitter();
 
-    /**
-     * Launch the LiquidJava verifier on the given files
-     * @param files Array of file paths to be verified
-     * @return ErrorEmitter containing any errors found during verification
-     */
-    public static ErrorEmitter launch(String... files) {
-        System.out.println("Running LiquidJava on: " + Arrays.toString(files).replaceAll("[\\[\\]]", ""));
+        // check if paths exist
+        for (String path : paths) {
+            if (!new File(path).exists()) {
+                ee.addError("Path not found", "The path " + path + " does not exist", 1);
+                return ee;
+            }
+        }
+
+        System.out.println("Running LiquidJava on: " + Arrays.toString(paths).replaceAll("[\\[\\]]", ""));
         Launcher launcher = new Launcher();
-        for (String file : files) {
-            launcher.addInputResource(file);
+        for (String path : paths) {
+            launcher.addInputResource(path);
         }
         launcher.getEnvironment().setNoClasspath(true);
 
@@ -65,24 +67,28 @@ public class CommandLineLauncher {
 
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);
-
-        ErrorEmitter ee = new ErrorEmitter();
         final RefinementProcessor processor = new RefinementProcessor(factory, ee);
         processingManager.addProcessor(processor);
 
         try {
-            // To only search the last package - less time spent
-            // CtPackage v = factory.Package().getAll().stream().reduce((first, second) ->
-            // second).orElse(null);
-            // if (v != null)
-            // processingManager.process(v);
-            // To search all previous packages
-            processingManager.process(factory.Package().getRootPackage());
+            // analyze all packages
+            CtPackage root = factory.Package().getRootPackage();
+            if (root != null)
+                processingManager.process(root);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
         }
 
         return ee;
+    }
+
+    /**
+     * Launch the LiquidJava verifier on the given file or directory path (for testing purposes)
+     * @param path Path to to be verified
+     * @return ErrorEmitter containing any errors found during verification
+     */
+    public static ErrorEmitter launchTest(String path) {
+        return launch(path);
     }
 }

@@ -56,7 +56,7 @@ public class ErrorEmitter {
     }
 
     public boolean foundError() {
-        return fullMessage != null && position != null;
+        return fullMessage != null;
     }
 
     public String getTitleMessage() {
