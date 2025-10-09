@@ -33,7 +33,10 @@ public class CommandLineLauncher {
 
     /**
      * Launch the LiquidJava verifier on the given file or directory paths
-     * @param paths Array of paths to be verified
+     * 
+     * @param paths
+     *            Array of paths to be verified
+     * 
      * @return ErrorEmitter containing any errors found during verification
      */
     public static ErrorEmitter launch(String... paths) {
