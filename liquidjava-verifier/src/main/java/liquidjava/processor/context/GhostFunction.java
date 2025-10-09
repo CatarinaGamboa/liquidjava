@@ -12,40 +12,39 @@ public class GhostFunction {
     private String name;
     private List<CtTypeReference<?>> param_types;
     private CtTypeReference<?> return_type;
+    private String prefix;
 
-    private String klassName;
-
-    public GhostFunction(GhostDTO f, Factory factory, String path, String klass) {
-        name = f.getName();
-        return_type = Utils.getType(f.getReturn_type().equals(klass) ? path : f.getReturn_type(), factory);
-        param_types = new ArrayList<>();
+    public GhostFunction(GhostDTO f, Factory factory, String prefix) {
+        String klass = this.getParentClassName(prefix);
+        this.name = f.getName();
+        this.return_type = Utils.getType(f.getReturn_type().equals(klass) ? prefix : f.getReturn_type(), factory);
+        this.param_types = new ArrayList<>();
+        this.prefix = prefix;
         for (String t : f.getParam_types()) {
-            param_types.add(Utils.getType(t.equals(klass) ? path : t, factory));
+            this.param_types.add(Utils.getType(t.equals(klass) ? prefix : t, factory));
         }
     }
 
     public GhostFunction(String name, List<String> param_types, CtTypeReference<?> return_type, Factory factory,
-            String path, String klass) {
+            String prefix) {
+        String klass = this.getParentClassName(prefix);
+        String type = return_type.toString().equals(klass) ? prefix : return_type.toString();
         this.name = name;
-        this.return_type = Utils.getType(return_type.toString().equals(klass) ? path : return_type.toString(), factory);
+        this.return_type = Utils.getType(type, factory);
         this.param_types = new ArrayList<>();
+        this.prefix = prefix;
         for (int i = 0; i < param_types.size(); i++) {
             String mType = param_types.get(i).toString();
-            this.param_types.add(Utils.getType(mType.equals(klass) ? path : mType, factory));
+            this.param_types.add(Utils.getType(mType.equals(klass) ? prefix : mType, factory));
         }
-        this.klassName = klass;
     }
 
-    protected GhostFunction(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String klass) {
+    protected GhostFunction(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String prefix) {
         this.name = name;
         this.return_type = return_type;
         this.param_types = new ArrayList<>();
         this.param_types = list;
-        this.klassName = klass;
-    }
-
-    public String getName() {
-        return name;
+        this.prefix = prefix;
     }
 
     public CtTypeReference<?> getReturnType() {
@@ -67,7 +66,30 @@ public class GhostFunction {
         return sb.toString();
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public String getQualifiedName() {
+        return Utils.qualifyName(prefix, name);
+    }
+
     public String getParentClassName() {
-        return klassName;
+        return getParentClassName(prefix);
+    }
+
+    private String getParentClassName(String pref) {
+        return Utils.getSimpleName(pref);
+    }
+
+    // Match by fully qualified name, exact simple name or by comparing the simple name of the provided identifier
+    // This allows references written in a different class (different prefix) to still match
+    public boolean matches(String name) {
+        return this.getQualifiedName().equals(name) || this.name.equals(name)
+                || this.name.equals(Utils.getSimpleName(name));
     }
 }

@@ -14,6 +14,8 @@ import liquidjava.rj_language.ast.LiteralReal;
 import liquidjava.rj_language.ast.LiteralString;
 import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
+import liquidjava.utils.Utils;
+
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.apache.commons.lang3.NotImplementedException;
 import rj.grammar.RJParser.AliasCallContext;
@@ -55,7 +57,13 @@ import rj.grammar.RJParser.VarContext;
  */
 public class CreateASTVisitor {
 
-    public static Expression create(ParseTree rc) {
+    String prefix;
+
+    public CreateASTVisitor(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public Expression create(ParseTree rc) {
         if (rc instanceof ProgContext)
             return progCreate((ProgContext) rc);
         else if (rc instanceof StartContext)
@@ -76,20 +84,20 @@ public class CreateASTVisitor {
         return null;
     }
 
-    private static Expression progCreate(ProgContext rc) {
+    private Expression progCreate(ProgContext rc) {
         if (rc.start() != null)
             return create(rc.start());
         return null;
     }
 
-    private static Expression startCreate(ParseTree rc) {
+    private Expression startCreate(ParseTree rc) {
         if (rc instanceof StartPredContext)
             return create(((StartPredContext) rc).pred());
         // alias and ghost do not have evaluation
         return null;
     }
 
-    private static Expression predCreate(ParseTree rc) {
+    private Expression predCreate(ParseTree rc) {
         if (rc instanceof PredGroupContext)
             return new GroupExpression(create(((PredGroupContext) rc).pred()));
         else if (rc instanceof PredNegateContext)
@@ -104,7 +112,7 @@ public class CreateASTVisitor {
             return create(((PredExpContext) rc).exp());
     }
 
-    private static Expression expCreate(ParseTree rc) {
+    private Expression expCreate(ParseTree rc) {
         if (rc instanceof ExpGroupContext)
             return new GroupExpression(create(((ExpGroupContext) rc).exp()));
         else if (rc instanceof ExpBoolContext) {
@@ -116,7 +124,7 @@ public class CreateASTVisitor {
         }
     }
 
-    private static Expression operandCreate(ParseTree rc) {
+    private Expression operandCreate(ParseTree rc) {
         if (rc instanceof OpLiteralContext)
             return create(((OpLiteralContext) rc).literalExpression());
         else if (rc instanceof OpArithContext)
@@ -135,7 +143,7 @@ public class CreateASTVisitor {
         return null;
     }
 
-    private static Expression literalExpressionCreate(ParseTree rc) {
+    private Expression literalExpressionCreate(ParseTree rc) {
         if (rc instanceof LitGroupContext)
             return new GroupExpression(create(((LitGroupContext) rc).literalExpression()));
         else if (rc instanceof LitContext)
@@ -150,11 +158,12 @@ public class CreateASTVisitor {
         }
     }
 
-    private static Expression functionCallCreate(FunctionCallContext rc) {
+    private Expression functionCallCreate(FunctionCallContext rc) {
         if (rc.ghostCall() != null) {
             GhostCallContext gc = rc.ghostCall();
             List<Expression> le = getArgs(gc.args());
-            return new FunctionInvocation(gc.ID().getText(), le);
+            String name = Utils.qualifyName(prefix, gc.ID().getText());
+            return new FunctionInvocation(name, le);
         } else {
             AliasCallContext gc = rc.aliasCall();
             List<Expression> le = getArgs(gc.args());
@@ -162,7 +171,7 @@ public class CreateASTVisitor {
         }
     }
 
-    private static List<Expression> getArgs(ArgsContext args) {
+    private List<Expression> getArgs(ArgsContext args) {
         List<Expression> le = new ArrayList<>();
         if (args != null)
             for (PredContext oc : args.pred()) {
@@ -171,7 +180,7 @@ public class CreateASTVisitor {
         return le;
     }
 
-    private static Expression literalCreate(LiteralContext literalContext) {
+    private Expression literalCreate(LiteralContext literalContext) {
         if (literalContext.BOOL() != null)
             return new LiteralBoolean(literalContext.BOOL().getText());
         else if (literalContext.STRING() != null)

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
@@ -16,6 +17,7 @@ import liquidjava.processor.refinement_checker.object_checkers.AuxHierarchyRefin
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
+import liquidjava.utils.Utils;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
@@ -90,7 +92,8 @@ public class MethodsFunctionsChecker {
         rtc.getContext().addFunctionToContext(f);
 
         auxGetMethodRefinements(method, f);
-        AuxStateHandler.handleMethodState(method, f, rtc);
+        String prefix = method.getDeclaringType().getQualifiedName();
+        AuxStateHandler.handleMethodState(method, f, rtc, prefix);
 
         if (klass != null)
             AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
@@ -98,8 +101,7 @@ public class MethodsFunctionsChecker {
 
     public <R> void getMethodRefinements(CtMethod<R> method, String prefix) throws ParsingException {
         String constructorName = "<init>";
-        String[] pac = prefix.split("\\.");
-        String k = pac[pac.length - 1];
+        String k = Utils.getSimpleName(prefix);
 
         String functionName = String.format("%s.%s", prefix, method.getSimpleName());
         if (k.equals(method.getSimpleName())) { // is a constructor
@@ -114,7 +116,7 @@ public class MethodsFunctionsChecker {
         rtc.getContext().addFunctionToContext(f);
         auxGetMethodRefinements(method, f);
 
-        AuxStateHandler.handleMethodState(method, f, rtc);
+        AuxStateHandler.handleMethodState(method, f, rtc, prefix);
         if (functionName.equals(constructorName) && !f.hasStateChange()) {
             AuxStateHandler.setDefaultState(f, rtc);
         }

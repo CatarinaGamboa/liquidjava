@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import liquidjava.smt.TranslatorToZ3;
+import liquidjava.utils.Utils;
 
 public class FunctionInvocation extends Expression {
     String name;
@@ -50,8 +51,18 @@ public class FunctionInvocation extends Expression {
 
     @Override
     public void getStateInvocations(List<String> toAdd, List<String> all) {
-        if (!toAdd.contains(name) && all.contains(name))
-            toAdd.add(name);
+        if (!toAdd.contains(name)) {
+            // Accept either qualified or simple name
+            if (all.contains(name)) {
+                toAdd.add(name);
+            } else {
+                String simple = Utils.getSimpleName(name);
+                boolean matchesSimple = all.stream()
+                        .anyMatch(s -> s.equals(simple) || (s.contains(".") && Utils.getSimpleName(s).equals(simple)));
+                if (matchesSimple)
+                    toAdd.add(name);
+            }
+        }
         for (Expression e : getArgs())
             e.getStateInvocations(toAdd, all);
     }

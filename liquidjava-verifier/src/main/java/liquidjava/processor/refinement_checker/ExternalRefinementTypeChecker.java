@@ -12,6 +12,7 @@ import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctions
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
+import liquidjava.utils.Utils;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
@@ -40,7 +41,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
         Optional<String> externalRefinements = getExternalRefinement(intrface);
         if (externalRefinements.isPresent()) {
-            prefix = externalRefinements.get();
+            this.prefix = externalRefinements.get();
             try {
                 getRefinementFromAnnotation(intrface);
             } catch (ParsingException e) {
@@ -89,9 +90,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             // RefinementParser.parseFunctionDecl(value);
             GhostDTO f = RefinementsParser.getGhostDeclaration(value);
             if (f != null && element.getParent() instanceof CtInterface<?>) {
-                String[] a = prefix.split("\\.");
-                String d = a[a.length - 1];
-                GhostFunction gh = new GhostFunction(f, factory, prefix, d);
+                GhostFunction gh = new GhostFunction(f, factory, prefix);
                 context.addGhostFunction(gh);
             }
 
@@ -104,13 +103,12 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     protected Optional<GhostFunction> createStateGhost(int order, CtElement element) {
-        String[] a = prefix.split("\\.");
-        String klass = a[a.length - 1];
+        String klass = Utils.getSimpleName(prefix);
         if (klass != null) {
             CtTypeReference<?> ret = factory.Type().INTEGER_PRIMITIVE;
             List<String> params = Arrays.asList(klass);
-            GhostFunction gh = new GhostFunction(String.format("%s_state%d", klass.toLowerCase(), order), params, ret,
-                    factory, prefix, klass);
+            String name = String.format("state%d", order);
+            GhostFunction gh = new GhostFunction(name, params, ret, factory, prefix);
             return Optional.of(gh);
         }
         return Optional.empty();
@@ -123,7 +121,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     protected String getSimpleClassName(CtElement elem) {
-        String[] a = prefix.split("\\.");
-        return a[a.length - 1];
+        return Utils.getSimpleName(prefix);
     }
 }
