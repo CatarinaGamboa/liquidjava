@@ -9,6 +9,8 @@ import java.nio.file.Paths;
 import java.util.stream.Stream;
 import liquidjava.api.CommandLineLauncher;
 import liquidjava.errors.ErrorEmitter;
+
+import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -27,7 +29,7 @@ public class TestExamples {
         String fileName = filePath.getFileName().toString();
 
         // 1. Run the verifier on the file or package
-        ErrorEmitter errorEmitter = CommandLineLauncher.launchTest(filePath.toAbsolutePath().toString());
+        ErrorEmitter errorEmitter = CommandLineLauncher.launch(filePath.toAbsolutePath().toString());
 
         // 2. Check if the file is correct or contains an error
         if ((fileName.startsWith("Correct") && errorEmitter.foundError())
@@ -67,5 +69,22 @@ public class TestExamples {
                     // Return true if either condition matches
                     return isFileStartingWithCorrectOrError || isDirectoryWithCorrectOrError;
                 });
+    }
+
+    /**
+     * Test multiple paths at once, including both files and directories. This test ensures that the verifier can handle
+     * multiple inputs correctly and that no errors are found in files/directories that are expected to be correct.
+     */
+    @Test
+    public void testMultiplePaths() {
+        String[] paths = { "../liquidjava-example/src/main/java/testSuite/SimpleTest.java",
+                "../liquidjava-example/src/main/java/testSuite/classes/arraylist_correct", };
+        ErrorEmitter errorEmitter = CommandLineLauncher.launch(paths);
+
+        // Check if any of the paths that should be correct found an error
+        if (errorEmitter.foundError()) {
+            System.out.println("Error found in files that should be correct.");
+            fail();
+        }
     }
 }

@@ -53,7 +53,6 @@ public class CommandLineLauncher {
         // launcher.getEnvironment().setSourceClasspath(
         // "lib1.jar:lib2.jar".split(":"));
         launcher.getEnvironment().setComplianceLevel(8);
-
         launcher.run();
 
         final Factory factory = launcher.getFactory();
@@ -72,14 +71,5 @@ public class CommandLineLauncher {
         }
 
         return ee;
-    }
-
-    /**
-     * Launch the LiquidJava verifier on the given file or directory path (for testing purposes)
-     * @param path Path to to be verified
-     * @return ErrorEmitter containing any errors found during verification
-     */
-    public static ErrorEmitter launchTest(String path) {
-        return launch(path);
     }
 }
