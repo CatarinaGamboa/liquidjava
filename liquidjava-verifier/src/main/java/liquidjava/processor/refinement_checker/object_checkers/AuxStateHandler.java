@@ -77,15 +77,15 @@ public class AuxStateHandler {
         Predicate c = new Predicate();
         List<GhostFunction> sets = getDifferentSets(tc, klass); // ??
         for (GhostFunction sg : sets) {
-            if (sg.getReturnType().toString().equals("int")) {
-                Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getQualifiedName(), s),
-                        Predicate.createLit("0", Utils.INT));
-                c = Predicate.createConjunction(c, p);
-            } else {
-                // TODO: Implement other stuff
-                throw new RuntimeException("Ghost Functions not implemented for other types than int -> implement in"
-                        + " AuxStateHandler defaultState");
-            }
+            String retType = sg.getReturnType().toString();
+            Predicate typePredicate = switch (retType) {
+            case "int" -> Predicate.createLit("0", Utils.INT);
+            case "boolean" -> Predicate.createLit("false", Utils.BOOLEAN);
+            case "double" -> Predicate.createLit("0.0", Utils.DOUBLE);
+            default -> throw new RuntimeException("Ghost not implemented for type " + retType);
+            };
+            Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s), typePredicate);
+            c = Predicate.createConjunction(c, p);
         }
         ObjectState os = new ObjectState();
         os.setTo(c);
