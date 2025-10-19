@@ -41,6 +41,28 @@ Before setting up LiquidJava, ensure you have the following installed:
 - Java 20+ - JDK for compiling and running Java programs
 - Maven 3.6+ - For building and dependency management
 
+Additionally, you'll need the following dependency, which includes the LiquidJava API annotations:
+
+#### Maven
+```xml
+<dependency>
+    <groupId>io.github.rcosta358</groupId>
+    <artifactId>liquidjava-api</artifactId>
+    <version>0.0.2</version>
+</dependency>
+```
+
+#### Gradle
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.rcosta358:liquidjava-api:0.0.2'
+}
+```
+
 #### Setup
 
 1. Clone the repository: `git clone https://github.com/CatarinaGamboa/liquidjava.git`
