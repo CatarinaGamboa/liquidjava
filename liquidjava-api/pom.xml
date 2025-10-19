@@ -3,15 +3,9 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>liquidjava</groupId>
-		<artifactId>liquidjava-umbrella</artifactId>
-		<version>1.0</version>
-	</parent>
-
 	<groupId>io.github.rcosta358</groupId>
 	<artifactId>liquidjava-api</artifactId>
-	<version>0.0.2</version>
+	<version>0.0.3</version>
 	<name>liquidjava-api</name>
 	<description>LiquidJava API</description>
 	<url>https://github.com/CatarinaGamboa/liquidjava</url>
@@ -150,6 +144,7 @@
 	</distributionManagement>
 
 	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<javaVersion>20</javaVersion>
 		<maven.compiler.source>20</maven.compiler.source>
 		<maven.compiler.target>20</maven.compiler.target>
