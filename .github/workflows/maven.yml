@@ -42,14 +42,14 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}  # Cache dependencies based on pom.xml changes
+          key: ${{ runner.os }}-maven-v2-${{ hashFiles('**/pom.xml') }}  # Cache dependencies based on pom.xml changes
           restore-keys: |
-            ${{ runner.os }}-maven-
+            ${{ runner.os }}-maven-v2-
 
       # Build the project (compiles and packages the code)
       - name: Build the project
-        run: mvn -B -X -e clean install --file pom.xml --batch-mode --fail-fast -Dgpg.skip=true -Dmaven.deploy.skip=true
+        run: mvn -B clean install --file pom.xml --batch-mode --fail-fast -Dgpg.skip=true -Dmaven.deploy.skip=true
 
       # Run tests
       - name: Run tests
-        run: mvn test -B -X -e --file pom.xml --batch-mode --fail-fast
+        run: mvn test -B --file pom.xml --batch-mode --fail-fast
