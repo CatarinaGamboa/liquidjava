@@ -172,9 +172,9 @@
 		</dependency>
 
 		<dependency>
-			<groupId>liquidjava-api</groupId>
+			<groupId>io.github.rcosta358</groupId>
 			<artifactId>liquidjava-api</artifactId>
-			<version>0.0.2-SNAPSHOT</version>
+			<version>0.0.2</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.antlr/antlr4 -->
@@ -200,9 +200,9 @@
 				<scope>import</scope>
 			</dependency>
 			<dependency>
-				<groupId>liquidjava-api</groupId>
+				<groupId>io.github.rcosta358</groupId>
 				<artifactId>liquidjava-api</artifactId>
-				<version>0.0.2-SNAPSHOT</version>
+				<version>0.0.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
