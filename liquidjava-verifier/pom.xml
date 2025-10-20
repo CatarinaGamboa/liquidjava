@@ -174,7 +174,7 @@
 		<dependency>
 			<groupId>io.github.rcosta358</groupId>
 			<artifactId>liquidjava-api</artifactId>
-			<version>0.0.2</version>
+			<version>0.0.3</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.antlr/antlr4 -->
@@ -198,11 +198,6 @@
 				<version>5.10.0</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>
-			<dependency>
-				<groupId>io.github.rcosta358</groupId>
-				<artifactId>liquidjava-api</artifactId>
-				<version>0.0.2</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
