@@ -266,6 +266,8 @@ public class RefinementTypeChecker extends TypeChecker {
 
         } else if (lit.getType().getQualifiedName().contentEquals("java.lang.String")) {
             // Only taking care of strings inside refinements
+        } else if (type == "<nulltype>") {
+            // Skip null literals for now
         } else {
             throw new NotImplementedException(
                     String.format("Literal of type %s not implemented:", lit.getType().getQualifiedName()));
