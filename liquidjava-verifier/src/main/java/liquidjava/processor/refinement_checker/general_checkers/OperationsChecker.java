@@ -249,7 +249,7 @@ public class OperationsChecker {
 
             // Get function refinements with non_used variables
             String met = ((CtClass<?>) method.getParent()).getQualifiedName(); // TODO check
-            RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(), met);
+            RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(), met, inv.getArguments().size());
             Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv); // TODO REVER!!
             // Substitute _ by the variable that we send
             String newName = String.format(rtc.freshFormat, rtc.getContext().getCounter());
@@ -275,7 +275,8 @@ public class OperationsChecker {
             int i = c.indexOf("<");
             String typeNotParametrized = (i > 0) ? c.substring(0, i) : c;
             String methodInClassName = typeNotParametrized + "." + simpleName;
-            RefinedFunction fi = rtc.getContext().getFunction(methodInClassName, typeNotParametrized);
+            RefinedFunction fi = rtc.getContext().getFunction(methodInClassName, typeNotParametrized,
+                    inv.getArguments().size());
             Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv); // TODO REVER!!
 
             // Substitute _ by the variable that we send
