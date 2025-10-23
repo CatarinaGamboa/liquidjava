@@ -18,6 +18,8 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtType;
+import spoon.reflect.declaration.CtTypeParameter;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -42,6 +44,10 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         Optional<String> externalRefinements = getExternalRefinement(intrface);
         if (externalRefinements.isPresent()) {
             this.prefix = externalRefinements.get();
+            if (!classExists(prefix)) {
+                ErrorHandler.printCostumeError(intrface, "Could not find class '" + prefix + "'", errorEmitter);
+                return;
+            }
             try {
                 getRefinementFromAnnotation(intrface);
             } catch (ParsingException e) {
@@ -72,6 +78,11 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (errorEmitter.foundError())
             return;
 
+        if (!methodExists(method)) {
+            ErrorHandler.printCostumeError(method,
+                    "Could not find method '" + method.getSignature() + "' in class '" + prefix + "'", errorEmitter);
+            return;
+        }
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
         try {
             mfc.getMethodRefinements(method, prefix);
@@ -122,5 +133,24 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
     @Override
     protected String getSimpleClassName(CtElement elem) {
         return Utils.getSimpleName(prefix);
+    }
+
+    private boolean classExists(String className) {
+        return factory.Type().createReference(className).getTypeDeclaration() != null;
+    }
+
+    private boolean methodExists(CtMethod<?> method) {
+        CtType<?> targetType = factory.Type().createReference(prefix).getTypeDeclaration();
+
+        // find a method with matching name and parameter count
+        boolean methodFound = targetType.getMethods().stream()
+                .anyMatch(m -> m.getSimpleName().equals(method.getSimpleName())
+                        && m.getParameters().size() == method.getParameters().size());
+
+        if (!methodFound) {
+            // check if constructor method
+            return method.getSimpleName().equals(targetType.getSimpleName());
+        }
+        return true;
     }
 }
