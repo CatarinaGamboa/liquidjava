@@ -364,7 +364,7 @@ public class VCChecker {
         } else if (e instanceof NotFoundError) {
             ErrorHandler.printNotFound(element, cSMTMessageReady, etMessageReady, e.getMessage(), map, errorEmitter);
         } else {
-            ErrorHandler.printCostumeError(element, e.getMessage(), errorEmitter);
+            ErrorHandler.printCustomError(element, e.getMessage(), errorEmitter);
             // System.err.println("Unknown error:"+e.getMessage());
             // e.printStackTrace();
             // System.exit(7);
