@@ -57,9 +57,6 @@ public interface MathRefinements {
     @Refinement("(a > b)? (_ == b):(_ == a)")
     public int min(int a, int b);
 
-    @Refinement(" _ > 0.0 && _ < 1.0")
-    public long random(long a, long b);
-
     @Refinement("((sig > 0)?(_ > 0):(_ < 0)) && (( _ == arg)||(_ == -arg))")
     public float copySign(float arg, float sig);
 }
