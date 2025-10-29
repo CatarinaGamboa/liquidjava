@@ -12,6 +12,8 @@ import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.BuiltinFunctionPredicate;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
+import liquidjava.utils.Utils;
+
 import org.apache.commons.lang3.NotImplementedException;
 import spoon.reflect.code.CtArrayRead;
 import spoon.reflect.code.CtArrayWrite;
@@ -264,8 +266,10 @@ public class RefinementTypeChecker extends TypeChecker {
             lit.putMetadata(REFINE_KEY, Predicate.createEquals(Predicate.createVar(WILD_VAR),
                     Predicate.createLit(lit.getValue().toString(), type)));
 
-        } else if (lit.getType().getQualifiedName().contentEquals("java.lang.String")) {
+        } else if (lit.getType().getQualifiedName().equals("java.lang.String")) {
             // Only taking care of strings inside refinements
+        } else if (type.equals(Utils.NULL_TYPE)) {
+            // Skip null literals
         } else {
             throw new NotImplementedException(
                     String.format("Literal of type %s not implemented:", lit.getType().getQualifiedName()));

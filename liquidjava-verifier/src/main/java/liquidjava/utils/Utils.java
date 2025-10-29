@@ -35,6 +35,7 @@ public class Utils {
     public static final String SHORT = "short";
     public static final String LONG = "long";
     public static final String FLOAT = "float";
+    public static final String NULL_TYPE = "<nulltype>";
 
     private static final Set<String> DEFAULT_NAMES = Set.of("old", "length", "addToIndex", "getFromIndex");
 
