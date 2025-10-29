@@ -148,5 +148,7 @@
 		<javaVersion>20</javaVersion>
 		<maven.compiler.source>20</maven.compiler.source>
 		<maven.compiler.target>20</maven.compiler.target>
+		<gpg.skip>true</gpg.skip>
+		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
 </project>

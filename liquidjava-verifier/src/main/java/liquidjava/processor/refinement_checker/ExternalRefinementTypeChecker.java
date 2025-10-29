@@ -45,7 +45,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (externalRefinements.isPresent()) {
             this.prefix = externalRefinements.get();
             if (!classExists(prefix)) {
-                ErrorHandler.printCostumeError(intrface, "Could not find class '" + prefix + "'", errorEmitter);
+                ErrorHandler.printCustomError(intrface, "Could not find class '" + prefix + "'", errorEmitter);
                 return;
             }
             try {
@@ -79,7 +79,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             return;
 
         if (!methodExists(method)) {
-            ErrorHandler.printCostumeError(method,
+            ErrorHandler.printCustomError(method,
                     "Could not find method '" + method.getSignature() + "' in class '" + prefix + "'", errorEmitter);
             return;
         }
