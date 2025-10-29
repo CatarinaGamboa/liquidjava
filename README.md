@@ -18,17 +18,18 @@ This project contains the LiquidJava verifier and its API, as well as some examp
 
 You can find out more about LiquidJava in the following resources:
 
-* [Try it](https://github.com/CatarinaGamboa/liquidjava-examples) with GitHub Codespaces or locally
-* [VS Code extension for LiquidJava](https://github.com/CatarinaGamboa/vscode-liquidjava)
-* [LiquidJava website](https://catarinagamboa.github.io/liquidjava.html)
-* [LiquidJava specification examples for the Java standard library](https://github.com/CatarinaGamboa/liquid-java-external-libs)
+* [LiquidJava Website](https://catarinagamboa.github.io/liquidjava.html)
+* [VS Code Extension (Marketplace)](https://marketplace.visualstudio.com/items?itemName=AlcidesFonseca.liquid-java)
+* [VS Code Extension (Source Code)](https://github.com/CatarinaGamboa/vscode-liquidjava)
+* [LiquidJava Examples](https://github.com/CatarinaGamboa/liquidjava-examples)
+* [LiquidJava External Libraries Examples](https://github.com/CatarinaGamboa/liquid-java-external-libs)
 <!-- * [Formalization of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-formalization) - not opensource yet -->
 
 ## Getting Started
 
 ### VS Code Extension
 
-The easiest way to use LiquidJava is through its [VS Code extension](https://github.com/CatarinaGamboa/vscode-liquidjava), which uses the LiquidJava verifier directly inside VS Code, with error diagnostics and syntax highlighting for refinements.
+The easiest way to use LiquidJava is through its [VS Code extension](https://marketplace.visualstudio.com/items?itemName=AlcidesFonseca.liquid-java), which uses the LiquidJava verifier directly inside VS Code, with real-time error diagnostics and syntax highlighting for refinements.
 
 ### Command Line
 
@@ -40,6 +41,28 @@ Before setting up LiquidJava, ensure you have the following installed:
 
 - Java 20+ - JDK for compiling and running Java programs
 - Maven 3.6+ - For building and dependency management
+
+Additionally, you'll need the following dependency, which includes the LiquidJava API annotations:
+
+#### Maven
+```xml
+<dependency>
+    <groupId>io.github.rcosta358</groupId>
+    <artifactId>liquidjava-api</artifactId>
+    <version>0.0.3</version>
+</dependency>
+```
+
+#### Gradle
+```groovy
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'io.github.rcosta358:liquidjava-api:0.0.3'
+}
+```
 
 #### Setup
 
