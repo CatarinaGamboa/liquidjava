@@ -77,15 +77,15 @@ public class AuxStateHandler {
         Predicate c = new Predicate();
         List<GhostFunction> sets = getDifferentSets(tc, klass); // ??
         for (GhostFunction sg : sets) {
-            if (sg.getReturnType().toString().equals("int")) {
-                Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getQualifiedName(), s),
-                        Predicate.createLit("0", Utils.INT));
-                c = Predicate.createConjunction(c, p);
-            } else {
-                // TODO: Implement other stuff
-                throw new RuntimeException("Ghost Functions not implemented for other types than int -> implement in"
-                        + " AuxStateHandler defaultState");
-            }
+            String retType = sg.getReturnType().toString();
+            Predicate typePredicate = switch (retType) {
+            case "int" -> Predicate.createLit("0", Utils.INT);
+            case "boolean" -> Predicate.createLit("false", Utils.BOOLEAN);
+            case "double" -> Predicate.createLit("0.0", Utils.DOUBLE);
+            default -> throw new RuntimeException("Ghost not implemented for type " + retType);
+            };
+            Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s), typePredicate);
+            c = Predicate.createConjunction(c, p);
         }
         ObjectState os = new ObjectState();
         os.setTo(c);
@@ -551,24 +551,21 @@ public class AuxStateHandler {
                 prevInstance.getRefinement(), invocation);
         // vi2.setState(transitionedState);
         vi2.setRefinement(transitionedState);
-        RefinedVariable rv = superName != null ? tc.getContext().getVariableByName(superName) : null;
-        if (rv != null) {
-            // propagate supertypes from the refined variable
-            for (CtTypeReference<?> t : rv.getSuperTypes())
+        Context ctx = tc.getContext();
+        if (ctx.hasVariable(superName)) {
+            RefinedVariable rv = ctx.getVariableByName(superName);
+            for (CtTypeReference<?> t : rv.getSuperTypes()) {
                 vi2.addSuperType(t);
-        } else {
-            // propagate supertypes from the previous instance
-            for (CtTypeReference<?> t : prevInstance.getSuperTypes())
-                vi2.addSuperType(t);
-        }
+            }
 
-        // if the variable is a parent (not a VariableInstance) we need to check that
-        // this refinement
-        // is a subtype of the variable's main refinement
-        if (rv instanceof Variable) {
-            Predicate superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
-            tc.checkSMT(superC, invocation);
-            tc.getContext().addRefinementInstanceToVariable(superName, name2);
+            // if the variable is a parent (not a VariableInstance) we need to check that
+            // this refinement
+            // is a subtype of the variable's main refinement
+            if (rv instanceof Variable) {
+                Predicate superC = rv.getMainRefinement().substituteVariable(rv.getName(), vi2.getName());
+                tc.checkSMT(superC, invocation);
+                tc.getContext().addRefinementInstanceToVariable(superName, name2);
+            }
         }
 
         invocation.putMetadata(tc.TARGET_KEY, vi2);
