@@ -191,7 +191,7 @@ public class MethodsFunctionsChecker {
                 return;
             if (method.getParent() instanceof CtClass) {
                 RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(),
-                        ((CtClass<?>) method.getParent()).getQualifiedName());
+                        ((CtClass<?>) method.getParent()).getQualifiedName(), method.getParameters().size());
 
                 List<Variable> lv = fi.getArguments();
                 for (Variable v : lv) {
@@ -229,7 +229,8 @@ public class MethodsFunctionsChecker {
 
         } else if (method.getParent() instanceof CtClass) {
             String ctype = ((CtClass<?>) method.getParent()).getQualifiedName();
-            RefinedFunction f = rtc.getContext().getFunction(method.getSimpleName(), ctype);
+            int argSize = invocation.getArguments().size();
+            RefinedFunction f = rtc.getContext().getFunction(method.getSimpleName(), ctype, argSize);
             if (f != null) { // inside rtc.context
                 checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(),
                         method.getSimpleName(), ctype);
@@ -264,13 +265,14 @@ public class MethodsFunctionsChecker {
         String ctype = (ctref != null) ? ctref.toString() : null;
 
         String name = ctr.getSimpleName(); // missing
-        if (rtc.getContext().getFunction(name, ctype) != null) { // inside rtc.context
+        int argSize = invocation.getArguments().size();
+        if (rtc.getContext().getFunction(name, ctype, argSize) != null) { // inside rtc.context
             checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), name, ctype);
             return;
         } else {
             String prefix = ctype;
             String completeName = String.format("%s.%s", prefix, name);
-            if (rtc.getContext().getFunction(completeName, ctype) != null) {
+            if (rtc.getContext().getFunction(completeName, ctype, argSize) != null) {
                 checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), completeName,
                         ctype);
             }
