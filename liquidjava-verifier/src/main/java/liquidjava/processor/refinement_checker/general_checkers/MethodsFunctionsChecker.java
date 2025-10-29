@@ -376,6 +376,10 @@ public class MethodsFunctionsChecker {
             for (String s : vars)
                 if (map.containsKey(s))
                     c = c.substituteVariable(s, map.get(s));
+            if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
+                VariableInstance vi = (VariableInstance) invocation.getMetadata(rtc.TARGET_KEY);
+                c = c.substituteVariable(rtc.THIS, vi.getName());
+            }
             rtc.checkSMT(c, invocation);
         }
     }
