@@ -84,7 +84,7 @@ public class AuxStateHandler {
             case "double" -> Predicate.createLit("0.0", Utils.DOUBLE);
             default -> throw new RuntimeException("Ghost not implemented for type " + retType);
             };
-            Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s), typePredicate);
+            Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getQualifiedName(), s), typePredicate);
             c = Predicate.createConjunction(c, p);
         }
         ObjectState os = new ObjectState();
