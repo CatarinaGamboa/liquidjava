@@ -3,6 +3,9 @@ package liquidjava.processor.refinement_checker;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.Context;
@@ -92,8 +95,19 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
         } else {
             if (!methodExists(targetType, method)) {
-                ErrorHandler.printCustomError(method, String.format("Could not find method '%s %s' for '%s'",
-                        method.getType().getSimpleName(), method.getSignature(), prefix), errorEmitter);
+                String matchingNames = targetType.getMethods().stream()
+                        .filter(m -> m.getSimpleName().equals(method.getSimpleName())).map(m -> m.getSignature())
+                        .collect(Collectors.joining("\n\t"));
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
+                        method.getSignature(), prefix));
+
+                if (!matchingNames.isEmpty()) {
+                    sb.append("\nPossible matches:\n\t");
+                    sb.append(matchingNames);
+                }
+                ErrorHandler.printCustomError(method, sb.toString(), errorEmitter);
                 return;
             }
         }
