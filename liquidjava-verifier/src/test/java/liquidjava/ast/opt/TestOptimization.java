@@ -1,6 +1,6 @@
+package liquidjava.ast.opt;
 
 import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
 
 import liquidjava.rj_language.ast.BinaryExpression;
