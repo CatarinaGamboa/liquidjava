@@ -249,6 +249,9 @@ public abstract class TypeChecker extends CtScanner {
                     AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
                     context.addAlias(aw);
                 }
+            } else {
+                // alias syntax error
+                ErrorHandler.printSyntaxError("Invalid alias definition", value, element, errorEmitter);
             }
         } catch (ParsingException e) {
             ErrorHandler.printCustomError(element, e.getMessage(), errorEmitter);
