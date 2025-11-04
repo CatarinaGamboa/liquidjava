@@ -96,15 +96,16 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         } else {
             if (!methodExists(targetType, method)) {
                 String matchingNames = targetType.getMethods().stream()
-                        .filter(m -> m.getSimpleName().equals(method.getSimpleName())).map(m -> m.getSignature())
-                        .collect(Collectors.joining("\n\t"));
+                        .filter(m -> m.getSimpleName().equals(method.getSimpleName()))
+                        .map(m -> String.format("%s %s", m.getType().getSimpleName(), m.getSignature()))
+                        .collect(Collectors.joining("\n  "));
 
                 StringBuilder sb = new StringBuilder();
                 sb.append(String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
                         method.getSignature(), prefix));
 
                 if (!matchingNames.isEmpty()) {
-                    sb.append("\nPossible matches:\n\t");
+                    sb.append("\nAvailable overloads:\n  ");
                     sb.append(matchingNames);
                 }
                 ErrorHandler.printCustomError(method, sb.toString(), errorEmitter);
