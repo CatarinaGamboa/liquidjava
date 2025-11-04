@@ -5,12 +5,12 @@ import liquidjava.specification.RefinementPredicate;
 import liquidjava.specification.StateRefinement;
 
 @ExternalRefinementsFor("java.util.ArrayList")
-public interface ErrorExtRefNonExistentMethod<E> {
+public interface ErrorExtRefWrongRetType<E> {
 
     @RefinementPredicate("int size(ArrayList l)")
     @StateRefinement(to = "size(this) == 0")
     public void ArrayList();
 
     @StateRefinement(to = "size(this) == (size(old(this)) + 1)")
-    public boolean adddd(E e);
+    public int add(E e); // wrong return type
 }
