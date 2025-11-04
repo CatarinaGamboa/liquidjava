@@ -18,8 +18,8 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;
-import spoon.reflect.declaration.CtTypeParameter;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -79,8 +79,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             return;
 
         if (!methodExists(method)) {
-            ErrorHandler.printCustomError(method,
-                    "Could not find method '" + method.getSignature() + "' in class '" + prefix + "'", errorEmitter);
+            ErrorHandler.printCustomError(method, String.format("Could not find method '%s %s' in class '%s'",
+                    method.getType().getSimpleName(), method.getSignature(), prefix), errorEmitter);
             return;
         }
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
@@ -140,15 +140,47 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     private boolean methodExists(CtMethod<?> method) {
         CtType<?> targetType = factory.Type().createReference(prefix).getTypeDeclaration();
+        if (targetType == null)
+            return false;
 
-        // find a method with matching name and parameter count
-        boolean methodFound = targetType.getMethods().stream()
-                .anyMatch(m -> m.getSimpleName().equals(method.getSimpleName())
-                        && m.getParameters().size() == method.getParameters().size());
+        String methodName = method.getSimpleName();
+        boolean isConstructor = methodName.equals(targetType.getSimpleName());
 
-        if (!methodFound) {
-            // check if constructor method
-            return method.getSimpleName().equals(targetType.getSimpleName());
+        if (isConstructor && targetType instanceof CtClass) {
+            // find constructor with matching signature
+            CtClass<?> targetClass = (CtClass<?>) targetType;
+            return targetClass.getConstructors().stream()
+                    .anyMatch(c -> parametersMatch(c.getParameters(), method.getParameters()));
+        } else {
+            // find method with matching signature
+            return targetType.getMethods().stream().filter(m -> m.getSimpleName().equals(methodName))
+                    .anyMatch(m -> parametersMatch(m.getParameters(), method.getParameters())
+                            && typesMatch(m.getType(), method.getType()));
+        }
+    }
+
+    private boolean typesMatch(CtTypeReference<?> type1, CtTypeReference<?> type2) {
+        if (type1 == null && type2 == null)
+            return true;
+
+        if (type1 == null || type2 == null)
+            return false;
+
+        return type1.getQualifiedName().equals(type2.getQualifiedName());
+    }
+
+    private boolean parametersMatch(List<?> targetParams, List<?> refinementParams) {
+        if (targetParams.size() != refinementParams.size())
+            return false;
+
+        for (int i = 0; i < targetParams.size(); i++) {
+            CtParameter<?> targetParam = (CtParameter<?>) targetParams.get(i);
+            CtParameter<?> refinementParam = (CtParameter<?>) refinementParams.get(i);
+            if (targetParam == null || refinementParam == null)
+                return false;
+
+            if (!typesMatch(targetParam.getType(), refinementParam.getType()))
+                return false;
         }
         return true;
     }

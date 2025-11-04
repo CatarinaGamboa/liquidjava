@@ -12,7 +12,7 @@ public interface ArrayListRefinements<E> {
     public void ArrayList();
 
     @StateRefinement(to = "size(this) == (size(old(this)) + 1)")
-    public void add(E e);
+    public boolean add(E e);
 
     //	@Refinement("size(_) == size(this)")
     //	public Object clone();
