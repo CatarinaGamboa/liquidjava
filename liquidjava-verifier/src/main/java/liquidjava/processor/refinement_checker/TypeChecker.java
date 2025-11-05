@@ -88,8 +88,15 @@ public abstract class TypeChecker extends CtScanner {
         }
         if (ref.isPresent()) {
             Predicate p = new Predicate(ref.get(), element, errorEmitter);
+
+            // check if refinement is valid
+            if (!p.getExpression().isBooleanExpression()) {
+                ErrorHandler.printCustomError(element, "Refinement predicate must be a boolean expression",
+                        errorEmitter);
+            }
             if (errorEmitter.foundError())
                 return Optional.empty();
+            
             constr = Optional.of(p);
         }
         return constr;
