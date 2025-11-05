@@ -1,4 +1,4 @@
-package liquidjava.errors;
+package liquidjava.diagnostics;
 
 import spoon.reflect.cu.SourcePosition;
 

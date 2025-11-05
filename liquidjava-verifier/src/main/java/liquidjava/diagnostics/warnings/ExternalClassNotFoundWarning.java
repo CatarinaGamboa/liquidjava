@@ -1,4 +1,4 @@
-package liquidjava.errors.warnings;
+package liquidjava.diagnostics.warnings;
 
 import spoon.reflect.declaration.CtElement;
 

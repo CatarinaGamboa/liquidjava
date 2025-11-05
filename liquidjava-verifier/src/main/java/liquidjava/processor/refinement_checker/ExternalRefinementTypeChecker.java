@@ -3,8 +3,9 @@ package liquidjava.processor.refinement_checker;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import liquidjava.errors.ErrorEmitter;
-import liquidjava.errors.ErrorHandler;
+
+import liquidjava.diagnostics.ErrorEmitter;
+import liquidjava.diagnostics.ErrorHandler;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.facade.GhostDTO;

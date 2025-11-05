@@ -1,4 +1,4 @@
-package liquidjava.errors.errors;
+package liquidjava.diagnostics.errors;
 
 public class CustomError extends LJError {
 

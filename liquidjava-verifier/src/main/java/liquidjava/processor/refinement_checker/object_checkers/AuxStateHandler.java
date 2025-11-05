@@ -3,7 +3,8 @@ package liquidjava.processor.refinement_checker.object_checkers;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
-import liquidjava.errors.ErrorHandler;
+
+import liquidjava.diagnostics.ErrorHandler;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;

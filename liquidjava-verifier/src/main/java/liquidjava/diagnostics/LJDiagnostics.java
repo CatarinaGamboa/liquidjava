@@ -1,10 +1,10 @@
-package liquidjava.errors;
+package liquidjava.diagnostics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import liquidjava.errors.errors.LJError;
-import liquidjava.errors.warnings.LJWarning;
+import liquidjava.diagnostics.errors.LJError;
+import liquidjava.diagnostics.warnings.LJWarning;
 import liquidjava.processor.context.PlacementInCode;
 
 public class LJDiagnostics {

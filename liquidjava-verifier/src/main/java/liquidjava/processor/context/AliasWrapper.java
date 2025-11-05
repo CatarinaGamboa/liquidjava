@@ -4,7 +4,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import liquidjava.errors.ErrorEmitter;
+
+import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.Expression;

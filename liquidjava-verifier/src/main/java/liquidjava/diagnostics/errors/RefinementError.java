@@ -1,4 +1,4 @@
-package liquidjava.errors.errors;
+package liquidjava.diagnostics.errors;
 
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;

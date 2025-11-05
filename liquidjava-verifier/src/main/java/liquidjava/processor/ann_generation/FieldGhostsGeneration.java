@@ -1,6 +1,6 @@
 package liquidjava.processor.ann_generation;
 
-import liquidjava.errors.ErrorEmitter;
+import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.context.Context;
 import liquidjava.specification.Ghost;
 import spoon.reflect.declaration.*;

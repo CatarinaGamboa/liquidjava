@@ -3,7 +3,8 @@ package liquidjava.api;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import liquidjava.errors.ErrorEmitter;
+
+import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;

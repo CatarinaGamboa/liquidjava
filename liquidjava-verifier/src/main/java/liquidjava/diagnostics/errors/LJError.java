@@ -1,31 +1,35 @@
-package liquidjava.errors.warnings;
+package liquidjava.diagnostics.errors;
 
-import java.net.URI;
-
-import liquidjava.errors.ErrorPosition;
+import liquidjava.diagnostics.ErrorPosition;
 import liquidjava.utils.Utils;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 
-// base class for all LiquidJava warnings
-public abstract class LJWarning {
+// base class for all LiquidJava errors
+public abstract class LJError extends Exception {
 
+    private String title;
     private String message;
     private CtElement element;
     private ErrorPosition position;
     private SourcePosition location;
 
-    public LJWarning(String message, CtElement element) {
+    public LJError(String title, String message, CtElement element) {
+        super(message);
+        this.title = title;
         this.message = message;
         this.element = element;
         try {
             this.location = element.getPosition();
             this.position = ErrorPosition.fromSpoonPosition(element.getPosition());
         } catch (Exception e) {
-            // This warning is from a generated part of the source code, so no precise position is provided
             this.location = null;
             this.position = null;
         }
+    }
+
+    public String getTitle() {
+        return title;
     }
 
     public String getMessage() {
@@ -49,8 +53,9 @@ public abstract class LJWarning {
 
     public String toString(String extra) {
         StringBuilder sb = new StringBuilder();
-        sb.append(message).append(" at: \n").append(element.toString().replace("@liquidjava.specification.", "@"))
+        sb.append(title).append(" at: \n").append(element.toString().replace("@liquidjava.specification.", "@"))
                 .append("\n\n");
+        sb.append(message).append("\n");
         if (extra != null)
             sb.append(extra).append("\n");
         sb.append("Location: ").append(location != null ? Utils.stripParens(location.toString()) : "<unknown>")
