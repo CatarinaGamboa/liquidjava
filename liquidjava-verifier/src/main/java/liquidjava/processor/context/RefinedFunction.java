@@ -12,6 +12,7 @@ public class RefinedFunction extends Refined {
     private List<Variable> argRefinements;
     private String targetClass;
     private List<ObjectState> stateChange;
+    private String signature;
 
     public RefinedFunction() {
         argRefinements = new ArrayList<>();
@@ -45,6 +46,14 @@ public class RefinedFunction extends Refined {
 
     public String getTargetClass() {
         return targetClass;
+    }
+
+    public void setSignature(String signature) {
+        this.signature = signature;
+    }
+
+    public String getSignature() {
+        return signature;
     }
 
     public Predicate getRenamedRefinements(Context c, CtElement element) {
@@ -132,8 +141,8 @@ public class RefinedFunction extends Refined {
 
     @Override
     public String toString() {
-        return "Function [name=" + super.getName() + ", argRefinements=" + argRefinements + ", refReturn="
-                + super.getRefinement() + ", targetClass=" + targetClass + "]";
+        return "Function [name=" + super.getName() + ", signature=" + signature + ", argRefinements=" + argRefinements
+                + ", refReturn=" + super.getRefinement() + ", targetClass=" + targetClass + "]";
     }
 
     @Override
@@ -142,6 +151,7 @@ public class RefinedFunction extends Refined {
         int result = super.hashCode();
         result = prime * result + ((argRefinements == null) ? 0 : argRefinements.hashCode());
         result = prime * result + ((targetClass == null) ? 0 : targetClass.hashCode());
+        result = prime * result + ((signature == null) ? 0 : signature.hashCode());
         return result;
     }
 
@@ -157,12 +167,17 @@ public class RefinedFunction extends Refined {
         if (argRefinements == null) {
             if (other.argRefinements != null)
                 return false;
-        } else if (argRefinements.size() != other.argRefinements.size())
+        } else if (!argRefinements.equals(other.argRefinements))
             return false;
         if (targetClass == null) {
             if (other.targetClass != null)
                 return false;
         } else if (!targetClass.equals(other.targetClass))
+            return false;
+        if (signature == null) {
+            if (other.signature != null)
+                return false;
+        } else if (!signature.equals(other.signature))
             return false;
         return true;
     }

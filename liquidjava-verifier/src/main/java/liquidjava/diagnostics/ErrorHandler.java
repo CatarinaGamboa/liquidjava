@@ -1,4 +1,4 @@
-package liquidjava.errors;
+package liquidjava.diagnostics;
 
 import java.util.Formatter;
 import java.util.HashMap;

@@ -4,7 +4,8 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import liquidjava.errors.ErrorEmitter;
+
+import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.processor.refinement_checker.general_checkers.OperationsChecker;

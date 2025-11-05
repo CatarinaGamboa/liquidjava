@@ -2,7 +2,8 @@ package liquidjava.processor.refinement_checker;
 
 import java.util.ArrayList;
 import java.util.List;
-import liquidjava.errors.ErrorEmitter;
+
+import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.rj_language.parsing.ParsingException;

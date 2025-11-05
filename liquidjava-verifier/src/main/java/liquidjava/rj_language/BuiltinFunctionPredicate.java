@@ -1,6 +1,6 @@
 package liquidjava.rj_language;
 
-import liquidjava.errors.ErrorEmitter;
+import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtElement;
 
