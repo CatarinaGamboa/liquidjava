@@ -65,8 +65,15 @@ public class AuxStateHandler {
             Map<String, CtExpression> m = an.getAllValues();
             String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
             ObjectState state = new ObjectState();
-            if (to != null)
-                state.setTo(new Predicate(to, element, tc.getErrorEmitter()));
+            if (to != null) {
+                Predicate p = new Predicate(to, element, tc.getErrorEmitter());
+                if (!p.getExpression().isBooleanExpression()) {
+                    ErrorHandler.printCustomError(element, "State refinement must be a boolean expression",
+                            tc.getErrorEmitter());
+                    return;
+                }
+                state.setTo(p);
+            }
             l.add(state);
         }
         f.setAllStates(l);
@@ -176,6 +183,10 @@ public class AuxStateHandler {
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
             TypeChecker tc, CtElement e, boolean isTo, String prefix) throws ParsingException {
         Predicate p = new Predicate(value, e, tc.getErrorEmitter(), prefix);
+        if (!p.getExpression().isBooleanExpression()) {
+            ErrorHandler.printCustomError(e, "State refinement must be a boolean expression", tc.getErrorEmitter());
+            return new Predicate();
+        }
         String t = targetClass; // f.getTargetClass();
         CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
 
