@@ -233,28 +233,22 @@ public abstract class TypeChecker extends CtScanner {
     protected void handleAlias(String value, CtElement element) {
         try {
             AliasDTO a = RefinementsParser.getAliasDeclaration(value);
-
-            if (a != null) {
-                String klass = null;
-                String path = null;
-                if (element instanceof CtClass) {
-                    klass = ((CtClass<?>) element).getSimpleName();
-                    path = ((CtClass<?>) element).getQualifiedName();
-                } else if (element instanceof CtInterface<?>) {
-                    klass = ((CtInterface<?>) element).getSimpleName();
-                    path = ((CtInterface<?>) element).getQualifiedName();
-                }
-                if (klass != null && path != null) {
-                    a.parse(path);
-                    AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
-                    context.addAlias(aw);
-                }
-            } else {
-                // alias syntax error
-                ErrorHandler.printSyntaxError("Invalid alias definition", value, element, errorEmitter);
+            String klass = null;
+            String path = null;
+            if (element instanceof CtClass) {
+                klass = ((CtClass<?>) element).getSimpleName();
+                path = ((CtClass<?>) element).getQualifiedName();
+            } else if (element instanceof CtInterface<?>) {
+                klass = ((CtInterface<?>) element).getSimpleName();
+                path = ((CtInterface<?>) element).getQualifiedName();
+            }
+            if (klass != null && path != null) {
+                a.parse(path);
+                AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
+                context.addAlias(aw);
             }
         } catch (ParsingException e) {
-            ErrorHandler.printCustomError(element, e.getMessage(), errorEmitter);
+            ErrorHandler.printSyntaxError(e.getMessage(), value, element, errorEmitter);
             return;
             // e.printStackTrace();
         }
