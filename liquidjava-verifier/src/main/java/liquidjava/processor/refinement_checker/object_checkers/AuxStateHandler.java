@@ -68,7 +68,7 @@ public class AuxStateHandler {
             if (to != null) {
                 Predicate p = new Predicate(to, element, tc.getErrorEmitter());
                 if (!p.getExpression().isBooleanExpression()) {
-                    ErrorHandler.printCustomError(element, "State refinement must be a boolean expression",
+                    ErrorHandler.printCustomError(element, "State refinement transition must be a boolean expression",
                             tc.getErrorEmitter());
                     return;
                 }
@@ -184,7 +184,8 @@ public class AuxStateHandler {
             TypeChecker tc, CtElement e, boolean isTo, String prefix) throws ParsingException {
         Predicate p = new Predicate(value, e, tc.getErrorEmitter(), prefix);
         if (!p.getExpression().isBooleanExpression()) {
-            ErrorHandler.printCustomError(e, "State refinement must be a boolean expression", tc.getErrorEmitter());
+            ErrorHandler.printCustomError(e, "State refinement transition must be a boolean expression",
+                    tc.getErrorEmitter());
             return new Predicate();
         }
         String t = targetClass; // f.getTargetClass();
