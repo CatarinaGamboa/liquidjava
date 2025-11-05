@@ -69,4 +69,8 @@ public class Utils {
             return name; // dont qualify
         return String.format("%s.%s", prefix, name);
     }
+
+    public static String stripParens(String s) {
+        return s.startsWith("(") && s.endsWith(")") ? s.substring(1, s.length() - 1) : s;
+    }
 }
