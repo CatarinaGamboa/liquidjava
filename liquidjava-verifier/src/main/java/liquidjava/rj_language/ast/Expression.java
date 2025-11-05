@@ -53,16 +53,24 @@ public abstract class Expression {
 
     /**
      * Checks if this expression produces a boolean type based on its structure
+     * 
      * @return true if it is a boolean expression, false otherwise
      */
     public boolean isBooleanExpression() {
-        return switch (this) {
-            case LiteralBoolean _, Ite _, AliasInvocation _, FunctionInvocation _ -> true;
-            case GroupExpression ge -> ge.getExpression().isBooleanExpression();
-            case BinaryExpression be -> be.isBooleanOperation() || be.isLogicOperation();
-            case UnaryExpression ue -> ue.getOp().equals("!");
-            default -> false;
-        };
+        if (this instanceof LiteralBoolean || this instanceof Ite || this instanceof AliasInvocation
+                || this instanceof FunctionInvocation) {
+            return true;
+        }
+        if (this instanceof GroupExpression ge) {
+            return ge.getExpression().isBooleanExpression();
+        }
+        if (this instanceof BinaryExpression be) {
+            return be.isBooleanOperation() || be.isLogicOperation();
+        }
+        if (this instanceof UnaryExpression ue) {
+            return ue.getOp().equals("!");
+        }
+        return false;
     }
 
     /**
