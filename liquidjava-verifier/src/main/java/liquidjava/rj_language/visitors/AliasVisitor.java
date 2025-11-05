@@ -31,7 +31,7 @@ public class AliasVisitor {
      *
      * @throws ParsingException
      */
-    public AliasDTO getAlias(ParseTree rc) throws ParsingException {
+    public AliasDTO getAlias(ParseTree rc) {
         if (rc instanceof AliasContext) {
             AliasContext ac = (AliasContext) rc;
             String name = ac.ID_UPPER().getText();
