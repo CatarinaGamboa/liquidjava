@@ -96,7 +96,7 @@ public abstract class TypeChecker extends CtScanner {
             }
             if (errorEmitter.foundError())
                 return Optional.empty();
-            
+
             constr = Optional.of(p);
         }
         return constr;
@@ -252,6 +252,12 @@ public abstract class TypeChecker extends CtScanner {
             }
             if (klass != null && path != null) {
                 a.parse(path);
+                // refinement alias must return a boolean expression
+                if (a.getExpression() != null && !a.getExpression().isBooleanExpression()) {
+                    ErrorHandler.printCustomError(element, "Refinement alias must return a boolean expression",
+                            errorEmitter);
+                    return;
+                }
                 AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
                 context.addAlias(aw);
             }
