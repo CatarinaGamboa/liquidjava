@@ -36,7 +36,7 @@ public class RefinementsParser {
         ParseTree rc = compile(s);
         GhostDTO g = GhostVisitor.getGhostDecl(rc);
         if (g == null)
-            throw new ParsingException(" The ghost should be in format <type> <name> (<parameters>)");
+            throw new ParsingException("Ghost declarations should be in format <type> <name> (<parameters>)");
         return g;
     }
 
@@ -59,7 +59,10 @@ public class RefinementsParser {
 
         RuleContext rc = parser.prog();
         AliasVisitor av = new AliasVisitor(input);
-        return av.getAlias(rc);
+        AliasDTO alias = av.getAlias(rc);
+        if (alias == null)
+            throw new ParsingException("Alias definitions should be in format <name>(<parameters>) { <definition> }");
+        return alias;
     }
 
     private static ParseTree compile(String toParse) throws ParsingException {

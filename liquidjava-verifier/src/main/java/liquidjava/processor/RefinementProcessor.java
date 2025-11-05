@@ -2,7 +2,8 @@ package liquidjava.processor;
 
 import java.util.ArrayList;
 import java.util.List;
-import liquidjava.errors.ErrorEmitter;
+
+import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.ann_generation.FieldGhostsGeneration;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.ExternalRefinementTypeChecker;

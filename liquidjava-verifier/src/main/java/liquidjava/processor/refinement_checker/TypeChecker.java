@@ -4,8 +4,9 @@ import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import liquidjava.errors.ErrorEmitter;
-import liquidjava.errors.ErrorHandler;
+
+import liquidjava.diagnostics.ErrorEmitter;
+import liquidjava.diagnostics.ErrorHandler;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
@@ -233,25 +234,22 @@ public abstract class TypeChecker extends CtScanner {
     protected void handleAlias(String value, CtElement element) {
         try {
             AliasDTO a = RefinementsParser.getAliasDeclaration(value);
-
-            if (a != null) {
-                String klass = null;
-                String path = null;
-                if (element instanceof CtClass) {
-                    klass = ((CtClass<?>) element).getSimpleName();
-                    path = ((CtClass<?>) element).getQualifiedName();
-                } else if (element instanceof CtInterface<?>) {
-                    klass = ((CtInterface<?>) element).getSimpleName();
-                    path = ((CtInterface<?>) element).getQualifiedName();
-                }
-                if (klass != null && path != null) {
-                    a.parse(path);
-                    AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
-                    context.addAlias(aw);
-                }
+            String klass = null;
+            String path = null;
+            if (element instanceof CtClass) {
+                klass = ((CtClass<?>) element).getSimpleName();
+                path = ((CtClass<?>) element).getQualifiedName();
+            } else if (element instanceof CtInterface<?>) {
+                klass = ((CtInterface<?>) element).getSimpleName();
+                path = ((CtInterface<?>) element).getQualifiedName();
+            }
+            if (klass != null && path != null) {
+                a.parse(path);
+                AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
+                context.addAlias(aw);
             }
         } catch (ParsingException e) {
-            ErrorHandler.printCustomError(element, e.getMessage(), errorEmitter);
+            ErrorHandler.printSyntaxError(e.getMessage(), value, element, errorEmitter);
             return;
             // e.printStackTrace();
         }

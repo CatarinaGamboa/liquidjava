@@ -3,7 +3,8 @@ package liquidjava.processor.refinement_checker.object_checkers;
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
-import liquidjava.errors.ErrorHandler;
+
+import liquidjava.diagnostics.ErrorHandler;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;
@@ -84,7 +85,7 @@ public class AuxStateHandler {
             case "double" -> Predicate.createLit("0.0", Utils.DOUBLE);
             default -> throw new RuntimeException("Ghost not implemented for type " + retType);
             };
-            Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getName(), s), typePredicate);
+            Predicate p = Predicate.createEquals(Predicate.createInvocation(sg.getQualifiedName(), s), typePredicate);
             c = Predicate.createConjunction(c, p);
         }
         ObjectState os = new ObjectState();

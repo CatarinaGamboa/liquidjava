@@ -22,7 +22,7 @@ public class AliasDTO {
         this.expression = expression;
     }
 
-    public AliasDTO(String name2, List<String> varTypes2, List<String> varNames2, String ref) throws ParsingException {
+    public AliasDTO(String name2, List<String> varTypes2, List<String> varNames2, String ref) {
         super();
         this.name = name2;
         this.varTypes = varTypes2;
