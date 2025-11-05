@@ -3,6 +3,9 @@ package liquidjava.processor.refinement_checker;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import liquidjava.errors.ErrorEmitter;
 import liquidjava.errors.ErrorHandler;
 import liquidjava.processor.context.Context;
@@ -18,8 +21,8 @@ import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtField;
 import spoon.reflect.declaration.CtInterface;
 import spoon.reflect.declaration.CtMethod;
+import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.declaration.CtType;
-import spoon.reflect.declaration.CtTypeParameter;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -78,11 +81,38 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (errorEmitter.foundError())
             return;
 
-        if (!methodExists(method)) {
-            ErrorHandler.printCustomError(method,
-                    "Could not find method '" + method.getSignature() + "' in class '" + prefix + "'", errorEmitter);
+        CtType<?> targetType = factory.Type().createReference(prefix).getTypeDeclaration();
+        if (targetType == null || !(targetType instanceof CtClass))
             return;
+
+        boolean isConstructor = method.getSimpleName().equals(targetType.getSimpleName());
+        if (isConstructor) {
+            if (!constructorExists(targetType, method)) {
+                ErrorHandler.printCustomError(method,
+                        String.format("Could not find constructor '%s' for '%s'", method.getSignature(), prefix),
+                        errorEmitter);
+                return;
+            }
+        } else {
+            if (!methodExists(targetType, method)) {
+                String matchingNames = targetType.getMethods().stream()
+                        .filter(m -> m.getSimpleName().equals(method.getSimpleName()))
+                        .map(m -> String.format("%s %s", m.getType().getSimpleName(), m.getSignature()))
+                        .collect(Collectors.joining("\n  "));
+
+                StringBuilder sb = new StringBuilder();
+                sb.append(String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
+                        method.getSignature(), prefix));
+
+                if (!matchingNames.isEmpty()) {
+                    sb.append("\nAvailable overloads:\n  ");
+                    sb.append(matchingNames);
+                }
+                ErrorHandler.printCustomError(method, sb.toString(), errorEmitter);
+                return;
+            }
         }
+
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
         try {
             mfc.getMethodRefinements(method, prefix);
@@ -138,17 +168,42 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         return factory.Type().createReference(className).getTypeDeclaration() != null;
     }
 
-    private boolean methodExists(CtMethod<?> method) {
-        CtType<?> targetType = factory.Type().createReference(prefix).getTypeDeclaration();
+    private boolean methodExists(CtType<?> targetType, CtMethod<?> method) {
+        // find method with matching signature
+        return targetType.getMethods().stream().filter(m -> m.getSimpleName().equals(method.getSimpleName()))
+                .anyMatch(m -> parametersMatch(m.getParameters(), method.getParameters())
+                        && typesMatch(m.getType(), method.getType()));
+    }
 
-        // find a method with matching name and parameter count
-        boolean methodFound = targetType.getMethods().stream()
-                .anyMatch(m -> m.getSimpleName().equals(method.getSimpleName())
-                        && m.getParameters().size() == method.getParameters().size());
+    private boolean constructorExists(CtType<?> targetType, CtMethod<?> method) {
+        // find constructor with matching signature
+        CtClass<?> targetClass = (CtClass<?>) targetType;
+        return targetClass.getConstructors().stream()
+                .anyMatch(c -> parametersMatch(c.getParameters(), method.getParameters()));
+    }
 
-        if (!methodFound) {
-            // check if constructor method
-            return method.getSimpleName().equals(targetType.getSimpleName());
+    private boolean typesMatch(CtTypeReference<?> type1, CtTypeReference<?> type2) {
+        if (type1 == null && type2 == null)
+            return true;
+
+        if (type1 == null || type2 == null)
+            return false;
+
+        return type1.getQualifiedName().equals(type2.getQualifiedName());
+    }
+
+    private boolean parametersMatch(List<?> targetParams, List<?> refinementParams) {
+        if (targetParams.size() != refinementParams.size())
+            return false;
+
+        for (int i = 0; i < targetParams.size(); i++) {
+            CtParameter<?> targetParam = (CtParameter<?>) targetParams.get(i);
+            CtParameter<?> refinementParam = (CtParameter<?>) refinementParams.get(i);
+            if (targetParam == null || refinementParam == null)
+                return false;
+
+            if (!typesMatch(targetParam.getType(), refinementParam.getType()))
+                return false;
         }
         return true;
     }

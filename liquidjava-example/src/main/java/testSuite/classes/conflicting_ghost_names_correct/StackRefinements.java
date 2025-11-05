@@ -11,7 +11,7 @@ public interface StackRefinements<E> {
 	public void Stack();
 
 	@StateRefinement(to="size(this) == size(old(this)) + 1")
-	public boolean push(E elem);
+	public E push(E elem);
 
 	@StateRefinement(from="size(this) > 0", to="size(this) == size(old(this)) - 1")
 	public E pop();
