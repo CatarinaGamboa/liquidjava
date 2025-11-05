@@ -5,7 +5,9 @@ import liquidjava.utils.Utils;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 
-// base class for all LiquidJava errors
+/**
+ * Base class for all LiquidJava errors
+ */
 public abstract class LJError extends Exception {
 
     private String title;

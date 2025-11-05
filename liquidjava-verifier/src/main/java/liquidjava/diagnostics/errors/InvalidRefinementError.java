@@ -2,7 +2,10 @@ package liquidjava.diagnostics.errors;
 
 import spoon.reflect.declaration.CtElement;
 
-// when a refinement is invalid, e.g. is not a boolean expression
+/**
+ * Error indicating that a refinement is invalid (e.g., not a boolean expression)
+ * @see LJError
+ */
 public class InvalidRefinementError extends LJError {
 
     private String refinement;

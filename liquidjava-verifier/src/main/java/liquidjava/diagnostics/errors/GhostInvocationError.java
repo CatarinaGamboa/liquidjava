@@ -3,7 +3,10 @@ package liquidjava.diagnostics.errors;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 
-// when a ghost call has wrong types or number of arguments
+/**
+ * Error indicating that a ghost method invocation is invalid (e.g., has wrong arguments)
+ * @see LJError
+ */
 public class GhostInvocationError extends LJError {
 
     private Predicate expected;

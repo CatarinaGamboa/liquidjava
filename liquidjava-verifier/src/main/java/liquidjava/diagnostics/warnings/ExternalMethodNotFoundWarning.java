@@ -2,7 +2,10 @@ package liquidjava.diagnostics.warnings;
 
 import spoon.reflect.declaration.CtElement;
 
-// when a method referenced in an external refinement cannot be found
+/**
+ * Warning indicating that a method referenced in an external refinement was not found
+ * @see LJWarning
+ */
 public class ExternalMethodNotFoundWarning extends LJWarning {
 
     private String methodName;

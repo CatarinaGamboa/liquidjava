@@ -3,7 +3,10 @@ package liquidjava.diagnostics.errors;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 
-// when two incompatible states are found in a state set
+/**
+ * Error indicating that two disjoint states were found in a state refinement
+ * @see LJError
+ */
 public class StateConflictError extends LJError {
 
     private Predicate predicate;

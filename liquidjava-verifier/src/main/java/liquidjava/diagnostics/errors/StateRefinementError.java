@@ -4,7 +4,10 @@ import java.util.Arrays;
 
 import spoon.reflect.declaration.CtElement;
 
-// when a @StateRefinement is violated
+/**
+ * Error indicating that a state refinement transition was violated
+ * @see LJError
+ */
 public class StateRefinementError extends LJError {
 
     private final String method;

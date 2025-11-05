@@ -2,7 +2,10 @@ package liquidjava.diagnostics.errors;
 
 import spoon.reflect.declaration.CtElement;
 
-// when the syntax of a refinement is invalid
+/**
+ * Error indicating that the syntax of a refinement is invalid
+ * @see LJError
+ */
 public class SyntaxError extends LJError {
 
     private String refinement;

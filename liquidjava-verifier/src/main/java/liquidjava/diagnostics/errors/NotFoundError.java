@@ -2,7 +2,10 @@ package liquidjava.diagnostics.errors;
 
 import spoon.reflect.declaration.CtElement;
 
-// e.g. when a variable used in a refinement is not found
+/**
+ * Error indicating that an element referenced in a refinement was not found
+ * @see LJError
+ */
 public class NotFoundError extends LJError {
 
     public NotFoundError(String message, CtElement element) {

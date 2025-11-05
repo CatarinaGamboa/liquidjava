@@ -1,13 +1,13 @@
 package liquidjava.diagnostics.warnings;
 
-import java.net.URI;
-
 import liquidjava.diagnostics.ErrorPosition;
 import liquidjava.utils.Utils;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 
-// base class for all LiquidJava warnings
+/**
+ * Base class for all LiquidJava warnings
+ */
 public abstract class LJWarning {
 
     private String message;

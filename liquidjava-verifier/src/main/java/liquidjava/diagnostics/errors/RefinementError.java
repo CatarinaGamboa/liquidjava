@@ -5,7 +5,10 @@ import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 import liquidjava.utils.Utils;
 import spoon.reflect.declaration.CtElement;
 
-// when a @Refinement is violated
+/**
+ * Error indicating that a refinement constraint either was violated or cannot be proven
+ * @see LJError
+ */
 public class RefinementError extends LJError {
 
     private Predicate expected;
