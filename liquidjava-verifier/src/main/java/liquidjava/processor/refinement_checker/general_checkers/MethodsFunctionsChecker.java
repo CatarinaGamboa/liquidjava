@@ -51,6 +51,12 @@ public class MethodsFunctionsChecker {
         f.setType(c.getType());
         handleFunctionRefinements(f, c, c.getParameters());
         f.setRefReturn(new Predicate());
+        CtTypeReference<?> declaring = c.getDeclaringType() != null ? c.getDeclaringType().getReference() : null;
+        if (declaring != null) {
+            f.setSignature(String.format("%s.%s", declaring.getQualifiedName(), c.getSignature()));
+        } else {
+            f.setSignature(c.getSignature());
+        }
         if (c.getParent() instanceof CtClass) {
             CtClass<?> klass = (CtClass<?>) c.getParent();
             f.setClass(klass.getQualifiedName());
@@ -89,6 +95,11 @@ public class MethodsFunctionsChecker {
             CtInterface<?> inter = (CtInterface<?>) method.getParent();
             f.setClass(inter.getQualifiedName());
         }
+        String owner = f.getTargetClass();
+        if (owner != null)
+            f.setSignature(String.format("%s.%s", owner, method.getSignature()));
+        else
+            f.setSignature(method.getSignature());
         rtc.getContext().addFunctionToContext(f);
 
         auxGetMethodRefinements(method, f);
@@ -113,6 +124,7 @@ public class MethodsFunctionsChecker {
         f.setType(method.getType());
         f.setRefReturn(new Predicate());
         f.setClass(prefix);
+        f.setSignature(String.format("%s.%s", prefix, method.getSignature()));
         rtc.getContext().addFunctionToContext(f);
         auxGetMethodRefinements(method, f);
 
@@ -251,7 +263,7 @@ public class MethodsFunctionsChecker {
     public RefinedFunction getRefinementFunction(String methodName, String className, int size) {
         RefinedFunction f = rtc.getContext().getFunction(methodName, className, size);
         if (f == null)
-            f = rtc.getContext().getFunction(String.format("%s.%s", className, methodName), methodName, size);
+            f = rtc.getContext().getFunction(String.format("%s.%s", className, methodName), className, size);
         return f;
     }
 
@@ -266,12 +278,26 @@ public class MethodsFunctionsChecker {
 
         String name = ctr.getSimpleName(); // missing
         int argSize = invocation.getArguments().size();
+        String qualifiedSignature = null;
+        if (ctype != null) {
+            qualifiedSignature = String.format("%s.%s", ctype, ctr.getSignature());
+            if (rtc.getContext().getFunction(qualifiedSignature, ctype, argSize) != null) {
+                checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(),
+                        qualifiedSignature, ctype);
+                return;
+            }
+        }
+        String signature = ctr.getSignature();
+        if (rtc.getContext().getFunction(signature, ctype, argSize) != null) {
+            checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), signature, ctype);
+            return;
+        }
         if (rtc.getContext().getFunction(name, ctype, argSize) != null) { // inside rtc.context
             checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), name, ctype);
             return;
-        } else {
-            String prefix = ctype;
-            String completeName = String.format("%s.%s", prefix, name);
+        }
+        if (qualifiedSignature != null) {
+            String completeName = String.format("%s.%s", ctype, name);
             if (rtc.getContext().getFunction(completeName, ctype, argSize) != null) {
                 checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(), completeName,
                         ctype);
@@ -284,6 +310,8 @@ public class MethodsFunctionsChecker {
         // -- Part 1: Check if the invocation is possible
         int si = arguments.size();
         RefinedFunction f = rtc.getContext().getFunction(methodName, className, si);
+        if (f == null)
+            return new HashMap<>();
         Map<String, String> map = mapInvocation(arguments, f);
 
         if (target != null) {
