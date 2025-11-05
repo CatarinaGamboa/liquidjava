@@ -4,6 +4,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Warning indicating that a class referenced in an external refinement was not found
+ * 
  * @see LJWarning
  */
 public class ExternalClassNotFoundWarning extends LJWarning {

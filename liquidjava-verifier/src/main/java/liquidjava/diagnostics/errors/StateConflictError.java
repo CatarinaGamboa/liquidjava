@@ -5,6 +5,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Error indicating that two disjoint states were found in a state refinement
+ * 
  * @see LJError
  */
 public class StateConflictError extends LJError {

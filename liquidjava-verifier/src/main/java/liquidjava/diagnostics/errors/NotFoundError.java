@@ -4,6 +4,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Error indicating that an element referenced in a refinement was not found
+ * 
  * @see LJError
  */
 public class NotFoundError extends LJError {

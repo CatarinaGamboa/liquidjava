@@ -5,6 +5,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Error indicating that a ghost method invocation is invalid (e.g., has wrong arguments)
+ * 
  * @see LJError
  */
 public class GhostInvocationError extends LJError {

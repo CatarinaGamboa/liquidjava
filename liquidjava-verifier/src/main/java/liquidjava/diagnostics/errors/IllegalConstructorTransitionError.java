@@ -4,6 +4,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Error indicating that a constructor contains a state refinement with a 'from' state, which is not allowed
+ * 
  * @see LJError
  */
 public class IllegalConstructorTransitionError extends LJError {

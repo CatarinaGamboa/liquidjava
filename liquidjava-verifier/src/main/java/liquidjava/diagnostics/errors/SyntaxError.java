@@ -4,6 +4,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Error indicating that the syntax of a refinement is invalid
+ * 
  * @see LJError
  */
 public class SyntaxError extends LJError {

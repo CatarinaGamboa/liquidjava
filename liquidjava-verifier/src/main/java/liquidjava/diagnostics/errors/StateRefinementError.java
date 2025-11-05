@@ -6,6 +6,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Error indicating that a state refinement transition was violated
+ * 
  * @see LJError
  */
 public class StateRefinementError extends LJError {

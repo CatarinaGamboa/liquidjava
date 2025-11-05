@@ -2,6 +2,7 @@ package liquidjava.diagnostics.errors;
 
 /**
  * Custom error with an arbitrary message
+ * 
  * @see LJError
  */
 public class CustomError extends LJError {

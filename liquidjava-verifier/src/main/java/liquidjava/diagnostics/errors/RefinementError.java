@@ -7,6 +7,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Error indicating that a refinement constraint either was violated or cannot be proven
+ * 
  * @see LJError
  */
 public class RefinementError extends LJError {

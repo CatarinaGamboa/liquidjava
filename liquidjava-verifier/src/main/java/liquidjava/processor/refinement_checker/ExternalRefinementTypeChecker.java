@@ -3,6 +3,7 @@ package liquidjava.processor.refinement_checker;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.diagnostics.ErrorHandler;

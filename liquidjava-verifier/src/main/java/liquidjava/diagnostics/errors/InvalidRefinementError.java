@@ -4,6 +4,7 @@ import spoon.reflect.declaration.CtElement;
 
 /**
  * Error indicating that a refinement is invalid (e.g., not a boolean expression)
+ * 
  * @see LJError
  */
 public class InvalidRefinementError extends LJError {
