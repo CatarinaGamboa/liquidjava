@@ -1,4 +1,4 @@
-package liquidjava.errors;
+package liquidjava.diagnostics;
 
 import java.net.URI;
 import java.util.HashMap;

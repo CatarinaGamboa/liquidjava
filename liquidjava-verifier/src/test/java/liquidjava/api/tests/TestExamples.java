@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 import liquidjava.api.CommandLineLauncher;
-import liquidjava.errors.ErrorEmitter;
+import liquidjava.diagnostics.ErrorEmitter;
 
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;

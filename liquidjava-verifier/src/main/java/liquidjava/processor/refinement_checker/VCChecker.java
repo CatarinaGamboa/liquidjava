@@ -8,8 +8,9 @@ import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import liquidjava.errors.ErrorEmitter;
-import liquidjava.errors.ErrorHandler;
+
+import liquidjava.diagnostics.ErrorEmitter;
+import liquidjava.diagnostics.ErrorHandler;
 import liquidjava.processor.VCImplication;
 import liquidjava.processor.context.*;
 import liquidjava.rj_language.Predicate;
