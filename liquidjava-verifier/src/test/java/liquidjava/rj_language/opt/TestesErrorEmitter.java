@@ -23,7 +23,7 @@ public class TestesErrorEmitter {
 
     @Test
     void returnNonNullValues() {
-        emitter.addError("test", "main.java", 3);
+        emitter.addError("test", "main.java", 1);
         assertNotNull(emitter.getFullMessage());
         assertNotNull(emitter.getTitleMessage());
         assertNotNull(emitter.getErrorStatus());
@@ -34,10 +34,8 @@ public class TestesErrorEmitter {
      */
     @Test
     void addError() {
-        emitter.addError("Test error", "File.java", 42);
-
+        emitter.addError("Test error", "Some message", 1);
         assertTrue(emitter.foundError(), "Emitter should report found error");
-        assertEquals("File.java", emitter.getFilePath());
-        assertTrue(emitter.getFullMessage().contains("Test error"));
+        assertTrue(emitter.getFullMessage().contains("Some message"));
     }
 }
