@@ -32,5 +32,4 @@ public class TestOptimizationInt {
         assertEquals(new LiteralInt(3), r.getValue());
     }
 
-    
 }
