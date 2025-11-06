@@ -8,10 +8,18 @@ public class TestesErrorEmitter {
 
     private ErrorEmitter emitter;
 
+    /**
+     * Initializes a new ErrorEmitter before each test.
+     */
+
     @BeforeEach
     void setup() {
         emitter = new ErrorEmitter();
     }
+
+    /**
+     * Tests that all getter methods return non-null values after an error is added.
+     */
 
     @Test
     void returnNonNullValues() {
@@ -21,6 +29,9 @@ public class TestesErrorEmitter {
         assertNotNull(emitter.getErrorStatus());
     }
 
+    /**
+     * Tests adding an error and verifying that it is correctly registered and demontrated through the emitter.
+     */
     @Test
     void addError() {
         emitter.addError("Test error", "File.java", 42);
