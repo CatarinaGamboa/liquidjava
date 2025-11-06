@@ -1,4 +1,4 @@
-package testSuite.classes.input_reader_correct;
+package testSuite.classes.input_reader_correct_default_this;
 
 import java.io.InputStreamReader;
 

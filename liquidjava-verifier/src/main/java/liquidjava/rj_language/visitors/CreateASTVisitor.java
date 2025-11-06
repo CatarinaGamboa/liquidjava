@@ -161,9 +161,13 @@ public class CreateASTVisitor {
     private Expression functionCallCreate(FunctionCallContext rc) {
         if (rc.ghostCall() != null) {
             GhostCallContext gc = rc.ghostCall();
-            List<Expression> le = getArgs(gc.args());
             String name = Utils.qualifyName(prefix, gc.ID().getText());
-            return new FunctionInvocation(name, le);
+            List<Expression> args = getArgs(gc.args());
+            if (args.isEmpty()) {
+                // if no args provided, add "this" as default
+                args.add(new Var("this"));
+            }
+            return new FunctionInvocation(name, args);
         } else {
             AliasCallContext gc = rc.aliasCall();
             List<Expression> le = getArgs(gc.args());

@@ -261,9 +261,9 @@ public class Predicate {
         return new Predicate(new Var(name));
     }
 
-    public static Predicate createInvocation(String name, Predicate... Predicates) {
+    public static Predicate createInvocation(String name, Predicate... predicates) {
         List<Expression> le = new ArrayList<>();
-        for (Predicate c : Predicates)
+        for (Predicate c : predicates)
             le.add(c.getExpression());
         return new Predicate(new FunctionInvocation(name, le));
     }
