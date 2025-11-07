@@ -1,13 +1,12 @@
 package liquidjava.rj_language.ast;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Test;
-
-public class LiteralBooleanHashCodeTest {
+public class TestHashLitBoolean {
 
     @Test
-    public void sameValue_sameHashCode_andEquals() {
+    void sameValue_sameHashCode_andEquals() {
         LiteralBoolean a = new LiteralBoolean(true);
         LiteralBoolean b = new LiteralBoolean(true);
         assertEquals(a, b);
@@ -15,7 +14,7 @@ public class LiteralBooleanHashCodeTest {
     }
 
     @Test
-    public void differentValues_differentHashCodes() {
+    void differentValues_differentHashCodes() {
         LiteralBoolean a = new LiteralBoolean(true);
         LiteralBoolean b = new LiteralBoolean(false);
         assertNotEquals(a, b);
@@ -23,7 +22,7 @@ public class LiteralBooleanHashCodeTest {
     }
 
     @Test
-    public void clone_preservesEqualityAndHashCode() {
+    void clone_preservesEqualityAndHashCode() {
         LiteralBoolean a = new LiteralBoolean(false);
         LiteralBoolean c = (LiteralBoolean) a.clone();
         assertEquals(a, c);
