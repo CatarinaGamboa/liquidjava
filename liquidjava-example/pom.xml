@@ -48,7 +48,7 @@
 			<version>${version.memcompiler}</version>
 		</dependency>
 		<dependency>
-			<groupId>io.github.rcosta358</groupId>
+			<groupId>io.github.liquid-java</groupId>
 			<artifactId>liquidjava-api</artifactId>
 			<version>0.0.3</version>
 		</dependency>
