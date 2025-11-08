@@ -87,6 +87,8 @@ public class OperationsChecker {
                 operator.putMetadata(rtc.REFINE_KEY, Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), oper));
         } else if (types.contains(type)) {
             operator.putMetadata(rtc.REFINE_KEY, Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), oper));
+        } else if (type.equals("java.lang.String")) {
+            // skip strings
         } else {
             throw new NotImplementedException("Literal type not implemented");
         }
@@ -238,6 +240,10 @@ public class OperationsChecker {
 
         } else if (element instanceof CtLiteral<?>) {
             CtLiteral<?> l = (CtLiteral<?>) element;
+            if (l.getType().getQualifiedName().equals("java.lang.String")) {
+                // skip strings
+                return new Predicate();
+            }
             return new Predicate(l.getValue().toString(), element, rtc.getErrorEmitter());
 
         } else if (element instanceof CtInvocation<?>) {
