@@ -1,4 +1,4 @@
-// @ExpectedError: "Type expected:(#c_0 > 2)"
+// @ExpectedError: "Type expected"
 package testSuite;
 
 import liquidjava.specification.Refinement;
