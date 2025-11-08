@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.microsoft.z3.Expr;
-
 import liquidjava.processor.context.Context;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.ast.typing.TypeInfer;
@@ -51,6 +49,28 @@ public abstract class Expression {
 
     public boolean isLiteral() {
         return this instanceof LiteralInt || this instanceof LiteralReal || this instanceof LiteralBoolean;
+    }
+
+    /**
+     * Checks if this expression produces a boolean type based on its structure
+     * 
+     * @return true if it is a boolean expression, false otherwise
+     */
+    public boolean isBooleanExpression() {
+        if (this instanceof LiteralBoolean || this instanceof Ite || this instanceof AliasInvocation
+                || this instanceof FunctionInvocation) {
+            return true;
+        }
+        if (this instanceof GroupExpression ge) {
+            return ge.getExpression().isBooleanExpression();
+        }
+        if (this instanceof BinaryExpression be) {
+            return be.isBooleanOperation() || be.isLogicOperation();
+        }
+        if (this instanceof UnaryExpression ue) {
+            return ue.getOp().equals("!");
+        }
+        return false;
     }
 
     /**
