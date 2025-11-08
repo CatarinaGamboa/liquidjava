@@ -1,3 +1,4 @@
+// @ExpectedError: "Type expected:(#r_26 == a || #r_26 == b)"
 package testSuite;
 
 import liquidjava.specification.Refinement;
