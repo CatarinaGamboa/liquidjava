@@ -22,27 +22,51 @@ public class TestExamples {
      *
      * @param filePath
      *            path to the file to test
+     *
+     * @throws IOException
+     *             if an I/O error occurs reading the test file
      */
     @ParameterizedTest
     @MethodSource("fileNameSource")
-    public void testFile(final Path filePath) {
+    public void testFile(final Path filePath) throws IOException {
         String fileName = filePath.getFileName().toString();
+        boolean isErrorFile = fileName.startsWith("Error") || fileName.contains("error");
+        boolean isCorrectFile = fileName.startsWith("Correct") || fileName.contains("correct");
 
-        // 1. Run the verifier on the file or package
+        // Run the verifier on the file or package
         ErrorEmitter errorEmitter = CommandLineLauncher.launch(filePath.toAbsolutePath().toString());
 
-        // 2. Check if the file is correct or contains an error
-        if ((fileName.startsWith("Correct") && errorEmitter.foundError())
-                || (fileName.contains("correct") && errorEmitter.foundError())) {
-            System.out.println("Error in directory: " + fileName + " --- should be correct but an error was found");
-            fail();
+        if (isCorrectFile) {
+            // A "Correct" file should NOT have an error
+            if (errorEmitter.foundError()) {
+                System.out.println("Error in directory: " + fileName + " --- should be correct but an error was found");
+                System.out.println("Error: " + errorEmitter.getTitleMessage() + " - " + errorEmitter.getFullMessage());
+                fail();
+            }
+        } else if (isErrorFile) {
+            // An "Error" file SHOULD have an error
+            if (!errorEmitter.foundError()) {
+                System.out
+                        .println("Error in directory: " + fileName + " --- should be an error but passed verification");
+                fail();
+            } else {
+                // NEW: Check if it's the *correct* error
+                String expectedError = getExpectedError(filePath);
+
+                // If an expected error is specified in the file, check it.
+                // We check the 'title' for a match.
+                if (expectedError != null) {
+                    String actualErrorTitle = errorEmitter.getTitleMessage(); //
+                    if (actualErrorTitle == null || !actualErrorTitle.equals(expectedError)) {
+                        System.out.println("Error in directory: " + fileName + " --- wrong error message found.");
+                        System.out.println("  Expected: " + expectedError);
+                        System.out.println("  Actual: " + (actualErrorTitle != null ? actualErrorTitle : "NULL"));
+                        fail();
+                    }
+                }
+            }
         }
-        // 3. Check if the file has an error but passed verification
-        if ((fileName.startsWith("Error") && !errorEmitter.foundError())
-                || (fileName.contains("error") && !errorEmitter.foundError())) {
-            System.out.println("Error in directory: " + fileName + " --- should be an error but passed verification");
-            fail();
-        }
+        // If it's neither "Correct" nor "Error", no assertions are made.
     }
 
     /**
@@ -85,6 +109,34 @@ public class TestExamples {
         if (errorEmitter.foundError()) {
             System.out.println("Error found in files that should be correct.");
             fail();
+        }
+    }
+
+    /**
+     * Reads the given file to find an expected error message specified in a comment. The comment format is: //
+     * 
+     * @ExpectedError: "Error Title"
+     *
+     * @param filePath
+     *            path to the test file
+     *
+     * @return The expected error title, or null if not specified.
+     *
+     * @throws IOException
+     *             if an I/O error occurs
+     */
+    private String getExpectedError(Path filePath) throws IOException {
+        if (Files.isDirectory(filePath)) {
+            // Currently, we don't support expected errors for entire directories.
+            return null;
+        }
+
+        // Try to find the expected error comment in the first 10 lines
+        try (Stream<String> lines = Files.lines(filePath).limit(10)) {
+            return lines.map(String::trim).filter(line -> line.startsWith("// @ExpectedError:")).findFirst()
+                    .map(line -> line.substring(line.indexOf(":") + 1).trim()) // Get text after the colon
+                    .map(line -> line.replace("\"", "")) // Remove quotes
+                    .orElse(null); // No expected error specified
         }
     }
 }
