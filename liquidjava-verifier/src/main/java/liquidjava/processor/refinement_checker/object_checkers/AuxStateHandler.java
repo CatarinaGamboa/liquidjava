@@ -399,7 +399,7 @@ public class AuxStateHandler {
 
         if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) { // Invalid field transition
             if (!tc.getErrorEmitter().foundError()) { // No errors in errorEmitter
-                String states = stateChange.getFrom().toString();
+                Predicate[] states = { stateChange.getFrom() };
                 tc.createStateMismatchError(fw, fw.toString(), prevState, states);
             }
             return;
@@ -487,9 +487,8 @@ public class AuxStateHandler {
             }
         }
         if (!found && !tc.getErrorEmitter().foundError()) { // Reaches the end of stateChange no matching states
-            String states = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
-                    .map(Predicate::toString).collect(Collectors.joining(","));
-
+            Predicate[] states = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
+                    .toArray(Predicate[]::new);
             String simpleInvocation = invocation.toString(); // .getExecutable().toString();
             tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
             // ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState,

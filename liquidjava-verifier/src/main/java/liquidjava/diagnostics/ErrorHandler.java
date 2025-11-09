@@ -12,29 +12,29 @@ import spoon.reflect.declaration.CtElement;
 
 public class ErrorHandler {
 
-    public static <T> void printError(CtElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
-            HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
-        String resumeMessage = "Type expected:" + expectedType.toString(); // + "; " +"Refinement found:" +
-        // cSMT.toString();
+    // public static <T> void printError(CtElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
+    // HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+    // String resumeMessage = "Type expected:" + expectedType.toString(); // + "; " +"Refinement found:" +
+    // // cSMT.toString();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("______________________________________________________\n");
-        // title
-        StringBuilder sbtitle = new StringBuilder();
-        sbtitle.append("Failed to check refinement at: \n\n");
-        if (moreInfo != null)
-            sbtitle.append(moreInfo + "\n");
-        sbtitle.append(var.toString());
-        // all message
-        sb.append(sbtitle.toString() + "\n\n");
-        sb.append("Type expected:" + expectedType.toString() + "\n");
-        sb.append("Refinement found: " + cSMT.simplify().getValue() + "\n");
-        sb.append(printMap(map));
-        sb.append("Location: " + var.getPosition() + "\n");
-        sb.append("______________________________________________________\n");
+    // StringBuilder sb = new StringBuilder();
+    // sb.append("______________________________________________________\n");
+    // // title
+    // StringBuilder sbtitle = new StringBuilder();
+    // sbtitle.append("Failed to check refinement at: \n\n");
+    // if (moreInfo != null)
+    // sbtitle.append(moreInfo + "\n");
+    // sbtitle.append(var.toString());
+    // // all message
+    // sb.append(sbtitle.toString() + "\n\n");
+    // sb.append("Type expected:" + expectedType.toString() + "\n");
+    // sb.append("Refinement found: " + cSMT.simplify().getValue() + "\n");
+    // sb.append(printMap(map));
+    // sb.append("Location: " + var.getPosition() + "\n");
+    // sb.append("______________________________________________________\n");
 
-        ee.addError(resumeMessage, sb.toString(), var.getPosition(), 1, map);
-    }
+    // ee.addError(resumeMessage, sb.toString(), var.getPosition(), 1, map);
+    // }
 
     public static void printStateMismatch(CtElement element, String method, VCImplication constraintForErrorMsg,
             String states, HashMap<String, PlacementInCode> map, ErrorEmitter ee) {

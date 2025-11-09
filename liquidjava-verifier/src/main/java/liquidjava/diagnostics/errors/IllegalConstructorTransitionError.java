@@ -11,7 +11,7 @@ public class IllegalConstructorTransitionError extends LJError {
 
     public IllegalConstructorTransitionError(CtElement element) {
         super("Illegal Constructor Transition Error",
-                "Found constructor with 'from' state (should only have a 'to' state)", element);
+                "Found constructor with 'from' state (should only have a 'to' state)", element, null);
     }
 
     @Override

@@ -8,7 +8,7 @@ package liquidjava.diagnostics.errors;
 public class CustomError extends LJError {
 
     public CustomError(String message) {
-        super("Found Error", message, null);
+        super("Found Error", message, null, null);
     }
 
     @Override

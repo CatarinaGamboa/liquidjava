@@ -326,8 +326,8 @@ public abstract class TypeChecker extends CtScanner {
         vcChecker.printSameStateError(element, expectedType, klass);
     }
 
-    public void createStateMismatchError(CtElement element, String method, Predicate c, String states) {
-        vcChecker.printStateMismatchError(element, method, c, states);
+    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected) {
+        vcChecker.printStateMismatchError(element, method, found, expected);
     }
 
     public ErrorEmitter getErrorEmitter() {

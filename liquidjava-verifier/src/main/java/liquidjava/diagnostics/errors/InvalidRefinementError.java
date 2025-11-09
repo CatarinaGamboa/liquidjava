@@ -1,5 +1,6 @@
 package liquidjava.diagnostics.errors;
 
+import liquidjava.diagnostics.TranslationTable;
 import spoon.reflect.declaration.CtElement;
 
 /**
@@ -11,8 +12,9 @@ public class InvalidRefinementError extends LJError {
 
     private String refinement;
 
-    public InvalidRefinementError(String message, CtElement element, String refinement) {
-        super("Invalid Refinement", message, element);
+    public InvalidRefinementError(String message, CtElement element, String refinement,
+            TranslationTable translationTable) {
+        super("Invalid Refinement", message, element, translationTable);
         this.refinement = refinement;
     }
 

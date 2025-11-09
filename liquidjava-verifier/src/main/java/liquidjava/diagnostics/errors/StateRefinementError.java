@@ -2,6 +2,7 @@ package liquidjava.diagnostics.errors;
 
 import java.util.Arrays;
 
+import liquidjava.diagnostics.TranslationTable;
 import spoon.reflect.declaration.CtElement;
 
 /**
@@ -15,8 +16,9 @@ public class StateRefinementError extends LJError {
     private final String[] expected;
     private final String found;
 
-    public StateRefinementError(CtElement element, String method, String[] expected, String found) {
-        super("State Refinement Error", "State refinement transition violation", element);
+    public StateRefinementError(CtElement element, String method, String[] expected, String found,
+            TranslationTable translationTable) {
+        super("State Refinement Error", "State refinement transition violation", element, translationTable);
         this.method = method;
         this.expected = expected;
         this.found = found;
