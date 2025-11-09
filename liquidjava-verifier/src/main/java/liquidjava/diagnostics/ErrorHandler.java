@@ -37,7 +37,7 @@ public class ErrorHandler {
     // }
 
     public static void printStateMismatch(CtElement element, String method, VCImplication constraintForErrorMsg,
-            String states, HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+            String states, TranslationTable map, ErrorEmitter ee) {
 
         String resumeMessage = "Failed to check state transitions. " + "Expected possible states:" + states; // + ";
         // Found
@@ -66,7 +66,7 @@ public class ErrorHandler {
     }
 
     public static <T> void printErrorUnknownVariable(CtElement var, String et, String correctRefinement,
-            HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+            TranslationTable map, ErrorEmitter ee) {
 
         String resumeMessage = "Encountered unknown variable";
 
@@ -85,7 +85,7 @@ public class ErrorHandler {
     }
 
     public static <T> void printNotFound(CtElement var, Predicate constraint, Predicate constraint2, String msg,
-            HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+            TranslationTable map, ErrorEmitter ee) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
@@ -101,8 +101,8 @@ public class ErrorHandler {
         ee.addError(msg, sb.toString(), var.getPosition(), 2, map);
     }
 
-    public static <T> void printErrorArgs(CtElement var, Predicate expectedType, String msg,
-            HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+    public static <T> void printErrorArgs(CtElement var, Predicate expectedType, String msg, TranslationTable map,
+            ErrorEmitter ee) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
         String title = "Error in ghost invocation: " + msg + "\n";
@@ -116,7 +116,7 @@ public class ErrorHandler {
     }
 
     public static void printErrorTypeMismatch(CtElement element, Predicate expectedType, String message,
-            HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+            TranslationTable map, ErrorEmitter ee) {
         StringBuilder sb = new StringBuilder();
         sb.append("______________________________________________________\n");
         sb.append(message + "\n\n");
@@ -128,8 +128,8 @@ public class ErrorHandler {
         ee.addError(message, sb.toString(), element.getPosition(), 2, map);
     }
 
-    public static void printSameStateSetError(CtElement element, Predicate p, String name,
-            HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
+    public static void printSameStateSetError(CtElement element, Predicate p, String name, TranslationTable map,
+            ErrorEmitter ee) {
         String resume = "Error found multiple disjoint states from a State Set in a refinement";
 
         StringBuilder sb = new StringBuilder();
@@ -210,7 +210,7 @@ public class ErrorHandler {
         return sb.toString();
     }
 
-    private static String printMap(HashMap<String, PlacementInCode> map) {
+    private static String printMap(TranslationTable map) {
         StringBuilder sb = new StringBuilder();
         Formatter formatter = new Formatter(sb, Locale.US);
         if (map.isEmpty()) {

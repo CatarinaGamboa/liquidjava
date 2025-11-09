@@ -12,13 +12,12 @@ public class ErrorEmitter {
     private URI filePath;
     private ErrorPosition position;
     private int errorStatus;
-    private HashMap<String, PlacementInCode> map;
+    private TranslationTable map;
 
     public ErrorEmitter() {
     }
 
-    public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus,
-            HashMap<String, PlacementInCode> map) {
+    public void addError(String titleMessage, String msg, SourcePosition p, int errorStatus, TranslationTable map) {
         this.titleMessage = titleMessage;
         fullMessage = msg;
         try {
@@ -86,7 +85,7 @@ public class ErrorEmitter {
         return errorStatus;
     }
 
-    public HashMap<String, PlacementInCode> getVCMap() {
+    public TranslationTable getVCMap() {
         return map;
     }
 }

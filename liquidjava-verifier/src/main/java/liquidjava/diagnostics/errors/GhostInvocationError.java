@@ -1,6 +1,7 @@
 package liquidjava.diagnostics.errors;
 
 import liquidjava.diagnostics.TranslationTable;
+import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 
 /**
@@ -12,10 +13,10 @@ public class GhostInvocationError extends LJError {
 
     private String expected;
 
-    public GhostInvocationError(CtElement element, String expected, TranslationTable translationTable) {
+    public GhostInvocationError(CtElement element, Predicate expected, TranslationTable translationTable) {
         super("Ghost Invocation Error", "Invalid types or number of arguments in ghost invocation", element,
                 translationTable);
-        this.expected = expected;
+        this.expected = expected.toString();
     }
 
     public String getExpected() {
