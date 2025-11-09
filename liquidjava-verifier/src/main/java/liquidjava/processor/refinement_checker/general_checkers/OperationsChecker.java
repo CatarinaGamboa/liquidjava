@@ -245,6 +245,9 @@ public class OperationsChecker {
                 // skip strings
                 return new Predicate();
             }
+            if (l.getValue() == null)
+                throw new ParsingException("Null literals are not supported");
+
             return new Predicate(l.getValue().toString(), element, rtc.getErrorEmitter());
 
         } else if (element instanceof CtInvocation<?>) {
