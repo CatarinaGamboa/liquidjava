@@ -1,7 +1,5 @@
 package liquidjava.diagnostics.errors;
 
-import java.util.HashMap;
-
 import liquidjava.diagnostics.ErrorPosition;
 import liquidjava.diagnostics.TranslationTable;
 import liquidjava.utils.Utils;
