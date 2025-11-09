@@ -1,6 +1,9 @@
 package liquidjava.diagnostics.errors;
 
+import java.util.HashMap;
+
 import liquidjava.diagnostics.ErrorPosition;
+import liquidjava.processor.context.PlacementInCode;
 import liquidjava.utils.Utils;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
@@ -15,12 +18,14 @@ public abstract class LJError extends Exception {
     private CtElement element;
     private ErrorPosition position;
     private SourcePosition location;
+    private HashMap<String, PlacementInCode> translationTable;
 
     public LJError(String title, String message, CtElement element) {
         super(message);
         this.title = title;
         this.message = message;
         this.element = element;
+        this.translationTable = new HashMap<>();
         try {
             this.location = element.getPosition();
             this.position = ErrorPosition.fromSpoonPosition(element.getPosition());
@@ -48,6 +53,14 @@ public abstract class LJError extends Exception {
 
     public SourcePosition getLocation() {
         return location;
+    }
+
+    public HashMap<String, PlacementInCode> getTranslationTable() {
+        return translationTable;
+    }
+
+    public void setTranslationTable(HashMap<String, PlacementInCode> translationTable) {
+        this.translationTable = translationTable;
     }
 
     @Override

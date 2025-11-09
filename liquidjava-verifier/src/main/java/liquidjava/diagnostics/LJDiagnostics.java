@@ -1,65 +1,32 @@
 package liquidjava.diagnostics;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-
 import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.warnings.LJWarning;
-import liquidjava.processor.context.PlacementInCode;
 
 /**
- * Singleton class to store diagnostics information (errors, warnings, translation map) during the verification process
+ * Singleton class to store diagnostics (errors and warnings) during the verification process
  * 
  * @see LJError
  * @see LJWarning
  */
 public class LJDiagnostics {
-    private static LJDiagnostics instance;
+    public static final LJDiagnostics diagnostics = new LJDiagnostics();
 
     private ArrayList<LJError> errors;
     private ArrayList<LJWarning> warnings;
-    private HashMap<String, PlacementInCode> translationMap;
 
     private LJDiagnostics() {
         this.errors = new ArrayList<>();
         this.warnings = new ArrayList<>();
-        this.translationMap = new HashMap<>();
     }
 
-    public static LJDiagnostics getInstance() {
-        if (instance == null)
-            instance = new LJDiagnostics();
-        return instance;
-    }
-
-    public static LJDiagnostics add(LJError error) {
-        LJDiagnostics instance = getInstance();
-        instance.addError(error);
-        return instance;
-    }
-
-    public static LJDiagnostics add(LJWarning warning) {
-        LJDiagnostics instance = getInstance();
-        instance.addWarning(warning);
-        return instance;
-    }
-
-    public static LJDiagnostics add(HashMap<String, PlacementInCode> map) {
-        LJDiagnostics instance = getInstance();
-        instance.setTranslationMap(map);
-        return instance;
-    }
-
-    public void addError(LJError error) {
+    public void add(LJError error) {
         this.errors.add(error);
     }
 
-    public void addWarning(LJWarning warning) {
+    public void add(LJWarning warning) {
         this.warnings.add(warning);
-    }
-
-    public void setTranslationMap(HashMap<String, PlacementInCode> map) {
-        this.translationMap = map;
     }
 
     public boolean foundError() {
@@ -78,10 +45,6 @@ public class LJDiagnostics {
         return this.warnings;
     }
 
-    public HashMap<String, PlacementInCode> getTranslationMap() {
-        return this.translationMap;
-    }
-
     public LJError getError() {
         return foundError() ? this.errors.get(0) : null;
     }
@@ -93,7 +56,6 @@ public class LJDiagnostics {
     public void clear() {
         this.errors.clear();
         this.warnings.clear();
-        this.translationMap.clear();
     }
 
     @Override
