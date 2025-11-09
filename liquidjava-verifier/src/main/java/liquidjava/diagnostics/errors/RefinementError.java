@@ -16,7 +16,7 @@ public class RefinementError extends LJError {
     private ValDerivationNode found;
 
     public RefinementError(CtElement element, Predicate expected, ValDerivationNode found) {
-        super("Refinement Error", "Predicate refinement violation", element);
+        super("Refinement Error", String.format("%s is not a subtype of %s", found.getValue(), expected), element);
         this.expected = expected;
         this.found = found;
     }

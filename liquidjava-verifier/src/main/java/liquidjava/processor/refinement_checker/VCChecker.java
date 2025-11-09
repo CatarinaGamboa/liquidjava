@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import liquidjava.diagnostics.ErrorEmitter;
@@ -19,6 +18,7 @@ import liquidjava.smt.NotFoundError;
 import liquidjava.smt.SMTEvaluator;
 import liquidjava.smt.TypeCheckError;
 import liquidjava.smt.TypeMismatchError;
+import liquidjava.utils.constants.Keys;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
@@ -29,8 +29,6 @@ public class VCChecker {
     private final Context context;
     private final List<RefinedVariable> pathVariables;
     private final ErrorEmitter errorEmitter;
-    Pattern thisPattern = Pattern.compile("#this_\\d+");
-    Pattern instancePattern = Pattern.compile("^#(.+)_[0-9]+$");
 
     public VCChecker(ErrorEmitter errorEmitter) {
         context = Context.getInstance();
@@ -38,15 +36,14 @@ public class VCChecker {
         this.errorEmitter = errorEmitter;
     }
 
-    public void processSubtyping(Predicate expectedType, List<GhostState> list, String wild_var, String this_var,
-            CtElement element, Factory f) {
+    public void processSubtyping(Predicate expectedType, List<GhostState> list, CtElement element, Factory f) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         if (expectedType.isBooleanTrue())
             return;
 
         HashMap<String, PlacementInCode> map = new HashMap<>();
-        String[] s = { wild_var, this_var };
+        String[] s = { Keys.WILDCARD, Keys.THIS };
         Predicate premisesBeforeChange = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
         Predicate premises = new Predicate();
         Predicate et = new Predicate();
@@ -56,8 +53,8 @@ public class VCChecker {
                     .changeAliasToRefinement(context, f);
 
             et = expectedType.changeStatesToRefinements(filtered, s, errorEmitter).changeAliasToRefinement(context, f);
-        } catch (Exception e1) {
-            printError(premises, expectedType, element, map, e1.getMessage());
+        } catch (Exception e) {
+            ErrorHandler.printError(element, e.getMessage(), expectedType, premises, map, errorEmitter);
             return;
         }
 
@@ -69,15 +66,15 @@ public class VCChecker {
         }
     }
 
-    public void processSubtyping(Predicate type, Predicate expectedType, List<GhostState> list, String wild_var,
-            String this_var, CtElement element, String string, Factory f) {
-        boolean b = canProcessSubtyping(type, expectedType, list, wild_var, this_var, element.getPosition(), f);
+    public void processSubtyping(Predicate type, Predicate expectedType, List<GhostState> list, CtElement element,
+            String string, Factory f) {
+        boolean b = canProcessSubtyping(type, expectedType, list, element.getPosition(), f);
         if (!b)
             printSubtypingError(element, expectedType, type, string);
     }
 
-    public boolean canProcessSubtyping(Predicate type, Predicate expectedType, List<GhostState> list, String wild_var,
-            String this_var, SourcePosition p, Factory f) {
+    public boolean canProcessSubtyping(Predicate type, Predicate expectedType, List<GhostState> list, SourcePosition p,
+            Factory f) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         gatherVariables(type, lrv, mainVars);
@@ -86,7 +83,7 @@ public class VCChecker {
 
         // Predicate premises = joinPredicates(type, element, mainVars, lrv);
         HashMap<String, PlacementInCode> map = new HashMap<>();
-        String[] s = { wild_var, this_var };
+        String[] s = { Keys.WILDCARD, Keys.THIS };
 
         Predicate premises = new Predicate();
         Predicate et = new Predicate();
@@ -289,11 +286,10 @@ public class VCChecker {
      *
      * @return
      */
-    @SuppressWarnings("unused")
-    private Predicate substituteByMap(Predicate c, HashMap<String, String> map) {
-        map.keySet().forEach(s -> c.substituteVariable(s, map.get(s)));
-        return c;
-    }
+    // private Predicate substituteByMap(Predicate c, HashMap<String, String> map) {
+    // map.keySet().forEach(s -> c.substituteVariable(s, map.get(s)));
+    // return c;
+    // }
 
     public void addPathVariable(RefinedVariable rv) {
         pathVariables.add(rv);
@@ -308,12 +304,12 @@ public class VCChecker {
                 .collect(Collectors.toList()).forEach(pathVariables::remove);
     }
 
-    private void printVCs(String string, String stringSMT, Predicate expectedType) {
-        System.out.println("\n----------------------------VC--------------------------------\n");
-        System.out.println(string);
-        System.out.println("\nSMT subtyping:" + stringSMT + " <: " + expectedType.toString());
-        System.out.println("--------------------------------------------------------------");
-    }
+    // private void printVCs(String string, String stringSMT, Predicate expectedType) {
+    // System.out.println("\n----------------------------VC--------------------------------\n");
+    // System.out.println(string);
+    // System.out.println("\nSMT subtyping:" + stringSMT + " <: " + expectedType.toString());
+    // System.out.println("--------------------------------------------------------------");
+    // }
 
     // Print
     // Errors---------------------------------------------------------------------------------------------------
@@ -333,7 +329,8 @@ public class VCChecker {
         gatherVariables(foundType, lrv, mainVars);
         HashMap<String, PlacementInCode> map = new HashMap<>();
         Predicate premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
-        printError(premises, expectedType, element, map, customeMsg);
+
+        ErrorHandler.printError(element, customeMsg, expectedType, premises, map, errorEmitter);
     }
 
     public void printSameStateError(CtElement element, Predicate expectedType, String klass) {
@@ -372,12 +369,12 @@ public class VCChecker {
         }
     }
 
-    private void printError(Predicate premises, Predicate expectedType, CtElement element,
-            HashMap<String, PlacementInCode> map, String s) {
-        Predicate etMessageReady = expectedType; // substituteByMap(expectedType, map);
-        Predicate cSMTMessageReady = premises; // substituteByMap(premises, map);
-        ErrorHandler.printError(element, s, etMessageReady, cSMTMessageReady, map, errorEmitter);
-    }
+    // private void printError(Predicate premises, Predicate expectedType, CtElement element,
+    // HashMap<String, PlacementInCode> map, String s) {
+    // Predicate etMessageReady = expectedType; // substituteByMap(expectedType, map);
+    // Predicate cSMTMessageReady = premises; // substituteByMap(premises, map);
+    // ErrorHandler.printError(element, s, etMessageReady, cSMTMessageReady, map, errorEmitter);
+    // }
 
     public void printStateMismatchError(CtElement element, String method, Predicate c, String states) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();

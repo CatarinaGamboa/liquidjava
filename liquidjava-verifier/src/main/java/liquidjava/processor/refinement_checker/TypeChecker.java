@@ -17,7 +17,9 @@ import liquidjava.processor.facade.GhostDTO;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
-import liquidjava.utils.Utils;
+import liquidjava.utils.constants.Formats;
+import liquidjava.utils.constants.Keys;
+import liquidjava.utils.constants.Types;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtNewArray;
@@ -31,16 +33,6 @@ import spoon.reflect.reference.CtTypeReference;
 import spoon.reflect.visitor.CtScanner;
 
 public abstract class TypeChecker extends CtScanner {
-    public final String REFINE_KEY = "refinement";
-    public final String TARGET_KEY = "target";
-    // public final String STATE_KEY = "state";
-    public final String THIS = "this";
-    public final String WILD_VAR = "_";
-    public final String freshFormat = "#fresh_%d";
-    public final String instanceFormat = "#%s_%d";
-    public final String thisFormat = "this#%s";
-    public String[] implementedTypes = { "boolean", "int", "short", "long", "float", "double" }; // TODO add
-    // types e.g., "int[]"
 
     Context context;
     Factory factory;
@@ -63,7 +55,7 @@ public abstract class TypeChecker extends CtScanner {
     }
 
     public Predicate getRefinement(CtElement elem) {
-        Predicate c = (Predicate) elem.getMetadata(REFINE_KEY);
+        Predicate c = (Predicate) elem.getMetadata(Keys.REFINEMENT);
         return c == null ? new Predicate() : c;
     }
 
@@ -142,7 +134,7 @@ public abstract class TypeChecker extends CtScanner {
         context.addGhostClass(g.getParentClassName());
 
         List<CtExpression<?>> ls = e.getElements();
-        Predicate ip = Predicate.createInvocation(g.getName(), Predicate.createVar(THIS));
+        Predicate ip = Predicate.createInvocation(g.getName(), Predicate.createVar(Keys.WILDCARD));
         int order = 0;
         for (CtExpression<?> ce : ls) {
             if (ce instanceof CtLiteral<?>) {
@@ -154,7 +146,7 @@ public abstract class TypeChecker extends CtScanner {
                 gs.setGhostParent(g);
                 gs.setRefinement(
                         /* new OperationPredicate(new InvocationPredicate(f, THIS), "<-->", */
-                        Predicate.createEquals(ip, Predicate.createLit(Integer.toString(order), Utils.INT))); // open(THIS)
+                        Predicate.createEquals(ip, Predicate.createLit(Integer.toString(order), Types.INT))); // open(THIS)
                 // ->
                 // state1(THIS)
                 // == 1
@@ -258,7 +250,7 @@ public abstract class TypeChecker extends CtScanner {
                             errorEmitter);
                     return;
                 }
-                AliasWrapper aw = new AliasWrapper(a, factory, WILD_VAR, context, klass, path);
+                AliasWrapper aw = new AliasWrapper(a, factory, Keys.WILDCARD, context, klass, path);
                 context.addAlias(aw);
             }
         } catch (ParsingException e) {
@@ -295,12 +287,12 @@ public abstract class TypeChecker extends CtScanner {
         else
             cEt = new Predicate();
 
-        cEt = cEt.substituteVariable(WILD_VAR, simpleName);
-        Predicate cet = cEt.substituteVariable(WILD_VAR, simpleName);
+        cEt = cEt.substituteVariable(Keys.WILDCARD, simpleName);
+        Predicate cet = cEt.substituteVariable(Keys.WILDCARD, simpleName);
 
-        String newName = String.format(instanceFormat, simpleName, context.getCounter());
-        Predicate correctNewRefinement = refinementFound.substituteVariable(WILD_VAR, newName);
-        correctNewRefinement = correctNewRefinement.substituteVariable(THIS, newName);
+        String newName = String.format(Formats.INSTANCE, simpleName, context.getCounter());
+        Predicate correctNewRefinement = refinementFound.substituteVariable(Keys.WILDCARD, newName);
+        correctNewRefinement = correctNewRefinement.substituteVariable(Keys.THIS, newName);
         cEt = cEt.substituteVariable(simpleName, newName);
 
         // Substitute variable in verification
@@ -314,18 +306,16 @@ public abstract class TypeChecker extends CtScanner {
     }
 
     public void checkSMT(Predicate expectedType, CtElement element) {
-        vcChecker.processSubtyping(expectedType, context.getGhostState(), WILD_VAR, THIS, element, factory);
-        element.putMetadata(REFINE_KEY, expectedType);
+        vcChecker.processSubtyping(expectedType, context.getGhostState(), element, factory);
+        element.putMetadata(Keys.REFINEMENT, expectedType);
     }
 
-    public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String string) {
-        vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, target, string,
-                factory);
+    public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String moreInfo) {
+        vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), target, moreInfo, factory);
     }
 
     public boolean checksStateSMT(Predicate prevState, Predicate expectedState, SourcePosition p) {
-        return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), WILD_VAR, THIS, p,
-                factory);
+        return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), p, factory);
     }
 
     public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customeMessage) {

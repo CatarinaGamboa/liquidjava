@@ -22,12 +22,14 @@ import liquidjava.rj_language.ast.LiteralInt;
 import liquidjava.rj_language.ast.LiteralReal;
 import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
-import liquidjava.rj_language.opt.derivation_node.DerivationNode;
 import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 import liquidjava.rj_language.opt.ExpressionSimplifier;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
+import liquidjava.utils.constants.Keys;
+import liquidjava.utils.constants.Ops;
+import liquidjava.utils.constants.Types;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
@@ -155,7 +157,7 @@ public class Predicate {
         Expression prev = createVar(previousName).getExpression();
         List<Expression> le = new ArrayList<>();
         le.add(createVar(newName).getExpression());
-        e.substituteFunction(Utils.OLD, le, prev);
+        e.substituteFunction(Keys.OLD, le, prev);
         return new Predicate(e);
     }
 
@@ -168,7 +170,7 @@ public class Predicate {
     private void expressionGetOldVariableNames(Expression exp, List<String> ls) {
         if (exp instanceof FunctionInvocation) {
             FunctionInvocation fi = (FunctionInvocation) exp;
-            if (fi.getName().equals(Utils.OLD)) {
+            if (fi.getName().equals(Keys.OLD)) {
                 List<Expression> le = fi.getArgs();
                 for (Expression e : le) {
                     if (e instanceof Var)
@@ -221,15 +223,15 @@ public class Predicate {
     }
 
     public static Predicate createConjunction(Predicate c1, Predicate c2) {
-        return new Predicate(new BinaryExpression(c1.getExpression(), Utils.AND, c2.getExpression()));
+        return new Predicate(new BinaryExpression(c1.getExpression(), Ops.AND, c2.getExpression()));
     }
 
     public static Predicate createDisjunction(Predicate c1, Predicate c2) {
-        return new Predicate(new BinaryExpression(c1.getExpression(), Utils.OR, c2.getExpression()));
+        return new Predicate(new BinaryExpression(c1.getExpression(), Ops.OR, c2.getExpression()));
     }
 
     public static Predicate createEquals(Predicate c1, Predicate c2) {
-        return new Predicate(new BinaryExpression(c1.getExpression(), Utils.EQ, c2.getExpression()));
+        return new Predicate(new BinaryExpression(c1.getExpression(), Ops.EQ, c2.getExpression()));
     }
 
     public static Predicate createITE(Predicate c1, Predicate c2, Predicate c3) {
@@ -237,20 +239,13 @@ public class Predicate {
     }
 
     public static Predicate createLit(String value, String type) {
-        Expression ex;
-        if (type.equals(Utils.BOOLEAN))
-            ex = new LiteralBoolean(value);
-        else if (type.equals(Utils.INT))
-            ex = new LiteralInt(value);
-        else if (type.equals(Utils.DOUBLE))
-            ex = new LiteralReal(value);
-        else if (type.equals(Utils.SHORT))
-            ex = new LiteralInt(value);
-        else if (type.equals(Utils.LONG))
-            ex = new LiteralReal(value);
-        else // if(type.equals(Utils.DOUBLE))
-            ex = new LiteralReal(value);
-        return new Predicate(ex);
+        Expression exp = switch (type) {
+        case Types.BOOLEAN -> new LiteralBoolean(value);
+        case Types.INT, Types.SHORT -> new LiteralInt(value);
+        case Types.DOUBLE, Types.LONG -> new LiteralReal(value);
+        default -> new LiteralReal(value);
+        };
+        return new Predicate(exp);
     }
 
     public static Predicate createOperation(Predicate c1, String op, Predicate c2) {

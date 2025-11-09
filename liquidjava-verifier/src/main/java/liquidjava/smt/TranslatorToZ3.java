@@ -37,6 +37,7 @@ public class TranslatorToZ3 implements AutoCloseable {
         TranslatorContextToZ3.addGhostStates(z3, c.getGhostState(), funcTranslation);
     }
 
+    @SuppressWarnings("unchecked")
     public Status verifyExpression(Expr<?> e) throws Exception {
         Solver s = z3.mkSolver();
         // s.add((BoolExpr) e.eval(this));

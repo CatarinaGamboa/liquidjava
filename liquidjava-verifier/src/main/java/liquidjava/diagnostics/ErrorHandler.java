@@ -3,6 +3,7 @@ package liquidjava.diagnostics;
 import java.util.Formatter;
 import java.util.HashMap;
 import java.util.Locale;
+
 import liquidjava.processor.VCImplication;
 import liquidjava.processor.context.PlacementInCode;
 import liquidjava.rj_language.Predicate;
@@ -10,20 +11,6 @@ import spoon.reflect.code.CtLiteral;
 import spoon.reflect.declaration.CtElement;
 
 public class ErrorHandler {
-
-    /**
-     * Prints the error message
-     *
-     * @param <T>
-     * @param var
-     * @param s
-     * @param expectedType
-     * @param cSMT
-     */
-    public static <T> void printError(CtElement var, Predicate expectedType, Predicate cSMT,
-            HashMap<String, PlacementInCode> map, ErrorEmitter ee) {
-        printError(var, null, expectedType, cSMT, map, ee);
-    }
 
     public static <T> void printError(CtElement var, String moreInfo, Predicate expectedType, Predicate cSMT,
             HashMap<String, PlacementInCode> map, ErrorEmitter ee) {

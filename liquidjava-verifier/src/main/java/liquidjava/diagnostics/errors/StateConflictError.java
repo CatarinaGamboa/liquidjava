@@ -14,7 +14,7 @@ public class StateConflictError extends LJError {
     private String className;
 
     public StateConflictError(CtElement element, Predicate predicate, String className) {
-        super("State Conflict Error", "Found multiple disjoint states from a StateSet in refinement", element);
+        super("State Conflict Error", "Found multiple disjoint states in state transition", element);
         this.predicate = predicate;
         this.className = className;
     }
