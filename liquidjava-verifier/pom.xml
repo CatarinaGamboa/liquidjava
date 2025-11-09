@@ -9,12 +9,54 @@
 		<version>1.0</version>
 	</parent>
 
-	<groupId>liquidjava-verifier
-		</groupId>
+	<groupId>io.github.liquid-java</groupId>
 	<artifactId>liquidjava-verifier</artifactId>
-	<version>5.2-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>liquidjava-verifier</name>
+	<description>LiquidJava Verifier</description>
+	<url>https://github.com/liquid-java/liquidjava</url>
 	<packaging>jar</packaging>
+
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<developers>
+		<developer>
+			<id>CatarinaGamboa</id>
+			<name>Catarina Gamboa</name>
+			<email>CatarinaGamboa@users.noreply.github.com</email>
+			<url>https://github.com/CatarinaGamboa</url>
+		</developer>
+		<developer>
+			<id>alcides</id>
+			<name>Alcides Fonseca</name>
+			<email>alcides@users.noreply.github.com</email>
+			<url>https://github.com/alcides</url>
+		</developer>
+		<developer>
+			<id>pcanelas</id>
+			<name>Paulo Canelas</name>
+			<email>pcanelas@users.noreply.github.com</email>
+			<url>https://github.com/pcanelas</url>
+		</developer>
+		<developer>
+			<id>rcosta358</id>
+			<name>Ricardo Costa</name>
+			<email>rcosta358@users.noreply.github.com</email>
+			<url>https://github.com/rcosta358</url>
+		</developer>
+	</developers>
+
+	<scm>
+		<connection>scm:git:git://github.com/liquid-java/liquidjava.git</connection>
+		<developerConnection>scm:git:ssh://github.com:liquid-java/liquidjava.git</developerConnection>
+		<url>https://github.com/liquid-java/liquidjava/tree/main</url>
+	</scm>
 
 	<build>
 		<finalName>${jar.finalName}</finalName>
@@ -95,11 +137,95 @@
 					</execution>
 				</executions>
 			</plugin>
+
+			<!-- Generate source JAR -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>3.3.0</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- Generate Javadoc JAR -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>3.6.0</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<doclint>none</doclint>
+					<source>20</source>
+				</configuration>
+			</plugin>
+			
+			<!-- GPG Signing -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>3.1.0</version>
+				<configuration>
+					<skip>${gpg.skip}</skip>
+				</configuration>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- Skip default deploy -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-deploy-plugin</artifactId>
+				<version>3.1.2</version>
+				<configuration>
+					<skip>true</skip>
+				</configuration>
+			</plugin>
+			
+			<!-- Central Publishing Plugin -->
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.9.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+					<skipPublishing>${maven.deploy.skip}</skipPublishing>
+					<!-- <autoPublish>true</autoPublish> -->
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 
+	<distributionManagement>
+		<repository>
+			<id>central</id>
+			<url>https://central.sonatype.com/api/v1/publisher</url>
+		</repository>
+	</distributionManagement>
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<javaVersion>20</javaVersion>
 		<maven.compiler.source>20</maven.compiler.source>
 		<maven.compiler.target>20</maven.compiler.target>
 		<!-- versions -->
@@ -107,12 +233,13 @@
 		<version.memcompiler>1.3.0</version.memcompiler>
 		<version.spoon>10.4.2</version.spoon>
 		<version.z3>4.8.17</version.z3>
-		<version.liquidjava>1.0</version.liquidjava>
 		<!-- plugin versions -->
 		<pVersion.compiler>3.8.0</pVersion.compiler>
 		<pVersion.surefire>3.1.2</pVersion.surefire>
 		<!-- name of the generated plugin -->
 		<jar.finalName>${project.artifactId}-${project.version}</jar.finalName>
+		<gpg.skip>true</gpg.skip>
+		<maven.deploy.skip>true</maven.deploy.skip>
 	</properties>
 
 	<repositories>

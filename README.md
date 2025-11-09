@@ -18,12 +18,12 @@ This project contains the LiquidJava verifier and its API, as well as some examp
 
 You can find out more about LiquidJava in the following resources:
 
-* [LiquidJava Website](https://catarinagamboa.github.io/liquidjava.html)
+* [LiquidJava Website](https://liquid-java.github.io)
 * [VS Code Extension (Marketplace)](https://marketplace.visualstudio.com/items?itemName=AlcidesFonseca.liquid-java)
-* [VS Code Extension (Source Code)](https://github.com/CatarinaGamboa/vscode-liquidjava)
-* [LiquidJava Examples](https://github.com/CatarinaGamboa/liquidjava-examples)
-* [LiquidJava External Libraries Examples](https://github.com/CatarinaGamboa/liquid-java-external-libs)
-<!-- * [Formalization of LiquidJava](https://github.com/CatarinaGamboa/liquidjava-formalization) - not opensource yet -->
+* [VS Code Extension (Source Code)](https://github.com/liquid-java/vscode-liquidjava)
+* [LiquidJava Examples](https://github.com/liquid-java/liquidjava-examples)
+* [LiquidJava External Libraries Examples](https://github.com/liquid-java/liquid-java-external-libs)
+<!-- * [Formalization of LiquidJava](https://github.com/liquid-java/liquidjava-formalization) - not opensource yet -->
 
 ## Getting Started
 
@@ -66,7 +66,7 @@ dependencies {
 
 #### Setup
 
-1. Clone the repository: `git clone https://github.com/CatarinaGamboa/liquidjava.git`
+1. Clone the repository: `git clone https://github.com/liquid-java/liquidjava.git`
 2. Build the project `mvn clean install`
 3. Run tests to verify installation: `mvn test`
 4. If importing into an IDE, import the project as a Maven project using the root `pom.xml`
