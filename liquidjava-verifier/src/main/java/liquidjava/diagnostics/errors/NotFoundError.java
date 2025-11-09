@@ -10,7 +10,7 @@ import spoon.reflect.declaration.CtElement;
  */
 public class NotFoundError extends LJError {
 
-    public NotFoundError(String message, CtElement element, TranslationTable translationTable) {
+    public NotFoundError(CtElement element, String message, TranslationTable translationTable) {
         super("Not Found Error", message, element, translationTable);
     }
 

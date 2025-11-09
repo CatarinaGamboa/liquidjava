@@ -2,11 +2,10 @@ package liquidjava.smt;
 
 import spoon.reflect.declaration.CtElement;
 
-public class TypeMismatchError extends Exception {
-
+public class NotFoundSMTError extends Exception {
     private CtElement location;
 
-    public TypeMismatchError(String message) {
+    public NotFoundSMTError(String message) {
         super(message);
     }
 

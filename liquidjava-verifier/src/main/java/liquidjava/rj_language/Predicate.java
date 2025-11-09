@@ -1,5 +1,7 @@
 package liquidjava.rj_language;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -7,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import liquidjava.diagnostics.ErrorEmitter;
-import liquidjava.diagnostics.ErrorHandler;
+import liquidjava.diagnostics.errors.SyntaxError;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostState;
@@ -88,12 +90,12 @@ public class Predicate {
         exp = e;
     }
 
-    protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+    protected Expression parse(String ref, CtElement element, ErrorEmitter ee) throws ParsingException {
         try {
             return RefinementsParser.createAST(ref, prefix);
-        } catch (ParsingException e1) {
-            ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
-            throw e1;
+        } catch (ParsingException e) {
+            diagnostics.add(new SyntaxError(e.getMessage(), element, ref));
+            throw e;
         }
     }
 
@@ -101,9 +103,9 @@ public class Predicate {
         try {
             return RefinementsParser.createAST(ref, prefix);
         } catch (ParsingException e1) {
-            ErrorHandler.printSyntaxError(e1.getMessage(), ref, e);
+            diagnostics.add(new SyntaxError(e1.getMessage(), ref));
+            return null;
         }
-        return null;
     }
 
     public Predicate changeAliasToRefinement(Context context, Factory f) throws Exception {

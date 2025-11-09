@@ -1,10 +1,14 @@
 package liquidjava.processor.refinement_checker.object_checkers;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import liquidjava.diagnostics.ErrorHandler;
+import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.errors.IllegalConstructorTransitionError;
+import liquidjava.diagnostics.errors.InvalidRefinementError;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;
@@ -40,7 +44,7 @@ public class AuxStateHandler {
                 Map<String, CtExpression> m = a.getAllValues();
                 CtLiteral<String> from = (CtLiteral<String>) m.get("from");
                 if (from != null) {
-                    ErrorHandler.printErrorConstructorFromState(c, from, tc.getErrorEmitter());
+                    diagnostics.add(new IllegalConstructorTransitionError(from));
                     return;
                 }
             }
@@ -71,8 +75,8 @@ public class AuxStateHandler {
             if (to != null) {
                 Predicate p = new Predicate(to, element, tc.getErrorEmitter());
                 if (!p.getExpression().isBooleanExpression()) {
-                    ErrorHandler.printCustomError(element, "State refinement transition must be a boolean expression",
-                            tc.getErrorEmitter());
+                    diagnostics.add(new InvalidRefinementError(element,
+                            "State refinement transition must be a boolean expression", to));
                     return;
                 }
                 state.setTo(p);
@@ -165,21 +169,23 @@ public class AuxStateHandler {
         String from = TypeCheckingUtils.getStringFromAnnotation(m.get("from"));
         String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
         ObjectState state = new ObjectState();
-        if (from != null) { // has From
-            state.setFrom(createStatePredicate(from, f.getTargetClass(), tc, e, false, prefix));
-        }
-        if (to != null) { // has To
-            state.setTo(createStatePredicate(to, f.getTargetClass(), tc, e, true, prefix));
-        }
 
-        if (from != null && to == null) // has From but not To -> the state remains the same
-        {
+        // has from
+        if (from != null)
+            state.setFrom(createStatePredicate(from, f.getTargetClass(), tc, e, false, prefix));
+
+        // has to
+        if (to != null)
+            state.setTo(createStatePredicate(to, f.getTargetClass(), tc, e, true, prefix));
+
+        // has from but not to, state remains the same
+        if (from != null && to == null)
             state.setTo(createStatePredicate(from, f.getTargetClass(), tc, e, true, prefix));
-        }
-        if (from == null && to != null) // has To but not From -> enters with true and exists with a specific state
-        {
+
+        // has to but not from, state enters with true
+        if (from == null && to != null)
             state.setFrom(new Predicate());
-        }
+
         return state;
     }
 
@@ -187,8 +193,8 @@ public class AuxStateHandler {
             TypeChecker tc, CtElement e, boolean isTo, String prefix) throws ParsingException {
         Predicate p = new Predicate(value, e, tc.getErrorEmitter(), prefix);
         if (!p.getExpression().isBooleanExpression()) {
-            ErrorHandler.printCustomError(e, "State refinement transition must be a boolean expression",
-                    tc.getErrorEmitter());
+            diagnostics.add(
+                    new InvalidRefinementError(e, "State refinement transition must be a boolean expression", value));
             return new Predicate();
         }
         String t = targetClass; // f.getTargetClass();
@@ -384,12 +390,9 @@ public class AuxStateHandler {
             stateChange.setFrom(fromPredicate);
             stateChange.setTo(toPredicate);
         } catch (ParsingException e) {
-            ErrorHandler
-                    .printCustomError(fw,
-                            "ParsingException while constructing assignment update for `" + fw + "` in class `"
-                                    + fw.getVariable().getDeclaringType() + "` : " + e.getMessage(),
-                            tc.getErrorEmitter());
-
+            diagnostics.add(new CustomError(field,
+                    String.format("Parsing error while constructing assignment update for `%s` in class `%s` : %s", fw,
+                            field.getDeclaringType().getQualifiedName(), e.getMessage())));
             return;
         }
 

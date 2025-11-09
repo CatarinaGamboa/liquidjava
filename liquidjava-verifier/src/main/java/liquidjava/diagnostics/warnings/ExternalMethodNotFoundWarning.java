@@ -12,8 +12,8 @@ public class ExternalMethodNotFoundWarning extends LJWarning {
     private String methodName;
     private String className;
 
-    public ExternalMethodNotFoundWarning(CtElement element, String methodName, String className) {
-        super("Method in external refinement not found", element);
+    public ExternalMethodNotFoundWarning(CtElement element, String message, String methodName, String className) {
+        super(message, element);
         this.methodName = methodName;
         this.className = className;
     }

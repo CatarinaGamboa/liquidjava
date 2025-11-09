@@ -11,8 +11,8 @@ public class ExternalClassNotFoundWarning extends LJWarning {
 
     private String className;
 
-    public ExternalClassNotFoundWarning(CtElement element, String className) {
-        super("Class in external refinement not found", element);
+    public ExternalClassNotFoundWarning(CtElement element, String message, String className) {
+        super(message, element);
         this.className = className;
     }
 

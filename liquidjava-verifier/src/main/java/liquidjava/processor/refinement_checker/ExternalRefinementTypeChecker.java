@@ -1,12 +1,14 @@
 package liquidjava.processor.refinement_checker;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
 import liquidjava.diagnostics.ErrorEmitter;
-import liquidjava.diagnostics.ErrorHandler;
+import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.warnings.ExternalClassNotFoundWarning;
+import liquidjava.diagnostics.warnings.ExternalMethodNotFoundWarning;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.facade.GhostDTO;
@@ -47,7 +49,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (externalRefinements.isPresent()) {
             this.prefix = externalRefinements.get();
             if (!classExists(prefix)) {
-                ErrorHandler.printCustomError(intrface, "Could not find class '" + prefix + "'", errorEmitter);
+                String message = String.format("Could not find external class '%s'", prefix);
+                diagnostics.add(new ExternalClassNotFoundWarning(intrface, message, prefix));
                 return;
             }
             try {
@@ -85,33 +88,21 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             return;
 
         boolean isConstructor = method.getSimpleName().equals(targetType.getSimpleName());
-        if (isConstructor) {
-            if (!constructorExists(targetType, method)) {
-                ErrorHandler.printCustomError(method,
-                        String.format("Could not find constructor '%s' for '%s'", method.getSignature(), prefix),
-                        errorEmitter);
-                return;
-            }
-        } else {
-            if (!methodExists(targetType, method)) {
-                String matchingNames = targetType.getMethods().stream()
-                        .filter(m -> m.getSimpleName().equals(method.getSimpleName()))
-                        .map(m -> String.format("%s %s", m.getType().getSimpleName(), m.getSignature()))
-                        .collect(Collectors.joining("\n  "));
-
-                StringBuilder sb = new StringBuilder();
-                sb.append(String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
-                        method.getSignature(), prefix));
-
-                if (!matchingNames.isEmpty()) {
-                    sb.append("\nAvailable overloads:\n  ");
-                    sb.append(matchingNames);
-                }
-                ErrorHandler.printCustomError(method, sb.toString(), errorEmitter);
-                return;
-            }
+        if (isConstructor && !constructorExists(targetType, method)) {
+            String title = String.format("Could not find constructor '%s' for '%s'", method.getSignature(), prefix);
+            String[] overloads = getOverloads(targetType, method);
+            String message = overloads.length == 0 ? title
+                    : title + "\nAvailable constructors:\n  " + String.join("\n  ", overloads);
+            diagnostics.add(new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix));
+        } else if (!methodExists(targetType, method)) {
+            String title = String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
+                    method.getSignature(), prefix);
+            String[] overloads = getOverloads(targetType, method);
+            String message = overloads.length == 0 ? title
+                    : title + "\nAvailable overloads:\n  " + String.join("\n  ", overloads);
+            diagnostics.add(new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix));
+            return;
         }
-
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
         try {
             mfc.getMethodRefinements(method, prefix);
@@ -119,9 +110,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             return;
         }
         super.visitCtMethod(method);
-
-        //
-        // System.out.println("visited method external");
     }
 
     protected void getGhostFunction(String value, CtElement element) {
@@ -135,8 +123,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
 
         } catch (ParsingException e) {
-            ErrorHandler.printCustomError(element, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
-            // e.printStackTrace();
+            diagnostics.add(new CustomError(element, "Could not parse the ghost function" + e.getMessage()));
         }
     }
 
@@ -205,5 +192,10 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                 return false;
         }
         return true;
+    }
+
+    private String[] getOverloads(CtType<?> targetType, CtMethod<?> method) {
+        return targetType.getMethods().stream().filter(m -> m.getSimpleName().equals(method.getSimpleName()))
+                .map(m -> String.format("%s %s", m.getType().getSimpleName(), m.getSignature())).toArray(String[]::new);
     }
 }

@@ -1,8 +1,6 @@
 package liquidjava.diagnostics;
 
 import java.net.URI;
-import java.util.HashMap;
-import liquidjava.processor.context.PlacementInCode;
 import spoon.reflect.cu.SourcePosition;
 
 public class ErrorEmitter {
