@@ -13,6 +13,8 @@ import liquidjava.processor.context.RefinedVariable;
 import liquidjava.processor.context.Variable;
 import liquidjava.processor.context.VariableInstance;
 import liquidjava.processor.refinement_checker.TypeChecker;
+import liquidjava.utils.constants.Formats;
+import liquidjava.utils.constants.Keys;
 import liquidjava.processor.refinement_checker.object_checkers.AuxHierarchyRefinememtsPassage;
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.Predicate;
@@ -38,8 +40,6 @@ import spoon.reflect.reference.CtTypeReference;
 public class MethodsFunctionsChecker {
 
     private TypeChecker rtc;
-
-    private static String retNameFormat = "#ret_%d";
 
     public MethodsFunctionsChecker(TypeChecker rtc) {
         this.rtc = rtc;
@@ -74,7 +74,7 @@ public class MethodsFunctionsChecker {
                 Map<String, String> map = checkInvocationRefinements(ctConstructorCall,
                         ctConstructorCall.getArguments(), ctConstructorCall.getTarget(), f.getName(),
                         f.getTargetClass());
-                AuxStateHandler.constructorStateMetadata(rtc.REFINE_KEY, f, map, ctConstructorCall);
+                AuxStateHandler.constructorStateMetadata(Keys.REFINEMENT, f, map, ctConstructorCall);
             }
         }
     }
@@ -140,7 +140,7 @@ public class MethodsFunctionsChecker {
             return;
         List<CtParameter<?>> params = method.getParameters();
         Predicate ref = handleFunctionRefinements(rf, method, params);
-        method.putMetadata(rtc.REFINE_KEY, ref);
+        method.putMetadata(Keys.REFINEMENT, ref);
     }
 
     /**
@@ -163,8 +163,8 @@ public class MethodsFunctionsChecker {
             Optional<Predicate> oc = rtc.getRefinementFromAnnotation(param);
             Predicate c = new Predicate();
             if (oc.isPresent())
-                c = oc.get().substituteVariable(rtc.WILD_VAR, paramName);
-            param.putMetadata(rtc.REFINE_KEY, c);
+                c = oc.get().substituteVariable(Keys.WILDCARD, paramName);
+            param.putMetadata(Keys.REFINEMENT, c);
             RefinedVariable v = rtc.getContext().addVarToContext(param.getSimpleName(), param.getType(), c, param);
             if (v instanceof Variable)
                 f.addArgRefinements((Variable) v);
@@ -173,7 +173,7 @@ public class MethodsFunctionsChecker {
 
         Optional<Predicate> oret = rtc.getRefinementFromAnnotation(method);
         Predicate ret = oret.orElse(new Predicate());
-        ret = ret.substituteVariable("return", rtc.WILD_VAR);
+        ret = ret.substituteVariable("return", Keys.WILDCARD);
         f.setRefReturn(ret);
         // rtc.context.addFunctionToContext(f);
         return Predicate.createConjunction(joint, ret);
@@ -196,7 +196,7 @@ public class MethodsFunctionsChecker {
         if (ret.getReturnedExpression() != null) {
             // check if there are refinements
             if (rtc.getRefinement(ret.getReturnedExpression()) == null)
-                ret.getReturnedExpression().putMetadata(rtc.REFINE_KEY, new Predicate());
+                ret.getReturnedExpression().putMetadata(Keys.REFINEMENT, new Predicate());
             CtMethod<?> method = ret.getParent(CtMethod.class);
             // check if method has refinements
             if (rtc.getRefinement(method) == null)
@@ -211,14 +211,14 @@ public class MethodsFunctionsChecker {
                 }
 
                 // Both return and the method have metadata
-                String thisName = String.format(rtc.thisFormat, className);
+                String thisName = String.format(Formats.THIS, className);
                 rtc.getContext().addInstanceToContext(thisName, c.getReference(), new Predicate(), ret);
 
-                String returnVarName = String.format(retNameFormat, rtc.getContext().getCounter());
+                String returnVarName = String.format(Formats.RET, rtc.getContext().getCounter());
                 Predicate cretRef = rtc.getRefinement(ret.getReturnedExpression())
-                        .substituteVariable(rtc.WILD_VAR, returnVarName).substituteVariable(rtc.THIS, returnVarName);
-                Predicate cexpectedType = fi.getRefReturn().substituteVariable(rtc.WILD_VAR, returnVarName)
-                        .substituteVariable(rtc.THIS, returnVarName);
+                        .substituteVariable(Keys.WILDCARD, returnVarName).substituteVariable(Keys.THIS, returnVarName);
+                Predicate cexpectedType = fi.getRefReturn().substituteVariable(Keys.WILDCARD, returnVarName)
+                        .substituteVariable(Keys.THIS, returnVarName);
 
                 rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
                 rtc.checkSMT(cexpectedType, ret);
@@ -318,7 +318,7 @@ public class MethodsFunctionsChecker {
             AuxStateHandler.checkTargetChanges(rtc, f, target, map, invocation);
         }
         if (f.allRefinementsTrue()) {
-            invocation.putMetadata(rtc.REFINE_KEY, new Predicate());
+            invocation.putMetadata(Keys.REFINEMENT, new Predicate());
             return map;
         }
 
@@ -336,21 +336,21 @@ public class MethodsFunctionsChecker {
                     methodRef = methodRef.substituteVariable(s, map.get(s));
 
             String varName = null;
-            if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
-                VariableInstance vi = (VariableInstance) invocation.getMetadata(rtc.TARGET_KEY);
-                methodRef = methodRef.substituteVariable(rtc.THIS, vi.getName());
+            if (invocation.getMetadata(Keys.TARGET) != null) {
+                VariableInstance vi = (VariableInstance) invocation.getMetadata(Keys.TARGET);
+                methodRef = methodRef.substituteVariable(Keys.THIS, vi.getName());
                 Variable v = rtc.getContext().getVariableFromInstance(vi);
                 if (v != null)
                     varName = v.getName();
             }
 
-            String viName = String.format(rtc.instanceFormat, f.getName(), rtc.getContext().getCounter());
+            String viName = String.format(Formats.INSTANCE, f.getName(), rtc.getContext().getCounter());
             VariableInstance vi = (VariableInstance) rtc.getContext().addInstanceToContext(viName, f.getType(),
-                    methodRef.substituteVariable(rtc.WILD_VAR, viName), invocation); // TODO REVER!!
+                    methodRef.substituteVariable(Keys.WILDCARD, viName), invocation); // TODO REVER!!
             if (varName != null && f.hasStateChange() && equalsThis)
                 rtc.getContext().addRefinementInstanceToVariable(varName, viName);
-            invocation.putMetadata(rtc.TARGET_KEY, vi);
-            invocation.putMetadata(rtc.REFINE_KEY, methodRef);
+            invocation.putMetadata(Keys.TARGET, vi);
+            invocation.putMetadata(Keys.REFINEMENT, methodRef);
         }
         return map;
     }
@@ -382,13 +382,13 @@ public class MethodsFunctionsChecker {
     }
 
     private String createVariableRepresentingArgument(CtExpression<?> iArg, Variable fArg) {
-        Predicate met = (Predicate) iArg.getMetadata(rtc.REFINE_KEY);
+        Predicate met = (Predicate) iArg.getMetadata(Keys.REFINEMENT);
         if (met == null)
             met = new Predicate();
-        if (!met.getVariableNames().contains(rtc.WILD_VAR))
-            met = Predicate.createEquals(Predicate.createVar(rtc.WILD_VAR), met);
-        String nVar = String.format(rtc.instanceFormat, fArg.getName(), rtc.getContext().getCounter());
-        rtc.getContext().addInstanceToContext(nVar, fArg.getType(), met.substituteVariable(rtc.WILD_VAR, nVar), iArg);
+        if (!met.getVariableNames().contains(Keys.WILDCARD))
+            met = Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), met);
+        String nVar = String.format(Formats.INSTANCE, fArg.getName(), rtc.getContext().getCounter());
+        rtc.getContext().addInstanceToContext(nVar, fArg.getType(), met.substituteVariable(Keys.WILDCARD, nVar), iArg);
         return nVar;
     }
 
@@ -404,9 +404,9 @@ public class MethodsFunctionsChecker {
             for (String s : vars)
                 if (map.containsKey(s))
                     c = c.substituteVariable(s, map.get(s));
-            if (invocation.getMetadata(rtc.TARGET_KEY) != null) {
-                VariableInstance vi = (VariableInstance) invocation.getMetadata(rtc.TARGET_KEY);
-                c = c.substituteVariable(rtc.THIS, vi.getName());
+            if (invocation.getMetadata(Keys.TARGET) != null) {
+                VariableInstance vi = (VariableInstance) invocation.getMetadata(Keys.TARGET);
+                c = c.substituteVariable(Keys.THIS, vi.getName());
             }
             rtc.checkSMT(c, invocation);
         }
@@ -429,7 +429,7 @@ public class MethodsFunctionsChecker {
                 CtVariableRead<?> v = (CtVariableRead<?>) e;
                 String varName = v.getVariable().getSimpleName(); // TODO CHANGE
                 RefinedVariable rv = context.getVariableByName(varName);
-                String instanceName = String.format(rtc.instanceFormat, varName, context.getCounter());
+                String instanceName = String.format(Formats.INSTANCE, varName, context.getCounter());
 
                 inferredRefinement = inferredRefinement.substituteVariable(fArg.getName(), instanceName);
                 context.addInstanceToContext(instanceName, rv.getType(), inferredRefinement, element);

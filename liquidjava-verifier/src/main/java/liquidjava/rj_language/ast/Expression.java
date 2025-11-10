@@ -180,9 +180,9 @@ public abstract class Expression {
                     String varType = dto.getVarTypes().get(i);
                     Expression aliasExp = children.get(i);
 
-                    boolean checks = TypeInfer.checkCompatibleType(varType, aliasExp, ctx, f);
-                    if (!checks)
-                        throw new Exception("Type Mismatch: Cannoy substitute " + aliasExp + " : "
+                    boolean compatible = TypeInfer.checkCompatibleType(varType, aliasExp, ctx, f);
+                    if (!compatible)
+                        throw new Exception("Type Mismatch: Cannot substitute " + aliasExp + " : "
                                 + TypeInfer.getType(ctx, f, aliasExp).get().getQualifiedName() + " by " + varExp + " : "
                                 + TypeInfer.getType(ctx, f, varExp).get().getQualifiedName());
 

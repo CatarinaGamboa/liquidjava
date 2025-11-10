@@ -7,6 +7,12 @@ import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.warnings.LJWarning;
 import liquidjava.processor.context.PlacementInCode;
 
+/**
+ * Singleton class to store diagnostics information (errors, warnings, translation map) during the verification process
+ * 
+ * @see LJError
+ * @see LJWarning
+ */
 public class LJDiagnostics {
     private static LJDiagnostics instance;
 
@@ -23,6 +29,24 @@ public class LJDiagnostics {
     public static LJDiagnostics getInstance() {
         if (instance == null)
             instance = new LJDiagnostics();
+        return instance;
+    }
+
+    public static LJDiagnostics add(LJError error) {
+        LJDiagnostics instance = getInstance();
+        instance.addError(error);
+        return instance;
+    }
+
+    public static LJDiagnostics add(LJWarning warning) {
+        LJDiagnostics instance = getInstance();
+        instance.addWarning(warning);
+        return instance;
+    }
+
+    public static LJDiagnostics add(HashMap<String, PlacementInCode> map) {
+        LJDiagnostics instance = getInstance();
+        instance.setTranslationMap(map);
         return instance;
     }
 

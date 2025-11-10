@@ -13,7 +13,9 @@ import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.BuiltinFunctionPredicate;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
-import liquidjava.utils.Utils;
+import liquidjava.utils.constants.Formats;
+import liquidjava.utils.constants.Keys;
+import liquidjava.utils.constants.Types;
 
 import org.apache.commons.lang3.NotImplementedException;
 import spoon.reflect.code.CtArrayRead;
@@ -172,9 +174,9 @@ public class RefinementTypeChecker extends TypeChecker {
             } catch (ParsingException e) {
                 return; // error already in ErrorEmitter
             }
-            String name = String.format(freshFormat, context.getCounter());
-            if (c.getVariableNames().contains(WILD_VAR)) {
-                c = c.substituteVariable(WILD_VAR, name);
+            String name = String.format(Formats.FRESH, context.getCounter());
+            if (c.getVariableNames().contains(Keys.WILDCARD)) {
+                c = c.substituteVariable(Keys.WILDCARD, name);
             } else {
                 c = Predicate.createEquals(Predicate.createVar(name), c);
             }
@@ -182,12 +184,12 @@ public class RefinementTypeChecker extends TypeChecker {
             Predicate ep;
             try {
                 ep = Predicate.createEquals(
-                        BuiltinFunctionPredicate.builtin_length(WILD_VAR, newArray, getErrorEmitter()),
+                        BuiltinFunctionPredicate.builtin_length(Keys.WILDCARD, newArray, getErrorEmitter()),
                         Predicate.createVar(name));
             } catch (ParsingException e) {
                 return; // error already in ErrorEmitter
             }
-            newArray.putMetadata(REFINE_KEY, ep);
+            newArray.putMetadata(Keys.REFINEMENT, ep);
         }
     }
 
@@ -201,9 +203,9 @@ public class RefinementTypeChecker extends TypeChecker {
         CtClass<?> c = thisAccess.getParent(CtClass.class);
         String s = c.getSimpleName();
         if (thisAccess.getParent() instanceof CtReturn) {
-            String thisName = String.format(thisFormat, s);
-            thisAccess.putMetadata(REFINE_KEY,
-                    Predicate.createEquals(Predicate.createVar(WILD_VAR), Predicate.createVar(thisName)));
+            String thisName = String.format(Formats.THIS, s);
+            thisAccess.putMetadata(Keys.REFINEMENT,
+                    Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(thisName)));
         }
     }
 
@@ -227,7 +229,7 @@ public class RefinementTypeChecker extends TypeChecker {
             CtFieldWrite<?> fw = ((CtFieldWrite<?>) ex);
             CtFieldReference<?> cr = fw.getVariable();
             CtField<?> f = fw.getVariable().getDeclaration();
-            String updatedVarName = String.format(thisFormat, cr.getSimpleName());
+            String updatedVarName = String.format(Formats.THIS, cr.getSimpleName());
             checkAssignment(updatedVarName, cr.getType(), ex, assignment.getAssignment(), assignment, f);
 
             // corresponding ghost function update
@@ -249,9 +251,9 @@ public class RefinementTypeChecker extends TypeChecker {
         }
 
         super.visitCtArrayRead(arrayRead);
-        String name = String.format(instanceFormat, "arrayAccess", context.getCounter());
+        String name = String.format(Formats.INSTANCE, "arrayAccess", context.getCounter());
         context.addVarToContext(name, arrayRead.getType(), new Predicate(), arrayRead);
-        arrayRead.putMetadata(REFINE_KEY, Predicate.createVar(name));
+        arrayRead.putMetadata(Keys.REFINEMENT, Predicate.createVar(name));
         // TODO predicate for now is always TRUE
     }
 
@@ -261,15 +263,15 @@ public class RefinementTypeChecker extends TypeChecker {
             return;
         }
 
-        List<String> types = Arrays.asList(implementedTypes);
+        List<String> types = Arrays.asList(Types.IMPLEMENTED);
         String type = lit.getType().getQualifiedName();
         if (types.contains(type)) {
-            lit.putMetadata(REFINE_KEY, Predicate.createEquals(Predicate.createVar(WILD_VAR),
+            lit.putMetadata(Keys.REFINEMENT, Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
                     Predicate.createLit(lit.getValue().toString(), type)));
 
         } else if (lit.getType().getQualifiedName().equals("java.lang.String")) {
             // Only taking care of strings inside refinements
-        } else if (type.equals(Utils.NULL_TYPE)) {
+        } else if (type.equals(Types.NULL)) {
             // Skip null literals
         } else {
             throw new NotImplementedException(
@@ -293,10 +295,10 @@ public class RefinementTypeChecker extends TypeChecker {
         // context.addVarToContext(f.getSimpleName(), f.getType(),
         // c.map( i -> i.substituteVariable(WILD_VAR, f.getSimpleName()).orElse(new
         // Predicate()) );
-        String nname = String.format(thisFormat, f.getSimpleName());
+        String nname = String.format(Formats.THIS, f.getSimpleName());
         Predicate ret = new Predicate();
         if (c.isPresent()) {
-            ret = c.get().substituteVariable(WILD_VAR, nname).substituteVariable(f.getSimpleName(), nname);
+            ret = c.get().substituteVariable(Keys.WILDCARD, nname).substituteVariable(f.getSimpleName(), nname);
         }
         RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, f);
         if (v instanceof Variable) {
@@ -315,27 +317,27 @@ public class RefinementTypeChecker extends TypeChecker {
             RefinedVariable rv = context.getVariableByName(fieldName);
             if (rv instanceof Variable && ((Variable) rv).getLocation().isPresent()
                     && ((Variable) rv).getLocation().get().equals(fieldRead.getTarget().toString())) {
-                fieldRead.putMetadata(REFINE_KEY, context.getVariableRefinements(fieldName));
+                fieldRead.putMetadata(Keys.REFINEMENT, context.getVariableRefinements(fieldName));
             } else {
-                fieldRead.putMetadata(REFINE_KEY,
-                        Predicate.createEquals(Predicate.createVar(WILD_VAR), Predicate.createVar(fieldName)));
+                fieldRead.putMetadata(Keys.REFINEMENT,
+                        Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(fieldName)));
             }
 
-        } else if (context.hasVariable(String.format(thisFormat, fieldName))) {
-            String thisName = String.format(thisFormat, fieldName);
-            fieldRead.putMetadata(REFINE_KEY,
-                    Predicate.createEquals(Predicate.createVar(WILD_VAR), Predicate.createVar(thisName)));
+        } else if (context.hasVariable(String.format(Formats.THIS, fieldName))) {
+            String thisName = String.format(Formats.THIS, fieldName);
+            fieldRead.putMetadata(Keys.REFINEMENT,
+                    Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(thisName)));
 
         } else if (fieldRead.getVariable().getSimpleName().equals("length")) {
             String targetName = fieldRead.getTarget().toString();
             try {
-                fieldRead.putMetadata(REFINE_KEY, Predicate.createEquals(Predicate.createVar(WILD_VAR),
+                fieldRead.putMetadata(Keys.REFINEMENT, Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
                         BuiltinFunctionPredicate.builtin_length(targetName, fieldRead, getErrorEmitter())));
             } catch (ParsingException e) {
                 return; // error already in ErrorEmitter
             }
         } else {
-            fieldRead.putMetadata(REFINE_KEY, new Predicate());
+            fieldRead.putMetadata(Keys.REFINEMENT, new Predicate());
             // TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
         }
 
@@ -417,8 +419,8 @@ public class RefinementTypeChecker extends TypeChecker {
         } catch (ParsingException e) {
             return; // error already in ErrorEmitter
         }
-        String freshVarName = String.format(freshFormat, context.getCounter());
-        expRefs = expRefs.substituteVariable(WILD_VAR, freshVarName);
+        String freshVarName = String.format(Formats.FRESH, context.getCounter());
+        expRefs = expRefs.substituteVariable(Keys.WILDCARD, freshVarName);
         Predicate lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
         expRefs = Predicate.createConjunction(expRefs, lastExpRefs);
 
@@ -470,11 +472,11 @@ public class RefinementTypeChecker extends TypeChecker {
         BuiltinFunctionPredicate fp;
         try {
             fp = BuiltinFunctionPredicate.builtin_addToIndex(arrayWrite.getTarget().toString(), index.toString(),
-                    WILD_VAR, arrayWrite, getErrorEmitter());
+                    Keys.WILDCARD, arrayWrite, getErrorEmitter());
         } catch (ParsingException e) {
             return; // error already in ErrorEmitter
         }
-        arrayWrite.putMetadata(REFINE_KEY, fp);
+        arrayWrite.putMetadata(Keys.REFINEMENT, fp);
     }
 
     @Override
@@ -487,7 +489,7 @@ public class RefinementTypeChecker extends TypeChecker {
         Predicate cond = getRefinement(conditional.getCondition());
         Predicate c = Predicate.createITE(cond, getRefinement(conditional.getThenExpression()),
                 getRefinement(conditional.getElseExpression()));
-        conditional.putMetadata(REFINE_KEY, c);
+        conditional.putMetadata(Keys.REFINEMENT, c);
     }
 
     @Override
@@ -582,12 +584,12 @@ public class RefinementTypeChecker extends TypeChecker {
      *            Cannot be null
      */
     private <T> void getPutVariableMetadada(CtElement elem, String name) {
-        Predicate cref = Predicate.createEquals(Predicate.createVar(WILD_VAR), Predicate.createVar(name));
+        Predicate cref = Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(name));
         Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
         if (ovi.isPresent()) {
-            cref = Predicate.createEquals(Predicate.createVar(WILD_VAR), Predicate.createVar(ovi.get().getName()));
+            cref = Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(ovi.get().getName()));
         }
 
-        elem.putMetadata(REFINE_KEY, cref);
+        elem.putMetadata(Keys.REFINEMENT, cref);
     }
 }

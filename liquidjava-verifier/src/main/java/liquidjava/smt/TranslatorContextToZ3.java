@@ -41,25 +41,14 @@ public class TranslatorContextToZ3 {
 
     private static Expr<?> getExpr(Context z3, String name, CtTypeReference<?> type) {
         String typeName = type.getQualifiedName();
-        if (typeName.contentEquals("int"))
-            return z3.mkIntConst(name);
-        else if (typeName.contentEquals("short"))
-            return z3.mkIntConst(name);
-        else if (typeName.contentEquals("boolean"))
-            return z3.mkBoolConst(name);
-        else if (typeName.contentEquals("long"))
-            return z3.mkRealConst(name);
-        else if (typeName.contentEquals("float")) {
-            return (FPExpr) z3.mkConst(name, z3.mkFPSort64());
-        } else if (typeName.contentEquals("double")) {
-            return (FPExpr) z3.mkConst(name, z3.mkFPSort64());
-        } else if (typeName.contentEquals("int[]")) {
-            return z3.mkArrayConst(name, z3.mkIntSort(), z3.mkIntSort());
-        } else {
-            Sort nSort = z3.mkUninterpretedSort(typeName);
-            return z3.mkConst(name, nSort);
-            // System.out.println("Add new type: "+typeName);
-        }
+        return switch (typeName) {
+        case "int", "short" -> z3.mkIntConst(name);
+        case "boolean" -> z3.mkBoolConst(name);
+        case "long" -> z3.mkRealConst(name);
+        case "float", "double" -> (FPExpr) z3.mkConst(name, z3.mkFPSort64());
+        case "int[]" -> z3.mkArrayConst(name, z3.mkIntSort(), z3.mkIntSort());
+        default -> z3.mkConst(name, z3.mkUninterpretedSort(typeName));
+        };
     }
 
     static void addAlias(Context z3, List<AliasWrapper> alias, Map<String, AliasWrapper> aliasTranslation) {
@@ -92,27 +81,18 @@ public class TranslatorContextToZ3 {
     }
 
     static Sort getSort(Context z3, String sort) {
-        switch (sort) {
-        case "int":
-            return z3.getIntSort();
-        case "boolean":
-            return z3.getBoolSort();
-        case "long":
-            return z3.getRealSort();
-        case "float":
-            return z3.mkFPSort32();
-        case "double":
-            return z3.mkFPSortDouble();
-        case "int[]":
-            return z3.mkArraySort(z3.mkIntSort(), z3.mkIntSort());
-        case "String":
-            return z3.getStringSort();
-        case "void":
-            return z3.mkUninterpretedSort("void");
-        // case "List":return z3.mkListSort(name, elemSort)
-        default:
-            return z3.mkUninterpretedSort(sort);
-        }
+        return switch (sort) {
+        case "int" -> z3.getIntSort();
+        case "boolean" -> z3.getBoolSort();
+        case "long" -> z3.getRealSort();
+        case "float" -> z3.mkFPSort32();
+        case "double" -> z3.mkFPSortDouble();
+        case "int[]" -> z3.mkArraySort(z3.mkIntSort(), z3.mkIntSort());
+        case "String" -> z3.getStringSort();
+        case "void" -> z3.mkUninterpretedSort("void");
+        // case "List" -> z3.mkListSort(name, elemSort);
+        default -> z3.mkUninterpretedSort(sort);
+        };
     }
 
     public static void addGhostStates(Context z3, List<GhostState> ghostState,

@@ -11,6 +11,8 @@ import liquidjava.processor.context.Variable;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.rj_language.Predicate;
 import liquidjava.utils.Utils;
+import liquidjava.utils.constants.Formats;
+import liquidjava.utils.constants.Keys;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
@@ -51,7 +53,7 @@ public class AuxHierarchyRefinememtsPassage {
         List<Variable> fArgs = function.getArguments();
         HashMap<String, String> m = new HashMap<String, String>();
         for (int i = 0; i < fArgs.size(); i++) {
-            String newName = String.format(tc.instanceFormat, fArgs.get(i).getName(), tc.getContext().getCounter());
+            String newName = String.format(Formats.INSTANCE, fArgs.get(i).getName(), tc.getContext().getCounter());
             m.put(superArgs.get(i).getName(), newName);
             m.put(fArgs.get(i).getName(), newName);
             RefinedVariable rv = tc.getContext().addVarToContext(newName, superArgs.get(i).getType(), new Predicate(),
@@ -96,12 +98,12 @@ public class AuxHierarchyRefinememtsPassage {
         if (functionRef.isBooleanTrue())
             function.setRefinement(superRef);
         else {
-            String name = String.format(tc.freshFormat, tc.getContext().getCounter());
+            String name = String.format(Formats.FRESH, tc.getContext().getCounter());
             tc.getContext().addVarToContext(name, superFunction.getType(), new Predicate(), method);
             // functionRef might be stronger than superRef -> check (superRef <:
             // functionRef)
-            functionRef = functionRef.substituteVariable(tc.WILD_VAR, name);
-            superRef = superRef.substituteVariable(tc.WILD_VAR, name);
+            functionRef = functionRef.substituteVariable(Keys.WILDCARD, name);
+            superRef = superRef.substituteVariable(Keys.WILDCARD, name);
             for (String m : super2function.keySet())
                 superRef = superRef.substituteVariable(m, super2function.get(m));
             for (String m : super2function.keySet())
@@ -140,11 +142,11 @@ public class AuxHierarchyRefinememtsPassage {
                     ObjectState superState = superStates.get(i);
                     ObjectState subState = subStates.get(i);
 
-                    String thisName = String.format(tc.freshFormat, tc.getContext().getCounter());
+                    String thisName = String.format(Formats.FRESH, tc.getContext().getCounter());
                     createVariableInContext(thisName, tc, subFunction, superFunction, method.getParameters().get(i));
 
-                    Predicate superConst = matchVariableNames(tc.THIS, thisName, superState.getFrom());
-                    Predicate subConst = matchVariableNames(tc.THIS, thisName, superFunction, subFunction,
+                    Predicate superConst = matchVariableNames(Keys.THIS, thisName, superState.getFrom());
+                    Predicate subConst = matchVariableNames(Keys.THIS, thisName, superFunction, subFunction,
                             subState.getFrom());
 
                     // fromSup <: fromSub <==> fromSup is sub type and fromSub is expectedType
@@ -154,8 +156,8 @@ public class AuxHierarchyRefinememtsPassage {
                     // if(!correct) ErrorPrinter.printError(method, subState.getFrom(),
                     // superState.getFrom());
 
-                    superConst = matchVariableNames(tc.THIS, thisName, superState.getTo());
-                    subConst = matchVariableNames(tc.THIS, thisName, superFunction, subFunction, subState.getTo());
+                    superConst = matchVariableNames(Keys.THIS, thisName, superState.getTo());
+                    subConst = matchVariableNames(Keys.THIS, thisName, superFunction, subFunction, subState.getTo());
                     // toSub <: toSup <==> ToSub is sub type and toSup is expectedType
                     tc.checkStateSMT(subConst, superConst, method,
                             "TO State from Subclass must be subtype of TO State from Superclass");

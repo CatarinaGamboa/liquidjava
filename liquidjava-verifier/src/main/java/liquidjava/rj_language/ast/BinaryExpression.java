@@ -68,18 +68,10 @@ public class BinaryExpression extends Expression {
 
     @Override
     public boolean isBooleanTrue() {
-        switch (op) {
-        case "&&":
-            return getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
-        case "||":
-            return getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
-        case "-->":
-            return getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
-        case "==":
-            return getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
-        default:
-            return false;
-        }
+        return switch (op) {
+        case "&&", "||", "-->", "==" -> getFirstOperand().isBooleanTrue() && getSecondOperand().isBooleanTrue();
+        default -> false;
+        };
     }
 
     @Override
