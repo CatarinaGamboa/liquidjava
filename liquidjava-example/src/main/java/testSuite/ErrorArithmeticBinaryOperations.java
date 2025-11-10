@@ -1,3 +1,4 @@
+// @ExpectedError: "Type expected"
 package testSuite;
 
 import liquidjava.specification.Refinement;
