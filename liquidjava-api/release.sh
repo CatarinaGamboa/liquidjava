@@ -1,1 +1,0 @@
-mvn -Dgpg.skip=false -Dmaven.deploy.skip=false clean deploy

@@ -3,12 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
+	<parent>
+		<groupId>liquidjava</groupId>
+		<artifactId>liquidjava-umbrella</artifactId>
+		<version>1.0</version>
+	</parent>
+
 	<groupId>io.github.liquid-java</groupId>
 	<artifactId>liquidjava-api</artifactId>
 	<version>0.0.3</version>
 	<name>liquidjava-api</name>
 	<description>LiquidJava API</description>
-	<url>https://github.com/CatarinaGamboa/liquidjava</url>
+	<url>https://github.com/liquid-java/liquidjava</url>
 	<packaging>jar</packaging>
 
 	<licenses>
@@ -33,6 +39,12 @@
 			<url>https://github.com/alcides</url>
 		</developer>
 		<developer>
+			<id>pcanelas</id>
+			<name>Paulo Canelas</name>
+			<email>pcanelas@users.noreply.github.com</email>
+			<url>https://github.com/pcanelas</url>
+		</developer>
+		<developer>
 			<id>rcosta358</id>
 			<name>Ricardo Costa</name>
 			<email>rcosta358@users.noreply.github.com</email>
@@ -41,9 +53,9 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git://github.com/CatarinaGamboa/liquidjava.git</connection>
-		<developerConnection>scm:git:ssh://github.com:CatarinaGamboa/liquidjava.git</developerConnection>
-		<url>https://github.com/CatarinaGamboa/liquidjava/tree/main</url>
+		<connection>scm:git:git://github.com/liquid-java/liquidjava.git</connection>
+		<developerConnection>scm:git:ssh://github.com:liquid-java/liquidjava.git</developerConnection>
+		<url>https://github.com/liquid-java/liquidjava/tree/main</url>
 	</scm>
 
 	<build>
