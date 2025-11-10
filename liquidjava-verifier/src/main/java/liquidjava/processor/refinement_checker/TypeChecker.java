@@ -248,7 +248,8 @@ public abstract class TypeChecker extends CtScanner {
                 a.parse(path);
                 // refinement alias must return a boolean expression
                 if (a.getExpression() != null && !a.getExpression().isBooleanExpression()) {
-                    diagnostics.add(new CustomError(element, "Refinement alias must return a boolean expression"));
+                    diagnostics.add(new InvalidRefinementError(element,
+                            "Refinement alias must return a boolean expression", value));
                     return;
                 }
                 AliasWrapper aw = new AliasWrapper(a, factory, Keys.WILDCARD, context, klass, path);
