@@ -242,8 +242,8 @@ public class Predicate {
         Expression exp = switch (type) {
         case Types.BOOLEAN -> new LiteralBoolean(value);
         case Types.INT, Types.SHORT -> new LiteralInt(value);
-        case Types.DOUBLE, Types.LONG -> new LiteralReal(value);
-        default -> new LiteralReal(value);
+        case Types.DOUBLE, Types.LONG, Types.FLOAT -> new LiteralReal(value);
+        default -> throw new IllegalArgumentException("Unsupported literal type: " + type);
         };
         return new Predicate(exp);
     }

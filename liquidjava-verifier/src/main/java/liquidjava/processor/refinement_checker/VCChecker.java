@@ -304,14 +304,6 @@ public class VCChecker {
                 .collect(Collectors.toList()).forEach(pathVariables::remove);
     }
 
-    // private void printVCs(String string, String stringSMT, Predicate expectedType) {
-    // System.out.println("\n----------------------------VC--------------------------------\n");
-    // System.out.println(string);
-    // System.out.println("\nSMT subtyping:" + stringSMT + " <: " + expectedType.toString());
-    // System.out.println("--------------------------------------------------------------");
-    // }
-
-    // Print
     // Errors---------------------------------------------------------------------------------------------------
 
     private HashMap<String, PlacementInCode> createMap(CtElement element, Predicate expectedType) {
@@ -368,13 +360,6 @@ public class VCChecker {
             // System.exit(7);
         }
     }
-
-    // private void printError(Predicate premises, Predicate expectedType, CtElement element,
-    // HashMap<String, PlacementInCode> map, String s) {
-    // Predicate etMessageReady = expectedType; // substituteByMap(expectedType, map);
-    // Predicate cSMTMessageReady = premises; // substituteByMap(premises, map);
-    // ErrorHandler.printError(element, s, etMessageReady, cSMTMessageReady, map, errorEmitter);
-    // }
 
     public void printStateMismatchError(CtElement element, String method, Predicate c, String states) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();

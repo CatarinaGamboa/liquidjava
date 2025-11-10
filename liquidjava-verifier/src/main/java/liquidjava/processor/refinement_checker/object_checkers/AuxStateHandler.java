@@ -498,25 +498,6 @@ public class AuxStateHandler {
         return new Predicate();
     }
 
-    /**
-     * Method prepared to change all old vars in a predicate, however it has not been needed yet
-     *
-     * @param pred
-     * @param tc
-     *
-     * @return
-     */
-    // private static Predicate changeVarsFields(Predicate pred, TypeChecker tc) {
-    // Predicate noOld = pred;
-    // List<String> listVarsInOld = pred.getOldVariableNames();
-    // for (String varInOld : listVarsInOld) {
-    // Optional<VariableInstance> ovi = tc.getContext().getLastVariableInstance(varInOld);
-    // if (ovi.isPresent())
-    // noOld = noOld.changeOldMentions(varInOld, ovi.get().getName(), tc.getErrorEmitter());
-    // }
-    // return noOld;
-    // }
-
     private static Predicate checkOldMentions(Predicate transitionedState, String instanceName, String newInstanceName,
             TypeChecker tc) {
         return transitionedState.changeOldMentions(instanceName, newInstanceName, tc.getErrorEmitter());
@@ -534,12 +515,8 @@ public class AuxStateHandler {
      */
     private static Predicate sameState(TypeChecker tc, VariableInstance variableInstance, String name,
             CtElement invocation) {
-        // if(variableInstance.getState() != null) {
         if (variableInstance.getRefinement() != null) {
             String newInstanceName = String.format(Formats.INSTANCE, name, tc.getContext().getCounter());
-            // Predicate c =
-            // variableInstance.getState().substituteVariable(variableInstance.getName(),
-            // newInstanceName);
             Predicate c = variableInstance.getRefinement().substituteVariable(Keys.WILDCARD, newInstanceName)
                     .substituteVariable(variableInstance.getName(), newInstanceName);
 
@@ -636,15 +613,5 @@ public class AuxStateHandler {
         return element.getAnnotations().stream().filter(ann -> ann.getActualAnnotation().annotationType()
                 .getCanonicalName().contentEquals("liquidjava.specification.StateRefinement"))
                 .collect(Collectors.toList());
-
-        // List<CtAnnotation<? extends Annotation>> l = new ArrayList<CtAnnotation<?
-        // extends Annotation>>();
-        // for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
-        // String an = ann.getActualAnnotation().annotationType().getCanonicalName();
-        // if (an.contentEquals("liquidjava.specification.StateRefinement")) {
-        // l.add(ann);
-        // }
-        // }
-        // return l;
     }
 }

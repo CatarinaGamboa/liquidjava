@@ -174,7 +174,7 @@ public class RefinementTypeChecker extends TypeChecker {
             } catch (ParsingException e) {
                 return; // error already in ErrorEmitter
             }
-            String name = String.format(Formats.RET, context.getCounter());
+            String name = String.format(Formats.FRESH, context.getCounter());
             if (c.getVariableNames().contains(Keys.WILDCARD)) {
                 c = c.substituteVariable(Keys.WILDCARD, name);
             } else {
