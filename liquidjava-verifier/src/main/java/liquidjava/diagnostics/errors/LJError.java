@@ -4,33 +4,27 @@ import liquidjava.diagnostics.ErrorPosition;
 import liquidjava.diagnostics.TranslationTable;
 import liquidjava.utils.Utils;
 import spoon.reflect.cu.SourcePosition;
-import spoon.reflect.declaration.CtElement;
 
 /**
  * Base class for all LiquidJava errors
  */
-public abstract class LJError extends Exception {
+public abstract class LJError {
 
     private String title;
     private String message;
-    private CtElement element;
+    private String snippet;
     private ErrorPosition position;
     private SourcePosition location;
     private TranslationTable translationTable;
 
-    public LJError(String title, String message, CtElement element, TranslationTable translationTable) {
-        super(message);
+    public LJError(String title, String message, SourcePosition pos, String snippet,
+            TranslationTable translationTable) {
         this.title = title;
         this.message = message;
-        this.element = element;
+        this.snippet = snippet;
         this.translationTable = translationTable != null ? translationTable : new TranslationTable();
-        try {
-            this.location = element.getPosition();
-            this.position = ErrorPosition.fromSpoonPosition(element.getPosition());
-        } catch (Exception e) {
-            this.location = null;
-            this.position = null;
-        }
+        this.location = pos;
+        this.position = ErrorPosition.fromSpoonPosition(pos);
     }
 
     public String getTitle() {
@@ -41,8 +35,8 @@ public abstract class LJError extends Exception {
         return message;
     }
 
-    public CtElement getElement() {
-        return element;
+    public String getSnippet() {
+        return snippet;
     }
 
     public ErrorPosition getPosition() {
@@ -64,8 +58,8 @@ public abstract class LJError extends Exception {
         StringBuilder sb = new StringBuilder();
         sb.append(title);
 
-        if (element != null)
-            sb.append(" at: \n").append(element.toString().replace("@liquidjava.specification.", "@"));
+        if (snippet != null)
+            sb.append(" at: \n").append(snippet.replace("@liquidjava.specification.", "@"));
 
         sb.append("\n");
         sb.append(message).append("\n");

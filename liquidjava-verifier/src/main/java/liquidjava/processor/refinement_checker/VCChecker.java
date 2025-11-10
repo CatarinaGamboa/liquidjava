@@ -61,7 +61,7 @@ public class VCChecker {
         }
 
         try {
-            smtChecking(premises, et);
+            smtChecking(premises, et, element.getPosition());
         } catch (Exception e) {
             // To emit the message we use the constraints before the alias and state change
             printError(e, premisesBeforeChange, expectedType, element, map);
@@ -236,11 +236,11 @@ public class VCChecker {
 
     public boolean smtChecks(Predicate cSMT, Predicate expectedType, SourcePosition p) {
         try {
-            new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
+            new SMTEvaluator().verifySubtype(cSMT, expectedType, context, p);
         } catch (TypeCheckError e) {
             return false;
         } catch (Exception e) {
-            diagnostics.add(new CustomError(e.getMessage()));
+            diagnostics.add(new CustomError(e.getMessage(), p));
         }
         return true;
     }
@@ -256,9 +256,9 @@ public class VCChecker {
      * @throws GhostFunctionError
      * @throws TypeCheckError
      */
-    private void smtChecking(Predicate cSMT, Predicate expectedType)
+    private void smtChecking(Predicate cSMT, Predicate expectedType, SourcePosition p)
             throws TypeCheckError, GhostFunctionError, Exception {
-        new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
+        new SMTEvaluator().verifySubtype(cSMT, expectedType, context, p);
     }
 
     /**
@@ -323,7 +323,8 @@ public class VCChecker {
         if (e instanceof TypeCheckError) {
             return new RefinementError(element, expectedType, premisesBeforeChange.simplify(), map);
         } else if (e instanceof GhostFunctionError) {
-            return new GhostInvocationError(element, expectedType, map);
+            return new GhostInvocationError("Invalid types or number of arguments in ghost invocation",
+                    element.getPosition(), expectedType, map);
         } else if (e instanceof NotFoundSMTError) {
             return new NotFoundError(element, e.getMessage(), map);
         } else {
