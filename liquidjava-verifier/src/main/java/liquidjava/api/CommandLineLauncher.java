@@ -1,10 +1,13 @@
 package liquidjava.api;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
 import liquidjava.diagnostics.ErrorEmitter;
+import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
@@ -39,7 +42,7 @@ public class CommandLineLauncher {
         Launcher launcher = new Launcher();
         for (String path : paths) {
             if (!new File(path).exists()) {
-                ee.addError("Path not found", "The path " + path + " does not exist", 1);
+                diagnostics.add(new CustomError("The path " + path + " was not found"));
                 return ee;
             }
             launcher.addInputResource(path);

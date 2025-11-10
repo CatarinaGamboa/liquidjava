@@ -9,6 +9,10 @@ import spoon.reflect.declaration.CtElement;
  */
 public class CustomError extends LJError {
 
+    public CustomError(String message) {
+        super("Found Error", message, null, null);
+    }
+
     public CustomError(CtElement element, String message) {
         super("Found Error", message, element, null);
     }

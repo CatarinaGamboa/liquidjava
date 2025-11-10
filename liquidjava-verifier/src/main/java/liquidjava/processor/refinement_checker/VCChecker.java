@@ -244,11 +244,7 @@ public class VCChecker {
         } catch (TypeCheckError e) {
             return false;
         } catch (Exception e) {
-            // System.err.println("Unknown error:"+e.getMessage());
-            // e.printStackTrace();
-            // System.exit(7);
-            // fail();
-            errorEmitter.addError("Unknown Error", e.getMessage(), p, 7);
+            diagnostics.add(new CustomError(e.getMessage()));
         }
         return true;
     }
