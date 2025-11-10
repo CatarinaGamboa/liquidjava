@@ -73,7 +73,7 @@ public class AuxStateHandler {
             String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
             ObjectState state = new ObjectState();
             if (to != null) {
-                Predicate p = new Predicate(to, element, tc.getErrorEmitter());
+                Predicate p = new Predicate(to, element);
                 if (!p.getExpression().isBooleanExpression()) {
                     diagnostics.add(new InvalidRefinementError(element,
                             "State refinement transition must be a boolean expression", to));
@@ -191,7 +191,7 @@ public class AuxStateHandler {
 
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
             TypeChecker tc, CtElement e, boolean isTo, String prefix) throws ParsingException {
-        Predicate p = new Predicate(value, e, tc.getErrorEmitter(), prefix);
+        Predicate p = new Predicate(value, e, prefix);
         if (!p.getExpression().isBooleanExpression()) {
             diagnostics.add(
                     new InvalidRefinementError(e, "State refinement transition must be a boolean expression", value));
@@ -208,9 +208,9 @@ public class AuxStateHandler {
         // what is it for?
         Predicate c1 = isTo ? getMissingStates(t, tc, p) : p;
         Predicate c = c1.substituteVariable(Keys.THIS, name);
-        c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
+        c = c.changeOldMentions(nameOld, name);
         boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e.getPosition());
-        if (b && !tc.getErrorEmitter().foundError()) {
+        if (b && !diagnostics.foundError()) {
             tc.createSameStateError(e, p, t);
         }
 
@@ -398,10 +398,10 @@ public class AuxStateHandler {
 
         // replace "state(this)" to "state(whatever method is called from) and so on"
         Predicate expectState = stateChange.getFrom().substituteVariable(Keys.THIS, instanceName)
-                .changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
+                .changeOldMentions(vi.getName(), instanceName);
 
         if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) { // Invalid field transition
-            if (!tc.getErrorEmitter().foundError()) { // No errors in errorEmitter
+            if (!diagnostics.foundError()) { // No errors so far
                 Predicate[] states = { stateChange.getFrom() };
                 tc.createStateMismatchError(fw, fw.toString(), prevState, states);
             }
@@ -473,7 +473,7 @@ public class AuxStateHandler {
                 prevCheck = prevCheck.substituteVariable(s, map.get(s));
                 expectState = expectState.substituteVariable(s, map.get(s));
             }
-            expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
+            expectState = expectState.changeOldMentions(vi.getName(), instanceName);
 
             found = tc.checksStateSMT(prevCheck, expectState, invocation.getPosition());
             if (found && stateChange.hasTo()) {
@@ -489,7 +489,7 @@ public class AuxStateHandler {
                 return transitionedState;
             }
         }
-        if (!found && !tc.getErrorEmitter().foundError()) { // Reaches the end of stateChange no matching states
+        if (!found && !diagnostics.foundError()) { // Reaches the end of stateChange no matching states
             Predicate[] states = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
                     .toArray(Predicate[]::new);
             String simpleInvocation = invocation.toString(); // .getExecutable().toString();
@@ -502,7 +502,7 @@ public class AuxStateHandler {
 
     private static Predicate checkOldMentions(Predicate transitionedState, String instanceName, String newInstanceName,
             TypeChecker tc) {
-        return transitionedState.changeOldMentions(instanceName, newInstanceName, tc.getErrorEmitter());
+        return transitionedState.changeOldMentions(instanceName, newInstanceName);
     }
 
     /**

@@ -9,7 +9,6 @@ import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.diagnostics.errors.GhostInvocationError;
 import liquidjava.diagnostics.errors.LJError;
@@ -34,12 +33,10 @@ import spoon.reflect.reference.CtTypeReference;
 public class VCChecker {
     private final Context context;
     private final List<RefinedVariable> pathVariables;
-    private final ErrorEmitter errorEmitter;
 
-    public VCChecker(ErrorEmitter errorEmitter) {
+    public VCChecker() {
         context = Context.getInstance();
         pathVariables = new Stack<>();
-        this.errorEmitter = errorEmitter;
     }
 
     public void processSubtyping(Predicate expectedType, List<GhostState> list, CtElement element, Factory f) {
@@ -55,10 +52,9 @@ public class VCChecker {
         Predicate et = new Predicate();
         try {
             List<GhostState> filtered = filterGhostStatesForVariables(list, mainVars, lrv);
-            premises = premisesBeforeChange.changeStatesToRefinements(filtered, s, errorEmitter)
-                    .changeAliasToRefinement(context, f);
+            premises = premisesBeforeChange.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
 
-            et = expectedType.changeStatesToRefinements(filtered, s, errorEmitter).changeAliasToRefinement(context, f);
+            et = expectedType.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
         } catch (Exception e) {
             diagnostics.add(new RefinementError(element, expectedType, premises.simplify(), map));
             return;
@@ -96,9 +92,9 @@ public class VCChecker {
         try {
             premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
             List<GhostState> filtered = filterGhostStatesForVariables(list, mainVars, lrv);
-            premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(filtered, s, errorEmitter)
+            premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(filtered, s)
                     .changeAliasToRefinement(context, f);
-            et = expectedType.changeStatesToRefinements(filtered, s, errorEmitter).changeAliasToRefinement(context, f);
+            et = expectedType.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
         } catch (Exception e) {
             return false;
         }

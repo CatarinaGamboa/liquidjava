@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.Expression;
@@ -60,9 +59,8 @@ public class AliasWrapper {
         return expr.getExpression().clone();
     }
 
-    public Predicate getPremises(List<String> list, List<String> newNames, CtElement elem, ErrorEmitter ee)
-            throws ParsingException {
-        List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem, ee);
+    public Predicate getPremises(List<String> list, List<String> newNames, CtElement elem) throws ParsingException {
+        List<Predicate> invocationPredicates = getPredicatesFromExpression(list, elem);
         Predicate prem = new Predicate();
         for (int i = 0; i < invocationPredicates.size(); i++) {
             prem = Predicate.createConjunction(prem,
@@ -71,11 +69,10 @@ public class AliasWrapper {
         return prem.clone();
     }
 
-    private List<Predicate> getPredicatesFromExpression(List<String> list, CtElement elem, ErrorEmitter ee)
-            throws ParsingException {
+    private List<Predicate> getPredicatesFromExpression(List<String> list, CtElement elem) throws ParsingException {
         List<Predicate> lp = new ArrayList<>();
         for (String e : list)
-            lp.add(new Predicate(e, elem, ee));
+            lp.add(new Predicate(e, elem));
 
         return lp;
     }

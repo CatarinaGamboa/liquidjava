@@ -62,8 +62,12 @@ public abstract class LJError extends Exception {
 
     public String toString(String extra) {
         StringBuilder sb = new StringBuilder();
-        sb.append(title).append(" at: \n").append(element.toString().replace("@liquidjava.specification.", "@"))
-                .append("\n\n");
+        sb.append(title);
+
+        if (element != null)
+            sb.append(" at: \n").append(element.toString().replace("@liquidjava.specification.", "@"));
+
+        sb.append("\n");
         sb.append(message).append("\n");
         if (extra != null)
             sb.append(extra).append("\n");

@@ -5,7 +5,6 @@ import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.diagnostics.warnings.ExternalClassNotFoundWarning;
 import liquidjava.diagnostics.warnings.ExternalMethodNotFoundWarning;
@@ -31,8 +30,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
     String prefix;
     MethodsFunctionsChecker m;
 
-    public ExternalRefinementTypeChecker(Context context, Factory fac, ErrorEmitter errorEmitter) {
-        super(context, fac, errorEmitter);
+    public ExternalRefinementTypeChecker(Context context, Factory factory) {
+        super(context, factory);
     }
 
     @Override
@@ -42,7 +41,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         Optional<String> externalRefinements = getExternalRefinement(intrface);
@@ -56,7 +55,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             try {
                 getRefinementFromAnnotation(intrface);
             } catch (ParsingException e) {
-                return; // error already in ErrorEmitter
+                return; // error already reported
             }
             handleStateSetsFromAnnotation(intrface);
             super.visitCtInterface(intrface);
@@ -65,14 +64,14 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtField(CtField<T> f) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         Optional<Predicate> oc;
         try {
             oc = getRefinementFromAnnotation(f);
         } catch (ParsingException e) {
-            return; // error already in ErrorEmitter
+            return; // error already reported
         }
         Predicate c = oc.orElse(new Predicate());
         context.addGlobalVariableToContext(f.getSimpleName(), prefix, f.getType(), c);
@@ -80,7 +79,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         CtType<?> targetType = factory.Type().createReference(prefix).getTypeDeclaration();
@@ -88,20 +87,25 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             return;
 
         boolean isConstructor = method.getSimpleName().equals(targetType.getSimpleName());
-        if (isConstructor && !constructorExists(targetType, method)) {
-            String title = String.format("Could not find constructor '%s' for '%s'", method.getSignature(), prefix);
-            String[] overloads = getOverloads(targetType, method);
-            String message = overloads.length == 0 ? title
-                    : title + "\nAvailable constructors:\n  " + String.join("\n  ", overloads);
-            diagnostics.add(new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix));
-        } else if (!methodExists(targetType, method)) {
-            String title = String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
-                    method.getSignature(), prefix);
-            String[] overloads = getOverloads(targetType, method);
-            String message = overloads.length == 0 ? title
-                    : title + "\nAvailable overloads:\n  " + String.join("\n  ", overloads);
-            diagnostics.add(new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix));
-            return;
+        if (isConstructor) {
+            if (!constructorExists(targetType, method)) {
+                String title = String.format("Could not find constructor '%s' for '%s'", method.getSignature(), prefix);
+                String[] overloads = getOverloads(targetType, method);
+                String message = overloads.length == 0 ? title
+                        : title + "\nAvailable constructors:\n  " + String.join("\n  ", overloads);
+
+                diagnostics.add(new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix));
+            }
+        } else {
+            if (!methodExists(targetType, method)) {
+                String title = String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
+                        method.getSignature(), prefix);
+                String[] overloads = getOverloads(targetType, method);
+                String message = overloads.length == 0 ? title
+                        : title + "\nAvailable overloads:\n  " + String.join("\n  ", overloads);
+                diagnostics.add(new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix));
+                return;
+            }
         }
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
         try {

@@ -1,9 +1,10 @@
 package liquidjava.processor.refinement_checker;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.rj_language.parsing.ParsingException;
@@ -20,15 +21,15 @@ public class MethodsFirstChecker extends TypeChecker {
     MethodsFunctionsChecker mfc;
     List<String> visitedClasses;
 
-    public MethodsFirstChecker(Context c, Factory fac, ErrorEmitter errorEmitter) {
-        super(c, fac, errorEmitter);
+    public MethodsFirstChecker(Context context, Factory factory) {
+        super(context, factory);
         mfc = new MethodsFunctionsChecker(this);
         visitedClasses = new ArrayList<>();
     }
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         context.reinitializeContext();
@@ -55,7 +56,7 @@ public class MethodsFirstChecker extends TypeChecker {
         try {
             getRefinementFromAnnotation(ctClass);
         } catch (ParsingException e) {
-            return; // error already in ErrorEmitter
+            return; // error already reported
         }
         handleStateSetsFromAnnotation(ctClass);
         super.visitCtClass(ctClass);
@@ -63,7 +64,7 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         if (visitedClasses.contains(intrface.getQualifiedName()))
@@ -76,7 +77,7 @@ public class MethodsFirstChecker extends TypeChecker {
         try {
             getRefinementFromAnnotation(intrface);
         } catch (ParsingException e) {
-            return; // error already in ErrorEmitter
+            return; // error already reported
         }
         handleStateSetsFromAnnotation(intrface);
         super.visitCtInterface(intrface);
@@ -84,7 +85,7 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         context.enterContext();
@@ -99,7 +100,7 @@ public class MethodsFirstChecker extends TypeChecker {
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         context.enterContext();

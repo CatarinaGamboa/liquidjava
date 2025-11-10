@@ -1,5 +1,7 @@
 package liquidjava.processor.refinement_checker.object_checkers;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -83,7 +85,7 @@ public class AuxHierarchyRefinememtsPassage {
             } else {
                 boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i).getPosition());
                 if (!f) {
-                    if (!tc.getErrorEmitter().foundError())
+                    if (!diagnostics.foundError())
                         tc.createError(method, argRef, superArgRef, "");
                 }
             }

@@ -6,7 +6,6 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
-import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
@@ -27,7 +26,12 @@ public class CommandLineLauncher {
         }
         List<String> paths = Arrays.asList(args);
         launch(paths.toArray(new String[0]));
-        System.out.println(diagnostics.foundError() ? diagnostics.toString() : "Correct! Passed Verification.");
+        if (diagnostics.foundError()) {
+            System.out.println(diagnostics.getErrorOutput());
+        } else {
+            System.out.println(diagnostics.getWarningOutput());
+            System.out.println("Correct! Passed Verification.");
+        }
     }
 
     public static void launch(String... paths) {
@@ -45,6 +49,7 @@ public class CommandLineLauncher {
         launcher.getEnvironment().setNoClasspath(true);
         launcher.getEnvironment().setComplianceLevel(8);
         launcher.run();
+        diagnostics.clear();
 
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);

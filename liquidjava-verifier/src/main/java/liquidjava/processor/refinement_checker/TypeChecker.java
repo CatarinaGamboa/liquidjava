@@ -7,7 +7,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.diagnostics.errors.InvalidRefinementError;
 import liquidjava.diagnostics.errors.SyntaxError;
@@ -41,13 +40,11 @@ public abstract class TypeChecker extends CtScanner {
     Context context;
     Factory factory;
     VCChecker vcChecker;
-    ErrorEmitter errorEmitter;
 
-    public TypeChecker(Context c, Factory fac, ErrorEmitter errorEmitter) {
-        this.context = c;
-        this.factory = fac;
-        this.errorEmitter = errorEmitter;
-        vcChecker = new VCChecker(errorEmitter);
+    public TypeChecker(Context context, Factory factory) {
+        this.context = context;
+        this.factory = factory;
+        vcChecker = new VCChecker();
     }
 
     public Context getContext() {
@@ -83,7 +80,7 @@ public abstract class TypeChecker extends CtScanner {
             }
         }
         if (ref.isPresent()) {
-            Predicate p = new Predicate(ref.get(), element, errorEmitter);
+            Predicate p = new Predicate(ref.get(), element);
 
             // check if refinement is valid
             if (!p.getExpression().isBooleanExpression()) {
@@ -91,7 +88,7 @@ public abstract class TypeChecker extends CtScanner {
                         ref.get()));
                 return Optional.empty();
             }
-            if (errorEmitter.foundError())
+            if (diagnostics.foundError())
                 return Optional.empty();
 
             constr = Optional.of(p);
@@ -330,9 +327,5 @@ public abstract class TypeChecker extends CtScanner {
 
     public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected) {
         vcChecker.printStateMismatchError(element, method, found, expected);
-    }
-
-    public ErrorEmitter getErrorEmitter() {
-        return errorEmitter;
     }
 }

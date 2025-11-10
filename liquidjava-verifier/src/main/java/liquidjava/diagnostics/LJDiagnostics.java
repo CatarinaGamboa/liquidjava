@@ -58,8 +58,7 @@ public class LJDiagnostics {
         this.warnings.clear();
     }
 
-    @Override
-    public String toString() {
+    public String getErrorOutput() {
         StringBuilder sb = new StringBuilder();
         if (foundError()) {
             for (LJError error : errors) {
@@ -72,6 +71,16 @@ public class LJDiagnostics {
                     sb.append(warning.getMessage()).append("\n");
                 }
                 sb.append("Passed Verification!\n");
+            }
+        }
+        return sb.toString();
+    }
+
+    public String getWarningOutput() {
+        StringBuilder sb = new StringBuilder();
+        if (foundWarning()) {
+            for (LJWarning warning : warnings) {
+                sb.append(warning.toString()).append("\n");
             }
         }
         return sb.toString();
