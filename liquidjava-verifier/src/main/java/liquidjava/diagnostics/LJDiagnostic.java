@@ -117,4 +117,28 @@ public class LJDiagnostic {
             return null;
         }
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        LJDiagnostic other = (LJDiagnostic) obj;
+        return title.equals(other.title) && message.equals(other.message)
+                && ((details == null && other.details == null) || (details != null && details.equals(other.details)))
+                && ((file == null && other.file == null) || (file != null && file.equals(other.file)))
+                && ((position == null && other.position == null)
+                        || (position != null && position.equals(other.position)));
+    }
+
+    @Override
+    public int hashCode() {
+        int result = title.hashCode();
+        result = 31 * result + message.hashCode();
+        result = 31 * result + (details != null ? details.hashCode() : 0);
+        result = 31 * result + (file != null ? file.hashCode() : 0);
+        result = 31 * result + (position != null ? position.hashCode() : 0);
+        return result;
+    }
 }
