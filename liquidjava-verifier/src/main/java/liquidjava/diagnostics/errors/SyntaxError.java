@@ -16,18 +16,11 @@ public class SyntaxError extends LJError {
     }
 
     public SyntaxError(String message, CtElement element, String refinement) {
-        super("Syntax Error", message, element.getPosition(), element.toString(), null);
+        super("Syntax Error", message, "", element.getPosition(), null);
         this.refinement = refinement;
     }
 
     public String getRefinement() {
         return refinement;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Invalid syntax in refinement: ").append(refinement);
-        return super.toString(sb.toString());
     }
 }

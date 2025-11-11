@@ -19,8 +19,9 @@ public class StateRefinementError extends LJError {
 
     public StateRefinementError(CtElement element, String method, Predicate[] expected, Predicate found,
             TranslationTable translationTable) {
-        super("State Refinement Error", "State refinement transition violation", element.getPosition(),
-                element.toString(), translationTable);
+        super("State Refinement Error", "State refinement transition violation", String.format("Expected: %s\nFound: %s",
+                String.join(", ", Arrays.stream(expected).map(Predicate::toString).toArray(String[]::new)), found.toString()), element.getPosition(),
+                translationTable);
         this.method = method;
         this.expected = Arrays.stream(expected).map(Predicate::toString).toArray(String[]::new);
         this.found = found.toString();
@@ -36,16 +37,5 @@ public class StateRefinementError extends LJError {
 
     public String getFound() {
         return found;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Method: ").append(method).append("\n");
-        sb.append("Expected: ");
-        Arrays.stream(expected).forEach(s -> sb.append(s).append(", "));
-        sb.append("\n");
-        sb.append("Found: ").append(found);
-        return super.toString(sb.toString());
     }
 }

@@ -328,7 +328,7 @@ public class VCChecker {
         } else if (e instanceof NotFoundSMTError) {
             return new NotFoundError(element, e.getMessage(), map);
         } else {
-            return new CustomError(element, e.getMessage());
+            return new CustomError(e.getMessage(), element);
         }
     }
 

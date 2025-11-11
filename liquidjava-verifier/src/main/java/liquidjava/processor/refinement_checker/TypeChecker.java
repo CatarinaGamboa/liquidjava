@@ -122,7 +122,7 @@ public abstract class TypeChecker extends CtScanner {
                 String f = s.getValue();
                 if (Character.isUpperCase(f.charAt(0))) {
                     diagnostics
-                            .add(new CustomError(s, String.format("State name must start with lowercase in '%s'", f)));
+                            .add(new CustomError(String.format("State name must start with lowercase in '%s'", f), s));
                 }
             }
         }
@@ -163,12 +163,12 @@ public abstract class TypeChecker extends CtScanner {
         try {
             gd = RefinementsParser.getGhostDeclaration(string);
         } catch (ParsingException e) {
-            diagnostics.add(new CustomError(ann, "Could not parse the ghost function " + e.getMessage()));
+            diagnostics.add(new CustomError("Could not parse the ghost function " + e.getMessage(), ann));
             return;
         }
         if (gd.getParam_types().size() > 0) {
-            diagnostics.add(new CustomError(ann, "Ghost States have the class as parameter "
-                    + "by default, no other parameters are allowed in '" + string + "'"));
+            diagnostics.add(new CustomError("Ghost States have the class as parameter "
+                    + "by default, no other parameters are allowed in '" + string + "'", ann));
             return;
         }
         // Set class as parameter of Ghost
@@ -226,7 +226,7 @@ public abstract class TypeChecker extends CtScanner {
                 context.addGhostFunction(gh);
             }
         } catch (ParsingException e) {
-            diagnostics.add(new CustomError(element, "Could not parse the ghost function " + e.getMessage()));
+            diagnostics.add(new CustomError("Could not parse the ghost function " + e.getMessage(), element));
             // e.printStackTrace();
             return;
         }

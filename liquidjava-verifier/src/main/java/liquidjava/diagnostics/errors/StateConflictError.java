@@ -15,8 +15,9 @@ public class StateConflictError extends LJError {
     private String className;
 
     public StateConflictError(CtElement element, Predicate state, String className, TranslationTable translationTable) {
-        super("State Conflict Error", "Found multiple disjoint states in state transition — State transition can only go to one state of each state set", element.getPosition(),
-                element.toString(), translationTable);
+        super("State Conflict Error",
+                "Found multiple disjoint states in state transition", "State transition can only go to one state of each state set",
+                element.getPosition(), translationTable);
         this.state = state.toString();
         this.className = className;
     }
@@ -27,13 +28,5 @@ public class StateConflictError extends LJError {
 
     public String getClassName() {
         return className;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Class: ").append(className).append("\n");
-        sb.append("State: ").append(state);
-        return super.toString(sb.toString());
     }
 }

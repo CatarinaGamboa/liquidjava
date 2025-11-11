@@ -15,18 +15,11 @@ public class GhostInvocationError extends LJError {
 
     public GhostInvocationError(String message, SourcePosition pos, Predicate expected,
             TranslationTable translationTable) {
-        super("Ghost Invocation Error", message, pos, null, translationTable);
+        super("Ghost Invocation Error", message, "", pos, translationTable);
         this.expected = expected.toString();
     }
 
     public String getExpected() {
         return expected;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Expected: ").append(expected).append("\n");
-        return super.toString(sb.toString());
     }
 }
