@@ -17,9 +17,10 @@ public class RefinementError extends LJError {
 
     public RefinementError(CtElement element, Expression expected, ValDerivationNode found,
             TranslationTable translationTable) {
-        super("Refinement Error", String.format("%s is not a subtype of %s", found.getValue(), expected), "",
+        super("Refinement Error",
+                String.format("%s is not a subtype of %s", found.getValue(), expected.toSimplifiedString()), "",
                 element.getPosition(), translationTable);
-        this.expected = expected.toString();
+        this.expected = expected.toSimplifiedString();
         this.found = found;
     }
 

@@ -50,6 +50,11 @@ public class BinaryExpression extends Expression {
     }
 
     @Override
+    public String toSimplifiedString() {
+        return getFirstOperand().toSimplifiedString() + " " + op + " " + getSecondOperand().toSimplifiedString();
+    }
+
+    @Override
     public void getVariableNames(List<String> toAdd) {
         getFirstOperand().getVariableNames(toAdd);
         getSecondOperand().getVariableNames(toAdd);

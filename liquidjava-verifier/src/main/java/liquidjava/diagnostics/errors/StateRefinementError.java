@@ -22,12 +22,13 @@ public class StateRefinementError extends LJError {
             TranslationTable translationTable) {
         super("State Refinement Error", "State refinement transition violation",
                 String.format("Expected: %s\nFound: %s",
-                        String.join(", ", Arrays.stream(expected).map(Expression::toString).toArray(String[]::new)),
-                        found.toString()),
+                        String.join(", ",
+                                Arrays.stream(expected).map(Expression::toSimplifiedString).toArray(String[]::new)),
+                        found.toSimplifiedString()),
                 element.getPosition(), translationTable);
         this.method = method;
-        this.expected = Arrays.stream(expected).map(Expression::toString).toArray(String[]::new);
-        this.found = found.toString();
+        this.expected = Arrays.stream(expected).map(Expression::toSimplifiedString).toArray(String[]::new);
+        this.found = found.toSimplifiedString();
     }
 
     public String getMethod() {

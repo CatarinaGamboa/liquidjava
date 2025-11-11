@@ -16,7 +16,7 @@ public class GhostInvocationError extends LJError {
     public GhostInvocationError(String message, SourcePosition pos, Expression expected,
             TranslationTable translationTable) {
         super("Ghost Invocation Error", message, "", pos, translationTable);
-        this.expected = expected.toString();
+        this.expected = expected.toSimplifiedString();
     }
 
     public String getExpected() {
