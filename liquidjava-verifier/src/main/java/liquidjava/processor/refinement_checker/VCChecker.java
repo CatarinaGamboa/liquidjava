@@ -3,6 +3,7 @@ package liquidjava.processor.refinement_checker;
 import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
@@ -20,6 +21,7 @@ import liquidjava.diagnostics.errors.StateRefinementError;
 import liquidjava.processor.VCImplication;
 import liquidjava.processor.context.*;
 import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.ast.Expression;
 import liquidjava.smt.GhostFunctionError;
 import liquidjava.smt.NotFoundSMTError;
 import liquidjava.smt.SMTEvaluator;
@@ -56,7 +58,7 @@ public class VCChecker {
 
             et = expectedType.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
         } catch (Exception e) {
-            diagnostics.add(new RefinementError(element, expectedType, premises.simplify(), map));
+            diagnostics.add(new RefinementError(element, expectedType.getExpression(), premises.simplify(), map));
             return;
         }
 
@@ -304,12 +306,12 @@ public class VCChecker {
         gatherVariables(foundType, lrv, mainVars);
         TranslationTable map = new TranslationTable();
         Predicate premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
-        diagnostics.add(new RefinementError(element, expectedType, premises.simplify(), map));
+        diagnostics.add(new RefinementError(element, expectedType.getExpression(), premises.simplify(), map));
     }
 
     public void printSameStateError(CtElement element, Predicate expectedType, String klass) {
         TranslationTable map = createMap(element, expectedType);
-        diagnostics.add(new StateConflictError(element, expectedType, klass, map));
+        diagnostics.add(new StateConflictError(element, expectedType.getExpression(), klass, map));
     }
 
     private void printError(Exception e, Predicate premisesBeforeChange, Predicate expectedType, CtElement element,
@@ -321,10 +323,10 @@ public class VCChecker {
     private LJError mapError(Exception e, Predicate premisesBeforeChange, Predicate expectedType, CtElement element,
             TranslationTable map) {
         if (e instanceof TypeCheckError) {
-            return new RefinementError(element, expectedType, premisesBeforeChange.simplify(), map);
+            return new RefinementError(element, expectedType.getExpression(), premisesBeforeChange.simplify(), map);
         } else if (e instanceof GhostFunctionError) {
             return new GhostInvocationError("Invalid types or number of arguments in ghost invocation",
-                    element.getPosition(), expectedType, map);
+                    element.getPosition(), expectedType.getExpression(), map);
         } else if (e instanceof NotFoundSMTError) {
             return new NotFoundError(element, e.getMessage(), map);
         } else {
@@ -337,6 +339,8 @@ public class VCChecker {
         gatherVariables(found, lrv, mainVars);
         TranslationTable map = new TranslationTable();
         VCImplication foundState = joinPredicates(found, mainVars, lrv, map);
-        diagnostics.add(new StateRefinementError(element, method, states, foundState.toConjunctions(), map));
+        diagnostics.add(new StateRefinementError(element, method,
+                Arrays.stream(states).map(Predicate::getExpression).toArray(Expression[]::new),
+                foundState.toConjunctions().simplify().getValue(), map));
     }
 }

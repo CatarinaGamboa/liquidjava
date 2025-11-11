@@ -10,7 +10,7 @@ import spoon.reflect.declaration.CtElement;
 public class IllegalConstructorTransitionError extends LJError {
 
     public IllegalConstructorTransitionError(CtElement element) {
-        super("Illegal Constructor Transition Error",
-                "Found constructor with 'from' state", "Constructor methods should only have a 'to' state", element.getPosition(), null);
+        super("Illegal Constructor Transition Error", "Found constructor with 'from' state",
+                "Constructor methods should only have a 'to' state", element.getPosition(), null);
     }
 }

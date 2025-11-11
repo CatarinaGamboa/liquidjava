@@ -7,7 +7,7 @@ import java.util.List;
 import spoon.reflect.cu.SourcePosition;
 
 public class LJDiagnostic {
-    
+
     private String title;
     private String message;
     private String details;
@@ -27,11 +27,11 @@ public class LJDiagnostic {
     public String getTitle() {
         return title;
     }
-    
+
     public String getMessage() {
         return message;
     }
-    
+
     public String getDetails() {
         return details;
     }
@@ -74,7 +74,7 @@ public class LJDiagnostic {
     public String getSnippet() {
         if (file == null || position == null)
             return null;
-        
+
         Path path = Path.of(file);
         try {
             List<String> lines = Files.readAllLines(path);

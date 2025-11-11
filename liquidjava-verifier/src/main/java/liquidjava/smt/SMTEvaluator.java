@@ -44,7 +44,7 @@ public class SMTEvaluator {
         } catch (Z3Exception e) {
             String msg = e.getLocalizedMessage().toLowerCase();
             if (msg.contains("wrong number of arguments") || msg.contains("sort mismatch"))
-                diagnostics.add(new GhostInvocationError(msg, pos, supRef, null));
+                diagnostics.add(new GhostInvocationError(msg, pos, supRef.getExpression(), null));
 
             throw new Z3Exception(e.getLocalizedMessage());
         }

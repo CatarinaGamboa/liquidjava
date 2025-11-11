@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import liquidjava.diagnostics.TranslationTable;
 import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.ast.Expression;
 import spoon.reflect.declaration.CtElement;
 
 /**
@@ -17,13 +18,15 @@ public class StateRefinementError extends LJError {
     private final String[] expected;
     private final String found;
 
-    public StateRefinementError(CtElement element, String method, Predicate[] expected, Predicate found,
+    public StateRefinementError(CtElement element, String method, Expression[] expected, Expression found,
             TranslationTable translationTable) {
-        super("State Refinement Error", "State refinement transition violation", String.format("Expected: %s\nFound: %s",
-                String.join(", ", Arrays.stream(expected).map(Predicate::toString).toArray(String[]::new)), found.toString()), element.getPosition(),
-                translationTable);
+        super("State Refinement Error", "State refinement transition violation",
+                String.format("Expected: %s\nFound: %s",
+                        String.join(", ", Arrays.stream(expected).map(Expression::toString).toArray(String[]::new)),
+                        found.toString()),
+                element.getPosition(), translationTable);
         this.method = method;
-        this.expected = Arrays.stream(expected).map(Predicate::toString).toArray(String[]::new);
+        this.expected = Arrays.stream(expected).map(Expression::toString).toArray(String[]::new);
         this.found = found.toString();
     }
 

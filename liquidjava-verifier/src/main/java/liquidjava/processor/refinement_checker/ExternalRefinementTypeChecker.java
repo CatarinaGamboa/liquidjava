@@ -89,19 +89,24 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         boolean isConstructor = method.getSimpleName().equals(targetType.getSimpleName());
         if (isConstructor) {
             if (!constructorExists(targetType, method)) {
-                String message = String.format("Could not find constructor '%s' for '%s'", method.getSignature(), prefix);
+                String message = String.format("Could not find constructor '%s' for '%s'", method.getSignature(),
+                        prefix);
                 String[] overloads = getOverloads(targetType, method);
-                String details = overloads.length == 0 ? null : "Available constructors:\n  " + String.join("\n  ", overloads);
+                String details = overloads.length == 0 ? null
+                        : "Available constructors:\n  " + String.join("\n  ", overloads);
 
-                diagnostics.add(new ExternalMethodNotFoundWarning(method, message, details, method.getSignature(), prefix));
+                diagnostics.add(
+                        new ExternalMethodNotFoundWarning(method, message, details, method.getSignature(), prefix));
             }
         } else {
             if (!methodExists(targetType, method)) {
-                String message = String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
-                        method.getSignature(), prefix);
+                String message = String.format("Could not find method '%s %s' for '%s'",
+                        method.getType().getSimpleName(), method.getSignature(), prefix);
                 String[] overloads = getOverloads(targetType, method);
-                String details = overloads.length == 0 ? null : "Available overloads:\n  " + String.join("\n  ", overloads);
-                diagnostics.add(new ExternalMethodNotFoundWarning(method, message, details, method.getSignature(), prefix));
+                String details = overloads.length == 0 ? null
+                        : "Available overloads:\n  " + String.join("\n  ", overloads);
+                diagnostics.add(
+                        new ExternalMethodNotFoundWarning(method, message, details, method.getSignature(), prefix));
                 return;
             }
         }

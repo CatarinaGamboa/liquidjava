@@ -45,10 +45,8 @@ public class ErrorPosition {
         if (obj == null || getClass() != obj.getClass())
             return false;
         ErrorPosition other = (ErrorPosition) obj;
-        return lineStart == other.lineStart 
-            && colStart == other.colStart 
-            && lineEnd == other.lineEnd 
-            && colEnd == other.colEnd;
+        return lineStart == other.lineStart && colStart == other.colStart && lineEnd == other.lineEnd
+                && colEnd == other.colEnd;
     }
 
     @Override
