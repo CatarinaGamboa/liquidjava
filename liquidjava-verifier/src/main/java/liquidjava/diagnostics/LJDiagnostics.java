@@ -22,11 +22,13 @@ public class LJDiagnostics {
     }
 
     public void add(LJError error) {
-        this.errors.add(error);
+        if (!this.errors.contains(error))
+            this.errors.add(error);
     }
 
     public void add(LJWarning warning) {
-        this.warnings.add(warning);
+        if (!this.warnings.contains(warning))
+            this.warnings.add(warning);
     }
 
     public boolean foundError() {
