@@ -10,7 +10,7 @@ import org.junit.Test;
  * Este teste chama o CommandLineLauncher e verifica se o ErrorEmitter reporta corretamente os resultados para ficheiros
  * conhecidos.
  */
-public class TesteIntegração {
+public class TesteIntegracao {
 
     /**
      * Testa a verificação de um ficheiro que se espera estar correto. Este teste falha se o ErrorEmitter encontrar um
