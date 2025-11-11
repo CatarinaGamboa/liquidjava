@@ -390,10 +390,8 @@ public class AuxStateHandler {
             stateChange.setFrom(fromPredicate);
             stateChange.setTo(toPredicate);
         } catch (ParsingException e) {
-            String message = String.format(
-                    "Parsing error while constructing assignment update for `%s` in class `%s` : %s", fw,
-                    field.getDeclaringType().getQualifiedName(), e.getMessage());
-            diagnostics.add(new CustomError(message, field));
+            String message = String.format("Parsing error while constructing assignment update for `%s`", fw);
+            diagnostics.add(new CustomError(message, e.getMessage(), field));
             return;
         }
 

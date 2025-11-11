@@ -3,7 +3,6 @@ package liquidjava.diagnostics.errors;
 import java.util.Arrays;
 
 import liquidjava.diagnostics.TranslationTable;
-import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.Expression;
 import spoon.reflect.declaration.CtElement;
 

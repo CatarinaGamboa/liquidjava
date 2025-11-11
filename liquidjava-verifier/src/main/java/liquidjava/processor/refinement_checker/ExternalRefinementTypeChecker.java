@@ -48,7 +48,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         if (externalRefinements.isPresent()) {
             this.prefix = externalRefinements.get();
             if (!classExists(prefix)) {
-                String message = String.format("Could not find external class '%s'", prefix);
+                String message = String.format("Could not find class '%s'", prefix);
                 diagnostics.add(new ExternalClassNotFoundWarning(intrface, message, prefix));
                 return;
             }
@@ -130,7 +130,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
 
         } catch (ParsingException e) {
-            diagnostics.add(new CustomError("Could not parse the ghost function" + e.getMessage(), element));
+            diagnostics.add(new CustomError("Could not parse the ghost function", e.getMessage(), element));
         }
     }
 

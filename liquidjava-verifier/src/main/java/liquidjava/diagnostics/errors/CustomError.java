@@ -18,6 +18,10 @@ public class CustomError extends LJError {
         super("Error", message, null, pos, null);
     }
 
+    public CustomError(String message, String detail, CtElement element) {
+        super("Error", message, detail, element.getPosition(), null);
+    }
+
     public CustomError(String message, CtElement element) {
         super("Error", message, null, element.getPosition(), null);
     }

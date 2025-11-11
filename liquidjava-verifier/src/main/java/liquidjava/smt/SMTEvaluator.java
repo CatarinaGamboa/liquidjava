@@ -1,13 +1,10 @@
 package liquidjava.smt;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
-
 import com.martiansoftware.jsap.SyntaxException;
 import com.microsoft.z3.Expr;
 import com.microsoft.z3.Status;
 import com.microsoft.z3.Z3Exception;
 
-import liquidjava.diagnostics.errors.GhostInvocationError;
 import liquidjava.processor.context.Context;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.Expression;
@@ -42,10 +39,6 @@ public class SMTEvaluator {
             System.out.println("Could not parse: " + toVerify);
             e1.printStackTrace();
         } catch (Z3Exception e) {
-            String msg = e.getLocalizedMessage().toLowerCase();
-            if (msg.contains("wrong number of arguments") || msg.contains("sort mismatch"))
-                diagnostics.add(new GhostInvocationError(msg, pos, supRef.getExpression(), null));
-
             throw new Z3Exception(e.getLocalizedMessage());
         }
     }

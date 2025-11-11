@@ -236,13 +236,24 @@ public class VCChecker {
         getVariablesFromContext(l, newVars, varName);
     }
 
-    public boolean smtChecks(Predicate cSMT, Predicate expectedType, SourcePosition p) {
+    public boolean smtChecks(Predicate found, Predicate expectedType, SourcePosition p) {
         try {
-            new SMTEvaluator().verifySubtype(cSMT, expectedType, context, p);
+            new SMTEvaluator().verifySubtype(found, expectedType, context, p);
         } catch (TypeCheckError e) {
             return false;
         } catch (Exception e) {
-            diagnostics.add(new CustomError(e.getMessage(), p));
+            String msg = e.getLocalizedMessage().toLowerCase();
+            LJError error;
+            if (msg.contains("wrong number of arguments")) {
+                error = new GhostInvocationError("Wrong number of arguments in ghost invocation", p,
+                        expectedType.getExpression(), null);
+            } else if (msg.contains("sort mismatch")) {
+                error = new GhostInvocationError("Type mismatch in arguments of ghost invocation", p,
+                        expectedType.getExpression(), null);
+            } else {
+                error = new CustomError(e.getMessage(), p);
+            }
+            diagnostics.add(error);
         }
         return true;
     }
