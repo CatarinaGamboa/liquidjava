@@ -9,7 +9,7 @@ public class StateRefinementError {
     @StateRefinement(to="open(this)")
     public StateRefinementError() {}
 
-    @StateRefinement(from="open(this)", to="closed(this)")
+    @StateRefinement(from="!closed(this)", to="closed(this)")
     public void close() {}
 
     public static void main(String[] args) {

@@ -25,7 +25,7 @@ public class GroupExpression extends Expression {
 
     @Override
     public String toSimplifiedString() {
-        return "(" + getExpression().toSimplifiedString() + ")";
+        return getExpression().toSimplifiedString();
     }
 
     @Override
