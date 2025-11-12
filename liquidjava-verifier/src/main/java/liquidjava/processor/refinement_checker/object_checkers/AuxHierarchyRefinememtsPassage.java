@@ -1,6 +1,6 @@
 package liquidjava.processor.refinement_checker.object_checkers;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
 
 import java.util.HashMap;
 import java.util.List;

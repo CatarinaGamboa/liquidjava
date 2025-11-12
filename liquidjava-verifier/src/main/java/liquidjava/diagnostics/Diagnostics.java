@@ -10,13 +10,13 @@ import liquidjava.diagnostics.warnings.LJWarning;
  * @see LJError
  * @see LJWarning
  */
-public class LJDiagnostics {
-    public static final LJDiagnostics diagnostics = new LJDiagnostics();
+public class Diagnostics {
+    public static final Diagnostics diagnostics = new Diagnostics();
 
     private ArrayList<LJError> errors;
     private ArrayList<LJWarning> warnings;
 
-    private LJDiagnostics() {
+    private Diagnostics() {
         this.errors = new ArrayList<>();
         this.warnings = new ArrayList<>();
     }

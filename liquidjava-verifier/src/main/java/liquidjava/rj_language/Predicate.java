@@ -1,6 +1,6 @@
 package liquidjava.rj_language;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
