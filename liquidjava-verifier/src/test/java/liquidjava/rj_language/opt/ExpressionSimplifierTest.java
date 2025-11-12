@@ -304,6 +304,31 @@ class ExpressionSimplifierTest {
         assertDerivationEquals(expected, result, "");
     }
 
+    @Test
+    void testSingleEqualityNotSimplifiedToTrue() {
+        // Given: x == 1
+        // Expected: x == 1 (should not be simplified to "true")
+
+        Expression varX = new Var("x");
+        Expression one = new LiteralInt(1);
+        Expression xEquals1 = new BinaryExpression(varX, "==", one);
+
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(xEquals1);
+
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("x == 1", result.getValue().toString(),
+                "Single equality should not be simplified to a boolean literal");
+
+        // The result should be the original expression unchanged
+        assertTrue(result.getValue() instanceof BinaryExpression, "Result should still be a binary expression");
+        BinaryExpression resultExpr = (BinaryExpression) result.getValue();
+        assertEquals("==", resultExpr.getOperator(), "Operator should still be ==");
+        assertEquals("x", resultExpr.getFirstOperand().toString(), "Left operand should be x");
+        assertEquals("1", resultExpr.getSecondOperand().toString(), "Right operand should be 1");
+    }
+
     /**
      * Helper method to compare two derivation nodes recursively
      */
