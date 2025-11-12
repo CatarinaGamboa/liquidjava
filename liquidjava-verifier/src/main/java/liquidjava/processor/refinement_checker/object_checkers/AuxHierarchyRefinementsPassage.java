@@ -1,7 +1,5 @@
 package liquidjava.processor.refinement_checker.object_checkers;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
@@ -20,7 +18,7 @@ import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.declaration.CtParameter;
 import spoon.reflect.reference.CtTypeReference;
 
-public class AuxHierarchyRefinememtsPassage {
+public class AuxHierarchyRefinementsPassage {
 
     public static <R> void checkFunctionInSupertypes(CtClass<?> klass, CtMethod<R> method, RefinedFunction f,
             TypeChecker tc) {
@@ -83,10 +81,9 @@ public class AuxHierarchyRefinememtsPassage {
             if (argRef.isBooleanTrue()) {
                 arg.setRefinement(superArgRef.substituteVariable(newName, arg.getName()));
             } else {
-                boolean f = tc.checksStateSMT(superArgRef, argRef, params.get(i).getPosition());
-                if (!f) {
-                    if (!diagnostics.foundError())
-                        tc.createError(method, argRef, superArgRef, "");
+                boolean ok = tc.checksStateSMT(superArgRef, argRef, params.get(i).getPosition());
+                if (!ok) {
+                    tc.createError(method, argRef, superArgRef, "");
                 }
             }
         }

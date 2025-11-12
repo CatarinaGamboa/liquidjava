@@ -76,9 +76,6 @@ public class Predicate {
     public Predicate(String ref, CtElement element, String prefix) throws ParsingException {
         this.prefix = prefix;
         exp = parse(ref, element);
-        if (diagnostics.foundError()) {
-            return;
-        }
         if (!(exp instanceof GroupExpression)) {
             exp = new GroupExpression(exp);
         }

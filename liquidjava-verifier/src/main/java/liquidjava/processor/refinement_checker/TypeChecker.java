@@ -86,7 +86,6 @@ public abstract class TypeChecker extends CtScanner {
             if (!p.getExpression().isBooleanExpression()) {
                 diagnostics.add(new InvalidRefinementError(element, "Refinement predicate must be a boolean expression",
                         ref.get()));
-                return Optional.empty();
             }
             if (diagnostics.foundError())
                 return Optional.empty();
@@ -317,8 +316,8 @@ public abstract class TypeChecker extends CtScanner {
         return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), p, factory);
     }
 
-    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customeMessage) {
-        vcChecker.printSubtypingError(element, expectedType, foundType, customeMessage);
+    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customMessage) {
+        vcChecker.printSubtypingError(element, expectedType, foundType, customMessage);
     }
 
     public void createSameStateError(CtElement element, Predicate expectedType, String klass) {

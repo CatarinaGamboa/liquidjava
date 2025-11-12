@@ -311,7 +311,7 @@ public class VCChecker {
     }
 
     protected void printSubtypingError(CtElement element, Predicate expectedType, Predicate foundType,
-            String customeMsg) {
+            String customMsg) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         gatherVariables(foundType, lrv, mainVars);
