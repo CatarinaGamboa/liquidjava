@@ -1,0 +1,22 @@
+package liquidjava.ast.opt;
+
+import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import liquidjava.rj_language.ast.BinaryExpression;
+import liquidjava.rj_language.ast.LiteralInt;
+import liquidjava.rj_language.opt.ConstantFolding;
+import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
+
+public class TestConstantFoldingIntegration {
+    @Test
+    public void testComplexFold() {
+        BinaryExpression expr = new BinaryExpression(
+            new BinaryExpression(new LiteralInt(2), "*", new LiteralInt(3)),
+            "+",
+            new LiteralInt(4)
+        );
+
+        ValDerivationNode result = ConstantFolding.fold(new ValDerivationNode(expr, null));
+        assertEquals(new LiteralInt(10), result.getValue());
+    }
+}
