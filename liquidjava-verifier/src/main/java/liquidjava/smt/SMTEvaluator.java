@@ -8,12 +8,13 @@ import com.microsoft.z3.Z3Exception;
 import liquidjava.processor.context.Context;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.Expression;
+import liquidjava.smt.errors.TypeCheckError;
 import spoon.reflect.cu.SourcePosition;
 
 public class SMTEvaluator {
 
     public void verifySubtype(Predicate subRef, Predicate supRef, Context c, SourcePosition pos)
-            throws TypeCheckError, GhostFunctionError, Exception {
+            throws TypeCheckError, Exception {
         // Creates a parser for our SMT-ready refinement language
         // Discharges the verification to z3
 

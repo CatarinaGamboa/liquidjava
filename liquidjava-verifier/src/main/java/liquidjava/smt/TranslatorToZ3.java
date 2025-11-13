@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import liquidjava.processor.context.AliasWrapper;
+import liquidjava.smt.errors.NotFoundError;
 import liquidjava.utils.Utils;
 
 import org.apache.commons.lang3.NotImplementedException;
@@ -75,7 +76,7 @@ public class TranslatorToZ3 implements AutoCloseable {
 
     private Expr<?> getVariableTranslation(String name) throws Exception {
         if (!varTranslation.containsKey(name))
-            throw new NotFoundSMTError("Variable '" + name.toString() + "' not found");
+            throw new NotFoundError("Variable '" + name.toString() + "' not found");
         Expr<?> e = varTranslation.get(name);
         if (e == null)
             e = varTranslation.get(String.format("this#%s", name));
@@ -144,7 +145,7 @@ public class TranslatorToZ3 implements AutoCloseable {
         if (candidate != null) {
             return candidate;
         }
-        throw new NotFoundSMTError("Function '" + name + "' not found");
+        throw new NotFoundError("Function '" + name + "' not found");
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })

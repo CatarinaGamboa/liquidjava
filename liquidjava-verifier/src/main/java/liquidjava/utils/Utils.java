@@ -40,13 +40,10 @@ public class Utils {
     }
 
     public static SourcePosition getRefinementAnnotationPosition(CtElement element, String refinement) {
-          return element.getAnnotations().stream()
-                .filter(a -> {
-                    String value = a.getValue("value").toString();
-                    String unquoted = value.substring(1, value.length() - 1);
-                    return unquoted.equals(refinement);
-                }).findFirst()
-                .map(a -> a.getPosition())
-                .orElse(element.getPosition());
+        return element.getAnnotations().stream().filter(a -> {
+            String value = a.getValue("value").toString();
+            String unquoted = value.substring(1, value.length() - 1);
+            return unquoted.equals(refinement);
+        }).findFirst().map(a -> a.getPosition()).orElse(element.getPosition());
     }
 }

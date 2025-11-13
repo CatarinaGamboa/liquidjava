@@ -22,10 +22,8 @@ import liquidjava.processor.VCImplication;
 import liquidjava.processor.context.*;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.Expression;
-import liquidjava.smt.GhostFunctionError;
-import liquidjava.smt.NotFoundSMTError;
 import liquidjava.smt.SMTEvaluator;
-import liquidjava.smt.TypeCheckError;
+import liquidjava.smt.errors.TypeCheckError;
 import liquidjava.utils.constants.Keys;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
@@ -267,10 +265,10 @@ public class VCChecker {
      *
      * @throws Exception
      * @throws GhostFunctionError
-     * @throws TypeCheckError
+     * @throws SMTError
      */
     private void smtChecking(Predicate cSMT, Predicate expectedType, SourcePosition p)
-            throws TypeCheckError, GhostFunctionError, Exception {
+            throws TypeCheckError, Exception {
         new SMTEvaluator().verifySubtype(cSMT, expectedType, context, p);
     }
 
@@ -335,10 +333,7 @@ public class VCChecker {
             TranslationTable map) {
         if (e instanceof TypeCheckError) {
             return new RefinementError(element, expectedType.getExpression(), premisesBeforeChange.simplify(), map);
-        } else if (e instanceof GhostFunctionError) {
-            return new GhostInvocationError("Invalid types or number of arguments in ghost invocation",
-                    element.getPosition(), expectedType.getExpression(), map);
-        } else if (e instanceof NotFoundSMTError) {
+        } else if (e instanceof liquidjava.smt.errors.NotFoundError) {
             return new NotFoundError(element, e.getMessage(), map);
         } else {
             return new CustomError(e.getMessage(), element);

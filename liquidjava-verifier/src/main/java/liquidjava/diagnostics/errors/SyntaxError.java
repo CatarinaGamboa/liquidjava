@@ -11,7 +11,6 @@ public class SyntaxError extends LJError {
 
     private String refinement;
 
-
     public SyntaxError(String message, String refinement) {
         this(message, null, refinement);
     }
