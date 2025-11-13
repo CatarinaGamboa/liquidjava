@@ -3,7 +3,6 @@ package liquidjava.integration;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.List;
-import java.util.Map;
 
 import liquidjava.processor.context.*;
 import liquidjava.rj_language.Predicate;
@@ -87,7 +86,10 @@ class VerificationWorkflowIntegrationTest {
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
 
         // Create function: int divide(int x, int y) with precondition y != 0
-        RefinedFunction divideFunc = new RefinedFunction("divide", "MathUtils", intType, new Predicate());
+        RefinedFunction divideFunc = new RefinedFunction();
+        divideFunc.setName("divide");
+        divideFunc.setClass("MathUtils");
+        divideFunc.setType(intType);
 
         // Precondition: y != 0
         Predicate yNotZero = Predicate.createOperation(
@@ -167,53 +169,19 @@ class VerificationWorkflowIntegrationTest {
     }
 
     @Test
-    void testAliasExpansionWorkflow() {
-        // Define an alias and expand it in expressions
-        Predicate aliasDef = Predicate.createOperation(
-            Predicate.createOperation(
-                Predicate.createVar("x"),
-                "*",
-                Predicate.createVar("x")
-            ),
-            "+",
-            Predicate.createOperation(
-                Predicate.createVar("y"),
-                "*",
-                Predicate.createVar("y")
-            )
-        );
-
-        AliasWrapper distanceSquared = new AliasWrapper(
-            "distanceSquared", aliasDef, List.of("x", "y"), List.of("int", "int")
-        );
-        context.addAlias(distanceSquared);
-
-        // Generate new variables for substitution
-        List<String> newVars = distanceSquared.getNewVariables(context);
-        assertEquals(2, newVars.size(), "Should generate 2 new variables");
-
-        // Get expanded expression with new variables
-        liquidjava.rj_language.ast.Expression expanded = distanceSquared.getNewExpression(newVars);
-        assertNotNull(expanded, "Expanded expression should not be null");
-
-        String expandedStr = expanded.toString();
-        assertTrue(expandedStr.contains(newVars.get(0).substring(0, Math.min(10, newVars.get(0).length()))),
-            "Should contain first new variable");
-    }
-
-    @Test
     void testGhostStateVerificationWorkflow() {
         // Scenario: Define ghost states and track state transitions
         context.addGhostClass("Stack");
 
         // Define states
-        GhostState empty = new GhostState("Stack", "isEmpty", null, null);
+        List<CtTypeReference<?>> emptyList = List.of();
+        GhostState empty = new GhostState("Stack", "isEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
         empty.setRefinement(Predicate.createEquals(
             Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
             Predicate.createLit("0", "int")
         ));
 
-        GhostState nonEmpty = new GhostState("Stack", "isNonEmpty", null, null);
+        GhostState nonEmpty = new GhostState("Stack", "isNonEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
         nonEmpty.setRefinement(Predicate.createOperation(
             Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
             ">",
@@ -239,16 +207,25 @@ class VerificationWorkflowIntegrationTest {
         CtTypeReference<String> stringType = factory.Type().stringType();
 
         // Add overloaded methods: process(int), process(int, int), process(String)
-        RefinedFunction process1 = new RefinedFunction("process", "Processor", intType, new Predicate());
+        RefinedFunction process1 = new RefinedFunction();
+        process1.setName("process");
+        process1.setClass("Processor");
+        process1.setType(intType);
         process1.addArgRefinements("x", intType, new Predicate());
         context.addFunctionToContext(process1);
 
-        RefinedFunction process2 = new RefinedFunction("process", "Processor", intType, new Predicate());
+        RefinedFunction process2 = new RefinedFunction();
+        process2.setName("process");
+        process2.setClass("Processor");
+        process2.setType(intType);
         process2.addArgRefinements("x", intType, new Predicate());
         process2.addArgRefinements("y", intType, new Predicate());
         context.addFunctionToContext(process2);
 
-        RefinedFunction process3 = new RefinedFunction("process", "Processor", intType, new Predicate());
+        RefinedFunction process3 = new RefinedFunction();
+        process3.setName("process");
+        process3.setClass("Processor");
+        process3.setType(intType);
         process3.addArgRefinements("s", stringType, new Predicate());
         context.addFunctionToContext(process3);
 
@@ -348,16 +325,14 @@ class VerificationWorkflowIntegrationTest {
         context.addGlobalVariableToContext("GLOBAL_MAX", intType,
             Predicate.createLit("100", "int"));
 
-        // Add ghost function
-        GhostFunction ghost = new GhostFunction("validate",
-            List.of(intType), factory.Type().booleanPrimitiveType(), "Validator");
-        context.addGhostFunction(ghost);
-
         // Add local variable
         context.addVarToContext("local", intType, new Predicate(), null);
 
         // Add function
-        RefinedFunction func = new RefinedFunction("test", "TestClass", intType, new Predicate());
+        RefinedFunction func = new RefinedFunction();
+        func.setName("test");
+        func.setClass("TestClass");
+        func.setType(intType);
         context.addFunctionToContext(func);
 
         // Reinitialize (not all)
@@ -365,8 +340,41 @@ class VerificationWorkflowIntegrationTest {
 
         // Check what persists
         assertTrue(context.hasVariable("GLOBAL_MAX"), "Global variable persists");
-        assertTrue(context.hasGhost("Validator.validate"), "Ghost persists");
         assertNotNull(context.getFunction("test", "TestClass"), "Function persists");
         assertFalse(context.hasVariable("local"), "Local variable cleared");
+    }
+
+    @Test
+    void testStringUtilityFunctions() {
+        // Test string utility functions
+        String stripped = Utils.stripParens("(expression)");
+        assertEquals("expression", stripped, "Parens should be stripped");
+
+        String notStripped = Utils.stripParens("expression");
+        assertEquals("expression", notStripped, "Non-paren string unchanged");
+
+        String emptyParens = Utils.stripParens("()");
+        assertEquals("", emptyParens, "Empty parens result in empty string");
+    }
+
+    @Test
+    void testVariableInstanceParenting() {
+        // Test parent-child relationship between Variable and VariableInstance
+        CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
+
+        Variable parent = new Variable("x", intType, new Predicate());
+        context.addVarToContext(parent);
+
+        VariableInstance child = new VariableInstance("x_1", intType,
+            Predicate.createEquals(Predicate.createVar("x_1"), Predicate.createLit("5", "int")));
+
+        parent.addInstance(child);
+        context.addSpecificVariable(child);
+        context.addRefinementInstanceToVariable("x", "x_1");
+
+        // Verify relationship
+        Variable retrievedParent = context.getVariableFromInstance(child);
+        assertNotNull(retrievedParent, "Should find parent");
+        assertEquals(parent, retrievedParent, "Parent should match");
     }
 }

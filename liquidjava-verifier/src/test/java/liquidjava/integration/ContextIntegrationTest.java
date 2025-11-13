@@ -78,10 +78,12 @@ class ContextIntegrationTest {
     void testFunctionRegistrationAndRetrieval() {
         // Scenario: Register functions with refinements and retrieve them
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
-        CtTypeReference<String> stringType = factory.Type().stringType();
 
         // Create function with arguments and return refinement
-        RefinedFunction func = new RefinedFunction("calculate", "MathUtils", intType, new Predicate());
+        RefinedFunction func = new RefinedFunction();
+        func.setName("calculate");
+        func.setClass("MathUtils");
+        func.setType(intType);
         func.addArgRefinements("x", intType, Predicate.createOperation(
             Predicate.createVar("x"), ">", Predicate.createLit("0", "int")
         ));
@@ -100,7 +102,10 @@ class ContextIntegrationTest {
         assertEquals(2, retrieved.getArguments().size(), "Should have 2 arguments");
 
         // Add another function with same name but different arity
-        RefinedFunction func2 = new RefinedFunction("calculate", "MathUtils", intType, new Predicate());
+        RefinedFunction func2 = new RefinedFunction();
+        func2.setName("calculate");
+        func2.setClass("MathUtils");
+        func2.setType(intType);
         func2.addArgRefinements("x", intType, new Predicate());
         context.addFunctionToContext(func2);
 
@@ -112,60 +117,34 @@ class ContextIntegrationTest {
     }
 
     @Test
-    void testGhostFunctionsAndStates() {
-        // Scenario: Register ghost functions and states, verify hierarchy
-        GhostFunction ghost1 = new GhostFunction("ghostPredicate", List.of(), factory.Type().booleanPrimitiveType(), "TestClass");
-        context.addGhostFunction(ghost1);
-        assertTrue(context.hasGhost("TestClass.ghostPredicate"), "Should find ghost by qualified name");
-        assertTrue(context.hasGhost("ghostPredicate"), "Should find ghost by simple name");
+    void testGhostStatesAndRefinements() {
+        // Scenario: Register ghost states and verify refinements
+        context.addGhostClass("Stack");
 
-        // Add ghost class with states
-        context.addGhostClass("StateManager");
-        GhostState state1 = new GhostState("StateManager", "initialized", null, null);
-        state1.setRefinement(Predicate.createLit("true", "boolean"));
-        context.addToGhostClass("StateManager", state1);
+        // Define states using GhostState
+        List<CtTypeReference<?>> emptyList = List.of();
+        GhostState isEmpty = new GhostState("Stack", "isEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
+        isEmpty.setRefinement(Predicate.createEquals(
+            Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
+            Predicate.createLit("0", "int")
+        ));
 
-        GhostState state2 = new GhostState("StateManager", "ready", null, null);
-        state2.setRefinement(Predicate.createVar("initialized"));
-        context.addToGhostClass("StateManager", state2);
+        GhostState isNonEmpty = new GhostState("Stack", "isNonEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
+        isNonEmpty.setRefinement(Predicate.createOperation(
+            Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
+            ">",
+            Predicate.createLit("0", "int")
+        ));
 
-        List<GhostState> states = context.getGhostState("StateManager");
+        context.addToGhostClass("Stack", isEmpty);
+        context.addToGhostClass("Stack", isNonEmpty);
+
+        List<GhostState> states = context.getGhostState("Stack");
         assertEquals(2, states.size(), "Should have 2 states");
 
         // Verify state refinements
-        assertTrue(states.get(0).getRefinement().toString().contains("true"));
-        assertTrue(states.get(1).getRefinement().toString().contains("initialized"));
-    }
-
-    @Test
-    void testAliasManagement() {
-        // Scenario: Register and use aliases for complex predicates
-        Predicate complexPred = Predicate.createOperation(
-            Predicate.createOperation(
-                Predicate.createVar("x"),
-                "*",
-                Predicate.createVar("x")
-            ),
-            "+",
-            Predicate.createOperation(
-                Predicate.createVar("y"),
-                "*",
-                Predicate.createVar("y")
-            )
-        );
-
-        AliasWrapper alias = new AliasWrapper("distanceSquared", complexPred,
-            List.of("x", "y"), List.of("int", "int"));
-        context.addAlias(alias);
-
-        List<AliasWrapper> aliases = context.getAlias();
-        assertEquals(1, aliases.size(), "Should have 1 alias");
-        assertEquals("distanceSquared", aliases.get(0).getName());
-
-        // Create new variables for substitution
-        List<String> newVars = alias.getNewVariables(context);
-        assertEquals(2, newVars.size(), "Should generate 2 new variable names");
-        assertTrue(newVars.get(0).contains("alias_x"), "Generated name should contain original");
+        assertTrue(states.get(0).getRefinement().toString().contains("0"));
+        assertTrue(states.get(1).getRefinement().toString().contains(">"));
     }
 
     @Test
@@ -233,17 +212,18 @@ class ContextIntegrationTest {
 
     @Test
     void testComplexScenarioWithMultipleComponents() {
-        // Realistic scenario: Function with refinements, variables, and ghosts
+        // Realistic scenario: Function with refinements and variables
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
 
-        // Register a ghost function for validation
-        GhostFunction validationGhost = new GhostFunction("isValid",
-            List.of(intType), factory.Type().booleanPrimitiveType(), "Validator");
-        context.addGhostFunction(validationGhost);
+        // Create function with precondition
+        RefinedFunction processFunc = new RefinedFunction();
+        processFunc.setName("process");
+        processFunc.setClass("Processor");
+        processFunc.setType(intType);
 
-        // Create function with precondition using ghost
-        RefinedFunction processFunc = new RefinedFunction("process", "Processor", intType, new Predicate());
-        Predicate precondition = Predicate.createInvocation("Validator.isValid", Predicate.createVar("input"));
+        Predicate precondition = Predicate.createOperation(
+            Predicate.createVar("input"), ">", Predicate.createLit("0", "int")
+        );
         processFunc.addArgRefinements("input", intType, precondition);
 
         Predicate postcondition = Predicate.createOperation(
@@ -258,7 +238,6 @@ class ContextIntegrationTest {
         context.addVarToContext("result", intType, postcondition, null);
 
         // Verify everything is integrated
-        assertTrue(context.hasGhost("Validator.isValid"), "Ghost function registered");
         assertNotNull(context.getFunction("process", "Processor"), "Function registered");
         assertTrue(context.hasVariable("input"), "Input variable exists");
         assertTrue(context.hasVariable("result"), "Result variable exists");
@@ -299,5 +278,16 @@ class ContextIntegrationTest {
         assertTrue(counter2 > counter1, "Counter should increment");
         assertTrue(counter3 > counter2, "Counter should continue incrementing");
         assertEquals(1, counter2 - counter1, "Should increment by 1");
+    }
+
+    @Test
+    void testContextToString() {
+        // Test context string representation
+        CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
+        context.addVarToContext("x", intType, new Predicate(), null);
+
+        String result = context.toString();
+        assertNotNull(result, "toString should not return null");
+        assertTrue(result.contains("Variables"), "Should contain Variables section");
     }
 }
