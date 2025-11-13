@@ -263,9 +263,9 @@ public class VCChecker {
      * @param cSMT
      * @param expectedType
      *
+     * @throws TypeCheckError
      * @throws Exception
-     * @throws GhostFunctionError
-     * @throws SMTError
+     * 
      */
     private void smtChecking(Predicate cSMT, Predicate expectedType, SourcePosition p)
             throws TypeCheckError, Exception {
