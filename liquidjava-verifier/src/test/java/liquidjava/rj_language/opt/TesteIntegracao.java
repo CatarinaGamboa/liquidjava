@@ -5,6 +5,7 @@ import static org.junit.Assert.fail;
 import liquidjava.api.CommandLineLauncher;
 import org.junit.Test;
 
+public class TesteIntegracao {
     /**
      * Testa se a execução do método principal de CommandLineLauncher sem argumentos arranca sem lançar exceções
      */
