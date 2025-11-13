@@ -41,9 +41,9 @@ class ContextIntegrationTest {
             Predicate.createLit("0", "int")
         );
 
-        // Add variable in global scope
+        // Add variable in base scope
         context.addVarToContext("x", intType, initialPred, factory.createLiteral(0));
-        assertTrue(context.hasVariable("x"), "Variable should exist in global scope");
+        assertTrue(context.hasVariable("x"), "Variable should exist in base scope");
 
         // Enter new scope and add local variable
         context.enterContext();
