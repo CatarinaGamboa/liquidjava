@@ -245,7 +245,7 @@ class VerificationWorkflowIntegrationTest {
         // Test variables in nested scopes with same names
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
 
-        // Global x
+        // Base scope x
         context.addVarToContext("x", intType, Predicate.createLit("0", "int"), factory.createLiteral(0));
         assertEquals(1, context.getAllVariables().size());
 
