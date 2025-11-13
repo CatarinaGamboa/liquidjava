@@ -1,5 +1,6 @@
 package liquidjava.diagnostics.errors;
 
+import liquidjava.diagnostics.TranslationTable;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 import liquidjava.utils.Utils;
@@ -12,19 +13,29 @@ import spoon.reflect.declaration.CtElement;
  */
 public class RefinementError extends LJError {
 
-    private Predicate expected;
+    private String expected;
     private ValDerivationNode found;
 
-    public RefinementError(CtElement element, Predicate expected, ValDerivationNode found) {
-        super("Refinement Error", String.format("%s is not a subtype of %s", found.getValue(), expected), element);
-        this.expected = expected;
+    public RefinementError(CtElement element, Predicate expected, ValDerivationNode found,
+            TranslationTable translationTable) {
+        super("Refinement Error", String.format("%s is not a subtype of %s", found.getValue(), expected),
+                element.getPosition(), element.toString(), translationTable);
+        this.expected = expected.toString();
         this.found = found;
+    }
+
+    public String getExpected() {
+        return expected;
+    }
+
+    public ValDerivationNode getFound() {
+        return found;
     }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("Expected: ").append(Utils.stripParens(expected.toString())).append("\n");
+        sb.append("Expected: ").append(Utils.stripParens(expected)).append("\n");
         sb.append("Found: ").append(found.getValue());
         return super.toString(sb.toString());
     }

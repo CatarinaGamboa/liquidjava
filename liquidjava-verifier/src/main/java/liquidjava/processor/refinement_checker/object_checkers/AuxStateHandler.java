@@ -1,10 +1,14 @@
 package liquidjava.processor.refinement_checker.object_checkers;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import liquidjava.diagnostics.ErrorHandler;
+import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.errors.IllegalConstructorTransitionError;
+import liquidjava.diagnostics.errors.InvalidRefinementError;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;
@@ -40,7 +44,7 @@ public class AuxStateHandler {
                 Map<String, CtExpression> m = a.getAllValues();
                 CtLiteral<String> from = (CtLiteral<String>) m.get("from");
                 if (from != null) {
-                    ErrorHandler.printErrorConstructorFromState(c, from, tc.getErrorEmitter());
+                    diagnostics.add(new IllegalConstructorTransitionError(from));
                     return;
                 }
             }
@@ -69,10 +73,10 @@ public class AuxStateHandler {
             String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
             ObjectState state = new ObjectState();
             if (to != null) {
-                Predicate p = new Predicate(to, element, tc.getErrorEmitter());
+                Predicate p = new Predicate(to, element);
                 if (!p.getExpression().isBooleanExpression()) {
-                    ErrorHandler.printCustomError(element, "State refinement transition must be a boolean expression",
-                            tc.getErrorEmitter());
+                    diagnostics.add(new InvalidRefinementError(element,
+                            "State refinement transition must be a boolean expression", to));
                     return;
                 }
                 state.setTo(p);
@@ -165,30 +169,32 @@ public class AuxStateHandler {
         String from = TypeCheckingUtils.getStringFromAnnotation(m.get("from"));
         String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
         ObjectState state = new ObjectState();
-        if (from != null) { // has From
-            state.setFrom(createStatePredicate(from, f.getTargetClass(), tc, e, false, prefix));
-        }
-        if (to != null) { // has To
-            state.setTo(createStatePredicate(to, f.getTargetClass(), tc, e, true, prefix));
-        }
 
-        if (from != null && to == null) // has From but not To -> the state remains the same
-        {
+        // has from
+        if (from != null)
+            state.setFrom(createStatePredicate(from, f.getTargetClass(), tc, e, false, prefix));
+
+        // has to
+        if (to != null)
+            state.setTo(createStatePredicate(to, f.getTargetClass(), tc, e, true, prefix));
+
+        // has from but not to, state remains the same
+        if (from != null && to == null)
             state.setTo(createStatePredicate(from, f.getTargetClass(), tc, e, true, prefix));
-        }
-        if (from == null && to != null) // has To but not From -> enters with true and exists with a specific state
-        {
+
+        // has to but not from, state enters with true
+        if (from == null && to != null)
             state.setFrom(new Predicate());
-        }
+
         return state;
     }
 
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
             TypeChecker tc, CtElement e, boolean isTo, String prefix) throws ParsingException {
-        Predicate p = new Predicate(value, e, tc.getErrorEmitter(), prefix);
+        Predicate p = new Predicate(value, e, prefix);
         if (!p.getExpression().isBooleanExpression()) {
-            ErrorHandler.printCustomError(e, "State refinement transition must be a boolean expression",
-                    tc.getErrorEmitter());
+            diagnostics.add(
+                    new InvalidRefinementError(e, "State refinement transition must be a boolean expression", value));
             return new Predicate();
         }
         String t = targetClass; // f.getTargetClass();
@@ -202,9 +208,9 @@ public class AuxStateHandler {
         // what is it for?
         Predicate c1 = isTo ? getMissingStates(t, tc, p) : p;
         Predicate c = c1.substituteVariable(Keys.THIS, name);
-        c = c.changeOldMentions(nameOld, name, tc.getErrorEmitter());
+        c = c.changeOldMentions(nameOld, name);
         boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e.getPosition());
-        if (b && !tc.getErrorEmitter().foundError()) {
+        if (b && !diagnostics.foundError()) {
             tc.createSameStateError(e, p, t);
         }
 
@@ -384,22 +390,19 @@ public class AuxStateHandler {
             stateChange.setFrom(fromPredicate);
             stateChange.setTo(toPredicate);
         } catch (ParsingException e) {
-            ErrorHandler
-                    .printCustomError(fw,
-                            "ParsingException while constructing assignment update for `" + fw + "` in class `"
-                                    + fw.getVariable().getDeclaringType() + "` : " + e.getMessage(),
-                            tc.getErrorEmitter());
-
+            diagnostics.add(new CustomError(field,
+                    String.format("Parsing error while constructing assignment update for `%s` in class `%s` : %s", fw,
+                            field.getDeclaringType().getQualifiedName(), e.getMessage())));
             return;
         }
 
         // replace "state(this)" to "state(whatever method is called from) and so on"
         Predicate expectState = stateChange.getFrom().substituteVariable(Keys.THIS, instanceName)
-                .changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
+                .changeOldMentions(vi.getName(), instanceName);
 
         if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) { // Invalid field transition
-            if (!tc.getErrorEmitter().foundError()) { // No errors in errorEmitter
-                String states = stateChange.getFrom().toString();
+            if (!diagnostics.foundError()) { // No errors so far
+                Predicate[] states = { stateChange.getFrom() };
                 tc.createStateMismatchError(fw, fw.toString(), prevState, states);
             }
             return;
@@ -470,7 +473,7 @@ public class AuxStateHandler {
                 prevCheck = prevCheck.substituteVariable(s, map.get(s));
                 expectState = expectState.substituteVariable(s, map.get(s));
             }
-            expectState = expectState.changeOldMentions(vi.getName(), instanceName, tc.getErrorEmitter());
+            expectState = expectState.changeOldMentions(vi.getName(), instanceName);
 
             found = tc.checksStateSMT(prevCheck, expectState, invocation.getPosition());
             if (found && stateChange.hasTo()) {
@@ -486,10 +489,9 @@ public class AuxStateHandler {
                 return transitionedState;
             }
         }
-        if (!found && !tc.getErrorEmitter().foundError()) { // Reaches the end of stateChange no matching states
-            String states = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
-                    .map(Predicate::toString).collect(Collectors.joining(","));
-
+        if (!found && !diagnostics.foundError()) { // Reaches the end of stateChange no matching states
+            Predicate[] states = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
+                    .toArray(Predicate[]::new);
             String simpleInvocation = invocation.toString(); // .getExecutable().toString();
             tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
             // ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState,
@@ -500,7 +502,7 @@ public class AuxStateHandler {
 
     private static Predicate checkOldMentions(Predicate transitionedState, String instanceName, String newInstanceName,
             TypeChecker tc) {
-        return transitionedState.changeOldMentions(instanceName, newInstanceName, tc.getErrorEmitter());
+        return transitionedState.changeOldMentions(instanceName, newInstanceName);
     }
 
     /**

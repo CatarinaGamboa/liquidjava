@@ -1,13 +1,14 @@
 package liquidjava.rj_language;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import liquidjava.diagnostics.ErrorEmitter;
-import liquidjava.diagnostics.ErrorHandler;
+import liquidjava.diagnostics.errors.SyntaxError;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostState;
@@ -58,8 +59,8 @@ public class Predicate {
      *
      * @throws ParsingException
      */
-    public Predicate(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
-        this(ref, element, e, element.getParent(CtType.class).getQualifiedName());
+    public Predicate(String ref, CtElement element) throws ParsingException {
+        this(ref, element, element.getParent(CtType.class).getQualifiedName());
     }
 
     /**
@@ -72,10 +73,10 @@ public class Predicate {
      * 
      * @throws ParsingException
      */
-    public Predicate(String ref, CtElement element, ErrorEmitter e, String prefix) throws ParsingException {
+    public Predicate(String ref, CtElement element, String prefix) throws ParsingException {
         this.prefix = prefix;
-        exp = parse(ref, element, e);
-        if (e.foundError()) {
+        exp = parse(ref, element);
+        if (diagnostics.foundError()) {
             return;
         }
         if (!(exp instanceof GroupExpression)) {
@@ -88,22 +89,22 @@ public class Predicate {
         exp = e;
     }
 
-    protected Expression parse(String ref, CtElement element, ErrorEmitter e) throws ParsingException {
+    protected Expression parse(String ref, CtElement element) throws ParsingException {
         try {
             return RefinementsParser.createAST(ref, prefix);
-        } catch (ParsingException e1) {
-            ErrorHandler.printSyntaxError(e1.getMessage(), ref, element, e);
-            throw e1;
+        } catch (ParsingException e) {
+            diagnostics.add(new SyntaxError(e.getMessage(), element, ref));
+            throw e;
         }
     }
 
-    protected Expression innerParse(String ref, ErrorEmitter e, String prefix) {
+    protected Expression innerParse(String ref, String prefix) {
         try {
             return RefinementsParser.createAST(ref, prefix);
         } catch (ParsingException e1) {
-            ErrorHandler.printSyntaxError(e1.getMessage(), ref, e);
+            diagnostics.add(new SyntaxError(e1.getMessage(), ref));
+            return null;
         }
-        return null;
     }
 
     public Predicate changeAliasToRefinement(Context context, Factory f) throws Exception {
@@ -152,7 +153,7 @@ public class Predicate {
     }
 
     /** Change old mentions of previous name to the new name e.g., old(previousName) -> newName */
-    public Predicate changeOldMentions(String previousName, String newName, ErrorEmitter ee) {
+    public Predicate changeOldMentions(String previousName, String newName) {
         Expression e = exp.clone();
         Expression prev = createVar(previousName).getExpression();
         List<Expression> le = new ArrayList<>();
@@ -184,12 +185,12 @@ public class Predicate {
         }
     }
 
-    public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange, ErrorEmitter ee) {
+    public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange) {
         Map<String, Expression> nameRefinementMap = new HashMap<>();
         for (GhostState gs : ghostState) {
             if (gs.getRefinement() != null) { // is a state and not a ghost state
                 String name = gs.getQualifiedName();
-                Expression exp = innerParse(gs.getRefinement().toString(), ee, gs.getPrefix());
+                Expression exp = innerParse(gs.getRefinement().toString(), gs.getPrefix());
                 nameRefinementMap.put(name, exp);
                 // Also allow simple name lookup to enable hierarchy matching
                 String simple = Utils.getSimpleName(name);

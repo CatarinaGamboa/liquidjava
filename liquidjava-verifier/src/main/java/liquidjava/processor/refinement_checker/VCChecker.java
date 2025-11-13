@@ -1,25 +1,30 @@
 package liquidjava.processor.refinement_checker;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import liquidjava.diagnostics.ErrorEmitter;
-import liquidjava.diagnostics.ErrorHandler;
+import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.errors.GhostInvocationError;
+import liquidjava.diagnostics.errors.LJError;
+import liquidjava.diagnostics.errors.NotFoundError;
+import liquidjava.diagnostics.TranslationTable;
+import liquidjava.diagnostics.errors.RefinementError;
+import liquidjava.diagnostics.errors.StateConflictError;
+import liquidjava.diagnostics.errors.StateRefinementError;
 import liquidjava.processor.VCImplication;
 import liquidjava.processor.context.*;
 import liquidjava.rj_language.Predicate;
 import liquidjava.smt.GhostFunctionError;
-import liquidjava.smt.NotFoundError;
+import liquidjava.smt.NotFoundSMTError;
 import liquidjava.smt.SMTEvaluator;
 import liquidjava.smt.TypeCheckError;
-import liquidjava.smt.TypeMismatchError;
 import liquidjava.utils.constants.Keys;
-import spoon.reflect.code.CtInvocation;
 import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.factory.Factory;
@@ -28,12 +33,10 @@ import spoon.reflect.reference.CtTypeReference;
 public class VCChecker {
     private final Context context;
     private final List<RefinedVariable> pathVariables;
-    private final ErrorEmitter errorEmitter;
 
-    public VCChecker(ErrorEmitter errorEmitter) {
+    public VCChecker() {
         context = Context.getInstance();
         pathVariables = new Stack<>();
-        this.errorEmitter = errorEmitter;
     }
 
     public void processSubtyping(Predicate expectedType, List<GhostState> list, CtElement element, Factory f) {
@@ -42,24 +45,23 @@ public class VCChecker {
         if (expectedType.isBooleanTrue())
             return;
 
-        HashMap<String, PlacementInCode> map = new HashMap<>();
+        TranslationTable map = new TranslationTable();
         String[] s = { Keys.WILDCARD, Keys.THIS };
         Predicate premisesBeforeChange = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
         Predicate premises = new Predicate();
         Predicate et = new Predicate();
         try {
             List<GhostState> filtered = filterGhostStatesForVariables(list, mainVars, lrv);
-            premises = premisesBeforeChange.changeStatesToRefinements(filtered, s, errorEmitter)
-                    .changeAliasToRefinement(context, f);
+            premises = premisesBeforeChange.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
 
-            et = expectedType.changeStatesToRefinements(filtered, s, errorEmitter).changeAliasToRefinement(context, f);
+            et = expectedType.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
         } catch (Exception e) {
-            ErrorHandler.printError(element, e.getMessage(), expectedType, premises, map, errorEmitter);
+            diagnostics.add(new RefinementError(element, expectedType, premises.simplify(), map));
             return;
         }
 
         try {
-            smtChecking(premises, et);
+            smtChecking(premises, et, element.getPosition());
         } catch (Exception e) {
             // To emit the message we use the constraints before the alias and state change
             printError(e, premisesBeforeChange, expectedType, element, map);
@@ -82,7 +84,7 @@ public class VCChecker {
             return true;
 
         // Predicate premises = joinPredicates(type, element, mainVars, lrv);
-        HashMap<String, PlacementInCode> map = new HashMap<>();
+        TranslationTable map = new TranslationTable();
         String[] s = { Keys.WILDCARD, Keys.THIS };
 
         Predicate premises = new Predicate();
@@ -90,16 +92,12 @@ public class VCChecker {
         try {
             premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
             List<GhostState> filtered = filterGhostStatesForVariables(list, mainVars, lrv);
-            premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(filtered, s, errorEmitter)
+            premises = Predicate.createConjunction(premises, type).changeStatesToRefinements(filtered, s)
                     .changeAliasToRefinement(context, f);
-            et = expectedType.changeStatesToRefinements(filtered, s, errorEmitter).changeAliasToRefinement(context, f);
+            et = expectedType.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
         } catch (Exception e) {
             return false;
-            // printError(premises, expectedType, element, map, e.getMessage());
         }
-
-        // System.out.println("premise: " + premises.toString() + "\nexpectation: " +
-        // et.toString());
         return smtChecks(premises, et, p);
     }
 
@@ -145,7 +143,7 @@ public class VCChecker {
     }
 
     private VCImplication joinPredicates(Predicate expectedType, List<RefinedVariable> mainVars,
-            List<RefinedVariable> vars, HashMap<String, PlacementInCode> map) {
+            List<RefinedVariable> vars, TranslationTable map) {
 
         VCImplication firstSi = null;
         VCImplication lastSi = null;
@@ -185,19 +183,8 @@ public class VCChecker {
         return cSMT; // firstSi != null ? firstSi : new VCImplication(new Predicate());
     }
 
-    private void addMap(RefinedVariable var, HashMap<String, PlacementInCode> map) {
+    private void addMap(RefinedVariable var, TranslationTable map) {
         map.put(var.getName(), var.getPlacementInCode());
-        // if(var instanceof VariableInstance) {
-        // VariableInstance vi = (VariableInstance) var;
-        // if(vi.getParent().isPresent())
-        // map.put(vi.getName(), vi.getParent().get().getName());
-        // else if(instancePattern.matcher(var.getName()).matches()){
-        // String result = var.getName().replaceAll("(_[0-9]+)$", "").replaceAll("^#",
-        // "");
-        // map.put(var.getName(), result);
-        // }
-        // }else if(thisPattern.matcher(var.getName()).matches())
-        // map.put(var.getName(), "this");
     }
 
     private void gatherVariables(Predicate expectedType, List<RefinedVariable> lrv, List<RefinedVariable> mainVars) {
@@ -249,15 +236,11 @@ public class VCChecker {
 
     public boolean smtChecks(Predicate cSMT, Predicate expectedType, SourcePosition p) {
         try {
-            new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
+            new SMTEvaluator().verifySubtype(cSMT, expectedType, context, p);
         } catch (TypeCheckError e) {
             return false;
         } catch (Exception e) {
-            // System.err.println("Unknown error:"+e.getMessage());
-            // e.printStackTrace();
-            // System.exit(7);
-            // fail();
-            errorEmitter.addError("Unknown Error", e.getMessage(), p, 7);
+            diagnostics.add(new CustomError(e.getMessage(), p));
         }
         return true;
     }
@@ -273,9 +256,9 @@ public class VCChecker {
      * @throws GhostFunctionError
      * @throws TypeCheckError
      */
-    private void smtChecking(Predicate cSMT, Predicate expectedType)
+    private void smtChecking(Predicate cSMT, Predicate expectedType, SourcePosition p)
             throws TypeCheckError, GhostFunctionError, Exception {
-        new SMTEvaluator().verifySubtype(cSMT, expectedType, context);
+        new SMTEvaluator().verifySubtype(cSMT, expectedType, context, p);
     }
 
     /**
@@ -306,10 +289,10 @@ public class VCChecker {
 
     // Errors---------------------------------------------------------------------------------------------------
 
-    private HashMap<String, PlacementInCode> createMap(CtElement element, Predicate expectedType) {
+    private TranslationTable createMap(CtElement element, Predicate expectedType) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
-        HashMap<String, PlacementInCode> map = new HashMap<>();
+        TranslationTable map = new TranslationTable();
         joinPredicates(expectedType, mainVars, lrv, map);
         return map;
     }
@@ -319,54 +302,41 @@ public class VCChecker {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         gatherVariables(foundType, lrv, mainVars);
-        HashMap<String, PlacementInCode> map = new HashMap<>();
+        TranslationTable map = new TranslationTable();
         Predicate premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
-
-        ErrorHandler.printError(element, customeMsg, expectedType, premises, map, errorEmitter);
+        diagnostics.add(new RefinementError(element, expectedType, premises.simplify(), map));
     }
 
     public void printSameStateError(CtElement element, Predicate expectedType, String klass) {
-        HashMap<String, PlacementInCode> map = createMap(element, expectedType);
-        ErrorHandler.printSameStateSetError(element, expectedType, klass, map, errorEmitter);
+        TranslationTable map = createMap(element, expectedType);
+        diagnostics.add(new StateConflictError(element, expectedType, klass, map));
     }
 
     private void printError(Exception e, Predicate premisesBeforeChange, Predicate expectedType, CtElement element,
-            HashMap<String, PlacementInCode> map) {
-        String s = null;
-        if (element instanceof CtInvocation) {
-            CtInvocation<?> ci = (CtInvocation<?>) element;
-            String totalS = ci.getExecutable().toString();
-            if (ci.getTarget() != null) {
-                int targetL = ci.getTarget().toString().length();
-                totalS = ci.toString().substring(targetL + 1);
-            }
-            s = "Method invocation " + totalS + " in:";
-        }
+            TranslationTable map) {
+        LJError error = mapError(e, premisesBeforeChange, expectedType, element, map);
+        diagnostics.add(error);
+    }
 
-        Predicate etMessageReady = expectedType; // substituteByMap(expectedType, map);
-        Predicate cSMTMessageReady = premisesBeforeChange; // substituteByMap(premisesBeforeChange, map);
+    private LJError mapError(Exception e, Predicate premisesBeforeChange, Predicate expectedType, CtElement element,
+            TranslationTable map) {
         if (e instanceof TypeCheckError) {
-            ErrorHandler.printError(element, s, etMessageReady, cSMTMessageReady, map, errorEmitter);
+            return new RefinementError(element, expectedType, premisesBeforeChange.simplify(), map);
         } else if (e instanceof GhostFunctionError) {
-            ErrorHandler.printErrorArgs(element, etMessageReady, e.getMessage(), map, errorEmitter);
-        } else if (e instanceof TypeMismatchError) {
-            ErrorHandler.printErrorTypeMismatch(element, etMessageReady, e.getMessage(), map, errorEmitter);
-        } else if (e instanceof NotFoundError) {
-            ErrorHandler.printNotFound(element, cSMTMessageReady, etMessageReady, e.getMessage(), map, errorEmitter);
+            return new GhostInvocationError("Invalid types or number of arguments in ghost invocation",
+                    element.getPosition(), expectedType, map);
+        } else if (e instanceof NotFoundSMTError) {
+            return new NotFoundError(element, e.getMessage(), map);
         } else {
-            ErrorHandler.printCustomError(element, e.getMessage(), errorEmitter);
-            // System.err.println("Unknown error:"+e.getMessage());
-            // e.printStackTrace();
-            // System.exit(7);
+            return new CustomError(element, e.getMessage());
         }
     }
 
-    public void printStateMismatchError(CtElement element, String method, Predicate c, String states) {
+    public void printStateMismatchError(CtElement element, String method, Predicate found, Predicate[] states) {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
-        gatherVariables(c, lrv, mainVars);
-        HashMap<String, PlacementInCode> map = new HashMap<>();
-        VCImplication constraintForErrorMsg = joinPredicates(c, mainVars, lrv, map);
-        // HashMap<String, PlacementInCode> map = createMap(element, c);
-        ErrorHandler.printStateMismatch(element, method, constraintForErrorMsg, states, map, errorEmitter);
+        gatherVariables(found, lrv, mainVars);
+        TranslationTable map = new TranslationTable();
+        VCImplication foundState = joinPredicates(found, mainVars, lrv, map);
+        diagnostics.add(new StateRefinementError(element, method, states, foundState.toConjunctions(), map));
     }
 }

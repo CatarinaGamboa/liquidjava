@@ -1,12 +1,13 @@
 package liquidjava.processor.refinement_checker;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import liquidjava.diagnostics.ErrorEmitter;
-import liquidjava.diagnostics.ErrorHandler;
+import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.warnings.ExternalClassNotFoundWarning;
+import liquidjava.diagnostics.warnings.ExternalMethodNotFoundWarning;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.facade.GhostDTO;
@@ -29,8 +30,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
     String prefix;
     MethodsFunctionsChecker m;
 
-    public ExternalRefinementTypeChecker(Context context, Factory fac, ErrorEmitter errorEmitter) {
-        super(context, fac, errorEmitter);
+    public ExternalRefinementTypeChecker(Context context, Factory factory) {
+        super(context, factory);
     }
 
     @Override
@@ -40,20 +41,21 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         Optional<String> externalRefinements = getExternalRefinement(intrface);
         if (externalRefinements.isPresent()) {
             this.prefix = externalRefinements.get();
             if (!classExists(prefix)) {
-                ErrorHandler.printCustomError(intrface, "Could not find class '" + prefix + "'", errorEmitter);
+                String message = String.format("Could not find external class '%s'", prefix);
+                diagnostics.add(new ExternalClassNotFoundWarning(intrface, message, prefix));
                 return;
             }
             try {
                 getRefinementFromAnnotation(intrface);
             } catch (ParsingException e) {
-                return; // error already in ErrorEmitter
+                return; // error already reported
             }
             handleStateSetsFromAnnotation(intrface);
             super.visitCtInterface(intrface);
@@ -62,14 +64,14 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtField(CtField<T> f) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         Optional<Predicate> oc;
         try {
             oc = getRefinementFromAnnotation(f);
         } catch (ParsingException e) {
-            return; // error already in ErrorEmitter
+            return; // error already reported
         }
         Predicate c = oc.orElse(new Predicate());
         context.addGlobalVariableToContext(f.getSimpleName(), prefix, f.getType(), c);
@@ -77,7 +79,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (errorEmitter.foundError())
+        if (diagnostics.foundError())
             return;
 
         CtType<?> targetType = factory.Type().createReference(prefix).getTypeDeclaration();
@@ -87,31 +89,24 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         boolean isConstructor = method.getSimpleName().equals(targetType.getSimpleName());
         if (isConstructor) {
             if (!constructorExists(targetType, method)) {
-                ErrorHandler.printCustomError(method,
-                        String.format("Could not find constructor '%s' for '%s'", method.getSignature(), prefix),
-                        errorEmitter);
-                return;
+                String title = String.format("Could not find constructor '%s' for '%s'", method.getSignature(), prefix);
+                String[] overloads = getOverloads(targetType, method);
+                String message = overloads.length == 0 ? title
+                        : title + "\nAvailable constructors:\n  " + String.join("\n  ", overloads);
+
+                diagnostics.add(new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix));
             }
         } else {
             if (!methodExists(targetType, method)) {
-                String matchingNames = targetType.getMethods().stream()
-                        .filter(m -> m.getSimpleName().equals(method.getSimpleName()))
-                        .map(m -> String.format("%s %s", m.getType().getSimpleName(), m.getSignature()))
-                        .collect(Collectors.joining("\n  "));
-
-                StringBuilder sb = new StringBuilder();
-                sb.append(String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
-                        method.getSignature(), prefix));
-
-                if (!matchingNames.isEmpty()) {
-                    sb.append("\nAvailable overloads:\n  ");
-                    sb.append(matchingNames);
-                }
-                ErrorHandler.printCustomError(method, sb.toString(), errorEmitter);
+                String title = String.format("Could not find method '%s %s' for '%s'", method.getType().getSimpleName(),
+                        method.getSignature(), prefix);
+                String[] overloads = getOverloads(targetType, method);
+                String message = overloads.length == 0 ? title
+                        : title + "\nAvailable overloads:\n  " + String.join("\n  ", overloads);
+                diagnostics.add(new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix));
                 return;
             }
         }
-
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
         try {
             mfc.getMethodRefinements(method, prefix);
@@ -119,9 +114,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             return;
         }
         super.visitCtMethod(method);
-
-        //
-        // System.out.println("visited method external");
     }
 
     protected void getGhostFunction(String value, CtElement element) {
@@ -135,8 +127,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
 
         } catch (ParsingException e) {
-            ErrorHandler.printCustomError(element, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
-            // e.printStackTrace();
+            diagnostics.add(new CustomError(element, "Could not parse the ghost function" + e.getMessage()));
         }
     }
 
@@ -205,5 +196,10 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                 return false;
         }
         return true;
+    }
+
+    private String[] getOverloads(CtType<?> targetType, CtMethod<?> method) {
+        return targetType.getMethods().stream().filter(m -> m.getSimpleName().equals(method.getSimpleName()))
+                .map(m -> String.format("%s %s", m.getType().getSimpleName(), m.getSignature())).toArray(String[]::new);
     }
 }

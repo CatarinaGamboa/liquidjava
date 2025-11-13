@@ -49,10 +49,15 @@ public abstract class LJWarning {
 
     public String toString(String extra) {
         StringBuilder sb = new StringBuilder();
-        sb.append(message).append(" at: \n").append(element.toString().replace("@liquidjava.specification.", "@"))
-                .append("\n\n");
+        sb.append(message);
+
+        if (element != null)
+            sb.append(" at: \n").append(element.toString().replace("@liquidjava.specification.", "@"));
+
         if (extra != null)
-            sb.append(extra).append("\n");
+            sb.append("\n").append(extra);
+
+        sb.append("\n");
         sb.append("Location: ").append(location != null ? Utils.stripParens(location.toString()) : "<unknown>")
                 .append("\n");
         return sb.toString();

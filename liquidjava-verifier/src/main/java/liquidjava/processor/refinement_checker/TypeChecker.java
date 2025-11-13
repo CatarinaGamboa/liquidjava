@@ -1,12 +1,15 @@
 package liquidjava.processor.refinement_checker;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import liquidjava.diagnostics.ErrorEmitter;
-import liquidjava.diagnostics.ErrorHandler;
+import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.errors.InvalidRefinementError;
+import liquidjava.diagnostics.errors.SyntaxError;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.GhostFunction;
@@ -37,13 +40,11 @@ public abstract class TypeChecker extends CtScanner {
     Context context;
     Factory factory;
     VCChecker vcChecker;
-    ErrorEmitter errorEmitter;
 
-    public TypeChecker(Context c, Factory fac, ErrorEmitter errorEmitter) {
-        this.context = c;
-        this.factory = fac;
-        this.errorEmitter = errorEmitter;
-        vcChecker = new VCChecker(errorEmitter);
+    public TypeChecker(Context context, Factory factory) {
+        this.context = context;
+        this.factory = factory;
+        vcChecker = new VCChecker();
     }
 
     public Context getContext() {
@@ -79,14 +80,15 @@ public abstract class TypeChecker extends CtScanner {
             }
         }
         if (ref.isPresent()) {
-            Predicate p = new Predicate(ref.get(), element, errorEmitter);
+            Predicate p = new Predicate(ref.get(), element);
 
             // check if refinement is valid
             if (!p.getExpression().isBooleanExpression()) {
-                ErrorHandler.printCustomError(element, "Refinement predicate must be a boolean expression",
-                        errorEmitter);
+                diagnostics.add(new InvalidRefinementError(element, "Refinement predicate must be a boolean expression",
+                        ref.get()));
+                return Optional.empty();
             }
-            if (errorEmitter.foundError())
+            if (diagnostics.foundError())
                 return Optional.empty();
 
             constr = Optional.of(p);
@@ -119,8 +121,8 @@ public abstract class TypeChecker extends CtScanner {
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 if (Character.isUpperCase(f.charAt(0))) {
-                    ErrorHandler.printCustomError(s, "State name must start with lowercase in '" + f + "'",
-                            errorEmitter);
+                    diagnostics
+                            .add(new CustomError(s, String.format("State name must start with lowercase in '%s'", f)));
                 }
             }
         }
@@ -161,12 +163,12 @@ public abstract class TypeChecker extends CtScanner {
         try {
             gd = RefinementsParser.getGhostDeclaration(string);
         } catch (ParsingException e) {
-            ErrorHandler.printCustomError(ann, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
+            diagnostics.add(new CustomError(ann, "Could not parse the ghost function " + e.getMessage()));
             return;
         }
         if (gd.getParam_types().size() > 0) {
-            ErrorHandler.printCustomError(ann, "Ghost States have the class as parameter "
-                    + "by default, no other parameters are allowed in '" + string + "'", errorEmitter);
+            diagnostics.add(new CustomError(ann, "Ghost States have the class as parameter "
+                    + "by default, no other parameters are allowed in '" + string + "'"));
             return;
         }
         // Set class as parameter of Ghost
@@ -224,7 +226,7 @@ public abstract class TypeChecker extends CtScanner {
                 context.addGhostFunction(gh);
             }
         } catch (ParsingException e) {
-            ErrorHandler.printCustomError(element, "Could not parse the Ghost Function" + e.getMessage(), errorEmitter);
+            diagnostics.add(new CustomError(element, "Could not parse the ghost function " + e.getMessage()));
             // e.printStackTrace();
             return;
         }
@@ -246,17 +248,15 @@ public abstract class TypeChecker extends CtScanner {
                 a.parse(path);
                 // refinement alias must return a boolean expression
                 if (a.getExpression() != null && !a.getExpression().isBooleanExpression()) {
-                    ErrorHandler.printCustomError(element, "Refinement alias must return a boolean expression",
-                            errorEmitter);
+                    diagnostics.add(new InvalidRefinementError(element,
+                            "Refinement alias must return a boolean expression", value));
                     return;
                 }
                 AliasWrapper aw = new AliasWrapper(a, factory, Keys.WILDCARD, context, klass, path);
                 context.addAlias(aw);
             }
         } catch (ParsingException e) {
-            ErrorHandler.printSyntaxError(e.getMessage(), value, element, errorEmitter);
-            return;
-            // e.printStackTrace();
+            diagnostics.add(new SyntaxError(e.getMessage(), element, value));
         }
     }
 
@@ -326,11 +326,7 @@ public abstract class TypeChecker extends CtScanner {
         vcChecker.printSameStateError(element, expectedType, klass);
     }
 
-    public void createStateMismatchError(CtElement element, String method, Predicate c, String states) {
-        vcChecker.printStateMismatchError(element, method, c, states);
-    }
-
-    public ErrorEmitter getErrorEmitter() {
-        return errorEmitter;
+    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected) {
+        vcChecker.printStateMismatchError(element, method, found, expected);
     }
 }

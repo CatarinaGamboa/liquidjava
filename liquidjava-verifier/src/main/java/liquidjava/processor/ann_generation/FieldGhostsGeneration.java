@@ -1,6 +1,7 @@
 package liquidjava.processor.ann_generation;
 
-import liquidjava.diagnostics.ErrorEmitter;
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import liquidjava.processor.context.Context;
 import liquidjava.specification.Ghost;
 import spoon.reflect.declaration.*;
@@ -11,12 +12,10 @@ import spoon.reflect.visitor.CtScanner;
 public class FieldGhostsGeneration extends CtScanner {
     Context context;
     Factory factory;
-    ErrorEmitter errorEmitter;
 
-    public FieldGhostsGeneration(Context c, Factory fac, ErrorEmitter errorEmitter) {
-        this.context = c;
-        this.factory = fac;
-        this.errorEmitter = errorEmitter;
+    public FieldGhostsGeneration(Context context, Factory factory) {
+        this.context = context;
+        this.factory = factory;
     }
 
     public Context getContext() {
@@ -29,7 +28,7 @@ public class FieldGhostsGeneration extends CtScanner {
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        if (errorEmitter.foundError()) {
+        if (diagnostics.foundError()) {
             return;
         }
 

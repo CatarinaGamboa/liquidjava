@@ -16,7 +16,7 @@ public class SyntaxError extends LJError {
     }
 
     public SyntaxError(String message, CtElement element, String refinement) {
-        super("Syntax Error", message, element);
+        super("Syntax Error", message, element.getPosition(), element.toString(), null);
         this.refinement = refinement;
     }
 
