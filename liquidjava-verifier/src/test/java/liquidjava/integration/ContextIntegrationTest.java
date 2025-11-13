@@ -42,7 +42,7 @@ class ContextIntegrationTest {
         );
 
         // Add variable in global scope
-        context.addVarToContext("x", intType, initialPred, null);
+        context.addVarToContext("x", intType, initialPred, factory.createLiteral(0));
         assertTrue(context.hasVariable("x"), "Variable should exist in global scope");
 
         // Enter new scope and add local variable
@@ -52,7 +52,7 @@ class ContextIntegrationTest {
             "<",
             Predicate.createLit("100", "int")
         );
-        context.addVarToContext("y", intType, localPred, null);
+        context.addVarToContext("y", intType, localPred, factory.createLiteral(0));
 
         assertTrue(context.hasVariable("x"), "Global variable accessible in nested scope");
         assertTrue(context.hasVariable("y"), "Local variable exists");
@@ -234,8 +234,8 @@ class ContextIntegrationTest {
         context.addFunctionToContext(processFunc);
 
         // Add variables with refinements
-        context.addVarToContext("input", intType, precondition, null);
-        context.addVarToContext("result", intType, postcondition, null);
+        context.addVarToContext("input", intType, precondition, factory.createLiteral(0));
+        context.addVarToContext("result", intType, postcondition, factory.createLiteral(0));
 
         // Verify everything is integrated
         assertNotNull(context.getFunction("process", "Processor"), "Function registered");
@@ -258,7 +258,7 @@ class ContextIntegrationTest {
         assertTrue(context.hasVariable("GLOBAL_CONST"), "Global variable should exist");
 
         // Add local variable
-        context.addVarToContext("local", intType, new Predicate(), null);
+        context.addVarToContext("local", intType, new Predicate(), factory.createLiteral(0));
         assertEquals(2, context.getAllVariables().size(), "Should have both global and local");
 
         // Reinitialize context (not all)
@@ -284,7 +284,7 @@ class ContextIntegrationTest {
     void testContextToString() {
         // Test context string representation
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
-        context.addVarToContext("x", intType, new Predicate(), null);
+        context.addVarToContext("x", intType, new Predicate(), factory.createLiteral(0));
 
         String result = context.toString();
         assertNotNull(result, "toString should not return null");

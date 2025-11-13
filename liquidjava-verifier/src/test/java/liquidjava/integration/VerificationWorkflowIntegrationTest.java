@@ -246,18 +246,18 @@ class VerificationWorkflowIntegrationTest {
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
 
         // Global x
-        context.addVarToContext("x", intType, Predicate.createLit("0", "int"), null);
+        context.addVarToContext("x", intType, Predicate.createLit("0", "int"), factory.createLiteral(0));
         assertEquals(1, context.getAllVariables().size());
 
         // Enter scope 1
         context.enterContext();
-        context.addVarToContext("x", intType, Predicate.createLit("1", "int"), null);
-        context.addVarToContext("y", intType, Predicate.createLit("2", "int"), null);
+        context.addVarToContext("x", intType, Predicate.createLit("1", "int"), factory.createLiteral(0));
+        context.addVarToContext("y", intType, Predicate.createLit("2", "int"), factory.createLiteral(0));
         assertEquals(3, context.getAllVariables().size(), "Global x + scope1 x + scope1 y");
 
         // Enter scope 2
         context.enterContext();
-        context.addVarToContext("z", intType, Predicate.createLit("3", "int"), null);
+        context.addVarToContext("z", intType, Predicate.createLit("3", "int"), factory.createLiteral(0));
         assertEquals(4, context.getAllVariables().size());
 
         // Exit scope 2
@@ -309,7 +309,7 @@ class VerificationWorkflowIntegrationTest {
         assertTrue(intArray.isArray(), "Should be array type");
 
         // Use in context
-        context.addVarToContext("numbers", intArray, new Predicate(), null);
+        context.addVarToContext("numbers", intArray, new Predicate(), factory.createLiteral(0));
         assertTrue(context.hasVariable("numbers"), "Array variable should be in context");
 
         RefinedVariable var = context.getVariableByName("numbers");
@@ -326,7 +326,7 @@ class VerificationWorkflowIntegrationTest {
             Predicate.createLit("100", "int"));
 
         // Add local variable
-        context.addVarToContext("local", intType, new Predicate(), null);
+        context.addVarToContext("local", intType, new Predicate(), factory.createLiteral(0));
 
         // Add function
         RefinedFunction func = new RefinedFunction();
