@@ -69,9 +69,9 @@ class ContextIntegrationTest {
 
         // Exit scope
         context.exitContext();
-        assertTrue(context.hasVariable("x"), "Global variable still exists");
+        assertTrue(context.hasVariable("x"), "Base scope variable still exists");
         assertFalse(context.hasVariable("y"), "Local variable removed");
-        assertEquals(1, context.getAllVariables().size(), "Only global variable remains");
+        assertEquals(1, context.getAllVariables().size(), "Only base scope variable remains");
     }
 
     @Test
