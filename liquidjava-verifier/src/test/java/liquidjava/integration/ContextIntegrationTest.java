@@ -259,7 +259,11 @@ class ContextIntegrationTest {
 
         // Add local variable
         context.addVarToContext("local", intType, new Predicate(), factory.createLiteral(0));
-        assertEquals(2, context.getAllVariables().size(), "Should have both global and local");
+        // getAllVariables() only returns local/scoped variables, not global ones
+        assertEquals(1, context.getAllVariables().size(), "Should have 1 local variable");
+        // Verify both variables are accessible via hasVariable
+        assertTrue(context.hasVariable("GLOBAL_CONST"), "Global variable accessible");
+        assertTrue(context.hasVariable("local"), "Local variable accessible");
 
         // Reinitialize context (not all)
         context.reinitializeContext();
