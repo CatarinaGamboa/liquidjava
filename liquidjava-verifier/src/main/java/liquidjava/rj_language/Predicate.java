@@ -31,6 +31,7 @@ import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Keys;
 import liquidjava.utils.constants.Ops;
 import liquidjava.utils.constants.Types;
+import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
@@ -90,7 +91,8 @@ public class Predicate {
         try {
             return RefinementsParser.createAST(ref, prefix);
         } catch (ParsingException e) {
-            diagnostics.add(new SyntaxError(e.getMessage(), element, ref));
+            SourcePosition pos = Utils.getRefinementAnnotationPosition(element, ref);
+            diagnostics.add(new SyntaxError(e.getMessage(), pos, ref));
             throw e;
         }
     }

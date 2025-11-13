@@ -20,6 +20,7 @@ import liquidjava.processor.facade.GhostDTO;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
+import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Formats;
 import liquidjava.utils.constants.Keys;
 import liquidjava.utils.constants.Types;
@@ -254,7 +255,8 @@ public abstract class TypeChecker extends CtScanner {
                 context.addAlias(aw);
             }
         } catch (ParsingException e) {
-            diagnostics.add(new SyntaxError(e.getMessage(), element, value));
+            SourcePosition pos = Utils.getRefinementAnnotationPosition(element, value);
+            diagnostics.add(new SyntaxError(e.getMessage(), pos, value));
         }
     }
 
