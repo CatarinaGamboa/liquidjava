@@ -15,6 +15,15 @@ public class VariableResolver {
      * Extracts variables with constant values from an expression Returns a map from variable names to their values
      */
     public static Map<String, Expression> resolve(Expression exp) {
+        // if the expression is just a single equality (not a conjunction) don't extract it
+        // this avoids creating tautologies like "1 == 1" after substitution, which are then simplified to "true"
+        if (exp instanceof BinaryExpression) {
+            BinaryExpression be = (BinaryExpression) exp;
+            if ("==".equals(be.getOperator())) {
+                return new HashMap<>();
+            }
+        }
+
         Map<String, Expression> map = new HashMap<>();
         resolveRecursive(exp, map);
         return resolveTransitive(map);

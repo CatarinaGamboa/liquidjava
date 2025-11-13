@@ -5,7 +5,7 @@ import liquidjava.specification.RefinementPredicate;
 import liquidjava.specification.StateRefinement;
 
 @ExternalRefinementsFor("java.util.ArrayList")
-public interface ErrorExtRefWrongParameterType<E> {
+public interface WarningExtRefWrongParameterType<E> {
 
     @RefinementPredicate("int size(ArrayList l)")
     @StateRefinement(to = "size(this) == 0")

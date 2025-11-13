@@ -237,7 +237,7 @@ public class OperationsChecker {
             a = a.substituteVariable(Keys.WILDCARD, "");
             String s = a.toString().replace("(", "").replace(")", "").replace("==", "").replace(" ", ""); // TODO
             // IMPROVE
-            return new Predicate(String.format("(%s)", s), element, rtc.getErrorEmitter());
+            return new Predicate(String.format("(%s)", s), element);
 
         } else if (element instanceof CtLiteral<?>) {
             CtLiteral<?> l = (CtLiteral<?>) element;
@@ -248,7 +248,7 @@ public class OperationsChecker {
             if (l.getValue() == null)
                 throw new ParsingException("Null literals are not supported");
 
-            return new Predicate(l.getValue().toString(), element, rtc.getErrorEmitter());
+            return new Predicate(l.getValue().toString(), element);
 
         } else if (element instanceof CtInvocation<?>) {
             CtInvocation<?> inv = (CtInvocation<?>) element;
@@ -266,7 +266,7 @@ public class OperationsChecker {
 
             innerRefs = innerRefs.substituteVariable(Keys.WILDCARD, newName);
             rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
-            return new Predicate(newName, inv, rtc.getErrorEmitter()); // Return variable that represents the invocation
+            return new Predicate(newName, inv); // Return variable that represents the invocation
         }
         return rtc.getRefinement(element);
         // TODO Maybe add cases
@@ -301,7 +301,7 @@ public class OperationsChecker {
             }
 
             rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
-            return new Predicate(newName, inv, rtc.getErrorEmitter()); // Return variable that represents the invocation
+            return new Predicate(newName, inv); // Return variable that represents the invocation
         }
         return new Predicate();
     }
@@ -375,6 +375,6 @@ public class OperationsChecker {
         case NEG -> "-" + Keys.WILDCARD;
         default -> throw new ParsingException(kind + "operation not supported");
         };
-        return new Predicate(ret, elem, rtc.getErrorEmitter());
+        return new Predicate(ret, elem);
     };
 }

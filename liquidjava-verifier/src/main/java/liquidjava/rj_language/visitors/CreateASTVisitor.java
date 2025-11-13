@@ -14,6 +14,7 @@ import liquidjava.rj_language.ast.LiteralReal;
 import liquidjava.rj_language.ast.LiteralString;
 import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
+import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.utils.Utils;
 
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -63,7 +64,7 @@ public class CreateASTVisitor {
         this.prefix = prefix;
     }
 
-    public Expression create(ParseTree rc) {
+    public Expression create(ParseTree rc) throws ParsingException {
         if (rc instanceof ProgContext)
             return progCreate((ProgContext) rc);
         else if (rc instanceof StartContext)
@@ -84,20 +85,20 @@ public class CreateASTVisitor {
         return null;
     }
 
-    private Expression progCreate(ProgContext rc) {
+    private Expression progCreate(ProgContext rc) throws ParsingException {
         if (rc.start() != null)
             return create(rc.start());
         return null;
     }
 
-    private Expression startCreate(ParseTree rc) {
+    private Expression startCreate(ParseTree rc) throws ParsingException {
         if (rc instanceof StartPredContext)
             return create(((StartPredContext) rc).pred());
         // alias and ghost do not have evaluation
         return null;
     }
 
-    private Expression predCreate(ParseTree rc) {
+    private Expression predCreate(ParseTree rc) throws ParsingException {
         if (rc instanceof PredGroupContext)
             return new GroupExpression(create(((PredGroupContext) rc).pred()));
         else if (rc instanceof PredNegateContext)
@@ -112,7 +113,7 @@ public class CreateASTVisitor {
             return create(((PredExpContext) rc).exp());
     }
 
-    private Expression expCreate(ParseTree rc) {
+    private Expression expCreate(ParseTree rc) throws ParsingException {
         if (rc instanceof ExpGroupContext)
             return new GroupExpression(create(((ExpGroupContext) rc).exp()));
         else if (rc instanceof ExpBoolContext) {
@@ -124,7 +125,7 @@ public class CreateASTVisitor {
         }
     }
 
-    private Expression operandCreate(ParseTree rc) {
+    private Expression operandCreate(ParseTree rc) throws ParsingException {
         if (rc instanceof OpLiteralContext)
             return create(((OpLiteralContext) rc).literalExpression());
         else if (rc instanceof OpArithContext)
@@ -143,7 +144,7 @@ public class CreateASTVisitor {
         return null;
     }
 
-    private Expression literalExpressionCreate(ParseTree rc) {
+    private Expression literalExpressionCreate(ParseTree rc) throws ParsingException {
         if (rc instanceof LitGroupContext)
             return new GroupExpression(create(((LitGroupContext) rc).literalExpression()));
         else if (rc instanceof LitContext)
@@ -158,20 +159,24 @@ public class CreateASTVisitor {
         }
     }
 
-    private Expression functionCallCreate(FunctionCallContext rc) {
+    private Expression functionCallCreate(FunctionCallContext rc) throws ParsingException {
         if (rc.ghostCall() != null) {
             GhostCallContext gc = rc.ghostCall();
-            List<Expression> le = getArgs(gc.args());
             String name = Utils.qualifyName(prefix, gc.ID().getText());
-            return new FunctionInvocation(name, le);
+            List<Expression> args = getArgs(gc.args());
+            if (args.isEmpty())
+                throw new ParsingException("Ghost call cannot have empty arguments");
+            return new FunctionInvocation(name, args);
         } else {
             AliasCallContext gc = rc.aliasCall();
-            List<Expression> le = getArgs(gc.args());
-            return new AliasInvocation(gc.ID_UPPER().getText(), le);
+            List<Expression> args = getArgs(gc.args());
+            if (args.isEmpty())
+                throw new ParsingException("Alias call cannot have empty arguments");
+            return new AliasInvocation(gc.ID_UPPER().getText(), args);
         }
     }
 
-    private List<Expression> getArgs(ArgsContext args) {
+    private List<Expression> getArgs(ArgsContext args) throws ParsingException {
         List<Expression> le = new ArrayList<>();
         if (args != null)
             for (PredContext oc : args.pred()) {
@@ -180,7 +185,7 @@ public class CreateASTVisitor {
         return le;
     }
 
-    private Expression literalCreate(LiteralContext literalContext) {
+    private Expression literalCreate(LiteralContext literalContext) throws ParsingException {
         if (literalContext.BOOL() != null)
             return new LiteralBoolean(literalContext.BOOL().getText());
         else if (literalContext.STRING() != null)

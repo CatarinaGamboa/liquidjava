@@ -1,5 +1,6 @@
 package liquidjava.diagnostics.errors;
 
+import liquidjava.diagnostics.TranslationTable;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
 
@@ -10,19 +11,18 @@ import spoon.reflect.declaration.CtElement;
  */
 public class StateConflictError extends LJError {
 
-    private Predicate predicate;
+    private String state;
     private String className;
 
-    public StateConflictError(CtElement element, Predicate predicate, String className) {
-        super("State Conflict Error",
-                "Found multiple disjoint states in state transition — State transition can only go to one state of each state set",
-                element);
-        this.predicate = predicate;
+    public StateConflictError(CtElement element, Predicate state, String className, TranslationTable translationTable) {
+        super("State Conflict Error", "Found multiple disjoint states in state transition — State transition can only go to one state of each state set", element.getPosition(),
+                element.toString(), translationTable);
+        this.state = state.toString();
         this.className = className;
     }
 
-    public Predicate getPredicate() {
-        return predicate;
+    public String getState() {
+        return state;
     }
 
     public String getClassName() {
@@ -33,7 +33,7 @@ public class StateConflictError extends LJError {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Class: ").append(className).append("\n");
-        sb.append("Predicate: ").append(predicate.toString());
+        sb.append("State: ").append(state);
         return super.toString(sb.toString());
     }
 }

@@ -1,9 +1,10 @@
 package liquidjava.processor;
 
+import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import liquidjava.diagnostics.ErrorEmitter;
 import liquidjava.processor.ann_generation.FieldGhostsGeneration;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.ExternalRefinementTypeChecker;
@@ -18,11 +19,9 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
 
     List<CtPackage> visitedPackages = new ArrayList<>();
     Factory factory;
-    ErrorEmitter errorEmitter;
 
-    public RefinementProcessor(Factory factory, ErrorEmitter ee) {
+    public RefinementProcessor(Factory factory) {
         this.factory = factory;
-        errorEmitter = ee;
     }
 
     @Override
@@ -32,15 +31,14 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
             Context c = Context.getInstance();
             c.reinitializeAllContext();
 
-            pkg.accept(new FieldGhostsGeneration(c, factory, errorEmitter)); // generate annotations for field ghosts
+            pkg.accept(new FieldGhostsGeneration(c, factory)); // generate annotations for field ghosts
 
             // void spoon.reflect.visitor.CtVisitable.accept(CtVisitor arg0)
-            pkg.accept(new ExternalRefinementTypeChecker(c, factory, errorEmitter));
+            pkg.accept(new ExternalRefinementTypeChecker(c, factory));
+            pkg.accept(new MethodsFirstChecker(c, factory)); // double passing idea (instead of headers)
 
-            pkg.accept(new MethodsFirstChecker(c, factory, errorEmitter)); // double passing idea (instead of headers)
-
-            pkg.accept(new RefinementTypeChecker(c, factory, errorEmitter));
-            if (errorEmitter.foundError())
+            pkg.accept(new RefinementTypeChecker(c, factory));
+            if (diagnostics.foundError())
                 return;
         }
     }

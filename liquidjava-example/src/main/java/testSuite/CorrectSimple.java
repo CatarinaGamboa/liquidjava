@@ -3,7 +3,7 @@ package testSuite;
 import liquidjava.specification.Refinement;
 
 @SuppressWarnings("unused")
-public class SimpleTest {
+public class CorrectSimple {
     public static void main(String[] args) {
         // Arithmetic Binary Operations
         @Refinement("a >= 10")
