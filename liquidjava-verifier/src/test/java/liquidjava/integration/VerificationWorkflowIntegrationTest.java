@@ -267,7 +267,7 @@ class VerificationWorkflowIntegrationTest {
         // Exit scope 1
         context.exitContext();
         assertEquals(1, context.getAllVariables().size());
-        assertTrue(context.hasVariable("x"), "Global x remains");
+        assertTrue(context.hasVariable("x"), "Base scope x remains");
     }
 
     @Test
