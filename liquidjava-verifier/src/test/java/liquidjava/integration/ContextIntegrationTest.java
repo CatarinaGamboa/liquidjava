@@ -123,13 +123,13 @@ class ContextIntegrationTest {
 
         // Define states using GhostState
         List<CtTypeReference<?>> emptyList = List.of();
-        GhostState isEmpty = new GhostState("Stack", "isEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
+        GhostState isEmpty = new GhostState("isEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
         isEmpty.setRefinement(Predicate.createEquals(
             Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
             Predicate.createLit("0", "int")
         ));
 
-        GhostState isNonEmpty = new GhostState("Stack", "isNonEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
+        GhostState isNonEmpty = new GhostState("isNonEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
         isNonEmpty.setRefinement(Predicate.createOperation(
             Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
             ">",

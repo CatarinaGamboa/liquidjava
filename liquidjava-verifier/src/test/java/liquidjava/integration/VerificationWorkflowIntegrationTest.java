@@ -175,13 +175,13 @@ class VerificationWorkflowIntegrationTest {
 
         // Define states
         List<CtTypeReference<?>> emptyList = List.of();
-        GhostState empty = new GhostState("Stack", "isEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
+        GhostState empty = new GhostState("isEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
         empty.setRefinement(Predicate.createEquals(
             Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
             Predicate.createLit("0", "int")
         ));
 
-        GhostState nonEmpty = new GhostState("Stack", "isNonEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
+        GhostState nonEmpty = new GhostState("isNonEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
         nonEmpty.setRefinement(Predicate.createOperation(
             Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
             ">",
