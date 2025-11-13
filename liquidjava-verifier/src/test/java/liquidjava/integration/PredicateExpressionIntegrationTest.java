@@ -148,7 +148,7 @@ class PredicateExpressionIntegrationTest {
         assertTrue(oldVars.contains("x"), "Should contain x");
 
         // Test changeOldMentions method executes
-        Predicate changed = expr.changeOldMentions("x", "newX", null);
+        Predicate changed = expr.changeOldMentions("x", "newX");
         assertNotNull(changed, "Change should produce result");
 
         // Verify original expression still accessible
