@@ -165,11 +165,13 @@ public class CreateASTVisitor {
             String name = Utils.qualifyName(prefix, gc.ID().getText());
             List<Expression> args = getArgs(gc.args());
             if (args.isEmpty())
-                throw new ParsingException("Function call cannot have empty arguments");
+                throw new ParsingException("Ghost call cannot have empty arguments");
             return new FunctionInvocation(name, args);
         } else {
             AliasCallContext gc = rc.aliasCall();
             List<Expression> args = getArgs(gc.args());
+            if (args.isEmpty())
+                throw new ParsingException("Alias call cannot have empty arguments");
             return new AliasInvocation(gc.ID_UPPER().getText(), args);
         }
     }
