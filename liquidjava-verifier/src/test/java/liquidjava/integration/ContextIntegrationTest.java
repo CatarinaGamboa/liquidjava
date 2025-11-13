@@ -54,7 +54,7 @@ class ContextIntegrationTest {
         );
         context.addVarToContext("y", intType, localPred, factory.createLiteral(0));
 
-        assertTrue(context.hasVariable("x"), "Global variable accessible in nested scope");
+        assertTrue(context.hasVariable("x"), "Base scope variable accessible in nested scope");
         assertTrue(context.hasVariable("y"), "Local variable exists");
         assertEquals(2, context.getAllVariables().size(), "Should have 2 variables");
 
