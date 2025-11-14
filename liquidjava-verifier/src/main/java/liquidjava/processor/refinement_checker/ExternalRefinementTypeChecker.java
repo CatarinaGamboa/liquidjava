@@ -5,7 +5,7 @@ import static liquidjava.diagnostics.Diagnostics.diagnostics;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.warnings.ExternalClassNotFoundWarning;
 import liquidjava.diagnostics.warnings.ExternalMethodNotFoundWarning;
 import liquidjava.processor.context.Context;
@@ -13,7 +13,6 @@ import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.facade.GhostDTO;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
 import spoon.reflect.declaration.CtClass;
@@ -52,11 +51,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                 diagnostics.add(new ExternalClassNotFoundWarning(intrface, message, prefix));
                 return;
             }
-            try {
-                getRefinementFromAnnotation(intrface);
-            } catch (ParsingException e) {
-                return; // error already reported
-            }
+            getRefinementFromAnnotation(intrface);
             handleStateSetsFromAnnotation(intrface);
             super.visitCtInterface(intrface);
         }
@@ -70,8 +65,9 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         Optional<Predicate> oc;
         try {
             oc = getRefinementFromAnnotation(f);
-        } catch (ParsingException e) {
-            return; // error already reported
+        } catch (LJError e) {
+            diagnostics.add(e);
+            return;
         }
         Predicate c = oc.orElse(new Predicate());
         context.addGlobalVariableToContext(f.getSimpleName(), prefix, f.getType(), c);
@@ -111,26 +107,15 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
         }
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
-        try {
-            mfc.getMethodRefinements(method, prefix);
-        } catch (ParsingException e) {
-            return;
-        }
+        mfc.getMethodRefinements(method, prefix);
         super.visitCtMethod(method);
     }
 
-    protected void getGhostFunction(String value, CtElement element) {
-        try {
-            // Optional<FunctionDeclaration> ofd =
-            // RefinementParser.parseFunctionDecl(value);
-            GhostDTO f = RefinementsParser.getGhostDeclaration(value);
-            if (f != null && element.getParent() instanceof CtInterface<?>) {
-                GhostFunction gh = new GhostFunction(f, factory, prefix);
-                context.addGhostFunction(gh);
-            }
-
-        } catch (ParsingException e) {
-            diagnostics.add(new CustomError("Could not parse the ghost function", e.getMessage(), element));
+    protected void getGhostFunction(String value, CtElement element) throws LJError {
+        GhostDTO f = RefinementsParser.getGhostDeclaration(value);
+        if (f != null && element.getParent() instanceof CtInterface<?>) {
+            GhostFunction gh = new GhostFunction(f, factory, prefix);
+            context.addGhostFunction(gh);
         }
     }
 

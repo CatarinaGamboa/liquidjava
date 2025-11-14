@@ -9,6 +9,7 @@ import java.util.Optional;
 
 import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.diagnostics.errors.InvalidRefinementError;
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.errors.SyntaxError;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
@@ -18,7 +19,6 @@ import liquidjava.processor.context.RefinedVariable;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.processor.facade.GhostDTO;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Formats;
@@ -61,7 +61,7 @@ public abstract class TypeChecker extends CtScanner {
         return c == null ? new Predicate() : c;
     }
 
-    public Optional<Predicate> getRefinementFromAnnotation(CtElement element) throws ParsingException {
+    public Optional<Predicate> getRefinementFromAnnotation(CtElement element) throws LJError {
         Optional<Predicate> constr = Optional.empty();
         Optional<String> ref = Optional.empty();
         for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
@@ -85,8 +85,8 @@ public abstract class TypeChecker extends CtScanner {
 
             // check if refinement is valid
             if (!p.getExpression().isBooleanExpression()) {
-                diagnostics.add(new InvalidRefinementError(element, "Refinement predicate must be a boolean expression",
-                        ref.get()));
+                throw new InvalidRefinementError(element, "Refinement predicate must be a boolean expression",
+                        ref.get());
             }
             if (diagnostics.foundError())
                 return Optional.empty();
@@ -97,7 +97,7 @@ public abstract class TypeChecker extends CtScanner {
     }
 
     @SuppressWarnings("unchecked")
-    public void handleStateSetsFromAnnotation(CtElement element) {
+    public void handleStateSetsFromAnnotation(CtElement element) throws LJError {
         int set = 0;
         for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
             String an = ann.getActualAnnotation().annotationType().getCanonicalName();
@@ -112,7 +112,7 @@ public abstract class TypeChecker extends CtScanner {
         }
     }
 
-    private void createStateSet(CtNewArray<String> e, int set, CtElement element) {
+    private void createStateSet(CtNewArray<String> e, int set, CtElement element) throws LJError {
 
         // if any of the states starts with uppercase, throw error (reserved for alias)
         for (CtExpression<?> ce : e.getElements()) {
@@ -121,7 +121,7 @@ public abstract class TypeChecker extends CtScanner {
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 if (Character.isUpperCase(f.charAt(0))) {
-                    diagnostics.add(new CustomError("State names must start with lowercase", s));
+                    throw new CustomError("State names must start with lowercase", s);
                 }
             }
         }
@@ -157,18 +157,11 @@ public abstract class TypeChecker extends CtScanner {
         }
     }
 
-    private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, String an, CtElement element) {
-        GhostDTO gd = null;
-        try {
-            gd = RefinementsParser.getGhostDeclaration(string);
-        } catch (ParsingException e) {
-            diagnostics.add(new CustomError("Could not parse the ghost function", e.getMessage(), ann));
-            return;
-        }
+    private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, String an, CtElement element) throws LJError {
+        GhostDTO gd = RefinementsParser.getGhostDeclaration(string);
         if (gd.getParam_types().size() > 0) {
-            diagnostics.add(new CustomError(
-                    "Ghost States have the class as parameter " + "by default, no other parameters are allowed", ann));
-            return;
+            throw new CustomError(
+                    "Ghost States have the class as parameter " + "by default, no other parameters are allowed", ann);
         }
         // Set class as parameter of Ghost
         String qn = getQualifiedClassName(element);
@@ -216,22 +209,16 @@ public abstract class TypeChecker extends CtScanner {
         return Optional.empty();
     }
 
-    protected void getGhostFunction(String value, CtElement element) {
-        try {
-            GhostDTO f = RefinementsParser.getGhostDeclaration(value);
-            if (f != null && element.getParent() instanceof CtClass<?>) {
-                CtClass<?> klass = (CtClass<?>) element.getParent();
-                GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName());
-                context.addGhostFunction(gh);
-            }
-        } catch (ParsingException e) {
-            diagnostics.add(new CustomError("Could not parse the ghost function", e.getMessage(), element));
-            // e.printStackTrace();
-            return;
+    protected void getGhostFunction(String value, CtElement element) throws LJError {
+        GhostDTO f = RefinementsParser.getGhostDeclaration(value);
+        if (f != null && element.getParent() instanceof CtClass<?>) {
+            CtClass<?> klass = (CtClass<?>) element.getParent();
+            GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName());
+            context.addGhostFunction(gh);
         }
     }
 
-    protected void handleAlias(String value, CtElement element) {
+    protected void handleAlias(String value, CtElement element) throws LJError {
         try {
             AliasDTO a = RefinementsParser.getAliasDeclaration(value);
             String klass = null;
@@ -247,16 +234,15 @@ public abstract class TypeChecker extends CtScanner {
                 a.parse(path);
                 // refinement alias must return a boolean expression
                 if (a.getExpression() != null && !a.getExpression().isBooleanExpression()) {
-                    diagnostics.add(new InvalidRefinementError(element,
-                            "Refinement alias must return a boolean expression", value));
-                    return;
+                    throw new InvalidRefinementError(element, "Refinement alias must return a boolean expression", value);
                 }
                 AliasWrapper aw = new AliasWrapper(a, factory, Keys.WILDCARD, context, klass, path);
                 context.addAlias(aw);
             }
-        } catch (ParsingException e) {
+        } catch (SyntaxError e) {
+            // add location info to error
             SourcePosition pos = Utils.getRefinementAnnotationPosition(element, value);
-            diagnostics.add(new SyntaxError(e.getMessage(), pos, value));
+            throw new SyntaxError(e.getMessage(), pos, value);
         }
     }
 
@@ -273,7 +259,7 @@ public abstract class TypeChecker extends CtScanner {
     }
 
     public void checkVariableRefinements(Predicate refinementFound, String simpleName, CtTypeReference<?> type,
-            CtElement usage, CtElement variable) throws ParsingException {
+            CtElement usage, CtElement variable) throws LJError {
         Optional<Predicate> expectedType = getRefinementFromAnnotation(variable);
         Predicate cEt;
         RefinedVariable mainRV = null;
@@ -305,28 +291,28 @@ public abstract class TypeChecker extends CtScanner {
         context.addRefinementToVariableInContext(simpleName, type, cet, usage);
     }
 
-    public void checkSMT(Predicate expectedType, CtElement element) {
+    public void checkSMT(Predicate expectedType, CtElement element) throws LJError {
         vcChecker.processSubtyping(expectedType, context.getGhostState(), element, factory);
         element.putMetadata(Keys.REFINEMENT, expectedType);
     }
 
-    public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String moreInfo) {
+    public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String moreInfo) throws LJError {
         vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), target, moreInfo, factory);
     }
 
-    public boolean checksStateSMT(Predicate prevState, Predicate expectedState, SourcePosition p) {
+    public boolean checksStateSMT(Predicate prevState, Predicate expectedState, SourcePosition p) throws LJError {
         return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), p, factory);
     }
 
-    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customMessage) {
+    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customMessage) throws LJError {
         vcChecker.printSubtypingError(element, expectedType, foundType, customMessage);
     }
 
-    public void createSameStateError(CtElement element, Predicate expectedType, String klass) {
+    public void createSameStateError(CtElement element, Predicate expectedType, String klass) throws LJError {
         vcChecker.printSameStateError(element, expectedType, klass);
     }
 
-    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected) {
+    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected) throws LJError {
         vcChecker.printStateMismatchError(element, method, found, expected);
     }
 }

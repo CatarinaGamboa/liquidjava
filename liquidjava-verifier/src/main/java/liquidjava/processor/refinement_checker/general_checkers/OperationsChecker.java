@@ -3,6 +3,9 @@ package liquidjava.processor.refinement_checker.general_checkers;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
 import liquidjava.processor.context.Variable;
@@ -13,7 +16,6 @@ import liquidjava.utils.constants.Keys;
 import liquidjava.utils.constants.Ops;
 import liquidjava.utils.constants.Types;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.parsing.ParsingException;
 import org.apache.commons.lang3.NotImplementedException;
 import spoon.reflect.code.BinaryOperatorKind;
 import spoon.reflect.code.CtAssignment;
@@ -56,10 +58,8 @@ public class OperationsChecker {
      *
      * @param <T>
      * @param operator
-     *
-     * @throws ParsingException
      */
-    public <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) throws ParsingException {
+    public <T> void getBinaryOpRefinements(CtBinaryOperator<T> operator) throws LJError {
         CtExpression<?> right = operator.getRightHandOperand();
         CtExpression<?> left = operator.getLeftHandOperand();
         Predicate oper;
@@ -103,11 +103,9 @@ public class OperationsChecker {
      *
      * @param <T>
      * @param operator
-     *
-     * @throws ParsingException
      */
     @SuppressWarnings({ "unchecked" })
-    public <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) throws ParsingException {
+    public <T> void getUnaryOpRefinements(CtUnaryOperator<T> operator) throws LJError {
         CtExpression<T> ex = (CtExpression<T>) operator.getOperand();
         String name = Formats.FRESH;
         Predicate all;
@@ -165,11 +163,9 @@ public class OperationsChecker {
      * @param element
      *
      * @return String with the operation refinements
-     *
-     * @throws ParsingException
      */
     private Predicate getOperationRefinements(CtBinaryOperator<?> operator, CtExpression<?> element)
-            throws ParsingException {
+            throws LJError {
         return getOperationRefinements(operator, null, element);
     }
 
@@ -184,11 +180,9 @@ public class OperationsChecker {
      *            CtExpression that represent an Binary Operation or one of the operands
      *
      * @return Predicate with the operation refinements
-     *
-     * @throws ParsingException
      */
     private Predicate getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWrite<?> parentVar,
-            CtExpression<?> element) throws ParsingException {
+            CtExpression<?> element) throws LJError {
         if (element instanceof CtFieldRead<?>) {
             CtFieldRead<?> field = ((CtFieldRead<?>) element);
             if (field.getVariable().getSimpleName().equals("length")) {
@@ -246,7 +240,7 @@ public class OperationsChecker {
                 return new Predicate();
             }
             if (l.getValue() == null)
-                throw new ParsingException("Null literals are not supported");
+                throw new CustomError("Null literals are not supported");
 
             return new Predicate(l.getValue().toString(), element);
 
@@ -273,7 +267,7 @@ public class OperationsChecker {
     }
 
     private Predicate getOperationRefinementFromExternalLib(CtInvocation<?> inv, CtBinaryOperator<?> operator)
-            throws ParsingException {
+            throws LJError {
 
         CtExpression<?> t = inv.getTarget();
         if (t instanceof CtVariableRead) {
@@ -316,11 +310,9 @@ public class OperationsChecker {
      * @param name
      *
      * @return String with the refinements
-     *
-     * @throws ParsingException
      */
     private <T> Predicate getRefinementUnaryVariableWrite(CtExpression<T> ex, CtUnaryOperator<T> operator,
-            CtVariableWrite<T> w, String name) throws ParsingException {
+            CtVariableWrite<T> w, String name) throws LJError {
         String newName = String.format(Formats.INSTANCE, name, rtc.getContext().getCounter());
         CtVariable<T> varDecl = w.getVariable().getDeclaration();
 
@@ -363,7 +355,7 @@ public class OperationsChecker {
         };
     }
 
-    private Predicate getOperatorFromKind(UnaryOperatorKind kind, CtElement elem) throws ParsingException {
+    private Predicate getOperatorFromKind(UnaryOperatorKind kind, CtElement elem) throws LJError {
         String ret = switch (kind) {
         case POSTINC -> Keys.WILDCARD + " + 1";
         case POSTDEC -> Keys.WILDCARD + " - 1";
@@ -373,7 +365,7 @@ public class OperationsChecker {
         case NOT -> "!" + Keys.WILDCARD;
         case POS -> "0 + " + Keys.WILDCARD;
         case NEG -> "-" + Keys.WILDCARD;
-        default -> throw new ParsingException(kind + "operation not supported");
+        default -> throw new CustomError(kind + "operation not supported");
         };
         return new Predicate(ret, elem);
     };

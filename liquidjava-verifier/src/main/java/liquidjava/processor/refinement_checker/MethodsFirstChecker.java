@@ -7,7 +7,6 @@ import java.util.List;
 
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
-import liquidjava.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtInterface;
@@ -53,11 +52,7 @@ public class MethodsFirstChecker extends TypeChecker {
             if (ct instanceof CtClass)
                 visitCtClass((CtClass<?>) ct);
         }
-        try {
-            getRefinementFromAnnotation(ctClass);
-        } catch (ParsingException e) {
-            return; // error already reported
-        }
+        getRefinementFromAnnotation(ctClass);
         handleStateSetsFromAnnotation(ctClass);
         super.visitCtClass(ctClass);
     }
@@ -74,11 +69,7 @@ public class MethodsFirstChecker extends TypeChecker {
         if (getExternalRefinement(intrface).isPresent())
             return;
 
-        try {
-            getRefinementFromAnnotation(intrface);
-        } catch (ParsingException e) {
-            return; // error already reported
-        }
+        getRefinementFromAnnotation(intrface);
         handleStateSetsFromAnnotation(intrface);
         super.visitCtInterface(intrface);
     }
@@ -89,12 +80,8 @@ public class MethodsFirstChecker extends TypeChecker {
             return;
 
         context.enterContext();
-        try {
-            getRefinementFromAnnotation(c);
-            mfc.getConstructorRefinements(c);
-        } catch (ParsingException e) {
-            return;
-        }
+        getRefinementFromAnnotation(c);
+        mfc.getConstructorRefinements(c);
         super.visitCtConstructor(c);
         context.exitContext();
     }
@@ -104,11 +91,7 @@ public class MethodsFirstChecker extends TypeChecker {
             return;
 
         context.enterContext();
-        try {
-            mfc.getMethodRefinements(method);
-        } catch (ParsingException e) {
-            return;
-        }
+        mfc.getMethodRefinements(method);
         super.visitCtMethod(method);
         context.exitContext();
     }

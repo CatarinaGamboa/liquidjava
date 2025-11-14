@@ -39,7 +39,7 @@ public class VCChecker {
         pathVariables = new Stack<>();
     }
 
-    public void processSubtyping(Predicate expectedType, List<GhostState> list, CtElement element, Factory f) {
+    public void processSubtyping(Predicate expectedType, List<GhostState> list, CtElement element, Factory f) throws LJError {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         if (expectedType.isBooleanTrue())
@@ -53,11 +53,9 @@ public class VCChecker {
         try {
             List<GhostState> filtered = filterGhostStatesForVariables(list, mainVars, lrv);
             premises = premisesBeforeChange.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
-
             et = expectedType.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
         } catch (Exception e) {
-            diagnostics.add(new RefinementError(element, expectedType.getExpression(), premises.simplify(), map));
-            return;
+            throw new RefinementError(element, expectedType.getExpression(), premises.simplify(), map);
         }
 
         try {
@@ -69,14 +67,14 @@ public class VCChecker {
     }
 
     public void processSubtyping(Predicate type, Predicate expectedType, List<GhostState> list, CtElement element,
-            String string, Factory f) {
+            String string, Factory f) throws LJError {
         boolean b = canProcessSubtyping(type, expectedType, list, element.getPosition(), f);
         if (!b)
             printSubtypingError(element, expectedType, type, string);
     }
 
     public boolean canProcessSubtyping(Predicate type, Predicate expectedType, List<GhostState> list, SourcePosition p,
-            Factory f) {
+            Factory f) throws LJError {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         gatherVariables(type, lrv, mainVars);
@@ -234,24 +232,22 @@ public class VCChecker {
         getVariablesFromContext(l, newVars, varName);
     }
 
-    public boolean smtChecks(Predicate found, Predicate expectedType, SourcePosition p) {
+    public boolean smtChecks(Predicate found, Predicate expectedType, SourcePosition p) throws LJError {
         try {
             new SMTEvaluator().verifySubtype(found, expectedType, context, p);
         } catch (TypeCheckError e) {
             return false;
         } catch (Exception e) {
             String msg = e.getLocalizedMessage().toLowerCase();
-            LJError error;
             if (msg.contains("wrong number of arguments")) {
-                error = new GhostInvocationError("Wrong number of arguments in ghost invocation", p,
+                throw new GhostInvocationError("Wrong number of arguments in ghost invocation", p,
                         expectedType.getExpression(), null);
             } else if (msg.contains("sort mismatch")) {
-                error = new GhostInvocationError("Type mismatch in arguments of ghost invocation", p,
+                throw new GhostInvocationError("Type mismatch in arguments of ghost invocation", p,
                         expectedType.getExpression(), null);
             } else {
-                error = new CustomError(e.getMessage(), p);
+                throw new CustomError(e.getMessage(), p);
             }
-            diagnostics.add(error);
         }
         return true;
     }
@@ -262,9 +258,6 @@ public class VCChecker {
      *
      * @param cSMT
      * @param expectedType
-     *
-     * @throws TypeCheckError
-     * @throws Exception
      * 
      */
     private void smtChecking(Predicate cSMT, Predicate expectedType, SourcePosition p)
@@ -309,24 +302,24 @@ public class VCChecker {
     }
 
     protected void printSubtypingError(CtElement element, Predicate expectedType, Predicate foundType,
-            String customMsg) {
+            String customMsg) throws LJError {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         gatherVariables(foundType, lrv, mainVars);
         TranslationTable map = new TranslationTable();
         Predicate premises = joinPredicates(expectedType, mainVars, lrv, map).toConjunctions();
-        diagnostics.add(new RefinementError(element, expectedType.getExpression(), premises.simplify(), map));
+        throw new RefinementError(element, expectedType.getExpression(), premises.simplify(), map);
     }
 
-    public void printSameStateError(CtElement element, Predicate expectedType, String klass) {
+    public void printSameStateError(CtElement element, Predicate expectedType, String klass) throws LJError {
         TranslationTable map = createMap(element, expectedType);
-        diagnostics.add(new StateConflictError(element, expectedType.getExpression(), klass, map));
+        throw new StateConflictError(element, expectedType.getExpression(), klass, map);
     }
 
     private void printError(Exception e, Predicate premisesBeforeChange, Predicate expectedType, CtElement element,
-            TranslationTable map) {
+            TranslationTable map) throws LJError {
         LJError error = mapError(e, premisesBeforeChange, expectedType, element, map);
-        diagnostics.add(error);
+        throw error;
     }
 
     private LJError mapError(Exception e, Predicate premisesBeforeChange, Predicate expectedType, CtElement element,
@@ -340,13 +333,13 @@ public class VCChecker {
         }
     }
 
-    public void printStateMismatchError(CtElement element, String method, Predicate found, Predicate[] states) {
+    public void printStateMismatchError(CtElement element, String method, Predicate found, Predicate[] states) throws LJError {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(found, lrv, mainVars);
         TranslationTable map = new TranslationTable();
         VCImplication foundState = joinPredicates(found, mainVars, lrv, map);
-        diagnostics.add(new StateRefinementError(element, method,
+        throw new StateRefinementError(element, method,
                 Arrays.stream(states).map(Predicate::getExpression).toArray(Expression[]::new),
-                foundState.toConjunctions().simplify().getValue(), map));
+                foundState.toConjunctions().simplify().getValue(), map);
     }
 }

@@ -1,19 +1,16 @@
 package liquidjava.processor.refinement_checker.object_checkers;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.diagnostics.errors.IllegalConstructorTransitionError;
 import liquidjava.diagnostics.errors.InvalidRefinementError;
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Formats;
 import liquidjava.utils.constants.Keys;
@@ -32,20 +29,17 @@ public class AuxStateHandler {
      * @param c
      * @param f
      * @param tc
-     *
-     * @throws ParsingException
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, TypeChecker tc)
-            throws ParsingException {
+            throws LJError {
         List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
         if (!an.isEmpty()) {
             for (CtAnnotation<? extends Annotation> a : an) {
                 Map<String, CtExpression> m = a.getAllValues();
                 CtLiteral<String> from = (CtLiteral<String>) m.get("from");
                 if (from != null) {
-                    diagnostics.add(new IllegalConstructorTransitionError(from));
-                    return;
+                    throw new IllegalConstructorTransitionError(from);
                 }
             }
             setConstructorStates(f, an, tc, c); // f.setState(an, context.getGhosts(), c);
@@ -61,12 +55,10 @@ public class AuxStateHandler {
      * @param anns
      * @param tc
      * @param element
-     *
-     * @throws ParsingException
      */
     @SuppressWarnings({ "rawtypes" })
     private static void setConstructorStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
-            TypeChecker tc, CtElement element) throws ParsingException {
+            TypeChecker tc, CtElement element) throws LJError {
         List<ObjectState> l = new ArrayList<>();
         for (CtAnnotation<? extends Annotation> an : anns) {
             Map<String, CtExpression> m = an.getAllValues();
@@ -75,9 +67,7 @@ public class AuxStateHandler {
             if (to != null) {
                 Predicate p = new Predicate(to, element);
                 if (!p.getExpression().isBooleanExpression()) {
-                    diagnostics.add(new InvalidRefinementError(element,
-                            "State refinement transition must be a boolean expression", to));
-                    return;
+                    throw new InvalidRefinementError(element, "State refinement transition must be a boolean expression", to);
                 }
                 state.setTo(p);
             }
@@ -86,6 +76,11 @@ public class AuxStateHandler {
         f.setAllStates(l);
     }
 
+    /**
+     * Sets a default state where all ghost states are initialized to their default values
+     * @param f
+     * @param tc
+     */
     public static void setDefaultState(RefinedFunction f, TypeChecker tc) {
         String klass = f.getTargetClass();
         Predicate[] s = { Predicate.createVar(Keys.THIS) };
@@ -109,6 +104,12 @@ public class AuxStateHandler {
         f.setAllStates(los);
     }
 
+    /**
+     * Gets the different ghost state sets for the given class
+     * @param tc
+     * @param klassQualified
+     * @return list of different ghost function sets
+     */
     private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klassQualified) {
         List<GhostFunction> sets = new ArrayList<>();
         List<GhostState> l = getGhostStatesFor(klassQualified, tc);
@@ -130,11 +131,9 @@ public class AuxStateHandler {
      * @param method
      * @param f
      * @param tc
-     *
-     * @throws ParsingException
      */
     public static void handleMethodState(CtMethod<?> method, RefinedFunction f, TypeChecker tc, String prefix)
-            throws ParsingException {
+            throws LJError {
         List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(method);
         if (!an.isEmpty()) {
             setFunctionStates(f, an, tc, method, prefix);
@@ -150,11 +149,9 @@ public class AuxStateHandler {
      * @param anns
      * @param tc
      * @param element
-     *
-     * @throws ParsingException
      */
     private static void setFunctionStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
-            TypeChecker tc, CtElement element, String prefix) throws ParsingException {
+            TypeChecker tc, CtElement element, String prefix) throws LJError {
         List<ObjectState> l = new ArrayList<>();
         for (CtAnnotation<? extends Annotation> an : anns) {
             l.add(getStates(an, f, tc, element, prefix));
@@ -164,7 +161,7 @@ public class AuxStateHandler {
 
     @SuppressWarnings({ "rawtypes" })
     private static ObjectState getStates(CtAnnotation<? extends Annotation> ctAnnotation, RefinedFunction f,
-            TypeChecker tc, CtElement e, String prefix) throws ParsingException {
+            TypeChecker tc, CtElement e, String prefix) throws LJError {
         Map<String, CtExpression> m = ctAnnotation.getAllValues();
         String from = TypeCheckingUtils.getStringFromAnnotation(m.get("from"));
         String to = TypeCheckingUtils.getStringFromAnnotation(m.get("to"));
@@ -189,13 +186,21 @@ public class AuxStateHandler {
         return state;
     }
 
+    /**
+     * Creates the predicate for state transition
+     * @param value
+     * @param targetClass
+     * @param tc
+     * @param e
+     * @param isTo
+     * @param prefix
+     * @return the created predicate
+     */
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
-            TypeChecker tc, CtElement e, boolean isTo, String prefix) throws ParsingException {
+            TypeChecker tc, CtElement e, boolean isTo, String prefix) throws LJError {
         Predicate p = new Predicate(value, e, prefix);
         if (!p.getExpression().isBooleanExpression()) {
-            diagnostics.add(
-                    new InvalidRefinementError(e, "State refinement transition must be a boolean expression", value));
-            return new Predicate();
+            throw new InvalidRefinementError(e, "State refinement transition must be a boolean expression", value);
         }
         CtTypeReference<?> r = tc.getFactory().Type().createReference(targetClass);
         String nameOld = String.format(Formats.INSTANCE, Keys.THIS, tc.getContext().getCounter());
@@ -214,6 +219,13 @@ public class AuxStateHandler {
         return c1;
     }
 
+    /**
+     * Gets the missing states in the predicate and adds equalities to old states
+     * @param t
+     * @param tc
+     * @param p
+     * @return the updated predicate
+     */
     private static Predicate getMissingStates(String t, TypeChecker tc, Predicate p) {
         List<GhostState> gs = p.getStateInvocations(getGhostStatesFor(t, tc));
         List<GhostFunction> sets = getDifferentSets(tc, t);
@@ -228,7 +240,10 @@ public class AuxStateHandler {
     }
 
     /**
-     * Collect ghost states for the given qualified class name and its immediate supertypes (superclass and interfaces).
+     * Collect ghost states for the given qualified class name and its immediate supertypes (superclass and interfaces)
+     * @param qualifiedClass
+     * @param tc
+     * @return list of ghost states
      */
     private static List<GhostState> getGhostStatesFor(String qualifiedClass, TypeChecker tc) {
         // Keep order: class, then superclass, then interfaces; avoid duplicates
@@ -256,15 +271,14 @@ public class AuxStateHandler {
     }
 
     /**
-     * Create predicate with the equalities with previous versions of the object e.g., ghostfunction1(this) ==
-     * ghostfunction1(old(this))
-     *
+     * Create predicate with the equalities with previous versions of the object
+     * e.g., ghostfunction1(this) == ghostfunction1(old(this))
      * @param p
      * @param th
      * @param sets
      * @param tc
      *
-     * @return
+     * @return updated predicate
      */
     private static Predicate addOldStates(Predicate p, Predicate th, List<GhostFunction> sets, TypeChecker tc) {
         Predicate c = p;
@@ -333,7 +347,7 @@ public class AuxStateHandler {
      * @param invocation
      */
     public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtExpression<?> target2,
-            Map<String, String> map, CtElement invocation) {
+            Map<String, String> map, CtElement invocation) throws LJError {
         String parentTargetName = searchFistVariableTarget(tc, target2, invocation);
         VariableInstance target = getTarget(tc, invocation);
         if (target != null) {
@@ -346,7 +360,12 @@ public class AuxStateHandler {
         }
     }
 
-    public static void updateGhostField(CtFieldWrite<?> fw, TypeChecker tc) {
+    /**
+     * Updates the ghost field after a write
+     * @param fw
+     * @param tc
+     */
+    public static void updateGhostField(CtFieldWrite<?> fw, TypeChecker tc) throws LJError {
         CtField<?> field = fw.getVariable().getDeclaration();
         String updatedVarName = String.format(Formats.THIS, fw.getVariable().getSimpleName());
         String targetClass = field.getDeclaringType().getQualifiedName();
@@ -379,18 +398,13 @@ public class AuxStateHandler {
         // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
 
         ObjectState stateChange = new ObjectState();
-        try {
-            String prefix = field.getDeclaringType().getQualifiedName();
-            Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false,
-                    prefix);
-            Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true, prefix);
-            stateChange.setFrom(fromPredicate);
-            stateChange.setTo(toPredicate);
-        } catch (ParsingException e) {
-            String message = String.format("Parsing error while constructing assignment update for `%s`", fw);
-            diagnostics.add(new CustomError(message, e.getMessage(), field));
-            return;
-        }
+        String prefix = field.getDeclaringType().getQualifiedName();
+        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false,
+                prefix);
+        Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true, prefix);
+        stateChange.setFrom(fromPredicate);
+        stateChange.setTo(toPredicate);
+        
 
         // replace "state(this)" to "state(whatever method is called from) and so on"
         Predicate expectState = stateChange.getFrom().substituteVariable(Keys.THIS, instanceName)
@@ -440,7 +454,7 @@ public class AuxStateHandler {
      */
     private static Predicate changeState(TypeChecker tc, VariableInstance vi,
             /* RefinedFunction f */ List<ObjectState> stateChanges, String name, Map<String, String> map,
-            CtElement invocation) {
+            CtElement invocation) throws LJError {
         if (vi.getRefinement() == null) {
             return new Predicate();
         }
@@ -508,7 +522,7 @@ public class AuxStateHandler {
      * @return
      */
     private static Predicate sameState(TypeChecker tc, VariableInstance variableInstance, String name,
-            CtElement invocation) {
+            CtElement invocation) throws LJError {
         if (variableInstance.getRefinement() != null) {
             String newInstanceName = String.format(Formats.INSTANCE, name, tc.getContext().getCounter());
             Predicate c = variableInstance.getRefinement().substituteVariable(Keys.WILDCARD, newInstanceName)
@@ -533,7 +547,7 @@ public class AuxStateHandler {
      * @return
      */
     private static String addInstanceWithState(TypeChecker tc, String superName, String name2,
-            VariableInstance prevInstance, Predicate transitionedState, CtElement invocation) {
+            VariableInstance prevInstance, Predicate transitionedState, CtElement invocation) throws LJError {
         VariableInstance vi2 = (VariableInstance) tc.getContext().addInstanceToContext(name2, prevInstance.getType(),
                 prevInstance.getRefinement(), invocation);
         // vi2.setState(transitionedState);
@@ -564,7 +578,7 @@ public class AuxStateHandler {
      *
      * @param invocation
      *
-     * @return
+     * @return the name of the parent target
      */
     static String searchFistVariableTarget(TypeChecker tc, CtElement target2, CtElement invocation) {
         if (target2 instanceof CtVariableRead<?>) {

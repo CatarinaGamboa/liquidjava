@@ -1,6 +1,9 @@
 package liquidjava.rj_language.parsing;
 
 import java.util.Optional;
+
+import liquidjava.diagnostics.errors.LJError;
+import liquidjava.diagnostics.errors.SyntaxError;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.processor.facade.GhostDTO;
 import liquidjava.rj_language.ast.Expression;
@@ -17,7 +20,7 @@ import rj.grammar.RJParser;
 
 public class RefinementsParser {
 
-    public static Expression createAST(String toParse, String prefix) throws ParsingException {
+    public static Expression createAST(String toParse, String prefix) throws LJError {
         ParseTree pt = compile(toParse);
         CreateASTVisitor visitor = new CreateASTVisitor(prefix);
         return visitor.create(pt);
@@ -25,25 +28,20 @@ public class RefinementsParser {
 
     /**
      * The triple information of the ghost declaration in the order <type, name, list<type,name>>
-     *
      * @param s
-     *
-     * @return
-     *
-     * @throws ParsingException
      */
-    public static GhostDTO getGhostDeclaration(String s) throws ParsingException {
+    public static GhostDTO getGhostDeclaration(String s) throws LJError {
         ParseTree rc = compile(s);
         GhostDTO g = GhostVisitor.getGhostDecl(rc);
         if (g == null)
-            throw new ParsingException("Ghost declarations should be in format <type> <name> (<parameters>)");
+            throw new SyntaxError("Ghost declarations should be in format <type> <name> (<parameters>)", s);
         return g;
     }
 
-    public static AliasDTO getAliasDeclaration(String s) throws ParsingException {
+    public static AliasDTO getAliasDeclaration(String s) throws LJError {
         Optional<String> os = getErrors(s);
         if (os.isPresent())
-            throw new ParsingException(os.get());
+            throw new SyntaxError(os.get(), s);
         CodePointCharStream input;
         input = CharStreams.fromString(s);
         RJErrorListener err = new RJErrorListener();
@@ -61,14 +59,14 @@ public class RefinementsParser {
         AliasVisitor av = new AliasVisitor(input);
         AliasDTO alias = av.getAlias(rc);
         if (alias == null)
-            throw new ParsingException("Alias definitions should be in format <name>(<parameters>) { <definition> }");
+            throw new SyntaxError("Alias definitions should be in format <name>(<parameters>) { <definition> }", s);
         return alias;
     }
 
-    private static ParseTree compile(String toParse) throws ParsingException {
+    private static ParseTree compile(String toParse) throws LJError {
         Optional<String> s = getErrors(toParse);
         if (s.isPresent())
-            throw new ParsingException(s.get());
+            throw new SyntaxError(s.get(), toParse);
 
         CodePointCharStream input = CharStreams.fromString(toParse);
         RJErrorListener err = new RJErrorListener();
