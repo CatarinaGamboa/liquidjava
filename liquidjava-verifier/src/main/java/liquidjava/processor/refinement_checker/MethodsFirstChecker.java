@@ -28,9 +28,6 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        if (diagnostics.foundError())
-            return;
-
         context.reinitializeContext();
         if (visitedClasses.contains(ctClass.getQualifiedName()))
             return;
@@ -59,9 +56,6 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (diagnostics.foundError())
-            return;
-
         if (visitedClasses.contains(intrface.getQualifiedName()))
             return;
         else
@@ -76,9 +70,6 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
-        if (diagnostics.foundError())
-            return;
-
         context.enterContext();
         getRefinementFromAnnotation(c);
         mfc.getConstructorRefinements(c);
@@ -87,9 +78,6 @@ public class MethodsFirstChecker extends TypeChecker {
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (diagnostics.foundError())
-            return;
-
         context.enterContext();
         mfc.getMethodRefinements(method);
         super.visitCtMethod(method);

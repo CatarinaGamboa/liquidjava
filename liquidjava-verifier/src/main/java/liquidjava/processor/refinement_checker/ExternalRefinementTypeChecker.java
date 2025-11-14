@@ -40,9 +40,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (diagnostics.foundError())
-            return;
-
         Optional<String> externalRefinements = getExternalRefinement(intrface);
         if (externalRefinements.isPresent()) {
             this.prefix = externalRefinements.get();
@@ -59,9 +56,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtField(CtField<T> f) {
-        if (diagnostics.foundError())
-            return;
-
         Optional<Predicate> oc;
         try {
             oc = getRefinementFromAnnotation(f);
@@ -75,9 +69,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (diagnostics.foundError())
-            return;
-
         CtType<?> targetType = factory.Type().createReference(prefix).getTypeDeclaration();
         if (targetType == null || !(targetType instanceof CtClass))
             return;

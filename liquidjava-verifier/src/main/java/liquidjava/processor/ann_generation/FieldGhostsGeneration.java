@@ -28,10 +28,6 @@ public class FieldGhostsGeneration extends CtScanner {
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         ctClass.getDeclaredFields().stream().filter(fld -> fld.getType().getQualifiedName().equals("int"))
                 .forEach(fld -> {
                     CtTypeReference<?> fld_type = fld.getType();
