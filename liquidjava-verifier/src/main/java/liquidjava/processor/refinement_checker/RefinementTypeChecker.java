@@ -68,7 +68,14 @@ public class RefinementTypeChecker extends TypeChecker {
     public <T> void visitCtClass(CtClass<T> ctClass) {
         // System.out.println("CTCLASS:"+ctClass.getSimpleName());
         context.reinitializeContext();
-        super.visitCtClass(ctClass);
+
+        try {
+            super.visitCtClass(ctClass);
+        } catch (LJError e) {
+            System.out.println("Error in class: " + ctClass.getSimpleName());
+            diagnostics.add(e);
+        }
+        
     }
 
     @Override
@@ -77,7 +84,12 @@ public class RefinementTypeChecker extends TypeChecker {
         if (getExternalRefinement(intrface).isPresent()) {
             return;
         }
-        super.visitCtInterface(intrface);
+        try {
+            super.visitCtInterface(intrface);
+        } catch (LJError e) {
+            System.out.println("Error in interface: " + intrface.getSimpleName());
+            diagnostics.add(e);
+        }
     }
 
     @Override
@@ -89,7 +101,12 @@ public class RefinementTypeChecker extends TypeChecker {
     public <T> void visitCtConstructor(CtConstructor<T> c) {
         context.enterContext();
         mfc.loadFunctionInfo(c);
-        super.visitCtConstructor(c);
+        try {
+            super.visitCtConstructor(c);
+        } catch (LJError e) {
+            System.out.println("Error in constructor: " + c.getSimpleName());
+            diagnostics.add(e);
+        }
         context.exitContext();
     }
 
@@ -98,7 +115,12 @@ public class RefinementTypeChecker extends TypeChecker {
         if (!method.getSignature().equals("main(java.lang.String[])")) {
             mfc.loadFunctionInfo(method);
         }
-        super.visitCtMethod(method);
+        try {
+            super.visitCtMethod(method);
+        } catch (LJError e) {
+            System.out.println("Error in method: " + method.getSimpleName());
+            diagnostics.add(e);
+        }
         context.exitContext();
     }
 

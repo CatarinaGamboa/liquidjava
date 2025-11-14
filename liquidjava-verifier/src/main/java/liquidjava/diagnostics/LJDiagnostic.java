@@ -6,7 +6,7 @@ import java.util.List;
 
 import spoon.reflect.cu.SourcePosition;
 
-public class LJDiagnostic extends Exception {
+public class LJDiagnostic extends RuntimeException {
 
     private String title;
     private String message;

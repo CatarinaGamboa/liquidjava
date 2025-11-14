@@ -4,9 +4,18 @@ import liquidjava.specification.Refinement;
 
 class SimpleTest {
 
-    @Refinement("return > 0")
+
+
+    public int test2() {
+        @Refinement("y > 0")
+        int y = -3;
+        return y; 
+    }
+
     public int test() {
-        return 10;
+        @Refinement("x > 0")
+        int x = -5;
+        return x;
     }
 }
 
