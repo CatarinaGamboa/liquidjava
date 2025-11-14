@@ -48,13 +48,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                 diagnostics.add(new ExternalClassNotFoundWarning(intrface, message, prefix));
                 return;
             }
-            try {
-                getRefinementFromAnnotation(intrface);
-                handleStateSetsFromAnnotation(intrface);
-            } catch (LJError e) {
-                diagnostics.add(e);
-                return;
-            }
+            getRefinementFromAnnotation(intrface);
+            handleStateSetsFromAnnotation(intrface);
             super.visitCtInterface(intrface);
         }
     }
@@ -103,12 +98,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             }
         }
         MethodsFunctionsChecker mfc = new MethodsFunctionsChecker(this);
-        try {
-            mfc.getMethodRefinements(method, prefix);
-        } catch (LJError e) {
-            diagnostics.add(e);
-            return;
-        }
+        mfc.getMethodRefinements(method, prefix);
         super.visitCtMethod(method);
     }
 

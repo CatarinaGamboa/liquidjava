@@ -1,11 +1,10 @@
 package liquidjava.processor.refinement_checker;
 
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
-import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import spoon.reflect.declaration.CtClass;
@@ -50,13 +49,8 @@ public class MethodsFirstChecker extends TypeChecker {
             if (ct instanceof CtClass)
                 visitCtClass((CtClass<?>) ct);
         }
-        try {
-            getRefinementFromAnnotation(ctClass);
-            handleStateSetsFromAnnotation(ctClass);
-        } catch (LJError e) {
-            diagnostics.add(e);
-            return;
-        }
+        getRefinementFromAnnotation(ctClass);
+        handleStateSetsFromAnnotation(ctClass);
         super.visitCtClass(ctClass);
     }
 
@@ -69,38 +63,23 @@ public class MethodsFirstChecker extends TypeChecker {
         if (getExternalRefinement(intrface).isPresent())
             return;
 
-        try {
-            getRefinementFromAnnotation(intrface);
-            handleStateSetsFromAnnotation(intrface);
-        } catch (LJError e) {
-            diagnostics.add(e);
-            return;
-        }
+        getRefinementFromAnnotation(intrface);
+        handleStateSetsFromAnnotation(intrface);
         super.visitCtInterface(intrface);
     }
 
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
         context.enterContext();
-        try {
-            getRefinementFromAnnotation(c);
-            mfc.getConstructorRefinements(c);
-        } catch (LJError e) {
-            diagnostics.add(e);
-            return;
-        }
+        getRefinementFromAnnotation(c);
+        mfc.getConstructorRefinements(c);
         super.visitCtConstructor(c);
         context.exitContext();
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
         context.enterContext();
-        try {
-            mfc.getMethodRefinements(method);
-        } catch (LJError e) {
-            diagnostics.add(e);
-            return;
-        }
+        mfc.getMethodRefinements(method);
         super.visitCtMethod(method);
         context.exitContext();
     }
