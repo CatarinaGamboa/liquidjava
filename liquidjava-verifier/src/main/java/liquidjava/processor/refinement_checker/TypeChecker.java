@@ -88,9 +88,6 @@ public abstract class TypeChecker extends CtScanner {
                 throw new InvalidRefinementError(element, "Refinement predicate must be a boolean expression",
                         ref.get());
             }
-            if (diagnostics.foundError())
-                return Optional.empty();
-
             constr = Optional.of(p);
         }
         return constr;
