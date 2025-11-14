@@ -1,7 +1,5 @@
 package liquidjava.processor;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,14 +30,9 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
             c.reinitializeAllContext();
 
             pkg.accept(new FieldGhostsGeneration(c, factory)); // generate annotations for field ghosts
-
-            // void spoon.reflect.visitor.CtVisitable.accept(CtVisitor arg0)
             pkg.accept(new ExternalRefinementTypeChecker(c, factory));
             pkg.accept(new MethodsFirstChecker(c, factory)); // double passing idea (instead of headers)
-
             pkg.accept(new RefinementTypeChecker(c, factory));
-            if (diagnostics.foundError())
-                return;
         }
     }
 }

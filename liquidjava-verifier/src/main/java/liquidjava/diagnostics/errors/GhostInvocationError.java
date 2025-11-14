@@ -1,7 +1,7 @@
 package liquidjava.diagnostics.errors;
 
 import liquidjava.diagnostics.TranslationTable;
-import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.ast.Expression;
 import spoon.reflect.cu.SourcePosition;
 
 /**
@@ -13,20 +13,13 @@ public class GhostInvocationError extends LJError {
 
     private String expected;
 
-    public GhostInvocationError(String message, SourcePosition pos, Predicate expected,
+    public GhostInvocationError(String message, SourcePosition pos, Expression expected,
             TranslationTable translationTable) {
-        super("Ghost Invocation Error", message, pos, null, translationTable);
-        this.expected = expected.toString();
+        super("Ghost Invocation Error", message, "", pos, translationTable);
+        this.expected = expected.toSimplifiedString();
     }
 
     public String getExpected() {
         return expected;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Expected: ").append(expected).append("\n");
-        return super.toString(sb.toString());
     }
 }

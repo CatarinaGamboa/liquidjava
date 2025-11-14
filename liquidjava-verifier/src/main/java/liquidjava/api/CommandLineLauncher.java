@@ -1,6 +1,6 @@
 package liquidjava.api;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
 
 import java.io.File;
 import java.util.Arrays;

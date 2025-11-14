@@ -15,7 +15,7 @@ import liquidjava.processor.context.VariableInstance;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.utils.constants.Formats;
 import liquidjava.utils.constants.Keys;
-import liquidjava.processor.refinement_checker.object_checkers.AuxHierarchyRefinememtsPassage;
+import liquidjava.processor.refinement_checker.object_checkers.AuxHierarchyRefinementsPassage;
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
@@ -107,7 +107,7 @@ public class MethodsFunctionsChecker {
         AuxStateHandler.handleMethodState(method, f, rtc, prefix);
 
         if (klass != null)
-            AuxHierarchyRefinememtsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
+            AuxHierarchyRefinementsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
     }
 
     public <R> void getMethodRefinements(CtMethod<R> method, String prefix) throws ParsingException {

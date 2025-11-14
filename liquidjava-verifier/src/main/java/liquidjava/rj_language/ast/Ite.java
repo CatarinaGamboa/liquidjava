@@ -35,6 +35,12 @@ public class Ite extends Expression {
     }
 
     @Override
+    public String toSimplifiedString() {
+        return getCondition().toSimplifiedString() + "?" + getThen().toSimplifiedString() + ":"
+                + getElse().toSimplifiedString();
+    }
+
+    @Override
     public void getVariableNames(List<String> toAdd) {
         getCondition().getVariableNames(toAdd);
         getThen().getVariableNames(toAdd);

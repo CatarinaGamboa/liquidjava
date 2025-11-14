@@ -12,18 +12,11 @@ public class ExternalClassNotFoundWarning extends LJWarning {
     private String className;
 
     public ExternalClassNotFoundWarning(CtElement element, String message, String className) {
-        super(message, element);
+        super(message, "", element.getPosition());
         this.className = className;
     }
 
     public String getClassName() {
         return className;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Class: ").append(className);
-        return super.toString(sb.toString());
     }
 }

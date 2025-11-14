@@ -37,4 +37,24 @@ public class ErrorPosition {
             return null;
         return new ErrorPosition(pos.getLine(), pos.getColumn(), pos.getEndLine(), pos.getEndColumn());
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        ErrorPosition other = (ErrorPosition) obj;
+        return lineStart == other.lineStart && colStart == other.colStart && lineEnd == other.lineEnd
+                && colEnd == other.colEnd;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = lineStart;
+        result = 31 * result + colStart;
+        result = 31 * result + lineEnd;
+        result = 31 * result + colEnd;
+        return result;
+    }
 }

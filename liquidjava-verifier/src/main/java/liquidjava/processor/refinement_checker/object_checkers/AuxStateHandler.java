@@ -1,6 +1,6 @@
 package liquidjava.processor.refinement_checker.object_checkers;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
 
 import java.lang.annotation.Annotation;
 import java.util.*;
@@ -197,23 +197,20 @@ public class AuxStateHandler {
                     new InvalidRefinementError(e, "State refinement transition must be a boolean expression", value));
             return new Predicate();
         }
-        String t = targetClass; // f.getTargetClass();
-        CtTypeReference<?> r = tc.getFactory().Type().createReference(t);
-
+        CtTypeReference<?> r = tc.getFactory().Type().createReference(targetClass);
         String nameOld = String.format(Formats.INSTANCE, Keys.THIS, tc.getContext().getCounter());
         String name = String.format(Formats.INSTANCE, Keys.THIS, tc.getContext().getCounter());
         tc.getContext().addVarToContext(name, r, new Predicate(), e);
         tc.getContext().addVarToContext(nameOld, r, new Predicate(), e);
         // TODO REVIEW!!
         // what is it for?
-        Predicate c1 = isTo ? getMissingStates(t, tc, p) : p;
+        Predicate c1 = isTo ? getMissingStates(targetClass, tc, p) : p;
         Predicate c = c1.substituteVariable(Keys.THIS, name);
         c = c.changeOldMentions(nameOld, name);
-        boolean b = tc.checksStateSMT(new Predicate(), c.negate(), e.getPosition());
-        if (b && !diagnostics.foundError()) {
-            tc.createSameStateError(e, p, t);
+        boolean ok = tc.checksStateSMT(new Predicate(), c.negate(), e.getPosition());
+        if (ok) {
+            tc.createSameStateError(e, p, targetClass);
         }
-
         return c1;
     }
 
@@ -390,9 +387,8 @@ public class AuxStateHandler {
             stateChange.setFrom(fromPredicate);
             stateChange.setTo(toPredicate);
         } catch (ParsingException e) {
-            diagnostics.add(new CustomError(field,
-                    String.format("Parsing error while constructing assignment update for `%s` in class `%s` : %s", fw,
-                            field.getDeclaringType().getQualifiedName(), e.getMessage())));
+            String message = String.format("Parsing error while constructing assignment update for `%s`", fw);
+            diagnostics.add(new CustomError(message, e.getMessage(), field));
             return;
         }
 
@@ -401,10 +397,8 @@ public class AuxStateHandler {
                 .changeOldMentions(vi.getName(), instanceName);
 
         if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) { // Invalid field transition
-            if (!diagnostics.foundError()) { // No errors so far
-                Predicate[] states = { stateChange.getFrom() };
-                tc.createStateMismatchError(fw, fw.toString(), prevState, states);
-            }
+            Predicate[] states = { stateChange.getFrom() };
+            tc.createStateMismatchError(fw, fw.toString(), prevState, states);
             return;
         }
 
@@ -489,13 +483,11 @@ public class AuxStateHandler {
                 return transitionedState;
             }
         }
-        if (!found && !diagnostics.foundError()) { // Reaches the end of stateChange no matching states
+        if (!found) { // Reaches the end of stateChange no matching states
             Predicate[] states = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
                     .toArray(Predicate[]::new);
-            String simpleInvocation = invocation.toString(); // .getExecutable().toString();
+            String simpleInvocation = invocation.toString();
             tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
-            // ErrorPrinter.printStateMismatch(invocation, simpleInvocation, prevState,
-            // states);
         }
         return new Predicate();
     }

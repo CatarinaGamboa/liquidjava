@@ -10,23 +10,25 @@ import liquidjava.diagnostics.warnings.LJWarning;
  * @see LJError
  * @see LJWarning
  */
-public class LJDiagnostics {
-    public static final LJDiagnostics diagnostics = new LJDiagnostics();
+public class Diagnostics {
+    public static final Diagnostics diagnostics = new Diagnostics();
 
     private ArrayList<LJError> errors;
     private ArrayList<LJWarning> warnings;
 
-    private LJDiagnostics() {
+    private Diagnostics() {
         this.errors = new ArrayList<>();
         this.warnings = new ArrayList<>();
     }
 
     public void add(LJError error) {
-        this.errors.add(error);
+        if (!this.errors.contains(error))
+            this.errors.add(error);
     }
 
     public void add(LJWarning warning) {
-        this.warnings.add(warning);
+        if (!this.warnings.contains(warning))
+            this.warnings.add(warning);
     }
 
     public boolean foundError() {

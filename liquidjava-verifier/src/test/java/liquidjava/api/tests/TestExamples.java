@@ -1,6 +1,6 @@
 package liquidjava.api.tests;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;

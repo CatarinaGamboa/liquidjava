@@ -1,11 +1,11 @@
-package liquidjava.smt;
+package liquidjava.smt.errors;
 
 import spoon.reflect.declaration.CtElement;
 
-public class NotFoundSMTError extends Exception {
+public class SMTError extends Exception {
     private CtElement location;
 
-    public NotFoundSMTError(String message) {
+    public SMTError(String message) {
         super(message);
     }
 
@@ -16,7 +16,4 @@ public class NotFoundSMTError extends Exception {
     public void setLocation(CtElement location) {
         this.location = location;
     }
-
-    /** */
-    private static final long serialVersionUID = 1L;
 }

@@ -12,8 +12,9 @@ public class ExternalMethodNotFoundWarning extends LJWarning {
     private String methodName;
     private String className;
 
-    public ExternalMethodNotFoundWarning(CtElement element, String message, String methodName, String className) {
-        super(message, element);
+    public ExternalMethodNotFoundWarning(CtElement element, String message, String details, String methodName,
+            String className) {
+        super(message, details, element.getPosition());
         this.methodName = methodName;
         this.className = className;
     }
@@ -24,13 +25,5 @@ public class ExternalMethodNotFoundWarning extends LJWarning {
 
     public String getClassName() {
         return className;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Class: ").append(className).append("\n");
-        sb.append("Method: ").append(methodName);
-        return super.toString(sb.toString());
     }
 }
