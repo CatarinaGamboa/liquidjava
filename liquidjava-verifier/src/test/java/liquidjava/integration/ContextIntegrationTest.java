@@ -6,7 +6,6 @@ import java.util.List;
 
 import liquidjava.processor.context.*;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.ast.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,8 +14,8 @@ import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
 /**
- * Integration tests for Context management with variables, functions, ghosts, and refinements
- * These tests verify that multiple components work together correctly in realistic scenarios
+ * Integration tests for Context management with variables, functions, ghosts, and refinements These tests verify that
+ * multiple components work together correctly in realistic scenarios
  */
 class ContextIntegrationTest {
 
@@ -35,11 +34,8 @@ class ContextIntegrationTest {
     void testCompleteVariableLifecycle() {
         // Scenario: Create variables, enter/exit contexts, track refinements
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
-        Predicate initialPred = Predicate.createOperation(
-            Predicate.createVar("x"),
-            ">",
-            Predicate.createLit("0", "int")
-        );
+        Predicate initialPred = Predicate.createOperation(Predicate.createVar("x"), ">",
+                Predicate.createLit("0", "int"));
 
         // Add variable in base scope
         context.addVarToContext("x", intType, initialPred, factory.createLiteral(0));
@@ -47,11 +43,8 @@ class ContextIntegrationTest {
 
         // Enter new scope and add local variable
         context.enterContext();
-        Predicate localPred = Predicate.createOperation(
-            Predicate.createVar("y"),
-            "<",
-            Predicate.createLit("100", "int")
-        );
+        Predicate localPred = Predicate.createOperation(Predicate.createVar("y"), "<",
+                Predicate.createLit("100", "int"));
         context.addVarToContext("y", intType, localPred, factory.createLiteral(0));
 
         assertTrue(context.hasVariable("x"), "Base scope variable accessible in nested scope");
@@ -59,11 +52,7 @@ class ContextIntegrationTest {
         assertEquals(2, context.getAllVariables().size(), "Should have 2 variables");
 
         // Update refinement for x
-        Predicate newPred = Predicate.createOperation(
-            Predicate.createVar("x"),
-            ">=",
-            Predicate.createLit("5", "int")
-        );
+        Predicate newPred = Predicate.createOperation(Predicate.createVar("x"), ">=", Predicate.createLit("5", "int"));
         context.newRefinementToVariableInContext("x", newPred);
         assertEquals(newPred.toString(), context.getVariableRefinements("x").toString());
 
@@ -84,15 +73,12 @@ class ContextIntegrationTest {
         func.setName("calculate");
         func.setClass("MathUtils");
         func.setType(intType);
-        func.addArgRefinements("x", intType, Predicate.createOperation(
-            Predicate.createVar("x"), ">", Predicate.createLit("0", "int")
-        ));
-        func.addArgRefinements("y", intType, Predicate.createOperation(
-            Predicate.createVar("y"), ">", Predicate.createLit("0", "int")
-        ));
-        func.setRefReturn(Predicate.createOperation(
-            Predicate.createVar("result"), ">", Predicate.createLit("0", "int")
-        ));
+        func.addArgRefinements("x", intType,
+                Predicate.createOperation(Predicate.createVar("x"), ">", Predicate.createLit("0", "int")));
+        func.addArgRefinements("y", intType,
+                Predicate.createOperation(Predicate.createVar("y"), ">", Predicate.createLit("0", "int")));
+        func.setRefReturn(
+                Predicate.createOperation(Predicate.createVar("result"), ">", Predicate.createLit("0", "int")));
 
         context.addFunctionToContext(func);
 
@@ -124,17 +110,14 @@ class ContextIntegrationTest {
         // Define states using GhostState
         List<CtTypeReference<?>> emptyList = List.of();
         GhostState isEmpty = new GhostState("isEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
-        isEmpty.setRefinement(Predicate.createEquals(
-            Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
-            Predicate.createLit("0", "int")
-        ));
+        isEmpty.setRefinement(
+                Predicate.createEquals(Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
+                        Predicate.createLit("0", "int")));
 
         GhostState isNonEmpty = new GhostState("isNonEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
-        isNonEmpty.setRefinement(Predicate.createOperation(
-            Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
-            ">",
-            Predicate.createLit("0", "int")
-        ));
+        isNonEmpty.setRefinement(
+                Predicate.createOperation(Predicate.createInvocation("Stack.size", Predicate.createVar("this")), ">",
+                        Predicate.createLit("0", "int")));
 
         context.addToGhostClass("Stack", isEmpty);
         context.addToGhostClass("Stack", isNonEmpty);
@@ -158,7 +141,7 @@ class ContextIntegrationTest {
 
         // Simulate assignment: x = 5
         VariableInstance instance1 = new VariableInstance("x_1", intType,
-            Predicate.createEquals(Predicate.createVar("x_1"), Predicate.createLit("5", "int")));
+                Predicate.createEquals(Predicate.createVar("x_1"), Predicate.createLit("5", "int")));
         var.addInstance(instance1);
         context.addSpecificVariable(instance1);
         context.addRefinementInstanceToVariable("x", "x_1");
@@ -168,8 +151,8 @@ class ContextIntegrationTest {
 
         // Simulate second assignment: x = x + 1
         VariableInstance instance2 = new VariableInstance("x_2", intType,
-            Predicate.createEquals(Predicate.createVar("x_2"),
-                Predicate.createOperation(Predicate.createVar("x_1"), "+", Predicate.createLit("1", "int"))));
+                Predicate.createEquals(Predicate.createVar("x_2"),
+                        Predicate.createOperation(Predicate.createVar("x_1"), "+", Predicate.createLit("1", "int"))));
         var.addInstance(instance2);
         context.addSpecificVariable(instance2);
         context.addRefinementInstanceToVariable("x", "x_2");
@@ -190,13 +173,13 @@ class ContextIntegrationTest {
 
         // Then branch: x = 10
         VariableInstance thenInstance = new VariableInstance("x_then", intType,
-            Predicate.createEquals(Predicate.createVar("x_then"), Predicate.createLit("10", "int")));
+                Predicate.createEquals(Predicate.createVar("x_then"), Predicate.createLit("10", "int")));
         var.addInstance(thenInstance);
         context.variablesSetThenIf();
 
         // Else branch: x = 20
         VariableInstance elseInstance = new VariableInstance("x_else", intType,
-            Predicate.createEquals(Predicate.createVar("x_else"), Predicate.createLit("20", "int")));
+                Predicate.createEquals(Predicate.createVar("x_else"), Predicate.createLit("20", "int")));
         var.addInstance(elseInstance);
         context.variablesSetElseIf();
 
@@ -221,14 +204,12 @@ class ContextIntegrationTest {
         processFunc.setClass("Processor");
         processFunc.setType(intType);
 
-        Predicate precondition = Predicate.createOperation(
-            Predicate.createVar("input"), ">", Predicate.createLit("0", "int")
-        );
+        Predicate precondition = Predicate.createOperation(Predicate.createVar("input"), ">",
+                Predicate.createLit("0", "int"));
         processFunc.addArgRefinements("input", intType, precondition);
 
-        Predicate postcondition = Predicate.createOperation(
-            Predicate.createVar("result"), ">=", Predicate.createVar("input")
-        );
+        Predicate postcondition = Predicate.createOperation(Predicate.createVar("result"), ">=",
+                Predicate.createVar("input"));
         processFunc.setRefReturn(postcondition);
 
         context.addFunctionToContext(processFunc);
@@ -253,7 +234,7 @@ class ContextIntegrationTest {
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
 
         context.addGlobalVariableToContext("GLOBAL_CONST", intType,
-            Predicate.createEquals(Predicate.createVar("GLOBAL_CONST"), Predicate.createLit("42", "int")));
+                Predicate.createEquals(Predicate.createVar("GLOBAL_CONST"), Predicate.createLit("42", "int")));
 
         assertTrue(context.hasVariable("GLOBAL_CONST"), "Global variable should exist");
 

@@ -12,20 +12,17 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import spoon.Launcher;
-import spoon.reflect.factory.Factory;
 
 /**
- * Integration tests for Predicate and Expression classes working together
- * Tests realistic scenarios of expression building, manipulation, and evaluation
+ * Integration tests for Predicate and Expression classes working together Tests realistic scenarios of expression
+ * building, manipulation, and evaluation
  */
 class PredicateExpressionIntegrationTest {
-
-    private Factory factory;
 
     @BeforeEach
     void setUp() {
         Launcher launcher = new Launcher();
-        factory = launcher.getFactory();
+        launcher.getFactory();
         Context.getInstance().reinitializeAllContext();
     }
 
@@ -77,11 +74,7 @@ class PredicateExpressionIntegrationTest {
     @Test
     void testExpressionCloningAndModification() {
         // Create expression and clone it
-        Predicate original = Predicate.createOperation(
-            Predicate.createVar("x"),
-            "+",
-            Predicate.createLit("10", "int")
-        );
+        Predicate original = Predicate.createOperation(Predicate.createVar("x"), "+", Predicate.createLit("10", "int"));
 
         Predicate cloned = original.clone();
 
@@ -108,7 +101,7 @@ class PredicateExpressionIntegrationTest {
         assertTrue(result.contains("outer"), "Should contain outer function");
         assertTrue(result.contains("inner"), "Should contain inner function");
         assertTrue(result.contains("x") && result.contains("y") && result.contains("z"),
-            "Should contain all variables");
+                "Should contain all variables");
     }
 
     @Test
@@ -118,11 +111,7 @@ class PredicateExpressionIntegrationTest {
         Predicate zero = Predicate.createLit("0", "int");
         Predicate condition = Predicate.createOperation(x, ">", zero);
 
-        Predicate negX = Predicate.createOperation(
-            Predicate.createLit("-1", "int"),
-            "*",
-            x
-        );
+        Predicate negX = Predicate.createOperation(Predicate.createLit("-1", "int"), "*", x);
 
         Predicate ite = Predicate.createITE(condition, x, negX);
 
@@ -160,18 +149,8 @@ class PredicateExpressionIntegrationTest {
     void testVariableNameExtraction() {
         // Create complex expression and extract all variables
         Predicate expr = Predicate.createOperation(
-            Predicate.createOperation(
-                Predicate.createVar("a"),
-                "+",
-                Predicate.createVar("b")
-            ),
-            "*",
-            Predicate.createOperation(
-                Predicate.createVar("c"),
-                "-",
-                Predicate.createVar("d")
-            )
-        );
+                Predicate.createOperation(Predicate.createVar("a"), "+", Predicate.createVar("b")), "*",
+                Predicate.createOperation(Predicate.createVar("c"), "-", Predicate.createVar("d")));
 
         List<String> vars = expr.getVariableNames();
         assertEquals(4, vars.size(), "Should find 4 variables");
@@ -249,7 +228,7 @@ class PredicateExpressionIntegrationTest {
         String result = division.toString();
         assertTrue(result.contains("x") && result.contains("y"), "Should contain both variables");
         assertTrue(result.contains("2") && result.contains("5") && result.contains("3"),
-            "Should contain all constants");
+                "Should contain all constants");
     }
 
     @Test
@@ -307,9 +286,8 @@ class PredicateExpressionIntegrationTest {
         Predicate func = Predicate.createInvocation("f", aPlusB, cTimesD);
 
         List<String> vars = func.getVariableNames();
-        assertTrue(vars.contains("a") && vars.contains("b") &&
-                   vars.contains("c") && vars.contains("d"),
-            "Should contain all nested variables");
+        assertTrue(vars.contains("a") && vars.contains("b") && vars.contains("c") && vars.contains("d"),
+                "Should contain all nested variables");
     }
 
     @Test
@@ -336,16 +314,13 @@ class PredicateExpressionIntegrationTest {
     @Test
     void testPredicateEquality() {
         // Test that identical predicates are recognized
-        Predicate p1 = Predicate.createOperation(
-            Predicate.createVar("x"), "+", Predicate.createLit("5", "int"));
-        Predicate p2 = Predicate.createOperation(
-            Predicate.createVar("x"), "+", Predicate.createLit("5", "int"));
+        Predicate p1 = Predicate.createOperation(Predicate.createVar("x"), "+", Predicate.createLit("5", "int"));
+        Predicate p2 = Predicate.createOperation(Predicate.createVar("x"), "+", Predicate.createLit("5", "int"));
 
         assertEquals(p1.toString(), p2.toString(), "Identical predicates have same string form");
 
         // Different predicates
-        Predicate p3 = Predicate.createOperation(
-            Predicate.createVar("x"), "+", Predicate.createLit("6", "int"));
+        Predicate p3 = Predicate.createOperation(Predicate.createVar("x"), "+", Predicate.createLit("6", "int"));
 
         assertNotEquals(p1.toString(), p3.toString(), "Different predicates have different strings");
     }

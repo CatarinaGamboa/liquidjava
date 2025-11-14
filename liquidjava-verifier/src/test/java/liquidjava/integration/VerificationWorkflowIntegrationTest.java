@@ -16,8 +16,8 @@ import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtTypeReference;
 
 /**
- * Integration tests for complete verification workflows
- * Tests the interaction of utilities, context, predicates, and refinements in realistic scenarios
+ * Integration tests for complete verification workflows Tests the interaction of utilities, context, predicates, and
+ * refinements in realistic scenarios
  */
 class VerificationWorkflowIntegrationTest {
 
@@ -62,18 +62,14 @@ class VerificationWorkflowIntegrationTest {
     @Test
     void testPairUtility() {
         // Test Pair utility class in context of verification
-        Pair<String, CtTypeReference<?>> varTypePair =
-            new Pair<>("x", factory.Type().integerPrimitiveType());
+        Pair<String, CtTypeReference<?>> varTypePair = new Pair<>("x", factory.Type().integerPrimitiveType());
 
         assertEquals("x", varTypePair.getFirst());
         assertNotNull(varTypePair.getSecond());
 
         // Use in a map scenario
-        List<Pair<String, String>> argPairs = List.of(
-            new Pair<>("arg1", "int"),
-            new Pair<>("arg2", "String"),
-            new Pair<>("arg3", "boolean")
-        );
+        List<Pair<String, String>> argPairs = List.of(new Pair<>("arg1", "int"), new Pair<>("arg2", "String"),
+                new Pair<>("arg3", "boolean"));
 
         assertEquals(3, argPairs.size());
         assertEquals("arg1", argPairs.get(0).getFirst());
@@ -92,9 +88,7 @@ class VerificationWorkflowIntegrationTest {
         divideFunc.setType(intType);
 
         // Precondition: y != 0
-        Predicate yNotZero = Predicate.createOperation(
-            Predicate.createVar("y"), "!=", Predicate.createLit("0", "int")
-        );
+        Predicate yNotZero = Predicate.createOperation(Predicate.createVar("y"), "!=", Predicate.createLit("0", "int"));
 
         // Add arguments with refinements
         divideFunc.addArgRefinements("x", intType, new Predicate());
@@ -102,13 +96,8 @@ class VerificationWorkflowIntegrationTest {
 
         // Postcondition: result * y == x (approximately)
         Predicate postcondition = Predicate.createEquals(
-            Predicate.createOperation(
-                Predicate.createVar("result"),
-                "*",
-                Predicate.createVar("y")
-            ),
-            Predicate.createVar("x")
-        );
+                Predicate.createOperation(Predicate.createVar("result"), "*", Predicate.createVar("y")),
+                Predicate.createVar("x"));
         divideFunc.setRefReturn(postcondition);
 
         context.addFunctionToContext(divideFunc);
@@ -138,7 +127,7 @@ class VerificationWorkflowIntegrationTest {
 
         // Assignment 1: x = 5;
         VariableInstance x1 = new VariableInstance("x_1", intType,
-            Predicate.createEquals(Predicate.createVar("x_1"), Predicate.createLit("5", "int")));
+                Predicate.createEquals(Predicate.createVar("x_1"), Predicate.createLit("5", "int")));
         x.addInstance(x1);
         context.addSpecificVariable(x1);
         context.addRefinementInstanceToVariable("x", "x_1");
@@ -147,15 +136,8 @@ class VerificationWorkflowIntegrationTest {
         assertTrue(context.hasVariable("x_1"), "Instance should be in context");
 
         // Assignment 2: x = x + 10;
-        VariableInstance x2 = new VariableInstance("x_2", intType,
-            Predicate.createEquals(
-                Predicate.createVar("x_2"),
-                Predicate.createOperation(
-                    Predicate.createVar("x_1"),
-                    "+",
-                    Predicate.createLit("10", "int")
-                )
-            ));
+        VariableInstance x2 = new VariableInstance("x_2", intType, Predicate.createEquals(Predicate.createVar("x_2"),
+                Predicate.createOperation(Predicate.createVar("x_1"), "+", Predicate.createLit("10", "int"))));
         x.addInstance(x2);
         context.addSpecificVariable(x2);
         context.addRefinementInstanceToVariable("x", "x_2");
@@ -176,17 +158,14 @@ class VerificationWorkflowIntegrationTest {
         // Define states
         List<CtTypeReference<?>> emptyList = List.of();
         GhostState empty = new GhostState("isEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
-        empty.setRefinement(Predicate.createEquals(
-            Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
-            Predicate.createLit("0", "int")
-        ));
+        empty.setRefinement(
+                Predicate.createEquals(Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
+                        Predicate.createLit("0", "int")));
 
         GhostState nonEmpty = new GhostState("isNonEmpty", emptyList, factory.Type().booleanPrimitiveType(), "Stack");
-        nonEmpty.setRefinement(Predicate.createOperation(
-            Predicate.createInvocation("Stack.size", Predicate.createVar("this")),
-            ">",
-            Predicate.createLit("0", "int")
-        ));
+        nonEmpty.setRefinement(
+                Predicate.createOperation(Predicate.createInvocation("Stack.size", Predicate.createVar("this")), ">",
+                        Predicate.createLit("0", "int")));
 
         context.addToGhostClass("Stack", empty);
         context.addToGhostClass("Stack", nonEmpty);
@@ -284,10 +263,7 @@ class VerificationWorkflowIntegrationTest {
         Predicate cond2 = Predicate.createOperation(y, "<", Predicate.createLit("100", "int"));
 
         // z == x + y
-        Predicate cond3 = Predicate.createEquals(
-            z,
-            Predicate.createOperation(x, "+", y)
-        );
+        Predicate cond3 = Predicate.createEquals(z, Predicate.createOperation(x, "+", y));
 
         // Combine: (x > 0) && (y < 100) && (z == x + y)
         Predicate combined = Predicate.createConjunction(cond1, cond2);
@@ -295,7 +271,7 @@ class VerificationWorkflowIntegrationTest {
 
         List<String> vars = combined.getVariableNames();
         assertTrue(vars.contains("x") && vars.contains("y") && vars.contains("z"),
-            "Should contain all three variables");
+                "Should contain all three variables");
 
         String result = combined.toString();
         assertTrue(result.contains("&&"), "Should contain conjunction operators");
@@ -322,8 +298,7 @@ class VerificationWorkflowIntegrationTest {
         CtTypeReference<Integer> intType = factory.Type().integerPrimitiveType();
 
         // Add global variable
-        context.addGlobalVariableToContext("GLOBAL_MAX", intType,
-            Predicate.createLit("100", "int"));
+        context.addGlobalVariableToContext("GLOBAL_MAX", intType, Predicate.createLit("100", "int"));
 
         // Add local variable
         context.addVarToContext("local", intType, new Predicate(), factory.createLiteral(0));
@@ -366,7 +341,7 @@ class VerificationWorkflowIntegrationTest {
         context.addVarToContext(parent);
 
         VariableInstance child = new VariableInstance("x_1", intType,
-            Predicate.createEquals(Predicate.createVar("x_1"), Predicate.createLit("5", "int")));
+                Predicate.createEquals(Predicate.createVar("x_1"), Predicate.createLit("5", "int")));
 
         parent.addInstance(child);
         context.addSpecificVariable(child);
