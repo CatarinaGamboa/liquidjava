@@ -1,6 +1,6 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;

@@ -3,7 +3,7 @@ package liquidjava.diagnostics.errors;
 import java.util.Arrays;
 
 import liquidjava.diagnostics.TranslationTable;
-import liquidjava.rj_language.Predicate;
+import liquidjava.rj_language.ast.Expression;
 import spoon.reflect.declaration.CtElement;
 
 /**
@@ -17,13 +17,17 @@ public class StateRefinementError extends LJError {
     private final String[] expected;
     private final String found;
 
-    public StateRefinementError(CtElement element, String method, Predicate[] expected, Predicate found,
+    public StateRefinementError(CtElement element, String method, Expression[] expected, Expression found,
             TranslationTable translationTable) {
-        super("State Refinement Error", "State refinement transition violation", element.getPosition(),
-                element.toString(), translationTable);
+        super("State Refinement Error", "State refinement transition violation",
+                String.format("Expected: %s\nFound: %s",
+                        String.join(", ",
+                                Arrays.stream(expected).map(Expression::toSimplifiedString).toArray(String[]::new)),
+                        found.toSimplifiedString()),
+                element.getPosition(), translationTable);
         this.method = method;
-        this.expected = Arrays.stream(expected).map(Predicate::toString).toArray(String[]::new);
-        this.found = found.toString();
+        this.expected = Arrays.stream(expected).map(Expression::toSimplifiedString).toArray(String[]::new);
+        this.found = found.toSimplifiedString();
     }
 
     public String getMethod() {
@@ -36,16 +40,5 @@ public class StateRefinementError extends LJError {
 
     public String getFound() {
         return found;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Method: ").append(method).append("\n");
-        sb.append("Expected: ");
-        Arrays.stream(expected).forEach(s -> sb.append(s).append(", "));
-        sb.append("\n");
-        sb.append("Found: ").append(found);
-        return super.toString(sb.toString());
     }
 }

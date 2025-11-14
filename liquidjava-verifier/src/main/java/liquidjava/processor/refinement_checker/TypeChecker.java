@@ -1,6 +1,6 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
@@ -20,6 +20,7 @@ import liquidjava.processor.facade.GhostDTO;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
+import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Formats;
 import liquidjava.utils.constants.Keys;
 import liquidjava.utils.constants.Types;
@@ -86,7 +87,6 @@ public abstract class TypeChecker extends CtScanner {
             if (!p.getExpression().isBooleanExpression()) {
                 diagnostics.add(new InvalidRefinementError(element, "Refinement predicate must be a boolean expression",
                         ref.get()));
-                return Optional.empty();
             }
             if (diagnostics.foundError())
                 return Optional.empty();
@@ -121,8 +121,7 @@ public abstract class TypeChecker extends CtScanner {
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 if (Character.isUpperCase(f.charAt(0))) {
-                    diagnostics
-                            .add(new CustomError(s, String.format("State name must start with lowercase in '%s'", f)));
+                    diagnostics.add(new CustomError("State names must start with lowercase", s));
                 }
             }
         }
@@ -163,12 +162,12 @@ public abstract class TypeChecker extends CtScanner {
         try {
             gd = RefinementsParser.getGhostDeclaration(string);
         } catch (ParsingException e) {
-            diagnostics.add(new CustomError(ann, "Could not parse the ghost function " + e.getMessage()));
+            diagnostics.add(new CustomError("Could not parse the ghost function", e.getMessage(), ann));
             return;
         }
         if (gd.getParam_types().size() > 0) {
-            diagnostics.add(new CustomError(ann, "Ghost States have the class as parameter "
-                    + "by default, no other parameters are allowed in '" + string + "'"));
+            diagnostics.add(new CustomError(
+                    "Ghost States have the class as parameter " + "by default, no other parameters are allowed", ann));
             return;
         }
         // Set class as parameter of Ghost
@@ -226,7 +225,7 @@ public abstract class TypeChecker extends CtScanner {
                 context.addGhostFunction(gh);
             }
         } catch (ParsingException e) {
-            diagnostics.add(new CustomError(element, "Could not parse the ghost function " + e.getMessage()));
+            diagnostics.add(new CustomError("Could not parse the ghost function", e.getMessage(), element));
             // e.printStackTrace();
             return;
         }
@@ -256,7 +255,8 @@ public abstract class TypeChecker extends CtScanner {
                 context.addAlias(aw);
             }
         } catch (ParsingException e) {
-            diagnostics.add(new SyntaxError(e.getMessage(), element, value));
+            SourcePosition pos = Utils.getRefinementAnnotationPosition(element, value);
+            diagnostics.add(new SyntaxError(e.getMessage(), pos, value));
         }
     }
 
@@ -318,8 +318,8 @@ public abstract class TypeChecker extends CtScanner {
         return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), p, factory);
     }
 
-    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customeMessage) {
-        vcChecker.printSubtypingError(element, expectedType, foundType, customeMessage);
+    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customMessage) {
+        vcChecker.printSubtypingError(element, expectedType, foundType, customMessage);
     }
 
     public void createSameStateError(CtElement element, Predicate expectedType, String klass) {

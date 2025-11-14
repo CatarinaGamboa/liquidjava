@@ -40,6 +40,13 @@ public class FunctionInvocation extends Expression {
     }
 
     @Override
+    public String toSimplifiedString() {
+        String simpleName = Utils.getSimpleName(name);
+        return simpleName + "("
+                + getArgs().stream().map(Expression::toSimplifiedString).collect(Collectors.joining(",")) + ")";
+    }
+
+    @Override
     public void getVariableNames(List<String> toAdd) {
         for (Expression e : getArgs())
             e.getVariableNames(toAdd);

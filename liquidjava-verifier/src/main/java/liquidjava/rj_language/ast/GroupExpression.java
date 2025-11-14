@@ -24,6 +24,11 @@ public class GroupExpression extends Expression {
     }
 
     @Override
+    public String toSimplifiedString() {
+        return getExpression().toSimplifiedString();
+    }
+
+    @Override
     public void getVariableNames(List<String> toAdd) {
         getExpression().getVariableNames(toAdd);
     }

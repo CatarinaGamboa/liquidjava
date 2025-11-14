@@ -1,6 +1,6 @@
 package liquidjava.rj_language;
 
-import static liquidjava.diagnostics.LJDiagnostics.diagnostics;
+import static liquidjava.diagnostics.Diagnostics.diagnostics;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,6 +31,7 @@ import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Keys;
 import liquidjava.utils.constants.Ops;
 import liquidjava.utils.constants.Types;
+import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtElement;
 import spoon.reflect.declaration.CtType;
 import spoon.reflect.factory.Factory;
@@ -76,9 +77,6 @@ public class Predicate {
     public Predicate(String ref, CtElement element, String prefix) throws ParsingException {
         this.prefix = prefix;
         exp = parse(ref, element);
-        if (diagnostics.foundError()) {
-            return;
-        }
         if (!(exp instanceof GroupExpression)) {
             exp = new GroupExpression(exp);
         }
@@ -93,7 +91,8 @@ public class Predicate {
         try {
             return RefinementsParser.createAST(ref, prefix);
         } catch (ParsingException e) {
-            diagnostics.add(new SyntaxError(e.getMessage(), element, ref));
+            SourcePosition pos = Utils.getRefinementAnnotationPosition(element, ref);
+            diagnostics.add(new SyntaxError(e.getMessage(), pos, ref));
             throw e;
         }
     }
@@ -223,11 +222,33 @@ public class Predicate {
         return ExpressionSimplifier.simplify(exp.clone());
     }
 
+    private static boolean isBooleanLiteral(Expression expr, boolean value) {
+        return expr instanceof LiteralBoolean && ((LiteralBoolean) expr).isBooleanTrue() == value;
+    }
+
     public static Predicate createConjunction(Predicate c1, Predicate c2) {
+        // simplification: (true && x) = x, (false && x) = false
+        if (isBooleanLiteral(c1.getExpression(), true))
+            return c2;
+        if (isBooleanLiteral(c2.getExpression(), true))
+            return c1;
+        if (isBooleanLiteral(c1.getExpression(), false))
+            return c1;
+        if (isBooleanLiteral(c2.getExpression(), false))
+            return c2;
         return new Predicate(new BinaryExpression(c1.getExpression(), Ops.AND, c2.getExpression()));
     }
 
     public static Predicate createDisjunction(Predicate c1, Predicate c2) {
+        // simplification: (false || x) = x, (true || x) = true
+        if (isBooleanLiteral(c1.getExpression(), false))
+            return c2;
+        if (isBooleanLiteral(c2.getExpression(), false))
+            return c1;
+        if (isBooleanLiteral(c1.getExpression(), true))
+            return c1;
+        if (isBooleanLiteral(c2.getExpression(), true))
+            return c2;
         return new Predicate(new BinaryExpression(c1.getExpression(), Ops.OR, c2.getExpression()));
     }
 

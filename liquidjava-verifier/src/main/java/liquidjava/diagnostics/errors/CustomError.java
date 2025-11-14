@@ -11,19 +11,18 @@ import spoon.reflect.declaration.CtElement;
 public class CustomError extends LJError {
 
     public CustomError(String message) {
-        super("Found Error", message, null, null, null);
+        super("Error", message, null, null, null);
     }
 
     public CustomError(String message, SourcePosition pos) {
-        super("Found Error", message, pos, null, null);
+        super("Error", message, null, pos, null);
     }
 
-    public CustomError(CtElement element, String message) {
-        super("Found Error", message, element.getPosition(), element.toString(), null);
+    public CustomError(String message, String detail, CtElement element) {
+        super("Error", message, detail, element.getPosition(), null);
     }
 
-    @Override
-    public String toString() {
-        return super.toString(null);
+    public CustomError(String message, CtElement element) {
+        super("Error", message, null, element.getPosition(), null);
     }
 }

@@ -1,6 +1,6 @@
 package liquidjava.diagnostics.errors;
 
-import spoon.reflect.declaration.CtElement;
+import spoon.reflect.cu.SourcePosition;
 
 /**
  * Error indicating that the syntax of a refinement is invalid
@@ -15,19 +15,12 @@ public class SyntaxError extends LJError {
         this(message, null, refinement);
     }
 
-    public SyntaxError(String message, CtElement element, String refinement) {
-        super("Syntax Error", message, element.getPosition(), element.toString(), null);
+    public SyntaxError(String message, SourcePosition pos, String refinement) {
+        super("Syntax Error", message, "", pos, null);
         this.refinement = refinement;
     }
 
     public String getRefinement() {
         return refinement;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Invalid syntax in refinement: ").append(refinement);
-        return super.toString(sb.toString());
     }
 }
