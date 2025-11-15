@@ -49,8 +49,8 @@ public class LJDiagnostic extends RuntimeException {
         StringBuilder sb = new StringBuilder();
 
         // title
-        sb.append("\n").append(accentColor).append(title).append(": ").append(Colors.RESET).append(message.toLowerCase())
-                .append("\n");
+        sb.append("\n").append(accentColor).append(title).append(": ").append(Colors.RESET)
+                .append(message.toLowerCase()).append("\n");
 
         // snippet
         String snippet = getSnippet();
