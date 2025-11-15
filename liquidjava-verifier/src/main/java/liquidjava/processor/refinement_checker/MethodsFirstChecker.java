@@ -1,11 +1,8 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.util.ArrayList;
 import java.util.List;
 
-import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import spoon.reflect.declaration.CtClass;
@@ -52,12 +49,7 @@ public class MethodsFirstChecker extends TypeChecker {
         }
         getRefinementFromAnnotation(ctClass);
         handleStateSetsFromAnnotation(ctClass);
-        try {
-            super.visitCtClass(ctClass);
-        } catch (LJError e) {
-            System.out.println("Error in class: " + ctClass.getSimpleName());
-            diagnostics.add(e);
-        }
+        super.visitCtClass(ctClass);
     }
 
     @Override

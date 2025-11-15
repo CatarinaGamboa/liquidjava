@@ -1,7 +1,5 @@
 package liquidjava.processor.ann_generation;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import liquidjava.processor.context.Context;
 import liquidjava.specification.Ghost;
 import spoon.reflect.declaration.*;

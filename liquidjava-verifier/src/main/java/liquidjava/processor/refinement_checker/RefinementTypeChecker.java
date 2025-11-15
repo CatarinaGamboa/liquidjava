@@ -1,12 +1,11 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import liquidjava.diagnostics.Diagnostics;
 import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
@@ -55,6 +54,7 @@ public class RefinementTypeChecker extends TypeChecker {
     // Auxiliary TypeCheckers
     OperationsChecker otc;
     MethodsFunctionsChecker mfc;
+    Diagnostics diagnostics = Diagnostics.getInstance();
 
     public RefinementTypeChecker(Context context, Factory factory) {
         super(context, factory);
@@ -72,10 +72,9 @@ public class RefinementTypeChecker extends TypeChecker {
         try {
             super.visitCtClass(ctClass);
         } catch (LJError e) {
-            System.out.println("Error in class: " + ctClass.getSimpleName());
             diagnostics.add(e);
         }
-        
+
     }
 
     @Override
@@ -87,7 +86,6 @@ public class RefinementTypeChecker extends TypeChecker {
         try {
             super.visitCtInterface(intrface);
         } catch (LJError e) {
-            System.out.println("Error in interface: " + intrface.getSimpleName());
             diagnostics.add(e);
         }
     }
@@ -104,7 +102,6 @@ public class RefinementTypeChecker extends TypeChecker {
         try {
             super.visitCtConstructor(c);
         } catch (LJError e) {
-            System.out.println("Error in constructor: " + c.getSimpleName());
             diagnostics.add(e);
         }
         context.exitContext();
@@ -118,7 +115,6 @@ public class RefinementTypeChecker extends TypeChecker {
         try {
             super.visitCtMethod(method);
         } catch (LJError e) {
-            System.out.println("Error in method: " + method.getSimpleName());
             diagnostics.add(e);
         }
         context.exitContext();
@@ -163,8 +159,8 @@ public class RefinementTypeChecker extends TypeChecker {
             context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, exp);
             Predicate ep;
             ep = Predicate.createEquals(BuiltinFunctionPredicate.length(Keys.WILDCARD, newArray),
-                        Predicate.createVar(name));
-           
+                    Predicate.createVar(name));
+
             newArray.putMetadata(Keys.REFINEMENT, ep);
         }
     }
@@ -238,7 +234,7 @@ public class RefinementTypeChecker extends TypeChecker {
     public <T> void visitCtField(CtField<T> f) {
         super.visitCtField(f);
         Optional<Predicate> c = getRefinementFromAnnotation(f);
-       
+
         // context.addVarToContext(f.getSimpleName(), f.getType(),
         // c.map( i -> i.substituteVariable(WILD_VAR, f.getSimpleName()).orElse(new
         // Predicate()) );
@@ -274,8 +270,8 @@ public class RefinementTypeChecker extends TypeChecker {
         } else if (fieldRead.getVariable().getSimpleName().equals("length")) {
             String targetName = fieldRead.getTarget().toString();
             fieldRead.putMetadata(Keys.REFINEMENT, Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
-                        BuiltinFunctionPredicate.length(targetName, fieldRead)));
-           
+                    BuiltinFunctionPredicate.length(targetName, fieldRead)));
+
         } else {
             fieldRead.putMetadata(Keys.REFINEMENT, new Predicate());
             // TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
@@ -321,7 +317,7 @@ public class RefinementTypeChecker extends TypeChecker {
     public void visitCtIf(CtIf ifElement) {
         CtExpression<Boolean> exp = ifElement.getCondition();
         Predicate expRefs = getExpressionRefinements(exp);
-        
+
         String freshVarName = String.format(Formats.FRESH, context.getCounter());
         expRefs = expRefs.substituteVariable(Keys.WILDCARD, freshVarName);
         Predicate lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
@@ -368,7 +364,8 @@ public class RefinementTypeChecker extends TypeChecker {
     public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
         super.visitCtArrayWrite(arrayWrite);
         CtExpression<?> index = arrayWrite.getIndexExpression();
-        BuiltinFunctionPredicate fp = BuiltinFunctionPredicate.addToIndex(arrayWrite.getTarget().toString(), index.toString(), Keys.WILDCARD, arrayWrite);
+        BuiltinFunctionPredicate fp = BuiltinFunctionPredicate.addToIndex(arrayWrite.getTarget().toString(),
+                index.toString(), Keys.WILDCARD, arrayWrite);
         arrayWrite.putMetadata(Keys.REFINEMENT, fp);
     }
 

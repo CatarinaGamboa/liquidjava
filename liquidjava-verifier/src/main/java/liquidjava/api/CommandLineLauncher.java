@@ -1,11 +1,10 @@
 package liquidjava.api;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import liquidjava.diagnostics.Diagnostics;
 import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
@@ -26,6 +25,7 @@ public class CommandLineLauncher {
         }
         List<String> paths = Arrays.asList(args);
         launch(paths.toArray(new String[0]));
+        Diagnostics diagnostics = Diagnostics.getInstance();
         if (diagnostics.foundError()) {
             System.out.println(diagnostics.getErrorOutput());
         } else {
@@ -37,6 +37,7 @@ public class CommandLineLauncher {
     public static void launch(String... paths) {
         System.out.println("Running LiquidJava on: " + Arrays.toString(paths).replaceAll("[\\[\\]]", ""));
 
+        Diagnostics diagnostics = Diagnostics.getInstance();
         Launcher launcher = new Launcher();
         for (String path : paths) {
             if (!new File(path).exists()) {

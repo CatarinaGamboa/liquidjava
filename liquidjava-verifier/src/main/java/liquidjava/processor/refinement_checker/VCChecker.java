@@ -1,7 +1,5 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -39,7 +37,8 @@ public class VCChecker {
         pathVariables = new Stack<>();
     }
 
-    public void processSubtyping(Predicate expectedType, List<GhostState> list, CtElement element, Factory f) throws LJError {
+    public void processSubtyping(Predicate expectedType, List<GhostState> list, CtElement element, Factory f)
+            throws LJError {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         if (expectedType.isBooleanTrue())
@@ -301,8 +300,8 @@ public class VCChecker {
         return map;
     }
 
-    protected void printSubtypingError(CtElement element, Predicate expectedType, Predicate foundType,
-            String customMsg) throws LJError {
+    protected void printSubtypingError(CtElement element, Predicate expectedType, Predicate foundType, String customMsg)
+            throws LJError {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(expectedType, lrv, mainVars);
         gatherVariables(foundType, lrv, mainVars);
@@ -333,7 +332,8 @@ public class VCChecker {
         }
     }
 
-    public void printStateMismatchError(CtElement element, String method, Predicate found, Predicate[] states) throws LJError {
+    public void printStateMismatchError(CtElement element, String method, Predicate found, Predicate[] states)
+            throws LJError {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(found, lrv, mainVars);
         TranslationTable map = new TranslationTable();

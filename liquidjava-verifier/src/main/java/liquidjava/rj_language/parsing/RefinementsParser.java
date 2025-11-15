@@ -28,6 +28,7 @@ public class RefinementsParser {
 
     /**
      * The triple information of the ghost declaration in the order <type, name, list<type,name>>
+     * 
      * @param s
      */
     public static GhostDTO getGhostDeclaration(String s) throws LJError {

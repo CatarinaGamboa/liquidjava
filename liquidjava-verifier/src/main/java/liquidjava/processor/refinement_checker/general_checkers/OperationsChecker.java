@@ -164,8 +164,7 @@ public class OperationsChecker {
      *
      * @return String with the operation refinements
      */
-    private Predicate getOperationRefinements(CtBinaryOperator<?> operator, CtExpression<?> element)
-            throws LJError {
+    private Predicate getOperationRefinements(CtBinaryOperator<?> operator, CtExpression<?> element) throws LJError {
         return getOperationRefinements(operator, null, element);
     }
 

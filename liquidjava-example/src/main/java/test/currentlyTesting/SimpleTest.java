@@ -12,5 +12,8 @@ class SimpleTest {
     void test2() {
         @Refinement("y > 0")
         int y = -2;
+
+        @Refinement("z > 0")
+        int z = 3;
     }
 }

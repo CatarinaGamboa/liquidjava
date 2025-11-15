@@ -1,7 +1,5 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
@@ -154,7 +152,8 @@ public abstract class TypeChecker extends CtScanner {
         }
     }
 
-    private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, String an, CtElement element) throws LJError {
+    private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, String an, CtElement element)
+            throws LJError {
         GhostDTO gd = RefinementsParser.getGhostDeclaration(string);
         if (gd.getParam_types().size() > 0) {
             throw new CustomError(
@@ -231,7 +230,8 @@ public abstract class TypeChecker extends CtScanner {
                 a.parse(path);
                 // refinement alias must return a boolean expression
                 if (a.getExpression() != null && !a.getExpression().isBooleanExpression()) {
-                    throw new InvalidRefinementError(element, "Refinement alias must return a boolean expression", value);
+                    throw new InvalidRefinementError(element, "Refinement alias must return a boolean expression",
+                            value);
                 }
                 AliasWrapper aw = new AliasWrapper(a, factory, Keys.WILDCARD, context, klass, path);
                 context.addAlias(aw);
@@ -293,7 +293,8 @@ public abstract class TypeChecker extends CtScanner {
         element.putMetadata(Keys.REFINEMENT, expectedType);
     }
 
-    public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String moreInfo) throws LJError {
+    public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String moreInfo)
+            throws LJError {
         vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), target, moreInfo, factory);
     }
 
@@ -301,7 +302,8 @@ public abstract class TypeChecker extends CtScanner {
         return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), p, factory);
     }
 
-    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customMessage) throws LJError {
+    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customMessage)
+            throws LJError {
         vcChecker.printSubtypingError(element, expectedType, foundType, customMessage);
     }
 
@@ -309,7 +311,8 @@ public abstract class TypeChecker extends CtScanner {
         vcChecker.printSameStateError(element, expectedType, klass);
     }
 
-    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected) throws LJError {
+    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected)
+            throws LJError {
         vcChecker.printStateMismatchError(element, method, found, expected);
     }
 }

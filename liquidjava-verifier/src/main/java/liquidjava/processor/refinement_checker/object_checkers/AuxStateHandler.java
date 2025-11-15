@@ -31,8 +31,7 @@ public class AuxStateHandler {
      * @param tc
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, TypeChecker tc)
-            throws LJError {
+    public static void handleConstructorState(CtConstructor<?> c, RefinedFunction f, TypeChecker tc) throws LJError {
         List<CtAnnotation<? extends Annotation>> an = getStateAnnotation(c);
         if (!an.isEmpty()) {
             for (CtAnnotation<? extends Annotation> a : an) {
@@ -67,7 +66,8 @@ public class AuxStateHandler {
             if (to != null) {
                 Predicate p = new Predicate(to, element);
                 if (!p.getExpression().isBooleanExpression()) {
-                    throw new InvalidRefinementError(element, "State refinement transition must be a boolean expression", to);
+                    throw new InvalidRefinementError(element,
+                            "State refinement transition must be a boolean expression", to);
                 }
                 state.setTo(p);
             }
@@ -78,6 +78,7 @@ public class AuxStateHandler {
 
     /**
      * Sets a default state where all ghost states are initialized to their default values
+     * 
      * @param f
      * @param tc
      */
@@ -106,8 +107,10 @@ public class AuxStateHandler {
 
     /**
      * Gets the different ghost state sets for the given class
+     * 
      * @param tc
      * @param klassQualified
+     * 
      * @return list of different ghost function sets
      */
     private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klassQualified) {
@@ -188,12 +191,14 @@ public class AuxStateHandler {
 
     /**
      * Creates the predicate for state transition
+     * 
      * @param value
      * @param targetClass
      * @param tc
      * @param e
      * @param isTo
      * @param prefix
+     * 
      * @return the created predicate
      */
     private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
@@ -221,9 +226,11 @@ public class AuxStateHandler {
 
     /**
      * Gets the missing states in the predicate and adds equalities to old states
+     * 
      * @param t
      * @param tc
      * @param p
+     * 
      * @return the updated predicate
      */
     private static Predicate getMissingStates(String t, TypeChecker tc, Predicate p) {
@@ -241,8 +248,10 @@ public class AuxStateHandler {
 
     /**
      * Collect ghost states for the given qualified class name and its immediate supertypes (superclass and interfaces)
+     * 
      * @param qualifiedClass
      * @param tc
+     * 
      * @return list of ghost states
      */
     private static List<GhostState> getGhostStatesFor(String qualifiedClass, TypeChecker tc) {
@@ -271,8 +280,9 @@ public class AuxStateHandler {
     }
 
     /**
-     * Create predicate with the equalities with previous versions of the object
-     * e.g., ghostfunction1(this) == ghostfunction1(old(this))
+     * Create predicate with the equalities with previous versions of the object e.g., ghostfunction1(this) ==
+     * ghostfunction1(old(this))
+     * 
      * @param p
      * @param th
      * @param sets
@@ -362,6 +372,7 @@ public class AuxStateHandler {
 
     /**
      * Updates the ghost field after a write
+     * 
      * @param fw
      * @param tc
      */
@@ -399,12 +410,10 @@ public class AuxStateHandler {
 
         ObjectState stateChange = new ObjectState();
         String prefix = field.getDeclaringType().getQualifiedName();
-        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false,
-                prefix);
+        Predicate fromPredicate = createStatePredicate(stateChangeRefinementFrom, targetClass, tc, fw, false, prefix);
         Predicate toPredicate = createStatePredicate(stateChangeRefinementTo, targetClass, tc, fw, true, prefix);
         stateChange.setFrom(fromPredicate);
         stateChange.setTo(toPredicate);
-        
 
         // replace "state(this)" to "state(whatever method is called from) and so on"
         Predicate expectState = stateChange.getFrom().substituteVariable(Keys.THIS, instanceName)

@@ -1,10 +1,10 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import liquidjava.diagnostics.Diagnostics;
 import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.warnings.ExternalClassNotFoundWarning;
 import liquidjava.diagnostics.warnings.ExternalMethodNotFoundWarning;
@@ -28,6 +28,7 @@ import spoon.reflect.reference.CtTypeReference;
 public class ExternalRefinementTypeChecker extends TypeChecker {
     String prefix;
     MethodsFunctionsChecker m;
+    Diagnostics diagnostics = Diagnostics.getInstance();
 
     public ExternalRefinementTypeChecker(Context context, Factory factory) {
         super(context, factory);
@@ -56,13 +57,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtField(CtField<T> f) {
-        Optional<Predicate> oc;
-        try {
-            oc = getRefinementFromAnnotation(f);
-        } catch (LJError e) {
-            diagnostics.add(e);
-            return;
-        }
+        Optional<Predicate> oc = getRefinementFromAnnotation(f);
         Predicate c = oc.orElse(new Predicate());
         context.addGlobalVariableToContext(f.getSimpleName(), prefix, f.getType(), c);
         super.visitCtField(f);
