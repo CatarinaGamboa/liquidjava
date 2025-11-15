@@ -32,16 +32,14 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
             Context c = Context.getInstance();
             c.reinitializeAllContext();
 
-            // we need to catch errors here
             try {
                 pkg.accept(new FieldGhostsGeneration(c, factory)); // generate annotations for field ghosts
                 pkg.accept(new ExternalRefinementTypeChecker(c, factory));
                 pkg.accept(new MethodsFirstChecker(c, factory)); // double passing idea (instead of headers)
+                pkg.accept(new RefinementTypeChecker(c, factory));
             } catch (LJError e) {
                 diagnostics.add(e);
             }
-            // here we catch the errors in the visitors
-            pkg.accept(new RefinementTypeChecker(c, factory));
         }
     }
 }
