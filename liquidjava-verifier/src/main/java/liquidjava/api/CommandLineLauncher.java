@@ -14,6 +14,9 @@ import spoon.reflect.factory.Factory;
 import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
+
+    private static final Diagnostics diagnostics = Diagnostics.getInstance();
+    
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("No input paths provided");
@@ -25,7 +28,6 @@ public class CommandLineLauncher {
         }
         List<String> paths = Arrays.asList(args);
         launch(paths.toArray(new String[0]));
-        Diagnostics diagnostics = Diagnostics.getInstance();
         if (diagnostics.foundError()) {
             System.out.println(diagnostics.getErrorOutput());
         } else {
@@ -37,7 +39,6 @@ public class CommandLineLauncher {
     public static void launch(String... paths) {
         System.out.println("Running LiquidJava on: " + Arrays.toString(paths).replaceAll("[\\[\\]]", ""));
 
-        Diagnostics diagnostics = Diagnostics.getInstance();
         diagnostics.clear();
         Launcher launcher = new Launcher();
         for (String path : paths) {
