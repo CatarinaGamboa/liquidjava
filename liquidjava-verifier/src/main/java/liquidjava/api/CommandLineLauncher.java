@@ -16,7 +16,7 @@ import spoon.support.QueueProcessingManager;
 public class CommandLineLauncher {
 
     private static final Diagnostics diagnostics = Diagnostics.getInstance();
-    
+
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("No input paths provided");

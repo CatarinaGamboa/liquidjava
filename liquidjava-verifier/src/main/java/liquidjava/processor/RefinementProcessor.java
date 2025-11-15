@@ -33,10 +33,18 @@ public class RefinementProcessor extends AbstractProcessor<CtPackage> {
             c.reinitializeAllContext();
 
             try {
-                pkg.accept(new FieldGhostsGeneration(c, factory)); // generate annotations for field ghosts
-                pkg.accept(new ExternalRefinementTypeChecker(c, factory));
-                pkg.accept(new MethodsFirstChecker(c, factory)); // double passing idea (instead of headers)
-                pkg.accept(new RefinementTypeChecker(c, factory));
+                // process types in this package only, not sub-packages
+                // first pass: gather refinements
+                pkg.getTypes().forEach(type -> {
+                    type.accept(new FieldGhostsGeneration(c, factory)); // generate annotations for field ghosts
+                    type.accept(new ExternalRefinementTypeChecker(c, factory)); // process external refinements
+                    type.accept(new MethodsFirstChecker(c, factory)); // double passing idea (instead of headers)
+                });
+
+                // second pass: check refinements
+                pkg.getTypes().forEach(type -> {
+                    type.accept(new RefinementTypeChecker(c, factory));
+                });
             } catch (LJError e) {
                 diagnostics.add(e);
             }
