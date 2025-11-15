@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.ObjectState;
 import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
@@ -21,7 +23,7 @@ import spoon.reflect.reference.CtTypeReference;
 public class AuxHierarchyRefinementsPassage {
 
     public static <R> void checkFunctionInSupertypes(CtClass<?> klass, CtMethod<R> method, RefinedFunction f,
-            TypeChecker tc) {
+            TypeChecker tc) throws LJError {
         String name = method.getSimpleName();
         int size = method.getParameters().size();
         if (klass.getSuperInterfaces().size() > 0) { // implemented interfaces
@@ -40,7 +42,7 @@ public class AuxHierarchyRefinementsPassage {
     }
 
     static void transferRefinements(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method,
-            TypeChecker tc) {
+            TypeChecker tc) throws LJError {
         HashMap<String, String> super2function = getParametersMap(superFunction, function, tc, method);
         transferReturnRefinement(superFunction, function, method, tc, super2function);
         transferArgumentsRefinements(superFunction, function, method, tc, super2function);
@@ -66,7 +68,7 @@ public class AuxHierarchyRefinementsPassage {
     }
 
     static void transferArgumentsRefinements(RefinedFunction superFunction, RefinedFunction function,
-            CtMethod<?> method, TypeChecker tc, HashMap<String, String> super2function) {
+            CtMethod<?> method, TypeChecker tc, HashMap<String, String> super2function) throws LJError {
         List<Variable> superArgs = superFunction.getArguments();
         List<Variable> args = function.getArguments();
         List<CtParameter<?>> params = method.getParameters();
@@ -90,7 +92,7 @@ public class AuxHierarchyRefinementsPassage {
     }
 
     static void transferReturnRefinement(RefinedFunction superFunction, RefinedFunction function, CtMethod<?> method,
-            TypeChecker tc, HashMap<String, String> super2function) {
+            TypeChecker tc, HashMap<String, String> super2function) throws LJError {
         Predicate functionRef = function.getRefinement();
         Predicate superRef = superFunction.getRefinement();
         if (functionRef.isBooleanTrue())
@@ -125,7 +127,7 @@ public class AuxHierarchyRefinementsPassage {
     }
 
     private static void transferStateRefinements(RefinedFunction superFunction, RefinedFunction subFunction,
-            CtMethod<?> method, TypeChecker tc) {
+            CtMethod<?> method, TypeChecker tc) throws LJError {
         if (superFunction.hasStateChange()) {
             if (!subFunction.hasStateChange()) {
                 for (ObjectState o : superFunction.getAllStates())

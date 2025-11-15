@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.RefinedVariable;
@@ -18,7 +19,6 @@ import liquidjava.utils.constants.Keys;
 import liquidjava.processor.refinement_checker.object_checkers.AuxHierarchyRefinementsPassage;
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.utils.Utils;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
@@ -45,7 +45,7 @@ public class MethodsFunctionsChecker {
         this.rtc = rtc;
     }
 
-    public void getConstructorRefinements(CtConstructor<?> c) throws ParsingException {
+    public void getConstructorRefinements(CtConstructor<?> c) throws LJError {
         RefinedFunction f = new RefinedFunction();
         f.setName(c.getSimpleName());
         f.setType(c.getType());
@@ -65,7 +65,7 @@ public class MethodsFunctionsChecker {
         AuxStateHandler.handleConstructorState(c, f, rtc);
     }
 
-    public void getConstructorInvocationRefinements(CtConstructorCall<?> ctConstructorCall) {
+    public void getConstructorInvocationRefinements(CtConstructorCall<?> ctConstructorCall) throws LJError {
         CtExecutableReference<?> exe = ctConstructorCall.getExecutable();
         if (exe != null) {
             RefinedFunction f = rtc.getContext().getFunction(exe.getSimpleName(),
@@ -80,7 +80,7 @@ public class MethodsFunctionsChecker {
     }
 
     // ################### VISIT METHOD ##############################
-    public <R> void getMethodRefinements(CtMethod<R> method) throws ParsingException {
+    public <R> void getMethodRefinements(CtMethod<R> method) throws LJError {
         RefinedFunction f = new RefinedFunction();
         f.setName(method.getSimpleName().replaceAll("\\p{C}", "")); // remove any empty chars from string
         f.setType(method.getType());
@@ -110,7 +110,7 @@ public class MethodsFunctionsChecker {
             AuxHierarchyRefinementsPassage.checkFunctionInSupertypes(klass, method, f, rtc);
     }
 
-    public <R> void getMethodRefinements(CtMethod<R> method, String prefix) throws ParsingException {
+    public <R> void getMethodRefinements(CtMethod<R> method, String prefix) throws LJError {
         String constructorName = "<init>";
         String k = Utils.getSimpleName(prefix);
 
@@ -134,7 +134,7 @@ public class MethodsFunctionsChecker {
         }
     }
 
-    private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) throws ParsingException {
+    private <R> void auxGetMethodRefinements(CtMethod<R> method, RefinedFunction rf) throws LJError {
         // main cannot have refinement - for now
         if (method.getSignature().equals("main(java.lang.String[])"))
             return;
@@ -151,11 +151,9 @@ public class MethodsFunctionsChecker {
      * @param params
      *
      * @return Conjunction of all
-     *
-     * @throws ParsingException
      */
     private Predicate handleFunctionRefinements(RefinedFunction f, CtElement method, List<CtParameter<?>> params)
-            throws ParsingException {
+            throws LJError {
         Predicate joint = new Predicate();
 
         for (CtParameter<?> param : params) {
@@ -190,7 +188,7 @@ public class MethodsFunctionsChecker {
         return l;
     }
 
-    public <R> void getReturnRefinements(CtReturn<R> ret) {
+    public <R> void getReturnRefinements(CtReturn<R> ret) throws LJError {
         CtClass<?> c = ret.getParent(CtClass.class);
         String className = c.getSimpleName();
         if (ret.getReturnedExpression() != null) {
@@ -230,7 +228,7 @@ public class MethodsFunctionsChecker {
     // ############################### VISIT INVOCATION
     // ################################3
 
-    public <R> void getInvocationRefinements(CtInvocation<R> invocation) {
+    public <R> void getInvocationRefinements(CtInvocation<R> invocation) throws LJError {
         CtExecutable<?> method = invocation.getExecutable().getDeclaration();
         if (method == null) {
 
@@ -267,7 +265,7 @@ public class MethodsFunctionsChecker {
         return f;
     }
 
-    private void searchMethodInLibrary(CtExecutableReference<?> ctr, CtInvocation<?> invocation) {
+    private void searchMethodInLibrary(CtExecutableReference<?> ctr, CtInvocation<?> invocation) throws LJError {
         CtTypeReference<?> ctref = ctr.getDeclaringType();
         if (ctref == null) {
             // Plan B: get us get the definition from the invocation.
@@ -306,7 +304,7 @@ public class MethodsFunctionsChecker {
     }
 
     private Map<String, String> checkInvocationRefinements(CtElement invocation, List<CtExpression<?>> arguments,
-            CtExpression<?> target, String methodName, String className) {
+            CtExpression<?> target, String methodName, String className) throws LJError {
         // -- Part 1: Check if the invocation is possible
         int si = arguments.size();
         RefinedFunction f = rtc.getContext().getFunction(methodName, className, si);
@@ -393,7 +391,7 @@ public class MethodsFunctionsChecker {
     }
 
     private <R> void checkParameters(CtElement invocation, List<CtExpression<?>> arguments, RefinedFunction f,
-            Map<String, String> map) {
+            Map<String, String> map) throws LJError {
         List<CtExpression<?>> invocationParams = arguments;
         List<Variable> functionParams = f.getArguments();
         for (int i = 0; i < invocationParams.size(); i++) {

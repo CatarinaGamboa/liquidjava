@@ -1,4 +1,4 @@
-package testingInProgress.diagnostics.warnings;
+package testMultiple.warnings;
 
 import liquidjava.specification.ExternalRefinementsFor;
 

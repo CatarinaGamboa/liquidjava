@@ -2,8 +2,9 @@ package liquidjava.processor.facade;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.rj_language.ast.Expression;
-import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -32,7 +33,7 @@ public class AliasDTO {
 
     // Parse the alias expression using the given the prefix to ensure ghost names are qualified consistently with
     // where the alias is declared or used
-    public void parse(String prefix) throws ParsingException {
+    public void parse(String prefix) throws LJError {
         if (ref != null) {
             this.expression = RefinementsParser.createAST(ref, prefix);
         }

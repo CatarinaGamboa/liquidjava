@@ -1,6 +1,6 @@
 package liquidjava.diagnostics;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.warnings.LJWarning;
 
@@ -11,24 +11,26 @@ import liquidjava.diagnostics.warnings.LJWarning;
  * @see LJWarning
  */
 public class Diagnostics {
-    public static final Diagnostics diagnostics = new Diagnostics();
+    private static final Diagnostics instance = new Diagnostics();
 
-    private ArrayList<LJError> errors;
-    private ArrayList<LJWarning> warnings;
+    private LinkedHashSet<LJError> errors;
+    private LinkedHashSet<LJWarning> warnings;
 
     private Diagnostics() {
-        this.errors = new ArrayList<>();
-        this.warnings = new ArrayList<>();
+        this.errors = new LinkedHashSet<>();
+        this.warnings = new LinkedHashSet<>();
+    }
+
+    public static Diagnostics getInstance() {
+        return instance;
     }
 
     public void add(LJError error) {
-        if (!this.errors.contains(error))
-            this.errors.add(error);
+        this.errors.add(error);
     }
 
     public void add(LJWarning warning) {
-        if (!this.warnings.contains(warning))
-            this.warnings.add(warning);
+        this.warnings.add(warning);
     }
 
     public boolean foundError() {
@@ -39,20 +41,12 @@ public class Diagnostics {
         return !this.warnings.isEmpty();
     }
 
-    public ArrayList<LJError> getErrors() {
+    public LinkedHashSet<LJError> getErrors() {
         return this.errors;
     }
 
-    public ArrayList<LJWarning> getWarnings() {
+    public LinkedHashSet<LJWarning> getWarnings() {
         return this.warnings;
-    }
-
-    public LJError getError() {
-        return foundError() ? this.errors.get(0) : null;
-    }
-
-    public LJWarning getWarning() {
-        return foundWarning() ? this.warnings.get(0) : null;
     }
 
     public void clear() {
@@ -61,30 +55,11 @@ public class Diagnostics {
     }
 
     public String getErrorOutput() {
-        StringBuilder sb = new StringBuilder();
-        if (foundError()) {
-            for (LJError error : errors) {
-                sb.append(error.toString()).append("\n");
-            }
-        } else {
-            if (foundWarning()) {
-                sb.append("Warnings:\n");
-                for (LJWarning warning : warnings) {
-                    sb.append(warning.getMessage()).append("\n");
-                }
-                sb.append("Passed Verification!\n");
-            }
-        }
-        return sb.toString();
+        return String.join("\n", errors.stream().map(LJError::toString).toList()) + (errors.isEmpty() ? "" : "\n");
     }
 
     public String getWarningOutput() {
-        StringBuilder sb = new StringBuilder();
-        if (foundWarning()) {
-            for (LJWarning warning : warnings) {
-                sb.append(warning.toString()).append("\n");
-            }
-        }
-        return sb.toString();
+        return String.join("\n", warnings.stream().map(LJWarning::toString).toList())
+                + (warnings.isEmpty() ? "" : "\n");
     }
 }

@@ -1,20 +1,20 @@
 package liquidjava.rj_language;
 
-import liquidjava.rj_language.parsing.ParsingException;
+import liquidjava.diagnostics.errors.LJError;
 import spoon.reflect.declaration.CtElement;
 
 public class BuiltinFunctionPredicate extends Predicate {
 
-    public BuiltinFunctionPredicate(CtElement elem, String functionName, String... params) throws ParsingException {
+    public BuiltinFunctionPredicate(CtElement elem, String functionName, String... params) throws LJError {
         super(functionName + "(" + getFormattedParams(params) + ")", elem);
     }
 
-    public static BuiltinFunctionPredicate length(String param, CtElement elem) throws ParsingException {
+    public static BuiltinFunctionPredicate length(String param, CtElement elem) throws LJError {
         return new BuiltinFunctionPredicate(elem, "length", param);
     }
 
     public static BuiltinFunctionPredicate addToIndex(String array, String index, String value, CtElement elem)
-            throws ParsingException {
+            throws LJError {
         return new BuiltinFunctionPredicate(elem, "addToIndex", index, value);
     }
 

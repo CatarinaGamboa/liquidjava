@@ -1,6 +1,5 @@
 package liquidjava.api.tests;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
 import static org.junit.Assert.fail;
 
 import java.io.IOException;
@@ -9,12 +8,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.stream.Stream;
 import liquidjava.api.CommandLineLauncher;
+import liquidjava.diagnostics.Diagnostics;
 
 import org.junit.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class TestExamples {
+
+    Diagnostics diagnostics = Diagnostics.getInstance();
 
     /**
      * Test the file at the given path by launching the verifier and checking for errors. The file/directory is expected

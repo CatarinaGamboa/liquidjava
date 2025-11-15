@@ -1,11 +1,10 @@
 package liquidjava.api;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
+import liquidjava.diagnostics.Diagnostics;
 import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
@@ -15,6 +14,9 @@ import spoon.reflect.factory.Factory;
 import spoon.support.QueueProcessingManager;
 
 public class CommandLineLauncher {
+
+    private static final Diagnostics diagnostics = Diagnostics.getInstance();
+
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println("No input paths provided");
@@ -26,10 +28,12 @@ public class CommandLineLauncher {
         }
         List<String> paths = Arrays.asList(args);
         launch(paths.toArray(new String[0]));
+
+        // print diagnostics
+        System.out.println(diagnostics.getWarningOutput());
         if (diagnostics.foundError()) {
             System.out.println(diagnostics.getErrorOutput());
         } else {
-            System.out.println(diagnostics.getWarningOutput());
             System.out.println("Correct! Passed Verification.");
         }
     }
@@ -37,6 +41,7 @@ public class CommandLineLauncher {
     public static void launch(String... paths) {
         System.out.println("Running LiquidJava on: " + Arrays.toString(paths).replaceAll("[\\[\\]]", ""));
 
+        diagnostics.clear();
         Launcher launcher = new Launcher();
         for (String path : paths) {
             if (!new File(path).exists()) {
@@ -49,7 +54,6 @@ public class CommandLineLauncher {
         launcher.getEnvironment().setNoClasspath(true);
         launcher.getEnvironment().setComplianceLevel(8);
         launcher.run();
-        diagnostics.clear();
 
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);

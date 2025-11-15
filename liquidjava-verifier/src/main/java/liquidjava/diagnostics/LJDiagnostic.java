@@ -6,7 +6,7 @@ import java.util.List;
 
 import spoon.reflect.cu.SourcePosition;
 
-public class LJDiagnostic {
+public class LJDiagnostic extends RuntimeException {
 
     private String title;
     private String message;
@@ -49,8 +49,8 @@ public class LJDiagnostic {
         StringBuilder sb = new StringBuilder();
 
         // title
-        sb.append("\n").append(accentColor).append(title).append(": ").append(Colors.RESET).append(message)
-                .append("\n");
+        sb.append("\n").append(accentColor).append(title).append(": ").append(Colors.RESET)
+                .append(message.toLowerCase()).append("\n");
 
         // snippet
         String snippet = getSnippet();
@@ -113,7 +113,6 @@ public class LJDiagnostic {
             }
             return sb.toString();
         } catch (Exception e) {
-            e.printStackTrace();
             return null;
         }
     }

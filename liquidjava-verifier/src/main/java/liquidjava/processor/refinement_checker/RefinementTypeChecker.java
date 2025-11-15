@@ -1,19 +1,18 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import liquidjava.diagnostics.Diagnostics;
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import liquidjava.processor.refinement_checker.general_checkers.OperationsChecker;
 import liquidjava.processor.refinement_checker.object_checkers.AuxStateHandler;
 import liquidjava.rj_language.BuiltinFunctionPredicate;
 import liquidjava.rj_language.Predicate;
-import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.utils.constants.Formats;
 import liquidjava.utils.constants.Keys;
 import liquidjava.utils.constants.Types;
@@ -55,6 +54,7 @@ public class RefinementTypeChecker extends TypeChecker {
     // Auxiliary TypeCheckers
     OperationsChecker otc;
     MethodsFunctionsChecker mfc;
+    Diagnostics diagnostics = Diagnostics.getInstance();
 
     public RefinementTypeChecker(Context context, Factory factory) {
         super(context, factory);
@@ -66,76 +66,67 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         // System.out.println("CTCLASS:"+ctClass.getSimpleName());
         context.reinitializeContext();
-        super.visitCtClass(ctClass);
+
+        try {
+            super.visitCtClass(ctClass);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
+
     }
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         // System.out.println("CT INTERFACE: " +intrface.getSimpleName());
         if (getExternalRefinement(intrface).isPresent()) {
             return;
         }
-        super.visitCtInterface(intrface);
+        try {
+            super.visitCtInterface(intrface);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
     }
 
     @Override
     public <A extends Annotation> void visitCtAnnotationType(CtAnnotationType<A> annotationType) {
-        if (diagnostics.foundError()) {
-            return;
-        }
         super.visitCtAnnotationType(annotationType);
     }
 
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         context.enterContext();
         mfc.loadFunctionInfo(c);
-        super.visitCtConstructor(c);
+        try {
+            super.visitCtConstructor(c);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
         context.exitContext();
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         context.enterContext();
         if (!method.getSignature().equals("main(java.lang.String[])")) {
             mfc.loadFunctionInfo(method);
         }
-        super.visitCtMethod(method);
+        try {
+            super.visitCtMethod(method);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
         context.exitContext();
     }
 
     @Override
     public <T> void visitCtLocalVariable(CtLocalVariable<T> localVariable) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtLocalVariable(localVariable);
         // only declaration, no assignment
         if (localVariable.getAssignment() == null) {
             Optional<Predicate> a;
-            try {
-                a = getRefinementFromAnnotation(localVariable);
-            } catch (ParsingException e) {
-                return; // error already reported
-            }
+            a = getRefinementFromAnnotation(localVariable);
             context.addVarToContext(localVariable.getSimpleName(), localVariable.getType(), a.orElse(new Predicate()),
                     localVariable);
         } else {
@@ -147,34 +138,18 @@ public class RefinementTypeChecker extends TypeChecker {
                 refinementFound = new Predicate();
             }
             context.addVarToContext(varName, localVariable.getType(), new Predicate(), e);
-
-            try {
-                checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable,
-                        localVariable);
-            } catch (ParsingException e1) {
-                return; // error already reported
-            }
-
+            checkVariableRefinements(refinementFound, varName, localVariable.getType(), localVariable, localVariable);
             AuxStateHandler.addStateRefinements(this, varName, e);
         }
     }
 
     @Override
     public <T> void visitCtNewArray(CtNewArray<T> newArray) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtNewArray(newArray);
         List<CtExpression<Integer>> l = newArray.getDimensionExpressions();
         // TODO only working for 1 dimension
         for (CtExpression<?> exp : l) {
-            Predicate c;
-            try {
-                c = getExpressionRefinements(exp);
-            } catch (ParsingException e) {
-                return; // error already reported
-            }
+            Predicate c = getExpressionRefinements(exp);
             String name = String.format(Formats.FRESH, context.getCounter());
             if (c.getVariableNames().contains(Keys.WILDCARD)) {
                 c = c.substituteVariable(Keys.WILDCARD, name);
@@ -183,22 +158,15 @@ public class RefinementTypeChecker extends TypeChecker {
             }
             context.addVarToContext(name, factory.Type().INTEGER_PRIMITIVE, c, exp);
             Predicate ep;
-            try {
-                ep = Predicate.createEquals(BuiltinFunctionPredicate.length(Keys.WILDCARD, newArray),
-                        Predicate.createVar(name));
-            } catch (ParsingException e) {
-                return; // error already reported
-            }
+            ep = Predicate.createEquals(BuiltinFunctionPredicate.length(Keys.WILDCARD, newArray),
+                    Predicate.createVar(name));
+
             newArray.putMetadata(Keys.REFINEMENT, ep);
         }
     }
 
     @Override
     public <T> void visitCtThisAccess(CtThisAccess<T> thisAccess) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtThisAccess(thisAccess);
         CtClass<?> c = thisAccess.getParent(CtClass.class);
         String s = c.getSimpleName();
@@ -211,11 +179,7 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignment) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
+    public <T, A extends T> void visitCtAssignment(CtAssignment<T, A> assignment) throws LJError {
         super.visitCtAssignment(assignment);
         CtExpression<T> ex = assignment.getAssigned();
 
@@ -237,19 +201,10 @@ public class RefinementTypeChecker extends TypeChecker {
                 AuxStateHandler.updateGhostField(fw, this);
             }
         }
-        // if (ex instanceof CtArrayWrite) {
-        // Predicate c = getRefinement(ex);
-        // TODO continue
-        // c.substituteVariable(WILD_VAR, );
-        // }
     }
 
     @Override
     public <T> void visitCtArrayRead(CtArrayRead<T> arrayRead) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtArrayRead(arrayRead);
         String name = String.format(Formats.INSTANCE, "arrayAccess", context.getCounter());
         context.addVarToContext(name, arrayRead.getType(), new Predicate(), arrayRead);
@@ -259,10 +214,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtLiteral(CtLiteral<T> lit) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         List<String> types = Arrays.asList(Types.IMPLEMENTED);
         String type = lit.getType().getQualifiedName();
         if (types.contains(type)) {
@@ -281,17 +232,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtField(CtField<T> f) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtField(f);
-        Optional<Predicate> c;
-        try {
-            c = getRefinementFromAnnotation(f);
-        } catch (ParsingException e) {
-            return; // error already reported
-        }
+        Optional<Predicate> c = getRefinementFromAnnotation(f);
+
         // context.addVarToContext(f.getSimpleName(), f.getType(),
         // c.map( i -> i.substituteVariable(WILD_VAR, f.getSimpleName()).orElse(new
         // Predicate()) );
@@ -308,10 +251,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         String fieldName = fieldRead.getVariable().getSimpleName();
         if (context.hasVariable(fieldName)) {
             RefinedVariable rv = context.getVariableByName(fieldName);
@@ -330,12 +269,9 @@ public class RefinementTypeChecker extends TypeChecker {
 
         } else if (fieldRead.getVariable().getSimpleName().equals("length")) {
             String targetName = fieldRead.getTarget().toString();
-            try {
-                fieldRead.putMetadata(Keys.REFINEMENT, Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
-                        BuiltinFunctionPredicate.length(targetName, fieldRead)));
-            } catch (ParsingException e) {
-                return; // error already reported
-            }
+            fieldRead.putMetadata(Keys.REFINEMENT, Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
+                    BuiltinFunctionPredicate.length(targetName, fieldRead)));
+
         } else {
             fieldRead.putMetadata(Keys.REFINEMENT, new Predicate());
             // TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
@@ -346,10 +282,6 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtVariableRead(variableRead);
         CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
         getPutVariableMetadada(variableRead, varDecl.getSimpleName());
@@ -360,65 +292,32 @@ public class RefinementTypeChecker extends TypeChecker {
      */
     @Override
     public <T> void visitCtBinaryOperator(CtBinaryOperator<T> operator) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtBinaryOperator(operator);
-        try {
-            otc.getBinaryOpRefinements(operator);
-        } catch (ParsingException e) {
-            return; // error already reported
-        }
+        otc.getBinaryOpRefinements(operator);
     }
 
     @Override
     public <T> void visitCtUnaryOperator(CtUnaryOperator<T> operator) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtUnaryOperator(operator);
-        try {
-            otc.getUnaryOpRefinements(operator);
-        } catch (ParsingException e) {
-            return; // error already reported
-        }
+        otc.getUnaryOpRefinements(operator);
     }
 
     public <R> void visitCtInvocation(CtInvocation<R> invocation) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtInvocation(invocation);
         mfc.getInvocationRefinements(invocation);
     }
 
     @Override
     public <R> void visitCtReturn(CtReturn<R> ret) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtReturn(ret);
         mfc.getReturnRefinements(ret);
     }
 
     @Override
     public void visitCtIf(CtIf ifElement) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         CtExpression<Boolean> exp = ifElement.getCondition();
+        Predicate expRefs = getExpressionRefinements(exp);
 
-        Predicate expRefs;
-        try {
-            expRefs = getExpressionRefinements(exp);
-        } catch (ParsingException e) {
-            return; // error already reported
-        }
         String freshVarName = String.format(Formats.FRESH, context.getCounter());
         expRefs = expRefs.substituteVariable(Keys.WILDCARD, freshVarName);
         Predicate lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
@@ -463,28 +362,15 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtArrayWrite(arrayWrite);
         CtExpression<?> index = arrayWrite.getIndexExpression();
-        BuiltinFunctionPredicate fp;
-        try {
-            fp = BuiltinFunctionPredicate.addToIndex(arrayWrite.getTarget().toString(), index.toString(), Keys.WILDCARD,
-                    arrayWrite);
-        } catch (ParsingException e) {
-            return; // error already reported
-        }
+        BuiltinFunctionPredicate fp = BuiltinFunctionPredicate.addToIndex(arrayWrite.getTarget().toString(),
+                index.toString(), Keys.WILDCARD, arrayWrite);
         arrayWrite.putMetadata(Keys.REFINEMENT, fp);
     }
 
     @Override
     public <T> void visitCtConditional(CtConditional<T> conditional) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtConditional(conditional);
         Predicate cond = getRefinement(conditional.getCondition());
         Predicate c = Predicate.createITE(cond, getRefinement(conditional.getThenExpression()),
@@ -494,27 +380,19 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConstructorCall(CtConstructorCall<T> ctConstructorCall) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtConstructorCall(ctConstructorCall);
         mfc.getConstructorInvocationRefinements(ctConstructorCall);
     }
 
     @Override
     public <T> void visitCtNewClass(CtNewClass<T> newClass) {
-        if (diagnostics.foundError()) {
-            return;
-        }
-
         super.visitCtNewClass(newClass);
     }
 
     // ############################### Inner Visitors
     // ##########################################
     private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, CtExpression<?> assignment,
-            CtElement parentElem, CtElement varDecl) {
+            CtElement parentElem, CtElement varDecl) throws LJError {
         getPutVariableMetadada(ex, name);
 
         Predicate refinementFound = getRefinement(assignment);
@@ -531,14 +409,10 @@ public class RefinementTypeChecker extends TypeChecker {
         r.ifPresent(variableInstance -> vcChecker.removePathVariableThatIncludes(variableInstance.getName()));
 
         vcChecker.removePathVariableThatIncludes(name); // AQUI!!
-        try {
-            checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
-        } catch (ParsingException e) {
-            return; // error already reported
-        }
+        checkVariableRefinements(refinementFound, name, type, parentElem, varDecl);
     }
 
-    private Predicate getExpressionRefinements(CtExpression<?> element) throws ParsingException {
+    private Predicate getExpressionRefinements(CtExpression<?> element) throws LJError {
         if (element instanceof CtVariableRead<?>) {
             // CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
             return getRefinement(element);
