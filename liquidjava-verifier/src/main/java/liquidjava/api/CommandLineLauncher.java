@@ -38,6 +38,7 @@ public class CommandLineLauncher {
         System.out.println("Running LiquidJava on: " + Arrays.toString(paths).replaceAll("[\\[\\]]", ""));
 
         Diagnostics diagnostics = Diagnostics.getInstance();
+        diagnostics.clear();
         Launcher launcher = new Launcher();
         for (String path : paths) {
             if (!new File(path).exists()) {
@@ -50,7 +51,6 @@ public class CommandLineLauncher {
         launcher.getEnvironment().setNoClasspath(true);
         launcher.getEnvironment().setComplianceLevel(8);
         launcher.run();
-        diagnostics.clear();
 
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);
