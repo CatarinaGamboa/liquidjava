@@ -14,6 +14,6 @@ class MultipleErrorsExample {
         int b = -2;
 
         @Refinement("c > 0")
-        int c = 3;
+        int c = -3;
     }
 }
