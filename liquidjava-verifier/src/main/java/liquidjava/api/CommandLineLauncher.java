@@ -28,10 +28,12 @@ public class CommandLineLauncher {
         }
         List<String> paths = Arrays.asList(args);
         launch(paths.toArray(new String[0]));
+
+        // print diagnostics
+        System.out.println(diagnostics.getWarningOutput());
         if (diagnostics.foundError()) {
             System.out.println(diagnostics.getErrorOutput());
         } else {
-            System.out.println(diagnostics.getWarningOutput());
             System.out.println("Correct! Passed Verification.");
         }
     }
