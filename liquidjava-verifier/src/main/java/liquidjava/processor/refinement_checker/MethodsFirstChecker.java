@@ -3,6 +3,8 @@ package liquidjava.processor.refinement_checker;
 import java.util.ArrayList;
 import java.util.List;
 
+import liquidjava.diagnostics.Diagnostics;
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
 import spoon.reflect.declaration.CtClass;
@@ -17,6 +19,7 @@ import spoon.reflect.reference.CtTypeReference;
 public class MethodsFirstChecker extends TypeChecker {
     MethodsFunctionsChecker mfc;
     List<String> visitedClasses;
+    Diagnostics diagnostics = Diagnostics.getInstance();
 
     public MethodsFirstChecker(Context context, Factory factory) {
         super(context, factory);
@@ -47,9 +50,13 @@ public class MethodsFirstChecker extends TypeChecker {
             if (ct instanceof CtClass)
                 visitCtClass((CtClass<?>) ct);
         }
-        getRefinementFromAnnotation(ctClass);
-        handleStateSetsFromAnnotation(ctClass);
-        super.visitCtClass(ctClass);
+        try {
+            getRefinementFromAnnotation(ctClass);
+            handleStateSetsFromAnnotation(ctClass);
+            super.visitCtClass(ctClass);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
     }
 
     @Override
@@ -61,9 +68,13 @@ public class MethodsFirstChecker extends TypeChecker {
         if (getExternalRefinement(intrface).isPresent())
             return;
 
-        getRefinementFromAnnotation(intrface);
-        handleStateSetsFromAnnotation(intrface);
-        super.visitCtInterface(intrface);
+        try {
+            getRefinementFromAnnotation(intrface);
+            handleStateSetsFromAnnotation(intrface);
+            super.visitCtInterface(intrface);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
     }
 
     @Override
