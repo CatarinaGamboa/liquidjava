@@ -50,9 +50,17 @@ public class MethodsFirstChecker extends TypeChecker {
             if (ct instanceof CtClass)
                 visitCtClass((CtClass<?>) ct);
         }
+        // first try-catch: process class-level annotations)
+        // errors here should not prevent visiting methods, constructors or fields of the class
         try {
             getRefinementFromAnnotation(ctClass);
             handleStateSetsFromAnnotation(ctClass);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
+        // second try-catch: visit class children (methods, constructors, fields)
+        // errors from one child should not prevent visiting sibling elements
+        try {
             super.visitCtClass(ctClass);
         } catch (LJError e) {
             diagnostics.add(e);
@@ -68,9 +76,17 @@ public class MethodsFirstChecker extends TypeChecker {
         if (getExternalRefinement(intrface).isPresent())
             return;
 
+        // first try-catch: process interface-level annotations
+        // errors here should not prevent visiting the interface's methods
         try {
             getRefinementFromAnnotation(intrface);
             handleStateSetsFromAnnotation(intrface);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
+        // second try-catch: visit interface children (methods)
+        // errors from one child should not prevent visiting sibling methods
+        try {
             super.visitCtInterface(intrface);
         } catch (LJError e) {
             diagnostics.add(e);
