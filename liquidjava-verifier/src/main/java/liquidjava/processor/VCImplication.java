@@ -32,7 +32,7 @@ public class VCImplication {
             String qualType = type.getQualifiedName();
             String simpleType = qualType.contains(".") ? Utils.getSimpleName(qualType) : qualType;
             return String.format("%-20s %s %s", "∀" + name + ":" + simpleType + ",", refinement.toString(),
-                    next != null ? " => \n" + next.toString() : "");
+                    next != null ? " => \n" + next : "");
         } else
             return String.format("%-20s %s", "", refinement.toString());
     }

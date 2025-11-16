@@ -27,11 +27,8 @@ public class ExpressionSimplifier {
         DerivationNode origin = node.getOrigin();
 
         // binary expression with &&
-        if (value instanceof BinaryExpression) {
-            BinaryExpression binExp = (BinaryExpression) value;
-            if ("&&".equals(binExp.getOperator()) && origin instanceof BinaryDerivationNode) {
-                BinaryDerivationNode binOrigin = (BinaryDerivationNode) origin;
-
+        if (value instanceof BinaryExpression binExp) {
+            if ("&&".equals(binExp.getOperator()) && origin instanceof BinaryDerivationNode binOrigin) {
                 // recursively simplify children
                 ValDerivationNode leftSimplified = simplifyDerivationTree(binOrigin.getLeft());
                 ValDerivationNode rightSimplified = simplifyDerivationTree(binOrigin.getRight());
@@ -57,12 +54,11 @@ public class ExpressionSimplifier {
      */
     private static boolean isRedundant(Expression exp) {
         // true
-        if (exp instanceof LiteralBoolean && ((LiteralBoolean) exp).isBooleanTrue()) {
+        if (exp instanceof LiteralBoolean && exp.isBooleanTrue()) {
             return true;
         }
         // x == x
-        if (exp instanceof BinaryExpression) {
-            BinaryExpression binExp = (BinaryExpression) exp;
+        if (exp instanceof BinaryExpression binExp) {
             if ("==".equals(binExp.getOperator())) {
                 Expression left = binExp.getFirstOperand();
                 Expression right = binExp.getSecondOperand();

@@ -9,7 +9,7 @@ import spoon.reflect.declaration.CtElement;
  */
 public class ExternalClassNotFoundWarning extends LJWarning {
 
-    private String className;
+    private final String className;
 
     public ExternalClassNotFoundWarning(CtElement element, String message, String className) {
         super(message, "", element.getPosition());

@@ -11,8 +11,8 @@ import spoon.reflect.declaration.CtElement;
  */
 public class StateConflictError extends LJError {
 
-    private String state;
-    private String className;
+    private final String state;
+    private final String className;
 
     public StateConflictError(CtElement element, Expression state, String className,
             TranslationTable translationTable) {

@@ -17,8 +17,7 @@ public class VariableResolver {
     public static Map<String, Expression> resolve(Expression exp) {
         // if the expression is just a single equality (not a conjunction) don't extract it
         // this avoids creating tautologies like "1 == 1" after substitution, which are then simplified to "true"
-        if (exp instanceof BinaryExpression) {
-            BinaryExpression be = (BinaryExpression) exp;
+        if (exp instanceof BinaryExpression be) {
             if ("==".equals(be.getOperator())) {
                 return new HashMap<>();
             }
@@ -34,10 +33,9 @@ public class VariableResolver {
      * Modifies the given map in place
      */
     private static void resolveRecursive(Expression exp, Map<String, Expression> map) {
-        if (!(exp instanceof BinaryExpression))
+        if (!(exp instanceof BinaryExpression be))
             return;
 
-        BinaryExpression be = (BinaryExpression) exp;
         String op = be.getOperator();
         if ("&&".equals(op)) {
             resolveRecursive(be.getFirstOperand(), map);

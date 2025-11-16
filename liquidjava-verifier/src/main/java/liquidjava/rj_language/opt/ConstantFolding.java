@@ -26,8 +26,7 @@ public class ConstantFolding {
         if (exp instanceof UnaryExpression)
             return foldUnary(node);
 
-        if (exp instanceof GroupExpression) {
-            GroupExpression group = (GroupExpression) exp;
+        if (exp instanceof GroupExpression group) {
             if (group.getChildren().size() == 1) {
                 return fold(new ValDerivationNode(group.getChildren().get(0), node.getOrigin()));
             }
@@ -45,9 +44,8 @@ public class ConstantFolding {
         // fold child nodes
         ValDerivationNode leftNode;
         ValDerivationNode rightNode;
-        if (parent instanceof BinaryDerivationNode) {
+        if (parent instanceof BinaryDerivationNode binaryOrigin) {
             // has origin (from constant propagation)
-            BinaryDerivationNode binaryOrigin = (BinaryDerivationNode) parent;
             leftNode = fold(binaryOrigin.getLeft());
             rightNode = fold(binaryOrigin.getRight());
         } else {
@@ -129,8 +127,8 @@ public class ConstantFolding {
         }
         // bool and bool
         else if (left instanceof LiteralBoolean && right instanceof LiteralBoolean) {
-            boolean l = ((LiteralBoolean) left).isBooleanTrue();
-            boolean r = ((LiteralBoolean) right).isBooleanTrue();
+            boolean l = left.isBooleanTrue();
+            boolean r = right.isBooleanTrue();
             Expression res = switch (op) {
             case "&&" -> new LiteralBoolean(l && r);
             case "||" -> new LiteralBoolean(l || r);
@@ -158,9 +156,8 @@ public class ConstantFolding {
 
         // fold child node
         ValDerivationNode operandNode;
-        if (parent instanceof UnaryDerivationNode) {
+        if (parent instanceof UnaryDerivationNode unaryOrigin) {
             // has origin (from constant propagation)
-            UnaryDerivationNode unaryOrigin = (UnaryDerivationNode) parent;
             operandNode = fold(unaryOrigin.getOperand());
         } else {
             // no origin
@@ -173,7 +170,7 @@ public class ConstantFolding {
         // unary not
         if ("!".equals(operator) && operand instanceof LiteralBoolean) {
             // !true => false, !false => true
-            boolean value = ((LiteralBoolean) operand).isBooleanTrue();
+            boolean value = operand.isBooleanTrue();
             Expression res = new LiteralBoolean(!value);
             return new ValDerivationNode(res, new UnaryDerivationNode(operandNode, operator));
         }

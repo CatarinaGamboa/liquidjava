@@ -19,7 +19,7 @@ public class RJErrorListener implements ANTLRErrorListener {
     public RJErrorListener() {
         super();
         errors = 0;
-        msgs = new ArrayList<String>();
+        msgs = new ArrayList<>();
     }
 
     @Override
@@ -27,8 +27,7 @@ public class RJErrorListener implements ANTLRErrorListener {
             String msg, RecognitionException e) {
         // Hint for == instead of =
         String hint = null;
-        if (e instanceof LexerNoViableAltException) {
-            LexerNoViableAltException l = (LexerNoViableAltException) e;
+        if (e instanceof LexerNoViableAltException l) {
             char c = l.getInputStream().toString().charAt(charPositionInLine);
             if (c == '=')
                 hint = "Predicates must be compared with == instead of =";
@@ -60,9 +59,10 @@ public class RJErrorListener implements ANTLRErrorListener {
     public String getMessages() {
         StringBuilder sb = new StringBuilder();
         String pl = errors == 1 ? "" : "s";
-        sb.append("Found ").append(errors).append(" error" + pl).append(", with the message" + pl + ":\n");
+        sb.append("Found ").append(errors).append(" error").append(pl).append(", with the message").append(pl)
+                .append(":\n");
         for (String s : msgs)
-            sb.append("* " + s + "\n");
+            sb.append("* ").append(s).append("\n");
         return sb.toString();
     }
 }

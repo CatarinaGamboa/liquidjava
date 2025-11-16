@@ -6,7 +6,7 @@ import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class UnaryExpression extends Expression {
 
-    private String op;
+    private final String op;
 
     public UnaryExpression(String op, Expression e) {
         this.op = op;
@@ -80,10 +80,9 @@ public class UnaryExpression extends Expression {
         } else if (!getExpression().equals(other.getExpression()))
             return false;
         if (op == null) {
-            if (other.op != null)
-                return false;
-        } else if (!op.equals(other.op))
-            return false;
-        return true;
+            return other.op == null;
+        } else {
+            return op.equals(other.op);
+        }
     }
 }

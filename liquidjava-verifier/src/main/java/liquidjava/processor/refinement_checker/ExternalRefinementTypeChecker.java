@@ -1,6 +1,5 @@
 package liquidjava.processor.refinement_checker;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +26,6 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class ExternalRefinementTypeChecker extends TypeChecker {
     String prefix;
-    MethodsFunctionsChecker m;
     Diagnostics diagnostics = Diagnostics.getInstance();
 
     public ExternalRefinementTypeChecker(Context context, Factory factory) {
@@ -36,7 +34,6 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        return;
     }
 
     @Override
@@ -65,7 +62,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     public <R> void visitCtMethod(CtMethod<R> method) {
         CtType<?> targetType = factory.Type().createReference(prefix).getTypeDeclaration();
-        if (targetType == null || !(targetType instanceof CtClass))
+        if (!(targetType instanceof CtClass))
             return;
 
         boolean isConstructor = method.getSimpleName().equals(targetType.getSimpleName());
@@ -99,7 +96,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
 
     protected void getGhostFunction(String value, CtElement element) throws LJError {
         GhostDTO f = RefinementsParser.getGhostDeclaration(value);
-        if (f != null && element.getParent() instanceof CtInterface<?>) {
+        if (element.getParent() instanceof CtInterface<?>) {
             GhostFunction gh = new GhostFunction(f, factory, prefix);
             context.addGhostFunction(gh);
         }
@@ -110,7 +107,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
         String klass = Utils.getSimpleName(prefix);
         if (klass != null) {
             CtTypeReference<?> ret = factory.Type().INTEGER_PRIMITIVE;
-            List<String> params = Arrays.asList(klass);
+            List<String> params = List.of(klass);
             String name = String.format("state%d", order);
             GhostFunction gh = new GhostFunction(name, params, ret, factory, prefix);
             return Optional.of(gh);

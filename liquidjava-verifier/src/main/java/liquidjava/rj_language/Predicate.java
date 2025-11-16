@@ -10,6 +10,7 @@ import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.errors.SyntaxError;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
+import liquidjava.processor.context.GhostFunction;
 import liquidjava.processor.context.GhostState;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.rj_language.ast.BinaryExpression;
@@ -54,7 +55,6 @@ public class Predicate {
      *
      * @param ref
      * @param element
-     * @param e
      */
     public Predicate(String ref, CtElement element) throws LJError {
         this(ref, element, element.getParent(CtType.class).getQualifiedName());
@@ -65,7 +65,6 @@ public class Predicate {
      * 
      * @param ref
      * @param element
-     * @param e
      * @param prefix
      */
     public Predicate(String ref, CtElement element, String prefix) throws LJError {
@@ -126,7 +125,7 @@ public class Predicate {
     public List<GhostState> getStateInvocations(List<GhostState> lgs) {
         if (lgs == null)
             return new ArrayList<>();
-        List<String> all = lgs.stream().map(p -> p.getQualifiedName()).collect(Collectors.toList());
+        List<String> all = lgs.stream().map(GhostFunction::getQualifiedName).collect(Collectors.toList());
         List<String> toAdd = new ArrayList<>();
         exp.getStateInvocations(toAdd, all);
 
@@ -148,29 +147,6 @@ public class Predicate {
         le.add(createVar(newName).getExpression());
         e.substituteFunction(Keys.OLD, le, prev);
         return new Predicate(e);
-    }
-
-    public List<String> getOldVariableNames() {
-        List<String> ls = new ArrayList<>();
-        expressionGetOldVariableNames(this.exp, ls);
-        return ls;
-    }
-
-    private void expressionGetOldVariableNames(Expression exp, List<String> ls) {
-        if (exp instanceof FunctionInvocation) {
-            FunctionInvocation fi = (FunctionInvocation) exp;
-            if (fi.getName().equals(Keys.OLD)) {
-                List<Expression> le = fi.getArgs();
-                for (Expression e : le) {
-                    if (e instanceof Var)
-                        ls.add(((Var) e).getName());
-                }
-            }
-        }
-        if (exp.hasChildren()) {
-            for (var ch : exp.getChildren())
-                expressionGetOldVariableNames(ch, ls);
-        }
     }
 
     public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange) throws LJError {
@@ -212,7 +188,7 @@ public class Predicate {
     }
 
     private static boolean isBooleanLiteral(Expression expr, boolean value) {
-        return expr instanceof LiteralBoolean && ((LiteralBoolean) expr).isBooleanTrue() == value;
+        return expr instanceof LiteralBoolean && expr.isBooleanTrue() == value;
     }
 
     public static Predicate createConjunction(Predicate c1, Predicate c2) {
@@ -226,19 +202,6 @@ public class Predicate {
         if (isBooleanLiteral(c2.getExpression(), false))
             return c2;
         return new Predicate(new BinaryExpression(c1.getExpression(), Ops.AND, c2.getExpression()));
-    }
-
-    public static Predicate createDisjunction(Predicate c1, Predicate c2) {
-        // simplification: (false || x) = x, (true || x) = true
-        if (isBooleanLiteral(c1.getExpression(), false))
-            return c2;
-        if (isBooleanLiteral(c2.getExpression(), false))
-            return c1;
-        if (isBooleanLiteral(c1.getExpression(), true))
-            return c1;
-        if (isBooleanLiteral(c2.getExpression(), true))
-            return c2;
-        return new Predicate(new BinaryExpression(c1.getExpression(), Ops.OR, c2.getExpression()));
     }
 
     public static Predicate createEquals(Predicate c1, Predicate c2) {

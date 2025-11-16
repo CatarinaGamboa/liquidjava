@@ -22,12 +22,6 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class TypeInfer {
 
-    public static boolean checkCompatibleType(Expression e1, Expression e2, Context ctx, Factory factory) {
-        Optional<CtTypeReference<?>> t1 = getType(ctx, factory, e1);
-        Optional<CtTypeReference<?>> t2 = getType(ctx, factory, e2);
-        return t1.isPresent() && t2.isPresent() && t1.get().equals(t2.get());
-    }
-
     public static boolean checkCompatibleType(String type, Expression e, Context ctx, Factory factory) {
         Optional<CtTypeReference<?>> t1 = getType(ctx, factory, e);
         CtTypeReference<?> t2 = Utils.getType(type, factory);
@@ -44,7 +38,7 @@ public class TypeInfer {
         else if (e instanceof LiteralBoolean)
             return boolType(factory);
         else if (e instanceof Var)
-            return varType(ctx, factory, (Var) e);
+            return varType(ctx, (Var) e);
         else if (e instanceof UnaryExpression)
             return unaryType(ctx, factory, (UnaryExpression) e);
         else if (e instanceof Ite)
@@ -54,14 +48,14 @@ public class TypeInfer {
         else if (e instanceof GroupExpression)
             return getType(ctx, factory, ((GroupExpression) e).getExpression());
         else if (e instanceof FunctionInvocation)
-            return functionType(ctx, factory, (FunctionInvocation) e);
+            return functionType(ctx, (FunctionInvocation) e);
         else if (e instanceof AliasInvocation)
             return boolType(factory);
 
         return Optional.empty();
     }
 
-    private static Optional<CtTypeReference<?>> varType(Context ctx, Factory factory, Var v) {
+    private static Optional<CtTypeReference<?>> varType(Context ctx, Var v) {
         String name = v.getName();
         if (!ctx.hasVariable(name))
             return Optional.empty();
@@ -83,7 +77,7 @@ public class TypeInfer {
         } else if (e.isArithmeticOperation()) {
             Optional<CtTypeReference<?>> t1 = getType(ctx, factory, e.getFirstOperand());
             Optional<CtTypeReference<?>> t2 = getType(ctx, factory, e.getSecondOperand());
-            if (!t1.isPresent() || !t2.isPresent())
+            if (t1.isEmpty() || t2.isEmpty())
                 return Optional.empty();
             if (t1.get().equals(t2.get()))
                 return t1;
@@ -91,12 +85,12 @@ public class TypeInfer {
             throw new NotImplementedException(
                     "To implement in TypeInfer: Binary type, arithmetic with different arg types");
         }
-        return null;
+        return Optional.empty();
     }
 
-    private static Optional<CtTypeReference<?>> functionType(Context ctx, Factory factory, FunctionInvocation e) {
+    private static Optional<CtTypeReference<?>> functionType(Context ctx, FunctionInvocation e) {
         Optional<GhostFunction> gh = ctx.getGhosts().stream().filter(g -> g.matches(e.getName())).findAny();
-        return gh.map(i -> i.getReturnType());
+        return gh.map(GhostFunction::getReturnType);
     }
 
     private static Optional<CtTypeReference<?>> boolType(Factory factory) {

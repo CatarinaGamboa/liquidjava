@@ -8,14 +8,12 @@ import spoon.reflect.reference.CtTypeReference;
 public class TypeCheckingUtils {
 
     public static String getStringFromAnnotation(CtExpression<?> ce) {
-        if (ce instanceof CtLiteral<?>) {
-            CtLiteral<?> cl = (CtLiteral<?>) ce;
+        if (ce instanceof CtLiteral<?> cl) {
             CtTypeReference<?> r = ce.getType();
             if (r.getSimpleName().equals("String"))
                 return (String) cl.getValue();
 
-        } else if (ce instanceof CtBinaryOperator) {
-            CtBinaryOperator<?> cbo = (CtBinaryOperator<?>) ce;
+        } else if (ce instanceof CtBinaryOperator<?> cbo) {
             String l = getStringFromAnnotation(cbo.getLeftHandOperand());
             String r = getStringFromAnnotation(cbo.getRightHandOperand());
             return l + r;

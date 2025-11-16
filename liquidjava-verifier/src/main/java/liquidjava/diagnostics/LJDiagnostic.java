@@ -8,12 +8,12 @@ import spoon.reflect.cu.SourcePosition;
 
 public class LJDiagnostic extends RuntimeException {
 
-    private String title;
-    private String message;
-    private String details;
-    private String file;
-    private ErrorPosition position;
-    private String accentColor;
+    private final String title;
+    private final String message;
+    private final String details;
+    private final String file;
+    private final ErrorPosition position;
+    private final String accentColor;
 
     public LJDiagnostic(String title, String message, String details, SourcePosition pos, String accentColor) {
         this.title = title;
@@ -65,7 +65,7 @@ public class LJDiagnostic extends RuntimeException {
 
         // location
         if (file != null && position != null) {
-            sb.append("\n").append(file).append(":").append(position.getLineStart()).append(Colors.RESET).append("\n");
+            sb.append("\n").append(file).append(":").append(position.lineStart()).append(Colors.RESET).append("\n");
         }
 
         return sb.toString();
@@ -83,12 +83,11 @@ public class LJDiagnostic extends RuntimeException {
             // before and after lines for context
             int contextBefore = 2;
             int contextAfter = 2;
-            int startLine = Math.max(1, position.getLineStart() - contextBefore);
-            int endLine = Math.min(lines.size(), position.getLineEnd() + contextAfter);
+            int startLine = Math.max(1, position.lineStart() - contextBefore);
+            int endLine = Math.min(lines.size(), position.lineEnd() + contextAfter);
 
             // calculate padding for line numbers
-            int maxLineNum = endLine;
-            int padding = String.valueOf(maxLineNum).length();
+            int padding = String.valueOf(endLine).length();
 
             for (int i = startLine; i <= endLine; i++) {
                 String lineNumStr = String.format("%" + padding + "d", i);
@@ -98,9 +97,9 @@ public class LJDiagnostic extends RuntimeException {
                 sb.append(Colors.GREY).append(lineNumStr).append(" | ").append(line).append(Colors.RESET).append("\n");
 
                 // add error markers on the line(s) with the error
-                if (i >= position.getLineStart() && i <= position.getLineEnd()) {
-                    int colStart = (i == position.getLineStart()) ? position.getColStart() : 1;
-                    int colEnd = (i == position.getLineEnd()) ? position.getColEnd() : line.length();
+                if (i >= position.lineStart() && i <= position.lineEnd()) {
+                    int colStart = (i == position.lineStart()) ? position.colStart() : 1;
+                    int colEnd = (i == position.lineEnd()) ? position.colEnd() : line.length();
 
                     if (colStart > 0 && colEnd > 0) {
                         // line number padding + " | " + column offset

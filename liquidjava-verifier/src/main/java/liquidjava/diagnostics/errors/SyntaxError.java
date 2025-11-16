@@ -9,7 +9,7 @@ import spoon.reflect.cu.SourcePosition;
  */
 public class SyntaxError extends LJError {
 
-    private String refinement;
+    private final String refinement;
 
     public SyntaxError(String message, String refinement) {
         this(message, null, refinement);

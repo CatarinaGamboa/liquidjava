@@ -198,6 +198,6 @@ public class CreateASTVisitor {
             return new LiteralInt(literalContext.INT().getText());
         else if (literalContext.REAL() != null)
             return new LiteralReal(literalContext.REAL().getText());
-        throw new NotImplementedException("Error got to unexistant literal.");
+        throw new NotImplementedException("Literal type not implemented");
     }
 }

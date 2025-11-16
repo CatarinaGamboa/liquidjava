@@ -13,8 +13,8 @@ import liquidjava.diagnostics.warnings.LJWarning;
 public class Diagnostics {
     private static final Diagnostics instance = new Diagnostics();
 
-    private LinkedHashSet<LJError> errors;
-    private LinkedHashSet<LJWarning> warnings;
+    private final LinkedHashSet<LJError> errors;
+    private final LinkedHashSet<LJWarning> warnings;
 
     private Diagnostics() {
         this.errors = new LinkedHashSet<>();

@@ -30,7 +30,9 @@ public class CommandLineLauncher {
         launch(paths.toArray(new String[0]));
 
         // print diagnostics
-        System.out.println(diagnostics.getWarningOutput());
+        if (diagnostics.foundWarning()) {
+            System.out.println(diagnostics.getWarningOutput());
+        }
         if (diagnostics.foundError()) {
             System.out.println(diagnostics.getErrorOutput());
         } else {
@@ -50,7 +52,6 @@ public class CommandLineLauncher {
             }
             launcher.addInputResource(path);
         }
-
         launcher.getEnvironment().setNoClasspath(true);
         launcher.getEnvironment().setComplianceLevel(8);
         launcher.run();
@@ -60,16 +61,9 @@ public class CommandLineLauncher {
         final RefinementProcessor processor = new RefinementProcessor(factory);
         processingManager.addProcessor(processor);
 
-        try {
-            // analyze all packages
-            CtPackage root = factory.Package().getRootPackage();
-            if (root != null)
-                processingManager.process(root);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw e;
-        }
-
-        return;
+        // analyze all packages
+        CtPackage root = factory.Package().getRootPackage();
+        if (root != null)
+            processingManager.process(root);
     }
 }

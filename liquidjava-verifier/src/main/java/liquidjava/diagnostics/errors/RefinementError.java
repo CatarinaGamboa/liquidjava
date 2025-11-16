@@ -12,8 +12,8 @@ import spoon.reflect.declaration.CtElement;
  */
 public class RefinementError extends LJError {
 
-    private String expected;
-    private ValDerivationNode found;
+    private final String expected;
+    private final ValDerivationNode found;
 
     public RefinementError(CtElement element, Expression expected, ValDerivationNode found,
             TranslationTable translationTable) {

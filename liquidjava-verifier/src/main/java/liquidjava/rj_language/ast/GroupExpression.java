@@ -66,10 +66,9 @@ public class GroupExpression extends Expression {
             return false;
         GroupExpression other = (GroupExpression) obj;
         if (getExpression() == null) {
-            if (other.getExpression() != null)
-                return false;
-        } else if (!getExpression().equals(other.getExpression()))
-            return false;
-        return true;
+            return other.getExpression() == null;
+        } else {
+            return getExpression().equals(other.getExpression());
+        }
     }
 }

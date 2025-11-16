@@ -47,7 +47,7 @@ import spoon.support.reflect.code.CtIfImpl;
  */
 public class OperationsChecker {
 
-    private TypeChecker rtc;
+    private final TypeChecker rtc;
 
     public OperationsChecker(TypeChecker rtc) {
         this.rtc = rtc;
@@ -69,17 +69,13 @@ public class OperationsChecker {
             return; // Operations in annotations are not handled here
 
         if (parent instanceof CtAssignment<?, ?>
-                && ((CtAssignment<?, ?>) parent).getAssigned() instanceof CtVariableWrite<?>) {
-            CtVariableWrite<?> parentVar = (CtVariableWrite<?>) ((CtAssignment<?, ?>) parent).getAssigned();
+                && ((CtAssignment<?, ?>) parent).getAssigned()instanceof CtVariableWrite<?> parentVar) {
             oper = getOperationRefinements(operator, parentVar, operator);
 
         } else {
             Predicate varLeft = getOperationRefinements(operator, left);
             Predicate varRight = getOperationRefinements(operator, right);
             oper = Predicate.createOperation(varLeft, getOperatorFromKind(operator.getKind()), varRight);
-            // new Predicate(String.format("(%s %s %s)",
-            // varLeft,,varRight));
-
         }
         String type = operator.getType().getQualifiedName();
         List<String> types = Arrays.asList(Types.IMPLEMENTED);
@@ -109,15 +105,13 @@ public class OperationsChecker {
         CtExpression<T> ex = (CtExpression<T>) operator.getOperand();
         String name = Formats.FRESH;
         Predicate all;
-        if (ex instanceof CtVariableWrite) {
-            CtVariableWrite<T> w = (CtVariableWrite<T>) ex;
+        if (ex instanceof CtVariableWrite<T> w) {
             name = w.getVariable().getSimpleName();
             all = getRefinementUnaryVariableWrite(ex, operator, w, name);
             rtc.checkVariableRefinements(all, name, w.getType(), operator, w.getVariable().getDeclaration());
             return;
 
-        } else if (ex instanceof CtVariableRead) {
-            CtVariableRead<T> var = (CtVariableRead<T>) ex;
+        } else if (ex instanceof CtVariableRead<T> var) {
             name = var.getVariable().getSimpleName();
             // If the variable is the same, the refinements need to be changed
             try {
@@ -137,20 +131,16 @@ public class OperationsChecker {
         }
 
         Predicate metadata = rtc.getRefinement(ex);
-        String newName;
-        if (!name.equals(Formats.FRESH))
-            newName = String.format(Formats.INSTANCE, name, rtc.getContext().getCounter());
-        else
-            newName = String.format(name, rtc.getContext().getCounter());
+        String newName = !name.equals(Formats.FRESH)
+                ? String.format(Formats.INSTANCE, name, rtc.getContext().getCounter())
+                : String.format(name, rtc.getContext().getCounter());
         Predicate newMeta = metadata.substituteVariable(Keys.WILDCARD, newName);
 
         Predicate unOp = getOperatorFromKind(operator.getKind(), operator);
         CtElement p = operator.getParent();
         Predicate opS = unOp.substituteVariable(Keys.WILDCARD, newName);
-        if (p instanceof CtIf)
-            all = opS;
-        else
-            all = Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), opS); // TODO SEE IF () IN OPS IS NEEDED
+        all = p instanceof CtIf ? opS : Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), opS);
+        // TODO SEE IF () IN OPS IS NEEDED
         rtc.getContext().addInstanceToContext(newName, ex.getType(), newMeta, operator);
         operator.putMetadata(Keys.REFINEMENT, all);
     }
@@ -182,8 +172,7 @@ public class OperationsChecker {
      */
     private Predicate getOperationRefinements(CtBinaryOperator<?> operator, CtVariableWrite<?> parentVar,
             CtExpression<?> element) throws LJError {
-        if (element instanceof CtFieldRead<?>) {
-            CtFieldRead<?> field = ((CtFieldRead<?>) element);
+        if (element instanceof CtFieldRead<?> field) {
             if (field.getVariable().getSimpleName().equals("length")) {
                 String name = String.format(Formats.FRESH, rtc.getContext().getCounter());
                 rtc.getContext().addVarToContext(name, element.getType(),
@@ -192,8 +181,7 @@ public class OperationsChecker {
             }
         }
 
-        if (element instanceof CtVariableRead<?>) {
-            CtVariableRead<?> elemVar = (CtVariableRead<?>) element;
+        if (element instanceof CtVariableRead<?> elemVar) {
             String elemName = elemVar.getVariable().getSimpleName();
             if (elemVar instanceof CtFieldRead)
                 elemName = String.format(Formats.THIS, elemName);
@@ -207,7 +195,6 @@ public class OperationsChecker {
                 elem_ref = rtc.getRefinement(elemVar);
                 String newName = String.format(Formats.INSTANCE, elemName, rtc.getContext().getCounter());
                 Predicate newElem_ref = elem_ref.substituteVariable(Keys.WILDCARD, newName);
-                // String newElem_ref = elem_ref.replace(rtc.WILD_VAR, newName);
                 RefinedVariable newVi = rtc.getContext().addVarToContext(newName, elemVar.getType(), newElem_ref,
                         elemVar);
                 rtc.getContext().addSpecificVariable(newVi);
@@ -217,23 +204,18 @@ public class OperationsChecker {
             Predicate e = elem_ref.substituteVariable(Keys.WILDCARD, elemName);
             rtc.getContext().addVarToContext(elemName, elemVar.getType(), e, elemVar);
             return Predicate.createVar(returnName);
-        } else if (element instanceof CtBinaryOperator<?>) {
-            CtBinaryOperator<?> binop = (CtBinaryOperator<?>) element;
+        } else if (element instanceof CtBinaryOperator<?> binop) {
             Predicate right = getOperationRefinements(operator, parentVar, binop.getRightHandOperand());
             Predicate left = getOperationRefinements(operator, parentVar, binop.getLeftHandOperand());
-
             return Predicate.createOperation(left, getOperatorFromKind(binop.getKind()), right);
-            // Predicate(left+" "+ getOperatorFromKind(binop.getKind()) +" "+ right);
-
         } else if (element instanceof CtUnaryOperator<?>) {
             Predicate a = (Predicate) element.getMetadata(Keys.REFINEMENT);
             a = a.substituteVariable(Keys.WILDCARD, "");
             String s = a.toString().replace("(", "").replace(")", "").replace("==", "").replace(" ", ""); // TODO
-            // IMPROVE
+            // TODO: IMPROVE
             return new Predicate(String.format("(%s)", s), element);
 
-        } else if (element instanceof CtLiteral<?>) {
-            CtLiteral<?> l = (CtLiteral<?>) element;
+        } else if (element instanceof CtLiteral<?> l) {
             if (l.getType().getQualifiedName().equals("java.lang.String")) {
                 // skip strings
                 return new Predicate();
@@ -243,20 +225,19 @@ public class OperationsChecker {
 
             return new Predicate(l.getValue().toString(), element);
 
-        } else if (element instanceof CtInvocation<?>) {
-            CtInvocation<?> inv = (CtInvocation<?>) element;
+        } else if (element instanceof CtInvocation<?> inv) {
             CtExecutable<?> method = inv.getExecutable().getDeclaration();
 
             if (method == null)
-                return getOperationRefinementFromExternalLib(inv, operator);
+                return getOperationRefinementFromExternalLib(inv);
 
             // Get function refinements with non_used variables
             String met = ((CtClass<?>) method.getParent()).getQualifiedName(); // TODO check
             RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(), met, inv.getArguments().size());
-            Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv); // TODO REVER!!
+            Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv); // TODO REVIEW!!
+
             // Substitute _ by the variable that we send
             String newName = String.format(Formats.FRESH, rtc.getContext().getCounter());
-
             innerRefs = innerRefs.substituteVariable(Keys.WILDCARD, newName);
             rtc.getContext().addVarToContext(newName, fi.getType(), innerRefs, inv);
             return new Predicate(newName, inv); // Return variable that represents the invocation
@@ -265,8 +246,7 @@ public class OperationsChecker {
         // TODO Maybe add cases
     }
 
-    private Predicate getOperationRefinementFromExternalLib(CtInvocation<?> inv, CtBinaryOperator<?> operator)
-            throws LJError {
+    private Predicate getOperationRefinementFromExternalLib(CtInvocation<?> inv) throws LJError {
 
         CtExpression<?> t = inv.getTarget();
         if (t instanceof CtVariableRead) {
@@ -280,11 +260,12 @@ public class OperationsChecker {
             String methodInClassName = typeNotParametrized + "." + simpleName;
             RefinedFunction fi = rtc.getContext().getFunction(methodInClassName, typeNotParametrized,
                     inv.getArguments().size());
-            Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv); // TODO REVER!!
+            Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv); // TODO REVIEW!!
 
             // Substitute _ by the variable that we send
             String newName = String.format(Formats.FRESH, rtc.getContext().getCounter());
             innerRefs = innerRefs.substituteVariable(Keys.WILDCARD, newName);
+
             // change this for the current instance
             RefinedVariable r = rtc.getContext().getVariableByName(v.getSimpleName());
             if (r instanceof Variable) {
@@ -300,7 +281,7 @@ public class OperationsChecker {
     }
 
     /**
-     * Retrieves the refinements for the a variable write inside unary operation
+     * Retrieves the refinements for the variable write inside unary operation
      *
      * @param <T>
      * @param ex
@@ -333,7 +314,7 @@ public class OperationsChecker {
      *
      * @param kind
      *
-     * @return
+     * @return operator string
      */
     private String getOperatorFromKind(BinaryOperatorKind kind) {
         return switch (kind) {
@@ -356,15 +337,12 @@ public class OperationsChecker {
 
     private Predicate getOperatorFromKind(UnaryOperatorKind kind, CtElement elem) throws LJError {
         String ret = switch (kind) {
-        case POSTINC -> Keys.WILDCARD + " + 1";
-        case POSTDEC -> Keys.WILDCARD + " - 1";
-        case PREINC -> Keys.WILDCARD + " + 1";
-        case PREDEC -> Keys.WILDCARD + " - 1";
+        case POSTINC, PREINC -> Keys.WILDCARD + " + 1";
+        case POSTDEC, PREDEC -> Keys.WILDCARD + " - 1";
         case COMPL -> "(32 & " + Keys.WILDCARD + ")";
         case NOT -> "!" + Keys.WILDCARD;
         case POS -> "0 + " + Keys.WILDCARD;
         case NEG -> "-" + Keys.WILDCARD;
-        default -> throw new CustomError(kind + "operation not supported");
         };
         return new Predicate(ret, elem);
     };

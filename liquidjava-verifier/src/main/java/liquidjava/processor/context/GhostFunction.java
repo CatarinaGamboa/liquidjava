@@ -9,18 +9,18 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class GhostFunction {
 
-    private String name;
-    private List<CtTypeReference<?>> param_types;
-    private CtTypeReference<?> return_type;
-    private String prefix;
+    private final String name;
+    private final List<CtTypeReference<?>> param_types;
+    private final CtTypeReference<?> return_type;
+    private final String prefix;
 
     public GhostFunction(GhostDTO f, Factory factory, String prefix) {
         String klass = this.getParentClassName(prefix);
-        this.name = f.getName();
-        this.return_type = Utils.getType(f.getReturn_type().equals(klass) ? prefix : f.getReturn_type(), factory);
+        this.name = f.name();
+        this.return_type = Utils.getType(f.return_type().equals(klass) ? prefix : f.return_type(), factory);
         this.param_types = new ArrayList<>();
         this.prefix = prefix;
-        for (String t : f.getParam_types()) {
+        for (String t : f.param_types()) {
             this.param_types.add(Utils.getType(t.equals(klass) ? prefix : t, factory));
         }
     }
@@ -33,8 +33,7 @@ public class GhostFunction {
         this.return_type = Utils.getType(type, factory);
         this.param_types = new ArrayList<>();
         this.prefix = prefix;
-        for (int i = 0; i < param_types.size(); i++) {
-            String mType = param_types.get(i).toString();
+        for (String mType : param_types) {
             this.param_types.add(Utils.getType(mType.equals(klass) ? prefix : mType, factory));
         }
     }
@@ -42,7 +41,6 @@ public class GhostFunction {
     protected GhostFunction(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String prefix) {
         this.name = name;
         this.return_type = return_type;
-        this.param_types = new ArrayList<>();
         this.param_types = list;
         this.prefix = prefix;
     }
@@ -57,9 +55,9 @@ public class GhostFunction {
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("ghost " + return_type.toString() + " " + name + "(");
+        sb.append("ghost ").append(return_type.toString()).append(" ").append(name).append("(");
         for (CtTypeReference<?> t : param_types) {
-            sb.append(t.toString() + " ,");
+            sb.append(t.toString()).append(" ,");
         }
         sb.delete(sb.length() - 2, sb.length());
         sb.append(")");

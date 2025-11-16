@@ -10,7 +10,7 @@ public class Context {
     private List<RefinedFunction> ctxFunctions;
     private List<RefinedVariable> ctxSpecificVars;
 
-    private List<RefinedVariable> ctxGlobalVars;
+    private final List<RefinedVariable> ctxGlobalVars;
 
     private List<GhostFunction> ghosts;
     private Map<String, List<GhostState>> classStates;
@@ -24,9 +24,7 @@ public class Context {
         ctxVars.add(new ArrayList<>());
         ctxFunctions = new ArrayList<>();
         ctxSpecificVars = new ArrayList<>();
-        // globals
         ctxGlobalVars = new ArrayList<>();
-        // ctxGlobalFunctions = new ArrayList<>();
 
         alias = new ArrayList<>();
         ghosts = new ArrayList<>();
@@ -34,7 +32,6 @@ public class Context {
         counter = 0;
     }
 
-    // SINGLETON
     public static Context getInstance() {
         if (instance == null)
             instance = new Context();
@@ -44,11 +41,7 @@ public class Context {
     public void reinitializeContext() {
         ctxVars = new Stack<>();
         ctxVars.add(new ArrayList<>()); // global vars
-        // ctxFunctions = new ArrayList<>();
         ctxSpecificVars = new ArrayList<>();
-        // alias = new ArrayList<>();
-        // ghosts = new ArrayList<>();
-        // counter = 0;
     }
 
     public void reinitializeAllContext() {
@@ -95,12 +88,6 @@ public class Context {
     }
 
     // ---------------------- Global variables ----------------------
-    public void addGlobalVariableToContext(String simpleName, CtTypeReference<?> type, Predicate c) {
-        RefinedVariable vi = new Variable(simpleName, type, c);
-        ctxGlobalVars.add(vi);
-        vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
-    }
-
     public void addGlobalVariableToContext(String simpleName, String location, CtTypeReference<?> type, Predicate c) {
         RefinedVariable vi = new Variable(simpleName, location, type, c);
         vi.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
@@ -109,7 +96,6 @@ public class Context {
 
     // ---------------------- Add variables and instances ----------------------
     public void addVarToContext(RefinedVariable var) {
-        // if(!hasVariable(var.getName()))
         ctxVars.peek().add(var);
         CtTypeReference<?> type = var.getType();
         var.addSuperTypes(type.getSuperclass(), type.getSuperInterfaces());
@@ -183,27 +169,15 @@ public class Context {
         return getVariableByName(name) != null;
     }
 
-    public String allVariablesToString() {
-        StringBuilder sb = new StringBuilder();
-        for (List<RefinedVariable> l : ctxVars) {
-            for (RefinedVariable var : l) {
-                sb.append(var.toString() + "; ");
-            }
-        }
-        return sb.toString();
-    }
-
     /**
      * Lists all variables inside the stack
      *
-     * @return
+     * @return list of all variables
      */
     public List<RefinedVariable> getAllVariables() {
         List<RefinedVariable> lvi = new ArrayList<>();
         for (List<RefinedVariable> l : ctxVars) {
-            for (RefinedVariable var : l) {
-                lvi.add(var);
-            }
+            lvi.addAll(l);
         }
         return lvi;
     }
@@ -211,11 +185,11 @@ public class Context {
     public List<RefinedVariable> getAllVariablesWithSupertypes() {
         List<RefinedVariable> lvi = new ArrayList<>();
         for (RefinedVariable rv : getAllVariables()) {
-            if (rv.getSuperTypes().size() > 0)
+            if (!rv.getSuperTypes().isEmpty())
                 lvi.add(rv);
         }
         for (RefinedVariable rv : ctxSpecificVars) {
-            if (rv.getSuperTypes().size() > 0)
+            if (!rv.getSuperTypes().isEmpty())
                 lvi.add(rv);
         }
         return lvi;
@@ -298,18 +272,6 @@ public class Context {
             ctxFunctions.add(f);
     }
 
-    public RefinedFunction getFunction(String name, String target) {
-        for (RefinedFunction fi : ctxFunctions) {
-            if (fi.getTargetClass() != null && fi.getName().equals(name) && fi.getTargetClass().equals(target))
-                return fi;
-        }
-        // for(RefinedFunction fi: ctxGlobalFunctions) {
-        // if(fi.getName().equals(name) && fi.getTargetClass().equals(target))
-        // return fi;
-        // }
-        return null;
-    }
-
     public RefinedFunction getFunction(String name, String target, int size) {
         for (RefinedFunction fi : ctxFunctions) {
             if (fi.getTargetClass() != null && fi.getName().equals(name) && fi.getTargetClass().equals(target)
@@ -331,14 +293,6 @@ public class Context {
     // ---------------------- Ghost Predicates ----------------------
     public void addGhostFunction(GhostFunction gh) {
         ghosts.add(gh);
-    }
-
-    public boolean hasGhost(String name) {
-        for (GhostFunction g : ghosts) {
-            if (g.matches(name))
-                return true;
-        }
-        return false;
     }
 
     public List<GhostFunction> getGhosts() {
@@ -387,13 +341,10 @@ public class Context {
         for (List<RefinedVariable> l : ctxVars) {
             sb.append("{");
             for (RefinedVariable var : l) {
-                sb.append(var.toString() + "; ");
+                sb.append(var.toString()).append("; ");
             }
             sb.append("}\n");
         }
-        // sb.append("\n############Global Functions:############\n");
-        // for(RefinedFunction f : ctxGlobalFunctions)
-        // sb.append(f.toString());
         sb.append("\n############Functions:############\n");
         for (RefinedFunction f : ctxFunctions)
             sb.append(f.toString());
@@ -406,10 +357,5 @@ public class Context {
 
     public Variable getVariableFromInstance(VariableInstance vi) {
         return vi.getParent().orElse(null);
-        // for(List<RefinedVariable> lv: ctxVars)
-        // for(RefinedVariable v: lv)
-        // if(v instanceof Variable && ((Variable)v).hasInstance(vi))
-        // return (Variable)v;
-        // return null;
     }
 }

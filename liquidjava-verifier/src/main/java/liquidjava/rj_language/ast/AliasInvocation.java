@@ -30,7 +30,7 @@ public class AliasInvocation extends Expression {
 
     @Override
     public String toString() {
-        return name + "(" + getArgs().stream().map(p -> p.toString()).collect(Collectors.joining(", ")) + ")";
+        return name + "(" + getArgs().stream().map(Expression::toString).collect(Collectors.joining(", ")) + ")";
     }
 
     @Override
@@ -88,10 +88,9 @@ public class AliasInvocation extends Expression {
         } else if (!getArgs().equals(other.getArgs()))
             return false;
         if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        return true;
+            return other.name == null;
+        } else {
+            return name.equals(other.name);
+        }
     }
 }

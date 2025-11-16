@@ -80,22 +80,22 @@ public class ExpressionToZ3Visitor implements ExpressionVisitor<Expr<?>> {
     }
 
     @Override
-    public Expr<?> visitLiteralInt(LiteralInt lit) throws Exception {
+    public Expr<?> visitLiteralInt(LiteralInt lit) {
         return ctx.makeIntegerLiteral(lit.getValue());
     }
 
     @Override
-    public Expr<?> visitLiteralBoolean(LiteralBoolean lit) throws Exception {
+    public Expr<?> visitLiteralBoolean(LiteralBoolean lit) {
         return ctx.makeBooleanLiteral(lit.isBooleanTrue());
     }
 
     @Override
-    public Expr<?> visitLiteralReal(LiteralReal lit) throws Exception {
+    public Expr<?> visitLiteralReal(LiteralReal lit) {
         return ctx.makeDoubleLiteral(lit.getValue());
     }
 
     @Override
-    public Expr<?> visitLiteralString(LiteralString lit) throws Exception {
+    public Expr<?> visitLiteralString(LiteralString lit) {
         return ctx.makeString(lit.toString());
     }
 

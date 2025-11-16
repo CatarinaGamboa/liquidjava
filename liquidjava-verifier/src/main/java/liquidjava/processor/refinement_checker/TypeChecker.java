@@ -1,7 +1,7 @@
 package liquidjava.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -66,7 +66,6 @@ public abstract class TypeChecker extends CtScanner {
             String an = ann.getActualAnnotation().annotationType().getCanonicalName();
             if (an.contentEquals("liquidjava.specification.Refinement")) {
                 String st = TypeCheckingUtils.getStringFromAnnotation(ann.getValue("value"));
-                // CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
                 ref = Optional.of(st);
 
             } else if (an.contentEquals("liquidjava.specification.RefinementPredicate")) {
@@ -102,7 +101,7 @@ public abstract class TypeChecker extends CtScanner {
             }
             if (an.contentEquals("liquidjava.specification.Ghost")) {
                 CtLiteral<String> s = (CtLiteral<String>) ann.getAllValues().get("value");
-                createStateGhost(s.getValue(), ann, an, element);
+                createStateGhost(s.getValue(), ann, element);
             }
         }
     }
@@ -122,7 +121,7 @@ public abstract class TypeChecker extends CtScanner {
         }
 
         Optional<GhostFunction> og = createStateGhost(set, element);
-        if (!og.isPresent()) {
+        if (og.isEmpty()) {
             throw new RuntimeException("Error in creation of GhostFunction");
         }
         GhostFunction g = og.get();
@@ -140,22 +139,18 @@ public abstract class TypeChecker extends CtScanner {
                 GhostState gs = new GhostState(f, g.getParametersTypes(), factory.Type().BOOLEAN_PRIMITIVE,
                         g.getPrefix());
                 gs.setGhostParent(g);
-                gs.setRefinement(
-                        /* new OperationPredicate(new InvocationPredicate(f, THIS), "<-->", */
-                        Predicate.createEquals(ip, Predicate.createLit(Integer.toString(order), Types.INT))); // open(THIS)
-                // ->
-                // state1(THIS)
-                // == 1
+                gs.setRefinement(Predicate.createEquals(ip, Predicate.createLit(Integer.toString(order), Types.INT)));
+                // open(THIS) -> state1(THIS) == 1
                 context.addToGhostClass(g.getParentClassName(), gs);
             }
             order++;
         }
     }
 
-    private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, String an, CtElement element)
+    private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, CtElement element)
             throws LJError {
         GhostDTO gd = RefinementsParser.getGhostDeclaration(string);
-        if (gd.getParam_types().size() > 0) {
+        if (!gd.param_types().isEmpty()) {
             throw new CustomError(
                     "Ghost States have the class as parameter " + "by default, no other parameters are allowed", ann);
         }
@@ -163,10 +158,10 @@ public abstract class TypeChecker extends CtScanner {
         String qn = getQualifiedClassName(element);
         String sn = getSimpleClassName(element);
         context.addGhostClass(sn);
-        List<CtTypeReference<?>> param = Arrays.asList(factory.Type().createReference(qn));
+        List<CtTypeReference<?>> param = Collections.singletonList(factory.Type().createReference(qn));
 
-        CtTypeReference<?> r = factory.Type().createReference(gd.getReturn_type());
-        GhostState gs = new GhostState(gd.getName(), param, r, qn);
+        CtTypeReference<?> r = factory.Type().createReference(gd.return_type());
+        GhostState gs = new GhostState(gd.name(), param, r, qn);
         context.addToGhostClass(sn, gs);
     }
 
@@ -197,7 +192,7 @@ public abstract class TypeChecker extends CtScanner {
         }
         if (klass != null) {
             CtTypeReference<?> ret = factory.Type().INTEGER_PRIMITIVE;
-            List<String> params = Arrays.asList(klass.getSimpleName());
+            List<String> params = Collections.singletonList(klass.getSimpleName());
             String name = String.format("state%d", order);
             GhostFunction gh = new GhostFunction(name, params, ret, factory, klass.getQualifiedName());
             return Optional.of(gh);
@@ -207,8 +202,7 @@ public abstract class TypeChecker extends CtScanner {
 
     protected void getGhostFunction(String value, CtElement element) throws LJError {
         GhostDTO f = RefinementsParser.getGhostDeclaration(value);
-        if (f != null && element.getParent() instanceof CtClass<?>) {
-            CtClass<?> klass = (CtClass<?>) element.getParent();
+        if (element.getParent()instanceof CtClass<?> klass) {
             GhostFunction gh = new GhostFunction(f, factory, klass.getQualifiedName());
             context.addGhostFunction(gh);
         }
@@ -233,7 +227,7 @@ public abstract class TypeChecker extends CtScanner {
                     throw new InvalidRefinementError(element, "Refinement alias must return a boolean expression",
                             value);
                 }
-                AliasWrapper aw = new AliasWrapper(a, factory, Keys.WILDCARD, context, klass, path);
+                AliasWrapper aw = new AliasWrapper(a, factory, klass, path);
                 context.addAlias(aw);
             }
         } catch (SyntaxError e) {
@@ -263,12 +257,11 @@ public abstract class TypeChecker extends CtScanner {
         if (context.hasVariable(simpleName))
             mainRV = context.getVariableByName(simpleName);
 
-        if (context.hasVariable(simpleName) && !context.getVariableByName(simpleName).getRefinement().isBooleanTrue())
+        if (context.hasVariable(simpleName) && !context.getVariableByName(simpleName).getRefinement().isBooleanTrue()) {
             cEt = mainRV.getMainRefinement();
-        else if (expectedType.isPresent())
-            cEt = expectedType.get();
-        else
-            cEt = new Predicate();
+        } else {
+            cEt = expectedType.orElseGet(Predicate::new);
+        }
 
         cEt = cEt.substituteVariable(Keys.WILDCARD, simpleName);
         Predicate cet = cEt.substituteVariable(Keys.WILDCARD, simpleName);
@@ -295,24 +288,23 @@ public abstract class TypeChecker extends CtScanner {
 
     public void checkStateSMT(Predicate prevState, Predicate expectedState, CtElement target, String moreInfo)
             throws LJError {
-        vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), target, moreInfo, factory);
+        vcChecker.processSubtyping(prevState, expectedState, context.getGhostState(), target, factory);
     }
 
     public boolean checksStateSMT(Predicate prevState, Predicate expectedState, SourcePosition p) throws LJError {
         return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), p, factory);
     }
 
-    public void createError(CtElement element, Predicate expectedType, Predicate foundType, String customMessage)
-            throws LJError {
-        vcChecker.printSubtypingError(element, expectedType, foundType, customMessage);
+    public void createError(CtElement element, Predicate expectedType, Predicate foundType) throws LJError {
+        vcChecker.raiseSubtypingError(element, expectedType, foundType);
     }
 
     public void createSameStateError(CtElement element, Predicate expectedType, String klass) throws LJError {
-        vcChecker.printSameStateError(element, expectedType, klass);
+        vcChecker.raiseSameStateError(element, expectedType, klass);
     }
 
     public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected)
             throws LJError {
-        vcChecker.printStateMismatchError(element, method, found, expected);
+        vcChecker.raiseStateMismatchError(element, method, found, expected);
     }
 }

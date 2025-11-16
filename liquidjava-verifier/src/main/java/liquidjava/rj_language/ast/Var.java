@@ -6,7 +6,7 @@ import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class Var extends Expression {
 
-    private String name;
+    private final String name;
 
     public Var(String name) {
         this.name = name;
@@ -64,10 +64,9 @@ public class Var extends Expression {
             return false;
         Var other = (Var) obj;
         if (name == null) {
-            if (other.name != null)
-                return false;
-        } else if (!name.equals(other.name))
-            return false;
-        return true;
+            return other.name == null;
+        } else {
+            return name.equals(other.name);
+        }
     }
 }
