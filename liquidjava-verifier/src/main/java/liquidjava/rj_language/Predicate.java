@@ -1,13 +1,12 @@
 package liquidjava.rj_language;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.errors.SyntaxError;
 import liquidjava.processor.context.AliasWrapper;
 import liquidjava.processor.context.Context;
@@ -25,7 +24,6 @@ import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
 import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 import liquidjava.rj_language.opt.ExpressionSimplifier;
-import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Keys;
@@ -57,10 +55,8 @@ public class Predicate {
      * @param ref
      * @param element
      * @param e
-     *
-     * @throws ParsingException
      */
-    public Predicate(String ref, CtElement element) throws ParsingException {
+    public Predicate(String ref, CtElement element) throws LJError {
         this(ref, element, element.getParent(CtType.class).getQualifiedName());
     }
 
@@ -71,10 +67,8 @@ public class Predicate {
      * @param element
      * @param e
      * @param prefix
-     * 
-     * @throws ParsingException
      */
-    public Predicate(String ref, CtElement element, String prefix) throws ParsingException {
+    public Predicate(String ref, CtElement element, String prefix) throws LJError {
         this.prefix = prefix;
         exp = parse(ref, element);
         if (!(exp instanceof GroupExpression)) {
@@ -87,23 +81,18 @@ public class Predicate {
         exp = e;
     }
 
-    protected Expression parse(String ref, CtElement element) throws ParsingException {
+    protected Expression parse(String ref, CtElement element) throws LJError {
         try {
             return RefinementsParser.createAST(ref, prefix);
-        } catch (ParsingException e) {
+        } catch (SyntaxError e) {
+            // add location info to error
             SourcePosition pos = Utils.getRefinementAnnotationPosition(element, ref);
-            diagnostics.add(new SyntaxError(e.getMessage(), pos, ref));
-            throw e;
+            throw new SyntaxError(e.getMessage(), pos, ref);
         }
     }
 
-    protected Expression innerParse(String ref, String prefix) {
-        try {
-            return RefinementsParser.createAST(ref, prefix);
-        } catch (ParsingException e1) {
-            diagnostics.add(new SyntaxError(e1.getMessage(), ref));
-            return null;
-        }
+    protected Expression innerParse(String ref, String prefix) throws LJError {
+        return RefinementsParser.createAST(ref, prefix);
     }
 
     public Predicate changeAliasToRefinement(Context context, Factory f) throws Exception {
@@ -184,7 +173,7 @@ public class Predicate {
         }
     }
 
-    public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange) {
+    public Predicate changeStatesToRefinements(List<GhostState> ghostState, String[] toChange) throws LJError {
         Map<String, Expression> nameRefinementMap = new HashMap<>();
         for (GhostState gs : ghostState) {
             if (gs.getRefinement() != null) { // is a state and not a ghost state

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import liquidjava.processor.facade.AliasDTO;
-import liquidjava.rj_language.parsing.ParsingException;
 import liquidjava.utils.Pair;
 import org.antlr.v4.runtime.CodePointCharStream;
 import org.antlr.v4.runtime.TokenStreamRewriter;
@@ -28,8 +27,6 @@ public class AliasVisitor {
      * @param rc
      *
      * @return
-     *
-     * @throws ParsingException
      */
     public AliasDTO getAlias(ParseTree rc) {
         if (rc instanceof AliasContext) {

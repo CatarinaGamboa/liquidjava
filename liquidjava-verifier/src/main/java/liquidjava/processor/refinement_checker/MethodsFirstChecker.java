@@ -1,13 +1,12 @@
 package liquidjava.processor.refinement_checker;
 
-import static liquidjava.diagnostics.Diagnostics.diagnostics;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import liquidjava.diagnostics.Diagnostics;
+import liquidjava.diagnostics.errors.LJError;
 import liquidjava.processor.context.Context;
 import liquidjava.processor.refinement_checker.general_checkers.MethodsFunctionsChecker;
-import liquidjava.rj_language.parsing.ParsingException;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtInterface;
@@ -20,6 +19,7 @@ import spoon.reflect.reference.CtTypeReference;
 public class MethodsFirstChecker extends TypeChecker {
     MethodsFunctionsChecker mfc;
     List<String> visitedClasses;
+    Diagnostics diagnostics = Diagnostics.getInstance();
 
     public MethodsFirstChecker(Context context, Factory factory) {
         super(context, factory);
@@ -29,9 +29,6 @@ public class MethodsFirstChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtClass(CtClass<T> ctClass) {
-        if (diagnostics.foundError())
-            return;
-
         context.reinitializeContext();
         if (visitedClasses.contains(ctClass.getQualifiedName()))
             return;
@@ -53,20 +50,25 @@ public class MethodsFirstChecker extends TypeChecker {
             if (ct instanceof CtClass)
                 visitCtClass((CtClass<?>) ct);
         }
+        // first try-catch: process class-level annotations)
+        // errors here should not prevent visiting methods, constructors or fields of the class
         try {
             getRefinementFromAnnotation(ctClass);
-        } catch (ParsingException e) {
-            return; // error already reported
+            handleStateSetsFromAnnotation(ctClass);
+        } catch (LJError e) {
+            diagnostics.add(e);
         }
-        handleStateSetsFromAnnotation(ctClass);
-        super.visitCtClass(ctClass);
+        // second try-catch: visit class children (methods, constructors, fields)
+        // errors from one child should not prevent visiting sibling elements
+        try {
+            super.visitCtClass(ctClass);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
     }
 
     @Override
     public <T> void visitCtInterface(CtInterface<T> intrface) {
-        if (diagnostics.foundError())
-            return;
-
         if (visitedClasses.contains(intrface.getQualifiedName()))
             return;
         else
@@ -74,41 +76,35 @@ public class MethodsFirstChecker extends TypeChecker {
         if (getExternalRefinement(intrface).isPresent())
             return;
 
+        // first try-catch: process interface-level annotations
+        // errors here should not prevent visiting the interface's methods
         try {
             getRefinementFromAnnotation(intrface);
-        } catch (ParsingException e) {
-            return; // error already reported
+            handleStateSetsFromAnnotation(intrface);
+        } catch (LJError e) {
+            diagnostics.add(e);
         }
-        handleStateSetsFromAnnotation(intrface);
-        super.visitCtInterface(intrface);
+        // second try-catch: visit interface children (methods)
+        // errors from one child should not prevent visiting sibling methods
+        try {
+            super.visitCtInterface(intrface);
+        } catch (LJError e) {
+            diagnostics.add(e);
+        }
     }
 
     @Override
     public <T> void visitCtConstructor(CtConstructor<T> c) {
-        if (diagnostics.foundError())
-            return;
-
         context.enterContext();
-        try {
-            getRefinementFromAnnotation(c);
-            mfc.getConstructorRefinements(c);
-        } catch (ParsingException e) {
-            return;
-        }
+        getRefinementFromAnnotation(c);
+        mfc.getConstructorRefinements(c);
         super.visitCtConstructor(c);
         context.exitContext();
     }
 
     public <R> void visitCtMethod(CtMethod<R> method) {
-        if (diagnostics.foundError())
-            return;
-
         context.enterContext();
-        try {
-            mfc.getMethodRefinements(method);
-        } catch (ParsingException e) {
-            return;
-        }
+        mfc.getMethodRefinements(method);
         super.visitCtMethod(method);
         context.exitContext();
     }

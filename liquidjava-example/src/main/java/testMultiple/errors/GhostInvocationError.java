@@ -1,4 +1,4 @@
-package testingInProgress.diagnostics.errors;
+package testMultiple.errors;
 
 import liquidjava.specification.Ghost;
 import liquidjava.specification.StateRefinement;
