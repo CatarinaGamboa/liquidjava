@@ -383,13 +383,13 @@ public class AuxStateHandler {
         }
 
         String parentTargetName = ((CtVariableRead<?>) fw.getTarget()).getVariable().getSimpleName();
-        Optional<VariableInstance> invocation_callee = tc.getContext().getLastVariableInstance(parentTargetName);
+        Optional<VariableInstance> invocationCallee = tc.getContext().getLastVariableInstance(parentTargetName);
 
-        if (invocation_callee.isEmpty()) {
+        if (invocationCallee.isEmpty()) {
             return;
         }
 
-        VariableInstance vi = invocation_callee.get();
+        VariableInstance vi = invocationCallee.get();
         String instanceName = vi.getName();
         Predicate prevState = vi.getRefinement().substituteVariable(Keys.WILDCARD, instanceName)
                 .substituteVariable(parentTargetName, instanceName);
@@ -563,9 +563,9 @@ public class AuxStateHandler {
             // v--------- field read
             // means invocation is in a form of `t.method(args)`
             String name = v.getVariable().getSimpleName();
-            Optional<VariableInstance> invocation_callee = tc.getContext().getLastVariableInstance(name);
-            if (invocation_callee.isPresent()) {
-                invocation.putMetadata(Keys.TARGET, invocation_callee.get());
+            Optional<VariableInstance> invocationCallee = tc.getContext().getLastVariableInstance(name);
+            if (invocationCallee.isPresent()) {
+                invocation.putMetadata(Keys.TARGET, invocationCallee.get());
             } else if (target2.getMetadata(Keys.TARGET) == null) {
                 RefinedVariable var = tc.getContext().getVariableByName(name);
                 String nName = String.format(Formats.INSTANCE, name, tc.getContext().getCounter());
@@ -579,10 +579,10 @@ public class AuxStateHandler {
         } else if (target2.getMetadata(Keys.TARGET) != null) {
             // invocation is in
             // who did put the metadata here then?
-            VariableInstance target2_vi = (VariableInstance) target2.getMetadata(Keys.TARGET);
-            Optional<Variable> v = target2_vi.getParent();
-            invocation.putMetadata(Keys.TARGET, target2_vi);
-            return v.map(Refined::getName).orElse(target2_vi.getName());
+            VariableInstance target2Vi = (VariableInstance) target2.getMetadata(Keys.TARGET);
+            Optional<Variable> v = target2Vi.getParent();
+            invocation.putMetadata(Keys.TARGET, target2Vi);
+            return v.map(Refined::getName).orElse(target2Vi.getName());
         }
         return null;
     }

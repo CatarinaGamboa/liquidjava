@@ -150,7 +150,7 @@ public abstract class TypeChecker extends CtScanner {
     private void createStateGhost(String string, CtAnnotation<? extends Annotation> ann, CtElement element)
             throws LJError {
         GhostDTO gd = RefinementsParser.getGhostDeclaration(string);
-        if (!gd.param_types().isEmpty()) {
+        if (!gd.paramTypes().isEmpty()) {
             throw new CustomError(
                     "Ghost States have the class as parameter " + "by default, no other parameters are allowed", ann);
         }
@@ -160,7 +160,7 @@ public abstract class TypeChecker extends CtScanner {
         context.addGhostClass(sn);
         List<CtTypeReference<?>> param = Collections.singletonList(factory.Type().createReference(qn));
 
-        CtTypeReference<?> r = factory.Type().createReference(gd.return_type());
+        CtTypeReference<?> r = factory.Type().createReference(gd.returnType());
         GhostState gs = new GhostState(gd.name(), param, r, qn);
         context.addToGhostClass(sn, gs);
     }

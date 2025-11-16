@@ -9,8 +9,8 @@ public class GhostState extends GhostFunction {
     private GhostFunction parent;
     private Predicate refinement;
 
-    public GhostState(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String prefix) {
-        super(name, list, return_type, prefix);
+    public GhostState(String name, List<CtTypeReference<?>> list, CtTypeReference<?> returnType, String prefix) {
+        super(name, list, returnType, prefix);
     }
 
     public void setGhostParent(GhostFunction parent) {

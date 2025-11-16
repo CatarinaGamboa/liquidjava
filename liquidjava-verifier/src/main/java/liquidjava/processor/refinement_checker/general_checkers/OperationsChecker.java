@@ -185,23 +185,23 @@ public class OperationsChecker {
             String elemName = elemVar.getVariable().getSimpleName();
             if (elemVar instanceof CtFieldRead)
                 elemName = String.format(Formats.THIS, elemName);
-            Predicate elem_ref = rtc.getContext().getVariableRefinements(elemName);
+            Predicate elemRef = rtc.getContext().getVariableRefinements(elemName);
 
             String returnName = elemName;
 
             CtElement parent = operator.getParent();
             // No need for specific values
             if (parent != null && !(parent instanceof CtIfImpl)) {
-                elem_ref = rtc.getRefinement(elemVar);
+                elemRef = rtc.getRefinement(elemVar);
                 String newName = String.format(Formats.INSTANCE, elemName, rtc.getContext().getCounter());
-                Predicate newElem_ref = elem_ref.substituteVariable(Keys.WILDCARD, newName);
-                RefinedVariable newVi = rtc.getContext().addVarToContext(newName, elemVar.getType(), newElem_ref,
+                Predicate newElemRef = elemRef.substituteVariable(Keys.WILDCARD, newName);
+                RefinedVariable newVi = rtc.getContext().addVarToContext(newName, elemVar.getType(), newElemRef,
                         elemVar);
                 rtc.getContext().addSpecificVariable(newVi);
                 returnName = newName;
             }
 
-            Predicate e = elem_ref.substituteVariable(Keys.WILDCARD, elemName);
+            Predicate e = elemRef.substituteVariable(Keys.WILDCARD, elemName);
             rtc.getContext().addVarToContext(elemName, elemVar.getType(), e, elemVar);
             return Predicate.createVar(returnName);
         } else if (element instanceof CtBinaryOperator<?> binop) {
