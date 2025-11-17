@@ -1,18 +1,12 @@
 package liquidjava.processor.refinement_checker.general_checkers;
 
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import liquidjava.diagnostics.errors.LJError;
-import liquidjava.processor.context.Context;
-import liquidjava.processor.context.RefinedFunction;
-import liquidjava.processor.context.RefinedVariable;
-import liquidjava.processor.context.Variable;
-import liquidjava.processor.context.VariableInstance;
+import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.utils.constants.Formats;
 import liquidjava.utils.constants.Keys;
@@ -26,7 +20,6 @@ import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtInvocation;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
-import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtClass;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
@@ -39,7 +32,7 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class MethodsFunctionsChecker {
 
-    private TypeChecker rtc;
+    private final TypeChecker rtc;
 
     public MethodsFunctionsChecker(TypeChecker rtc) {
         this.rtc = rtc;
@@ -57,8 +50,7 @@ public class MethodsFunctionsChecker {
         } else {
             f.setSignature(c.getSignature());
         }
-        if (c.getParent() instanceof CtClass) {
-            CtClass<?> klass = (CtClass<?>) c.getParent();
+        if (c.getParent()instanceof CtClass<?> klass) {
             f.setClass(klass.getQualifiedName());
         }
         rtc.getContext().addFunctionToContext(f);
@@ -91,8 +83,7 @@ public class MethodsFunctionsChecker {
             klass = (CtClass<?>) method.getParent();
             f.setClass(klass.getQualifiedName());
         }
-        if (method.getParent() instanceof CtInterface<?>) {
-            CtInterface<?> inter = (CtInterface<?>) method.getParent();
+        if (method.getParent()instanceof CtInterface<?> inter) {
             f.setClass(inter.getQualifiedName());
         }
         String owner = f.getTargetClass();
@@ -147,7 +138,7 @@ public class MethodsFunctionsChecker {
      * Joins all the refinements from parameters and return
      *
      * @param f
-     * @param methodRef
+     * @param method
      * @param params
      *
      * @return Conjunction of all
@@ -155,7 +146,6 @@ public class MethodsFunctionsChecker {
     private Predicate handleFunctionRefinements(RefinedFunction f, CtElement method, List<CtParameter<?>> params)
             throws LJError {
         Predicate joint = new Predicate();
-
         for (CtParameter<?> param : params) {
             String paramName = param.getSimpleName();
             Optional<Predicate> oc = rtc.getRefinementFromAnnotation(param);
@@ -168,24 +158,11 @@ public class MethodsFunctionsChecker {
                 f.addArgRefinements((Variable) v);
             joint = Predicate.createConjunction(joint, c);
         }
-
         Optional<Predicate> oret = rtc.getRefinementFromAnnotation(method);
         Predicate ret = oret.orElse(new Predicate());
         ret = ret.substituteVariable("return", Keys.WILDCARD);
         f.setRefReturn(ret);
-        // rtc.context.addFunctionToContext(f);
         return Predicate.createConjunction(joint, ret);
-    }
-
-    public List<CtAnnotation<? extends Annotation>> getStateAnnotation(CtElement element) {
-        List<CtAnnotation<? extends Annotation>> l = new ArrayList<>();
-        for (CtAnnotation<? extends Annotation> ann : element.getAnnotations()) {
-            String an = ann.getActualAnnotation().annotationType().getCanonicalName();
-            if (an.contentEquals("liquidjava.specification.StateRefinement")) {
-                l.add(ann);
-            }
-        }
-        return l;
     }
 
     public <R> void getReturnRefinements(CtReturn<R> ret) throws LJError {
@@ -244,16 +221,6 @@ public class MethodsFunctionsChecker {
             if (f != null) { // inside rtc.context
                 checkInvocationRefinements(invocation, invocation.getArguments(), invocation.getTarget(),
                         method.getSimpleName(), ctype);
-
-            } else {
-                CtExecutable<?> cet = invocation.getExecutable().getDeclaration();
-                if (cet instanceof CtMethod) {
-                    // CtMethod met = (CtMethod) cet;
-                    // rtc.visitCtMethod(met);
-                    // checkInvocationRefinements(invocation, method.getSimpleName());
-                }
-                // rtc.visitCtMethod(method);
-
             }
         }
     }
@@ -344,7 +311,7 @@ public class MethodsFunctionsChecker {
 
             String viName = String.format(Formats.INSTANCE, f.getName(), rtc.getContext().getCounter());
             VariableInstance vi = (VariableInstance) rtc.getContext().addInstanceToContext(viName, f.getType(),
-                    methodRef.substituteVariable(Keys.WILDCARD, viName), invocation); // TODO REVER!!
+                    methodRef.substituteVariable(Keys.WILDCARD, viName), invocation); // TODO REVIEW!!
             if (varName != null && f.hasStateChange() && equalsThis)
                 rtc.getContext().addRefinementInstanceToVariable(varName, viName);
             invocation.putMetadata(Keys.TARGET, vi);
@@ -353,24 +320,19 @@ public class MethodsFunctionsChecker {
         return map;
     }
 
-    private <R> Map<String, String> mapInvocation(List<CtExpression<?>> arguments, RefinedFunction f) {
+    private Map<String, String> mapInvocation(List<CtExpression<?>> arguments, RefinedFunction f) {
         Map<String, String> mapInvocation = new HashMap<>();
-        List<CtExpression<?>> invocationParams = arguments;
         List<Variable> functionParams = f.getArguments();
-        for (int i = 0; i < invocationParams.size(); i++) {
+        for (int i = 0; i < arguments.size(); i++) {
             Variable fArg = functionParams.get(i);
-            CtExpression<?> iArg = invocationParams.get(i);
+            CtExpression<?> iArg = arguments.get(i);
             String invStr;
-            // if(iArg instanceof CtLiteral)
-            // invStr = iArg.toString();
-            // else
             if (iArg instanceof CtFieldRead) {
                 invStr = createVariableRepresentingArgument(iArg, fArg);
-            } else if (iArg instanceof CtVariableRead) {
-                CtVariableRead<?> vr = (CtVariableRead<?>) iArg;
+            } else if (iArg instanceof CtVariableRead<?> vr) {
                 Optional<VariableInstance> ovi = rtc.getContext()
                         .getLastVariableInstance(vr.getVariable().getSimpleName());
-                invStr = ovi.map(o -> o.getName()).orElse(vr.toString());
+                invStr = ovi.map(Refined::getName).orElse(vr.toString());
             } else // create new variable with the argument refinement
                 invStr = createVariableRepresentingArgument(iArg, fArg);
 
@@ -390,11 +352,10 @@ public class MethodsFunctionsChecker {
         return nVar;
     }
 
-    private <R> void checkParameters(CtElement invocation, List<CtExpression<?>> arguments, RefinedFunction f,
+    private void checkParameters(CtElement invocation, List<CtExpression<?>> arguments, RefinedFunction f,
             Map<String, String> map) throws LJError {
-        List<CtExpression<?>> invocationParams = arguments;
         List<Variable> functionParams = f.getArguments();
-        for (int i = 0; i < invocationParams.size(); i++) {
+        for (int i = 0; i < arguments.size(); i++) {
             Variable fArg = functionParams.get(i);
             Predicate c = fArg.getMainRefinement();
             c = c.substituteVariable(fArg.getName(), map.get(fArg.getName()));
@@ -415,16 +376,14 @@ public class MethodsFunctionsChecker {
     private void applyRefinementsToArguments(CtElement element, List<CtExpression<?>> arguments, RefinedFunction f,
             Map<String, String> map) {
         Context context = rtc.getContext();
-        List<CtExpression<?>> invocationParams = arguments;
         List<Variable> functionParams = f.getArguments();
 
-        for (int i = 0; i < invocationParams.size(); i++) {
+        for (int i = 0; i < arguments.size(); i++) {
             Variable fArg = functionParams.get(i);
             Predicate inferredRefinement = fArg.getRefinement();
 
-            CtExpression<?> e = invocationParams.get(i);
-            if (e instanceof CtVariableRead<?>) {
-                CtVariableRead<?> v = (CtVariableRead<?>) e;
+            CtExpression<?> e = arguments.get(i);
+            if (e instanceof CtVariableRead<?> v) {
                 String varName = v.getVariable().getSimpleName(); // TODO CHANGE
                 RefinedVariable rv = context.getVariableByName(varName);
                 String instanceName = String.format(Formats.INSTANCE, varName, context.getCounter());
@@ -433,13 +392,6 @@ public class MethodsFunctionsChecker {
                 context.addInstanceToContext(instanceName, rv.getType(), inferredRefinement, element);
                 context.addRefinementInstanceToVariable(varName, instanceName);
             } // TODO else's?
-
-            // c = c.substituteVariable(fArg.getName(), map.get(fArg.getName()));
-            // List<String> vars = c.getVariableNames();
-            // for(String s: vars)
-            // if(map.containsKey(s))
-            // c = c.substituteVariable(s, map.get(s));
-            // rtc.checkSMT(c, invocation);
         }
     }
 

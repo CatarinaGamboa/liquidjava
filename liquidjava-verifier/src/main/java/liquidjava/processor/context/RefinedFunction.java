@@ -5,11 +5,10 @@ import java.util.List;
 import java.util.Optional;
 import liquidjava.rj_language.Predicate;
 import spoon.reflect.declaration.CtElement;
-import spoon.reflect.reference.CtTypeReference;
 
 public class RefinedFunction extends Refined {
 
-    private List<Variable> argRefinements;
+    private final List<Variable> argRefinements;
     private String targetClass;
     private List<ObjectState> stateChange;
     private String signature;
@@ -21,11 +20,6 @@ public class RefinedFunction extends Refined {
 
     public List<Variable> getArguments() {
         return argRefinements;
-    }
-
-    public void addArgRefinements(String varName, CtTypeReference<?> type, Predicate refinement) {
-        Variable v = new Variable(varName, type, refinement);
-        this.argRefinements.add(v);
     }
 
     public void addArgRefinements(Variable vi) {
@@ -84,24 +78,9 @@ public class RefinedFunction extends Refined {
         return c;
     }
 
-    /**
-     * Gives the Predicate for a certain parameter index and regards all the previous parameters' Predicates
-     *
-     * @param index
-     *
-     * @return
-     */
-    public Predicate getRefinementsForParamIndex(int index) {
-        Predicate c = new Predicate();
-        for (int i = 0; i <= index && i < argRefinements.size(); i++)
-            c = Predicate.createConjunction(c, argRefinements.get(i).getRefinement());
-        return c;
-    }
-
     public boolean allRefinementsTrue() {
-        boolean t = true;
         Predicate p = new Predicate(getRefReturn().getExpression());
-        t = t && p.isBooleanTrue();
+        boolean t = p.isBooleanTrue();
         for (Variable v : argRefinements) {
             p = new Predicate(v.getRefinement().getExpression());
             t = t && p.isBooleanTrue();
@@ -122,7 +101,7 @@ public class RefinedFunction extends Refined {
     }
 
     public boolean hasStateChange() {
-        return stateChange.size() > 0;
+        return !stateChange.isEmpty();
     }
 
     public List<Predicate> getFromStates() {
@@ -149,7 +128,7 @@ public class RefinedFunction extends Refined {
     public int hashCode() {
         final int prime = 31;
         int result = super.hashCode();
-        result = prime * result + ((argRefinements == null) ? 0 : argRefinements.hashCode());
+        result = prime * result + argRefinements.hashCode();
         result = prime * result + ((targetClass == null) ? 0 : targetClass.hashCode());
         result = prime * result + ((signature == null) ? 0 : signature.hashCode());
         return result;
@@ -164,10 +143,7 @@ public class RefinedFunction extends Refined {
         if (getClass() != obj.getClass())
             return false;
         RefinedFunction other = (RefinedFunction) obj;
-        if (argRefinements == null) {
-            if (other.argRefinements != null)
-                return false;
-        } else if (!argRefinements.equals(other.argRefinements))
+        if (!argRefinements.equals(other.argRefinements))
             return false;
         if (targetClass == null) {
             if (other.targetClass != null)
@@ -175,10 +151,9 @@ public class RefinedFunction extends Refined {
         } else if (!targetClass.equals(other.targetClass))
             return false;
         if (signature == null) {
-            if (other.signature != null)
-                return false;
-        } else if (!signature.equals(other.signature))
-            return false;
-        return true;
+            return other.signature == null;
+        } else {
+            return signature.equals(other.signature);
+        }
     }
 }

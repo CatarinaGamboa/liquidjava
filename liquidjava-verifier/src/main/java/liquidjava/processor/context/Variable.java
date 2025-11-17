@@ -32,7 +32,7 @@ public class Variable extends RefinedVariable {
 
     private void startVariables() {
         this.instances = new Stack<>();
-        this.instances.push(new ArrayList<VariableInstance>());
+        this.instances.push(new ArrayList<>());
         ifCombiner = new Stack<>();
     }
 
@@ -73,16 +73,11 @@ public class Variable extends RefinedVariable {
         instances.peek().add(vi);
     }
 
-    public void removeLastInstance() {
-        if (instances.size() > 0)
-            instances.peek().remove(instances.size() - 1);
-    }
-
     public Optional<VariableInstance> getLastInstance() {
         Stack<List<VariableInstance>> backup = new Stack<>();
-        while (instances.size() > 0) {
+        while (!instances.isEmpty()) {
             List<VariableInstance> lvi = instances.peek();
-            if (lvi.size() > 0) { // last list in stack has a value
+            if (!lvi.isEmpty()) { // last list in stack has a value
                 reloadFromBackup(backup);
                 return Optional.of(lvi.get(lvi.size() - 1));
             } else {
@@ -94,16 +89,8 @@ public class Variable extends RefinedVariable {
     }
 
     private void reloadFromBackup(Stack<List<VariableInstance>> backup) {
-        while (backup.size() > 0)
+        while (!backup.isEmpty())
             instances.add(backup.pop());
-    }
-
-    public boolean hasInstance(VariableInstance vi) {
-        for (List<VariableInstance> lv : instances)
-            for (VariableInstance v : lv)
-                if (v.equals(vi))
-                    return true;
-        return false;
     }
 
     // IFS
@@ -167,8 +154,7 @@ public class Variable extends RefinedVariable {
 
     private boolean has(int index) {
         Object o = ifCombiner.peek()[index];
-        boolean b = o != null && (o instanceof VariableInstance);
-        return b;
+        return (o instanceof VariableInstance);
     }
 
     private VariableInstance get(int index) {
@@ -180,7 +166,7 @@ public class Variable extends RefinedVariable {
      *
      * @param nName
      * @param cond
-     * @param ifThen
+     * @param then
      *
      * @return
      */

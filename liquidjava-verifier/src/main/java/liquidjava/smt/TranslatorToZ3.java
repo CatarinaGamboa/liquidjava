@@ -24,33 +24,25 @@ import org.apache.commons.lang3.NotImplementedException;
 
 public class TranslatorToZ3 implements AutoCloseable {
 
-    private com.microsoft.z3.Context z3 = new com.microsoft.z3.Context();
-    private Map<String, Expr<?>> varTranslation = new HashMap<>();
-    private Map<String, List<Expr<?>>> varSuperTypes = new HashMap<>();
-    private Map<String, AliasWrapper> aliasTranslation = new HashMap<>();
-    private Map<String, FuncDecl<?>> funcTranslation = new HashMap<>();
+    private final com.microsoft.z3.Context z3 = new com.microsoft.z3.Context();
+    private final Map<String, Expr<?>> varTranslation = new HashMap<>();
+    private final Map<String, List<Expr<?>>> varSuperTypes = new HashMap<>();
+    private final Map<String, AliasWrapper> aliasTranslation = new HashMap<>(); // this is not being used
+    private final Map<String, FuncDecl<?>> funcTranslation = new HashMap<>();
 
     public TranslatorToZ3(liquidjava.processor.context.Context c) {
         TranslatorContextToZ3.translateVariables(z3, c.getContext(), varTranslation);
         TranslatorContextToZ3.storeVariablesSubtypes(z3, c.getAllVariablesWithSupertypes(), varSuperTypes);
-        TranslatorContextToZ3.addAlias(z3, c.getAlias(), aliasTranslation);
+        TranslatorContextToZ3.addAlias(c.getAlias(), aliasTranslation);
         TranslatorContextToZ3.addGhostFunctions(z3, c.getGhosts(), funcTranslation);
         TranslatorContextToZ3.addGhostStates(z3, c.getGhostState(), funcTranslation);
     }
 
     @SuppressWarnings("unchecked")
-    public Status verifyExpression(Expr<?> e) throws Exception {
+    public Status verifyExpression(Expr<?> e) {
         Solver s = z3.mkSolver();
-        // s.add((BoolExpr) e.eval(this));
-        // for(Expression ex: premisesToAdd)
-        // s.add((BoolExpr) ex.eval(this));
         s.add((BoolExpr) e);
-        Status st = s.check();
-        if (st.equals(Status.SATISFIABLE)) {
-            // Example of values
-            // System.out.println(s.getModel());
-        }
-        return st;
+        return s.check();
     }
 
     // #####################Literals and Variables#####################
@@ -76,7 +68,7 @@ public class TranslatorToZ3 implements AutoCloseable {
 
     private Expr<?> getVariableTranslation(String name) throws Exception {
         if (!varTranslation.containsKey(name))
-            throw new NotFoundError("Variable '" + name.toString() + "' not found");
+            throw new NotFoundError("Variable '" + name + "' not found");
         Expr<?> e = varTranslation.get(name);
         if (e == null)
             e = varTranslation.get(String.format("this#%s", name));
@@ -91,9 +83,9 @@ public class TranslatorToZ3 implements AutoCloseable {
 
     public Expr<?> makeFunctionInvocation(String name, Expr<?>[] params) throws Exception {
         if (name.equals("addToIndex"))
-            return makeStore(name, params);
+            return makeStore(params);
         if (name.equals("getFromIndex"))
-            return makeSelect(name, params);
+            return makeSelect(params);
         FuncDecl<?> fd = funcTranslation.get(name);
         if (fd == null)
             fd = resolveFunctionDeclFallback(name, params);
@@ -109,11 +101,7 @@ public class TranslatorToZ3 implements AutoCloseable {
                         if (e.getSort().equals(s[i]))
                             params[i] = e;
             }
-            // System.out.println("Expected sort"+s[i]+"; Final sort->"
-            // +params[i].toString() +":"+
-            // params[i].getSort());
         }
-
         return z3.mkApp(fd, params);
     }
 
@@ -149,14 +137,14 @@ public class TranslatorToZ3 implements AutoCloseable {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Expr<?> makeSelect(String name, Expr<?>[] params) {
+    private Expr<?> makeSelect(Expr<?>[] params) {
         if (params.length == 2 && params[0] instanceof ArrayExpr)
             return z3.mkSelect((ArrayExpr) params[0], params[1]);
         return null;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private Expr<?> makeStore(String name, Expr<?>[] params) {
+    private Expr<?> makeStore(Expr<?>[] params) {
         if (params.length == 3 && params[0] instanceof ArrayExpr)
             return z3.mkStore((ArrayExpr) params[0], params[1], params[2]);
         return null;
@@ -222,11 +210,6 @@ public class TranslatorToZ3 implements AutoCloseable {
         return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
     }
 
-    // public Expr<?> makeIf(Expr<?> eval, Expr<?> eval2) {
-    // z3.mkI
-    // return z3.mkOr((BoolExpr) eval, (BoolExpr) eval2);
-    // }
-
     // ##################### Unary Operations #####################
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public Expr<?> makeMinus(Expr<?> eval) {
@@ -280,8 +263,7 @@ public class TranslatorToZ3 implements AutoCloseable {
             f = (FPExpr) e;
         } else if (e instanceof IntNum)
             f = z3.mkFP(((IntNum) e).getInt(), z3.mkFPSort64());
-        else if (e instanceof IntExpr) {
-            IntExpr ee = (IntExpr) e;
+        else if (e instanceof IntExpr ee) {
             RealExpr re = z3.mkInt2Real(ee);
             f = z3.mkFPToFP(z3.mkFPRoundNearestTiesToEven(), re, z3.mkFPSort64());
         } else if (e instanceof RealExpr) {

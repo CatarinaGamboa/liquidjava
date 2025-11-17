@@ -47,7 +47,6 @@ import spoon.support.reflect.code.CtVariableWriteImpl;
 
 public class RefinementTypeChecker extends TypeChecker {
     // This class should do the following:
-
     // 1. Keep track of the context variable types
     // 2. Do type checking and inference
 
@@ -189,8 +188,7 @@ public class RefinementTypeChecker extends TypeChecker {
             String name = var.getSimpleName();
             checkAssignment(name, varDecl.getType(), ex, assignment.getAssignment(), assignment, varDecl);
 
-        } else if (ex instanceof CtFieldWrite) {
-            CtFieldWrite<?> fw = ((CtFieldWrite<?>) ex);
+        } else if (ex instanceof CtFieldWrite<?> fw) {
             CtFieldReference<?> cr = fw.getVariable();
             CtField<?> f = fw.getVariable().getDeclaration();
             String updatedVarName = String.format(Formats.THIS, cr.getSimpleName());
@@ -234,16 +232,12 @@ public class RefinementTypeChecker extends TypeChecker {
     public <T> void visitCtField(CtField<T> f) {
         super.visitCtField(f);
         Optional<Predicate> c = getRefinementFromAnnotation(f);
-
-        // context.addVarToContext(f.getSimpleName(), f.getType(),
-        // c.map( i -> i.substituteVariable(WILD_VAR, f.getSimpleName()).orElse(new
-        // Predicate()) );
-        String nname = String.format(Formats.THIS, f.getSimpleName());
+        String name = String.format(Formats.THIS, f.getSimpleName());
         Predicate ret = new Predicate();
         if (c.isPresent()) {
-            ret = c.get().substituteVariable(Keys.WILDCARD, nname).substituteVariable(f.getSimpleName(), nname);
+            ret = c.get().substituteVariable(Keys.WILDCARD, name).substituteVariable(f.getSimpleName(), name);
         }
-        RefinedVariable v = context.addVarToContext(nname, f.getType(), ret, f);
+        RefinedVariable v = context.addVarToContext(name, f.getType(), ret, f);
         if (v instanceof Variable) {
             ((Variable) v).setLocation("this");
         }
@@ -274,9 +268,8 @@ public class RefinementTypeChecker extends TypeChecker {
 
         } else {
             fieldRead.putMetadata(Keys.REFINEMENT, new Predicate());
-            // TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE
+            // TODO DO WE WANT THIS OR TO SHOW ERROR MESSAGE?
         }
-
         super.visitCtFieldRead(fieldRead);
     }
 
@@ -284,7 +277,7 @@ public class RefinementTypeChecker extends TypeChecker {
     public <T> void visitCtVariableRead(CtVariableRead<T> variableRead) {
         super.visitCtVariableRead(variableRead);
         CtVariable<T> varDecl = variableRead.getVariable().getDeclaration();
-        getPutVariableMetadada(variableRead, varDecl.getSimpleName());
+        getPutVariableMetadata(variableRead, varDecl.getSimpleName());
     }
 
     /**
@@ -364,8 +357,7 @@ public class RefinementTypeChecker extends TypeChecker {
     public <T> void visitCtArrayWrite(CtArrayWrite<T> arrayWrite) {
         super.visitCtArrayWrite(arrayWrite);
         CtExpression<?> index = arrayWrite.getIndexExpression();
-        BuiltinFunctionPredicate fp = BuiltinFunctionPredicate.addToIndex(arrayWrite.getTarget().toString(),
-                index.toString(), Keys.WILDCARD, arrayWrite);
+        BuiltinFunctionPredicate fp = BuiltinFunctionPredicate.addToIndex(index.toString(), Keys.WILDCARD, arrayWrite);
         arrayWrite.putMetadata(Keys.REFINEMENT, fp);
     }
 
@@ -393,7 +385,7 @@ public class RefinementTypeChecker extends TypeChecker {
     // ##########################################
     private void checkAssignment(String name, CtTypeReference<?> type, CtExpression<?> ex, CtExpression<?> assignment,
             CtElement parentElem, CtElement varDecl) throws LJError {
-        getPutVariableMetadada(ex, name);
+        getPutVariableMetadata(ex, name);
 
         Predicate refinementFound = getRefinement(assignment);
         if (refinementFound == null) {
@@ -452,18 +444,17 @@ public class RefinementTypeChecker extends TypeChecker {
     // ##########################################
 
     /**
-     * @param <T>
+     * Gets the variable refinement from the context and puts it as metadata in the element
+     * 
      * @param elem
      * @param name
-     *            Cannot be null
      */
-    private <T> void getPutVariableMetadada(CtElement elem, String name) {
+    private void getPutVariableMetadata(CtElement elem, String name) {
         Predicate cref = Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(name));
         Optional<VariableInstance> ovi = context.getLastVariableInstance(name);
         if (ovi.isPresent()) {
             cref = Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(ovi.get().getName()));
         }
-
         elem.putMetadata(Keys.REFINEMENT, cref);
     }
 }

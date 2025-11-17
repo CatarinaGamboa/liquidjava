@@ -6,19 +6,20 @@ import java.util.stream.Collectors;
 import liquidjava.diagnostics.errors.LJError;
 import liquidjava.rj_language.ast.Expression;
 import liquidjava.rj_language.parsing.RefinementsParser;
+import spoon.reflect.declaration.CtTypeInformation;
 import spoon.reflect.reference.CtTypeReference;
 
 public class AliasDTO {
-    private String name;
-    private List<String> varTypes;
-    private List<String> varNames;
+    private final String name;
+    private final List<String> varTypes;
+    private final List<String> varNames;
     private Expression expression;
     private String ref;
 
     public AliasDTO(String name, List<CtTypeReference<?>> varTypes, List<String> varNames, Expression expression) {
         super();
         this.name = name;
-        this.varTypes = varTypes.stream().map(m -> m.getQualifiedName()).collect(Collectors.toList());
+        this.varTypes = varTypes.stream().map(CtTypeInformation::getQualifiedName).collect(Collectors.toList());
         this.varNames = varNames;
         this.expression = expression;
     }

@@ -6,7 +6,7 @@ import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class LiteralInt extends Expression {
 
-    private int value;
+    private final int value;
 
     public LiteralInt(int v) {
         value = v;
@@ -32,13 +32,11 @@ public class LiteralInt extends Expression {
     @Override
     public void getVariableNames(List<String> toAdd) {
         // end leaf
-
     }
 
     @Override
     public void getStateInvocations(List<String> toAdd, List<String> all) {
         // end leaf
-
     }
 
     @Override
@@ -68,8 +66,6 @@ public class LiteralInt extends Expression {
         if (getClass() != obj.getClass())
             return false;
         LiteralInt other = (LiteralInt) obj;
-        if (value != other.value)
-            return false;
-        return true;
+        return value == other.value;
     }
 }

@@ -6,7 +6,6 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class VariableInstance extends RefinedVariable {
 
-    // private Predicate state;
     private Variable parent;
 
     public VariableInstance(String name, CtTypeReference<?> type, Predicate c) {
@@ -37,13 +36,4 @@ public class VariableInstance extends RefinedVariable {
     public Optional<Variable> getParent() {
         return parent == null ? Optional.empty() : Optional.of(parent);
     }
-
-    // public void setState(Predicate c) {
-    // state = c;
-    // }
-    // public Predicate getState() {
-    // return state;
-    // }
-    //
-
 }

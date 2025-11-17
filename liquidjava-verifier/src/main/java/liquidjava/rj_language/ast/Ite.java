@@ -94,10 +94,9 @@ public class Ite extends Expression {
         } else if (!getElse().equals(other.getElse()))
             return false;
         if (getThen() == null) {
-            if (other.getThen() != null)
-                return false;
-        } else if (!getThen().equals(other.getThen()))
-            return false;
-        return true;
+            return other.getThen() == null;
+        } else {
+            return getThen().equals(other.getThen());
+        }
     }
 }

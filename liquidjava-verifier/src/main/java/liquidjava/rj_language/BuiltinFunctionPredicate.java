@@ -13,8 +13,7 @@ public class BuiltinFunctionPredicate extends Predicate {
         return new BuiltinFunctionPredicate(elem, "length", param);
     }
 
-    public static BuiltinFunctionPredicate addToIndex(String array, String index, String value, CtElement elem)
-            throws LJError {
+    public static BuiltinFunctionPredicate addToIndex(String index, String value, CtElement elem) throws LJError {
         return new BuiltinFunctionPredicate(elem, "addToIndex", index, value);
     }
 

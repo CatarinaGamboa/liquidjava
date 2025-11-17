@@ -7,7 +7,7 @@ import liquidjava.rj_language.Predicate;
 import spoon.reflect.reference.CtTypeReference;
 
 public abstract class RefinedVariable extends Refined {
-    private List<CtTypeReference<?>> supertypes;
+    private final List<CtTypeReference<?>> supertypes;
     private PlacementInCode placementInCode;
 
     public RefinedVariable(String name, CtTypeReference<?> type, Predicate c) {
@@ -60,10 +60,9 @@ public abstract class RefinedVariable extends Refined {
             return false;
         RefinedVariable other = (RefinedVariable) obj;
         if (supertypes == null) {
-            if (other.supertypes != null)
-                return false;
-        } else if (!supertypes.equals(other.supertypes))
-            return false;
-        return true;
+            return other.supertypes == null;
+        } else {
+            return supertypes.equals(other.supertypes);
+        }
     }
 }

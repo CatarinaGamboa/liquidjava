@@ -45,7 +45,7 @@ public class ValDerivationNode extends DerivationNode {
             if (exp instanceof LiteralReal)
                 return new JsonPrimitive(((LiteralReal) exp).getValue());
             if (exp instanceof LiteralBoolean)
-                return new JsonPrimitive(((LiteralBoolean) exp).isBooleanTrue());
+                return new JsonPrimitive(exp.isBooleanTrue());
             if (exp instanceof Var)
                 return new JsonPrimitive(((Var) exp).getName());
             return new JsonPrimitive(exp.toString());

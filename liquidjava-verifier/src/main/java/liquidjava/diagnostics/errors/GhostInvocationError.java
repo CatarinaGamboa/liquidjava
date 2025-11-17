@@ -11,7 +11,7 @@ import spoon.reflect.cu.SourcePosition;
  */
 public class GhostInvocationError extends LJError {
 
-    private String expected;
+    private final String expected;
 
     public GhostInvocationError(String message, SourcePosition pos, Expression expected,
             TranslationTable translationTable) {

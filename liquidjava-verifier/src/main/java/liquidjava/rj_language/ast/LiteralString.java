@@ -5,7 +5,8 @@ import java.util.List;
 import liquidjava.rj_language.visitors.ExpressionVisitor;
 
 public class LiteralString extends Expression {
-    private String value;
+
+    private final String value;
 
     public LiteralString(String v) {
         value = v;
@@ -58,10 +59,9 @@ public class LiteralString extends Expression {
             return false;
         LiteralString other = (LiteralString) obj;
         if (value == null) {
-            if (other.value != null)
-                return false;
-        } else if (!value.equals(other.value))
-            return false;
-        return true;
+            return other.value == null;
+        } else {
+            return value.equals(other.value);
+        }
     }
 }

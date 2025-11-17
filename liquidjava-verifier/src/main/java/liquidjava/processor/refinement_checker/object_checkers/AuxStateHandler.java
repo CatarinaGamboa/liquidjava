@@ -41,7 +41,7 @@ public class AuxStateHandler {
                     throw new IllegalConstructorTransitionError(from);
                 }
             }
-            setConstructorStates(f, an, tc, c); // f.setState(an, context.getGhosts(), c);
+            setConstructorStates(f, an, c);
         } else {
             setDefaultState(f, tc);
         }
@@ -52,12 +52,11 @@ public class AuxStateHandler {
      *
      * @param f
      * @param anns
-     * @param tc
      * @param element
      */
     @SuppressWarnings({ "rawtypes" })
     private static void setConstructorStates(RefinedFunction f, List<CtAnnotation<? extends Annotation>> anns,
-            TypeChecker tc, CtElement element) throws LJError {
+            CtElement element) throws LJError {
         List<ObjectState> l = new ArrayList<>();
         for (CtAnnotation<? extends Annotation> an : anns) {
             Map<String, CtExpression> m = an.getAllValues();
@@ -116,13 +115,11 @@ public class AuxStateHandler {
     private static List<GhostFunction> getDifferentSets(TypeChecker tc, String klassQualified) {
         List<GhostFunction> sets = new ArrayList<>();
         List<GhostState> l = getGhostStatesFor(klassQualified, tc);
-        if (l != null) {
-            for (GhostState g : l) {
-                if (g.getParent() == null) {
-                    sets.add(g);
-                } else if (!sets.contains(g.getParent())) {
-                    sets.add(g.getParent());
-                }
+        for (GhostState g : l) {
+            if (g.getParent() == null) {
+                sets.add(g);
+            } else if (!sets.contains(g.getParent())) {
+                sets.add(g.getParent());
             }
         }
         return sets;
@@ -141,8 +138,6 @@ public class AuxStateHandler {
         if (!an.isEmpty()) {
             setFunctionStates(f, an, tc, method, prefix);
         }
-        // f.setState(an, context.getGhosts(), method);
-
     }
 
     /**
@@ -201,8 +196,8 @@ public class AuxStateHandler {
      * 
      * @return the created predicate
      */
-    private static Predicate createStatePredicate(String value, /* RefinedFunction f */ String targetClass,
-            TypeChecker tc, CtElement e, boolean isTo, String prefix) throws LJError {
+    private static Predicate createStatePredicate(String value, String targetClass, TypeChecker tc, CtElement e,
+            boolean isTo, String prefix) throws LJError {
         Predicate p = new Predicate(value, e, prefix);
         if (!p.getExpression().isBooleanExpression()) {
             throw new InvalidRefinementError(e, "State refinement transition must be a boolean expression", value);
@@ -239,11 +234,11 @@ public class AuxStateHandler {
         for (GhostState g : gs) {
             if (g.getParent() == null && sets.contains(g)) {
                 sets.remove(g);
-            } else if (g.getParent() != null && sets.contains(g.getParent())) {
+            } else if (g.getParent() != null) {
                 sets.remove(g.getParent());
             }
         }
-        return addOldStates(p, Predicate.createVar(Keys.THIS), sets, tc);
+        return addOldStates(p, Predicate.createVar(Keys.THIS), sets);
     }
 
     /**
@@ -286,11 +281,10 @@ public class AuxStateHandler {
      * @param p
      * @param th
      * @param sets
-     * @param tc
-     *
+     * 
      * @return updated predicate
      */
-    private static Predicate addOldStates(Predicate p, Predicate th, List<GhostFunction> sets, TypeChecker tc) {
+    private static Predicate addOldStates(Predicate p, Predicate th, List<GhostFunction> sets) {
         Predicate c = p;
         for (GhostFunction gf : sets) {
             Predicate eq = Predicate.createEquals( // gf.name == old(gf.name(this))
@@ -314,17 +308,13 @@ public class AuxStateHandler {
     public static void constructorStateMetadata(String refKey, RefinedFunction f, Map<String, String> map,
             CtConstructorCall<?> ctConstructorCall) {
         List<Predicate> oc = f.getToStates();
-        if (oc.size() > 0) { // && !oc.get(0).isBooleanTrue())
-            // ctConstructorCall.putMetadata(stateKey, oc.get(0));
+        if (!oc.isEmpty()) {
             Predicate c = oc.get(0);
             for (String k : map.keySet()) {
                 c = c.substituteVariable(k, map.get(k));
             }
             ctConstructorCall.putMetadata(refKey, c);
-            // add maping to oc.get(0)-HERE
-        } else if (oc.size() > 1) {
-            // TODO: Proper Exception
-            throw new RuntimeException("Constructor can only have one to state, not multiple.");
+            // add mapping to oc.get(0)-HERE
         }
     }
 
@@ -352,16 +342,15 @@ public class AuxStateHandler {
      * @param tc
      * @param f
      * @param target2
-     * @param target2
      * @param map
      * @param invocation
      */
     public static void checkTargetChanges(TypeChecker tc, RefinedFunction f, CtExpression<?> target2,
             Map<String, String> map, CtElement invocation) throws LJError {
         String parentTargetName = searchFistVariableTarget(tc, target2, invocation);
-        VariableInstance target = getTarget(tc, invocation);
+        VariableInstance target = getTarget(invocation);
         if (target != null) {
-            if (f.hasStateChange() && f.getFromStates().size() > 0) {
+            if (f.hasStateChange() && !f.getFromStates().isEmpty()) {
                 changeState(tc, target, f.getAllStates(), parentTargetName, map, invocation);
             }
             if (!f.hasStateChange()) {
@@ -394,19 +383,16 @@ public class AuxStateHandler {
         }
 
         String parentTargetName = ((CtVariableRead<?>) fw.getTarget()).getVariable().getSimpleName();
-        Optional<VariableInstance> invocation_callee = tc.getContext().getLastVariableInstance(parentTargetName);
+        Optional<VariableInstance> invocationCallee = tc.getContext().getLastVariableInstance(parentTargetName);
 
-        if (!invocation_callee.isPresent()) {
+        if (invocationCallee.isEmpty()) {
             return;
         }
 
-        VariableInstance vi = invocation_callee.get();
+        VariableInstance vi = invocationCallee.get();
         String instanceName = vi.getName();
         Predicate prevState = vi.getRefinement().substituteVariable(Keys.WILDCARD, instanceName)
                 .substituteVariable(parentTargetName, instanceName);
-
-        // StateRefinement(from="true", to="n(this)=this#n")
-        // ObjectState stateChange = getStates(ann, rf, tc, transitionMethod);
 
         ObjectState stateChange = new ObjectState();
         String prefix = field.getDeclaringType().getQualifiedName();
@@ -429,7 +415,7 @@ public class AuxStateHandler {
         Predicate transitionedState = stateChange.getTo().substituteVariable(Keys.WILDCARD, newInstanceName)
                 .substituteVariable(Keys.THIS, newInstanceName);
 
-        transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
+        transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
         // update of stata of new instance of this#n#(whatever it was + 1)
 
         VariableInstance vi2 = (VariableInstance) tc.getContext().addInstanceToContext(newInstanceName, vi.getType(),
@@ -458,24 +444,17 @@ public class AuxStateHandler {
      * @param name
      * @param map
      * @param invocation
-     *
-     * @return
      */
-    private static Predicate changeState(TypeChecker tc, VariableInstance vi,
-            /* RefinedFunction f */ List<ObjectState> stateChanges, String name, Map<String, String> map,
-            CtElement invocation) throws LJError {
+    private static void changeState(TypeChecker tc, VariableInstance vi, List<ObjectState> stateChanges, String name,
+            Map<String, String> map, CtElement invocation) throws LJError {
         if (vi.getRefinement() == null) {
-            return new Predicate();
+            return;
         }
         String instanceName = vi.getName();
         Predicate prevState = vi.getRefinement().substituteVariable(Keys.WILDCARD, instanceName)
                 .substituteVariable(name, instanceName);
 
-        // List<ObjectState> stateChanges = f.getAllStates();
-
         boolean found = false;
-        // if(los.size() > 1)
-        // assertFalse("Change state only working for one method with one state",true);
         for (ObjectState stateChange : stateChanges) { // TODO: only working for 1 state annotation
             if (found) {
                 break;
@@ -500,10 +479,10 @@ public class AuxStateHandler {
                 for (String s : map.keySet()) {
                     transitionedState = transitionedState.substituteVariable(s, map.get(s));
                 }
-                transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName, tc);
+                transitionedState = checkOldMentions(transitionedState, instanceName, newInstanceName);
                 // update of stata of new instance of this#n#(whatever it was + 1)
                 addInstanceWithState(tc, name, newInstanceName, vi, transitionedState, invocation);
-                return transitionedState;
+                return;
             }
         }
         if (!found) { // Reaches the end of stateChange no matching states
@@ -512,11 +491,10 @@ public class AuxStateHandler {
             String simpleInvocation = invocation.toString();
             tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
         }
-        return new Predicate();
     }
 
-    private static Predicate checkOldMentions(Predicate transitionedState, String instanceName, String newInstanceName,
-            TypeChecker tc) {
+    private static Predicate checkOldMentions(Predicate transitionedState, String instanceName,
+            String newInstanceName) {
         return transitionedState.changeOldMentions(instanceName, newInstanceName);
     }
 
@@ -527,20 +505,16 @@ public class AuxStateHandler {
      * @param variableInstance
      * @param name
      * @param invocation
-     *
-     * @return
      */
-    private static Predicate sameState(TypeChecker tc, VariableInstance variableInstance, String name,
-            CtElement invocation) throws LJError {
+    private static void sameState(TypeChecker tc, VariableInstance variableInstance, String name, CtElement invocation)
+            throws LJError {
         if (variableInstance.getRefinement() != null) {
             String newInstanceName = String.format(Formats.INSTANCE, name, tc.getContext().getCounter());
             Predicate c = variableInstance.getRefinement().substituteVariable(Keys.WILDCARD, newInstanceName)
                     .substituteVariable(variableInstance.getName(), newInstanceName);
 
             addInstanceWithState(tc, name, newInstanceName, variableInstance, c, invocation);
-            return c;
         }
-        return new Predicate();
     }
 
     /**
@@ -552,14 +526,11 @@ public class AuxStateHandler {
      * @param prevInstance
      * @param transitionedState
      * @param invocation
-     *
-     * @return
      */
-    private static String addInstanceWithState(TypeChecker tc, String superName, String name2,
+    private static void addInstanceWithState(TypeChecker tc, String superName, String name2,
             VariableInstance prevInstance, Predicate transitionedState, CtElement invocation) throws LJError {
         VariableInstance vi2 = (VariableInstance) tc.getContext().addInstanceToContext(name2, prevInstance.getType(),
                 prevInstance.getRefinement(), invocation);
-        // vi2.setState(transitionedState);
         vi2.setRefinement(transitionedState);
         Context ctx = tc.getContext();
         if (ctx.hasVariable(superName)) {
@@ -577,9 +548,7 @@ public class AuxStateHandler {
                 tc.getContext().addRefinementInstanceToVariable(superName, name2);
             }
         }
-
         invocation.putMetadata(Keys.TARGET, vi2);
-        return name2;
     }
 
     /**
@@ -590,14 +559,13 @@ public class AuxStateHandler {
      * @return the name of the parent target
      */
     static String searchFistVariableTarget(TypeChecker tc, CtElement target2, CtElement invocation) {
-        if (target2 instanceof CtVariableRead<?>) {
+        if (target2 instanceof CtVariableRead<?> v) {
             // v--------- field read
-            // means invokation is in a form of `t.method(args)`
-            CtVariableRead<?> v = (CtVariableRead<?>) target2;
+            // means invocation is in a form of `t.method(args)`
             String name = v.getVariable().getSimpleName();
-            Optional<VariableInstance> invocation_callee = tc.getContext().getLastVariableInstance(name);
-            if (invocation_callee.isPresent()) {
-                invocation.putMetadata(Keys.TARGET, invocation_callee.get());
+            Optional<VariableInstance> invocationCallee = tc.getContext().getLastVariableInstance(name);
+            if (invocationCallee.isPresent()) {
+                invocation.putMetadata(Keys.TARGET, invocationCallee.get());
             } else if (target2.getMetadata(Keys.TARGET) == null) {
                 RefinedVariable var = tc.getContext().getVariableByName(name);
                 String nName = String.format(Formats.INSTANCE, name, tc.getContext().getCounter());
@@ -609,17 +577,17 @@ public class AuxStateHandler {
 
             return name;
         } else if (target2.getMetadata(Keys.TARGET) != null) {
-            // invokation is in
+            // invocation is in
             // who did put the metadata here then?
-            VariableInstance target2_vi = (VariableInstance) target2.getMetadata(Keys.TARGET);
-            Optional<Variable> v = target2_vi.getParent();
-            invocation.putMetadata(Keys.TARGET, target2_vi);
-            return v.map(Refined::getName).orElse(target2_vi.getName());
+            VariableInstance target2Vi = (VariableInstance) target2.getMetadata(Keys.TARGET);
+            Optional<Variable> v = target2Vi.getParent();
+            invocation.putMetadata(Keys.TARGET, target2Vi);
+            return v.map(Refined::getName).orElse(target2Vi.getName());
         }
         return null;
     }
 
-    static VariableInstance getTarget(TypeChecker tc, CtElement invocation) {
+    static VariableInstance getTarget(CtElement invocation) {
         if (invocation.getMetadata(Keys.TARGET) != null) {
             return (VariableInstance) invocation.getMetadata(Keys.TARGET);
         }

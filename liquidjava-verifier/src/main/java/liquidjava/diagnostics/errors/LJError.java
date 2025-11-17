@@ -10,7 +10,7 @@ import spoon.reflect.cu.SourcePosition;
  */
 public abstract class LJError extends LJDiagnostic {
 
-    private TranslationTable translationTable;
+    private final TranslationTable translationTable;
 
     public LJError(String title, String message, String details, SourcePosition pos,
             TranslationTable translationTable) {

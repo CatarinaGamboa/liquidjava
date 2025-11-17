@@ -30,8 +30,7 @@ public class ConstantPropagation {
     private static ValDerivationNode propagateRecursive(Expression exp, Map<String, Expression> subs) {
 
         // substitute variable
-        if (exp instanceof Var) {
-            Var var = (Var) exp;
+        if (exp instanceof Var var) {
             String name = var.getName();
             Expression value = subs.get(name);
             // substitution
@@ -43,8 +42,7 @@ public class ConstantPropagation {
         }
 
         // lift unary origin
-        if (exp instanceof UnaryExpression) {
-            UnaryExpression unary = (UnaryExpression) exp;
+        if (exp instanceof UnaryExpression unary) {
             ValDerivationNode operand = propagateRecursive(unary.getChildren().get(0), subs);
             unary.setChild(0, operand.getValue());
 
@@ -54,8 +52,7 @@ public class ConstantPropagation {
         }
 
         // lift binary origin
-        if (exp instanceof BinaryExpression) {
-            BinaryExpression binary = (BinaryExpression) exp;
+        if (exp instanceof BinaryExpression binary) {
             ValDerivationNode left = propagateRecursive(binary.getFirstOperand(), subs);
             ValDerivationNode right = propagateRecursive(binary.getSecondOperand(), subs);
             binary.setChild(0, left.getValue());

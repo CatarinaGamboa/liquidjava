@@ -9,7 +9,7 @@ import spoon.reflect.declaration.CtElement;
  */
 public class InvalidRefinementError extends LJError {
 
-    private String refinement;
+    private final String refinement;
 
     public InvalidRefinementError(CtElement element, String message, String refinement) {
         super("Invalid Refinement", message, "", element.getPosition(), null);

@@ -51,7 +51,7 @@ public class TranslatorContextToZ3 {
         };
     }
 
-    static void addAlias(Context z3, List<AliasWrapper> alias, Map<String, AliasWrapper> aliasTranslation) {
+    static void addAlias(List<AliasWrapper> alias, Map<String, AliasWrapper> aliasTranslation) {
         for (AliasWrapper a : alias) {
             aliasTranslation.put(a.getName(), a);
         }
@@ -69,9 +69,8 @@ public class TranslatorContextToZ3 {
 
     private static void addBuiltinFunctions(Context z3, Map<String, FuncDecl<?>> funcTranslation) {
         funcTranslation.put("length", z3.mkFuncDecl("length", getSort(z3, "int[]"), getSort(z3, "int"))); // ERRRRRRRRRRRRO!!!!!!!!!!!!!
-        // System.out.println("\nWorks only for int[] now! Change in future. Ignore this
-        // message, it is a glorified
-        // todo");
+        // Works only for int[] now! Change in the future
+        // Ignore this message, it is a glorified TODO
         // TODO add built-in function
         Sort[] s = Stream.of(getSort(z3, "int[]"), getSort(z3, "int"), getSort(z3, "int")).toArray(Sort[]::new);
         funcTranslation.put("addToIndex", z3.mkFuncDecl("addToIndex", s, getSort(z3, "void")));
@@ -90,7 +89,6 @@ public class TranslatorContextToZ3 {
         case "int[]" -> z3.mkArraySort(z3.mkIntSort(), z3.mkIntSort());
         case "String" -> z3.getStringSort();
         case "void" -> z3.mkUninterpretedSort("void");
-        // case "List" -> z3.mkListSort(name, elemSort);
         default -> z3.mkUninterpretedSort(sort);
         };
     }
@@ -99,15 +97,13 @@ public class TranslatorContextToZ3 {
             Map<String, FuncDecl<?>> funcTranslation) {
         for (GhostState g : ghostState) {
             addGhostFunction(z3, g, funcTranslation);
-            // if(g.getRefinement() != null)
-            // premisesToAdd.add(g.getRefinement().getExpression());
         }
     }
 
     private static void addGhostFunction(Context z3, GhostFunction gh, Map<String, FuncDecl<?>> funcTranslation) {
         List<CtTypeReference<?>> paramTypes = gh.getParametersTypes();
         Sort ret = getSort(z3, gh.getReturnType().toString());
-        Sort[] domain = paramTypes.stream().map(t -> t.toString()).map(t -> getSort(z3, t)).toArray(Sort[]::new);
+        Sort[] domain = paramTypes.stream().map(Object::toString).map(t -> getSort(z3, t)).toArray(Sort[]::new);
         String name = gh.getQualifiedName();
         funcTranslation.put(name, z3.mkFuncDecl(name, domain, ret));
     }

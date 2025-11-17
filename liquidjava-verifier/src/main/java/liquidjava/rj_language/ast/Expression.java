@@ -51,7 +51,7 @@ public abstract class Expression {
     }
 
     public boolean hasChildren() {
-        return children.size() > 0;
+        return !children.isEmpty();
     }
 
     public void setChild(int index, Expression element) {
@@ -114,15 +114,15 @@ public abstract class Expression {
     /**
      * Substitutes the function call with the given parameter to the expression e
      *
-     * @param s
-     * @param e
+     * @param functionName
+     * @param parameters
+     * @param sub
      */
     public void substituteFunction(String functionName, List<Expression> parameters, Expression sub) {
         if (hasChildren())
             for (int i = 0; i < children.size(); i++) {
                 Expression exp = children.get(i);
-                if (exp instanceof FunctionInvocation) {
-                    FunctionInvocation fi = (FunctionInvocation) exp;
+                if (exp instanceof FunctionInvocation fi) {
                     if (fi.name.equals(functionName) && fi.argumentsEqual(parameters)) {
                         // substitute by sub in parent
                         setChild(i, sub);
@@ -134,14 +134,12 @@ public abstract class Expression {
 
     public Expression substituteState(Map<String, Expression> subMap, String[] toChange) {
         Expression e = clone();
-        if (this instanceof FunctionInvocation) {
-            FunctionInvocation fi = (FunctionInvocation) this;
+        if (this instanceof FunctionInvocation fi) {
             String key = fi.name;
             String simple = Utils.getSimpleName(key);
             boolean has = subMap.containsKey(key) || subMap.containsKey(simple);
-            if (has && fi.children.size() == 1 && fi.children.get(0) instanceof Var) { // object
+            if (has && fi.children.size() == 1 && fi.children.get(0)instanceof Var v) { // object
                 // state
-                Var v = (Var) fi.children.get(0);
                 Expression sub = (subMap.containsKey(key) ? subMap.get(key) : subMap.get(simple)).clone();
                 for (String s : toChange) {
                     sub = sub.substitute(new Var(s), v);
@@ -158,14 +156,12 @@ public abstract class Expression {
         if (hasChildren()) {
             for (int i = 0; i < children.size(); i++) {
                 Expression exp = children.get(i);
-                if (exp instanceof FunctionInvocation) {
-                    FunctionInvocation fi = (FunctionInvocation) exp;
+                if (exp instanceof FunctionInvocation fi) {
                     String key = fi.name;
                     String simple = Utils.getSimpleName(key);
                     boolean has = subMap.containsKey(key) || subMap.containsKey(simple);
-                    if (has && fi.children.size() == 1 && fi.children.get(0) instanceof Var) { // object
+                    if (has && fi.children.size() == 1 && fi.children.get(0)instanceof Var v) { // object
                         // state
-                        Var v = (Var) fi.children.get(0);
                         Expression sub = (subMap.containsKey(key) ? subMap.get(key) : subMap.get(simple)).clone();
                         for (String s : toChange) {
                             sub = sub.substitute(new Var(s), v);
@@ -181,8 +177,7 @@ public abstract class Expression {
 
     public Expression changeAlias(Map<String, AliasDTO> alias, Context ctx, Factory f) throws Exception {
         Expression e = clone();
-        if (this instanceof AliasInvocation) {
-            AliasInvocation ai = (AliasInvocation) this;
+        if (this instanceof AliasInvocation ai) {
             if (alias.containsKey(ai.name)) { // object state
                 AliasDTO dto = alias.get(ai.name);
                 Expression sub = dto.getExpression().clone();
@@ -209,8 +204,7 @@ public abstract class Expression {
     private void auxChangeAlias(Map<String, AliasDTO> alias, Context ctx, Factory f) throws Exception {
         if (hasChildren())
             for (int i = 0; i < children.size(); i++) {
-                if (children.get(i) instanceof AliasInvocation) {
-                    AliasInvocation ai = (AliasInvocation) children.get(i);
+                if (children.get(i)instanceof AliasInvocation ai) {
                     if (!alias.containsKey(ai.name))
                         throw new Exception("Alias '" + ai.getName() + "' not found");
                     AliasDTO dto = alias.get(ai.name);

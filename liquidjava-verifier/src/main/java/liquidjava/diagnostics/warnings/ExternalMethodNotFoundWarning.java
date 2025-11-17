@@ -9,8 +9,8 @@ import spoon.reflect.declaration.CtElement;
  */
 public class ExternalMethodNotFoundWarning extends LJWarning {
 
-    private String methodName;
-    private String className;
+    private final String methodName;
+    private final String className;
 
     public ExternalMethodNotFoundWarning(CtElement element, String message, String details, String methodName,
             String className) {

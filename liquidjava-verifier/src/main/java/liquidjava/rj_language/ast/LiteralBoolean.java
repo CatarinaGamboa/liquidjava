@@ -33,7 +33,6 @@ public class LiteralBoolean extends Expression {
     @Override
     public void getStateInvocations(List<String> toAdd, List<String> all) {
         // end leaf
-
     }
 
     @Override
@@ -63,8 +62,6 @@ public class LiteralBoolean extends Expression {
         if (getClass() != obj.getClass())
             return false;
         LiteralBoolean other = (LiteralBoolean) obj;
-        if (value != other.value)
-            return false;
-        return true;
+        return value == other.value;
     }
 }

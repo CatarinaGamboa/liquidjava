@@ -9,57 +9,55 @@ import spoon.reflect.reference.CtTypeReference;
 
 public class GhostFunction {
 
-    private String name;
-    private List<CtTypeReference<?>> param_types;
-    private CtTypeReference<?> return_type;
-    private String prefix;
+    private final String name;
+    private final List<CtTypeReference<?>> paramTypes;
+    private final CtTypeReference<?> returnType;
+    private final String prefix;
 
     public GhostFunction(GhostDTO f, Factory factory, String prefix) {
         String klass = this.getParentClassName(prefix);
-        this.name = f.getName();
-        this.return_type = Utils.getType(f.getReturn_type().equals(klass) ? prefix : f.getReturn_type(), factory);
-        this.param_types = new ArrayList<>();
+        this.name = f.name();
+        this.returnType = Utils.getType(f.returnType().equals(klass) ? prefix : f.returnType(), factory);
+        this.paramTypes = new ArrayList<>();
         this.prefix = prefix;
-        for (String t : f.getParam_types()) {
-            this.param_types.add(Utils.getType(t.equals(klass) ? prefix : t, factory));
+        for (String t : f.paramTypes()) {
+            this.paramTypes.add(Utils.getType(t.equals(klass) ? prefix : t, factory));
         }
     }
 
-    public GhostFunction(String name, List<String> param_types, CtTypeReference<?> return_type, Factory factory,
+    public GhostFunction(String name, List<String> paramTypes, CtTypeReference<?> returnType, Factory factory,
             String prefix) {
         String klass = this.getParentClassName(prefix);
-        String type = return_type.toString().equals(klass) ? prefix : return_type.toString();
+        String type = returnType.toString().equals(klass) ? prefix : returnType.toString();
         this.name = name;
-        this.return_type = Utils.getType(type, factory);
-        this.param_types = new ArrayList<>();
+        this.returnType = Utils.getType(type, factory);
+        this.paramTypes = new ArrayList<>();
         this.prefix = prefix;
-        for (int i = 0; i < param_types.size(); i++) {
-            String mType = param_types.get(i).toString();
-            this.param_types.add(Utils.getType(mType.equals(klass) ? prefix : mType, factory));
+        for (String mType : paramTypes) {
+            this.paramTypes.add(Utils.getType(mType.equals(klass) ? prefix : mType, factory));
         }
     }
 
-    protected GhostFunction(String name, List<CtTypeReference<?>> list, CtTypeReference<?> return_type, String prefix) {
+    protected GhostFunction(String name, List<CtTypeReference<?>> list, CtTypeReference<?> returnType, String prefix) {
         this.name = name;
-        this.return_type = return_type;
-        this.param_types = new ArrayList<>();
-        this.param_types = list;
+        this.returnType = returnType;
+        this.paramTypes = list;
         this.prefix = prefix;
     }
 
     public CtTypeReference<?> getReturnType() {
-        return return_type;
+        return returnType;
     }
 
     public List<CtTypeReference<?>> getParametersTypes() {
-        return param_types;
+        return paramTypes;
     }
 
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("ghost " + return_type.toString() + " " + name + "(");
-        for (CtTypeReference<?> t : param_types) {
-            sb.append(t.toString() + " ,");
+        sb.append("ghost ").append(returnType.toString()).append(" ").append(name).append("(");
+        for (CtTypeReference<?> t : paramTypes) {
+            sb.append(t.toString()).append(" ,");
         }
         sb.delete(sb.length() - 2, sb.length());
         sb.append(")");
