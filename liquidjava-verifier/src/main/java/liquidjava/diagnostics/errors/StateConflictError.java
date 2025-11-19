@@ -11,22 +11,16 @@ import spoon.reflect.declaration.CtElement;
  */
 public class StateConflictError extends LJError {
 
-    private final String state;
-    private final String className;
+    private final String state;;
 
-    public StateConflictError(CtElement element, Expression state, String className,
+    public StateConflictError(CtElement element, Expression state,
             TranslationTable translationTable) {
         super("State Conflict Error", "Found multiple disjoint states in state transition",
                 "State transition can only go to one state of each state set", element.getPosition(), translationTable);
         this.state = state.toSimplifiedString();
-        this.className = className;
     }
 
     public String getState() {
         return state;
-    }
-
-    public String getClassName() {
-        return className;
     }
 }

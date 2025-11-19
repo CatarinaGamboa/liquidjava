@@ -1,6 +1,7 @@
 package liquidjava.diagnostics.errors;
 
 import liquidjava.diagnostics.TranslationTable;
+import liquidjava.utils.Utils;
 import spoon.reflect.declaration.CtElement;
 
 /**
@@ -9,8 +10,15 @@ import spoon.reflect.declaration.CtElement;
  * @see LJError
  */
 public class NotFoundError extends LJError {
+    
+    private final String name;
 
-    public NotFoundError(CtElement element, String message, TranslationTable translationTable) {
+    public NotFoundError(CtElement element, String message, String name, TranslationTable translationTable) {
         super("Not Found Error", message, "", element.getPosition(), translationTable);
+        this.name = Utils.getSimpleName(name);
+    }
+
+    public String getName() {
+        return name;
     }
 }

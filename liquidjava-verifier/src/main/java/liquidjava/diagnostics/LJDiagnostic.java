@@ -19,7 +19,7 @@ public class LJDiagnostic extends RuntimeException {
         this.title = title;
         this.message = message;
         this.details = details;
-        this.file = pos != null ? pos.getFile().getPath() : null;
+        this.file = (pos != null && pos.getFile() != null) ? pos.getFile().getPath() : null;
         this.position = ErrorPosition.fromSpoonPosition(pos);
         this.accentColor = accentColor;
     }
@@ -42,6 +42,10 @@ public class LJDiagnostic extends RuntimeException {
 
     public String getFile() {
         return file;
+    }
+
+    public String getAccentColor() {
+        return accentColor;
     }
 
     @Override

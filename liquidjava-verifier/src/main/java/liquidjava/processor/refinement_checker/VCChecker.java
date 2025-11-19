@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import liquidjava.diagnostics.errors.CustomError;
-import liquidjava.diagnostics.errors.GhostInvocationError;
 import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.errors.NotFoundError;
 import liquidjava.diagnostics.TranslationTable;
@@ -225,14 +224,14 @@ public class VCChecker {
             new SMTEvaluator().verifySubtype(found, expectedType, context);
         } catch (TypeCheckError e) {
             return false;
-        } catch (Exception e) {
+        } 
+        //TODO: handle NotFoundError properly
+        catch (Exception e) {
             String msg = e.getLocalizedMessage().toLowerCase();
             if (msg.contains("wrong number of arguments")) {
-                throw new GhostInvocationError("Wrong number of arguments in ghost invocation", p,
-                        expectedType.getExpression(), null);
+                throw new CustomError("Wrong number of arguments in ghost invocation", p);
             } else if (msg.contains("sort mismatch")) {
-                throw new GhostInvocationError("Type mismatch in arguments of ghost invocation", p,
-                        expectedType.getExpression(), null);
+                throw new CustomError("Type mismatch in arguments of ghost invocation", p);
             } else {
                 throw new CustomError(e.getMessage(), p);
             }
@@ -286,28 +285,28 @@ public class VCChecker {
 
     public void raiseSameStateError(CtElement element, Predicate expectedType, String klass) throws LJError {
         TranslationTable map = createMap(expectedType);
-        throw new StateConflictError(element, expectedType.getExpression(), klass, map);
+        throw new StateConflictError(element, expectedType.getExpression(), map);
     }
 
     private void raiseError(Exception e, Predicate premisesBeforeChange, Predicate expectedType, CtElement element,
             TranslationTable map) throws LJError {
         if (e instanceof TypeCheckError) {
             throw new RefinementError(element, expectedType.getExpression(), premisesBeforeChange.simplify(), map);
-        } else if (e instanceof liquidjava.smt.errors.NotFoundError) {
-            throw new NotFoundError(element, e.getMessage(), map);
+        } else if (e instanceof liquidjava.smt.errors.NotFoundError nfe) {
+            throw new NotFoundError(element, e.getMessage(), nfe.getName(), map);
         } else {
             throw new CustomError(e.getMessage(), element);
         }
     }
 
-    public void raiseStateMismatchError(CtElement element, String method, Predicate found, Predicate[] states)
+    public void raiseStateMismatchError(CtElement element, String method, Predicate found, Predicate expected)
             throws LJError {
         List<RefinedVariable> lrv = new ArrayList<>(), mainVars = new ArrayList<>();
         gatherVariables(found, lrv, mainVars);
         TranslationTable map = new TranslationTable();
         VCImplication foundState = joinPredicates(found, mainVars, lrv, map);
-        throw new StateRefinementError(element, method,
-                Arrays.stream(states).map(Predicate::getExpression).toArray(Expression[]::new),
+        throw new StateRefinementError(element,
+                expected.getExpression(),
                 foundState.toConjunctions().simplify().getValue(), map);
     }
 }

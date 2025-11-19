@@ -303,7 +303,7 @@ public abstract class TypeChecker extends CtScanner {
         vcChecker.raiseSameStateError(element, expectedType, klass);
     }
 
-    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate[] expected)
+    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate expected)
             throws LJError {
         vcChecker.raiseStateMismatchError(element, method, found, expected);
     }

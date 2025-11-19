@@ -406,8 +406,7 @@ public class AuxStateHandler {
                 .changeOldMentions(vi.getName(), instanceName);
 
         if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) { // Invalid field transition
-            Predicate[] states = { stateChange.getFrom() };
-            tc.createStateMismatchError(fw, fw.toString(), prevState, states);
+            tc.createStateMismatchError(fw, fw.toString(), prevState, stateChange.getFrom());
             return;
         }
 
@@ -486,10 +485,10 @@ public class AuxStateHandler {
             }
         }
         if (!found) { // Reaches the end of stateChange no matching states
-            Predicate[] states = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
-                    .toArray(Predicate[]::new);
+            Predicate expectedStatesDisjunction = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
+                    .reduce(Predicate.createLit("false", Types.BOOLEAN), Predicate::createDisjunction);
             String simpleInvocation = invocation.toString();
-            tc.createStateMismatchError(invocation, simpleInvocation, prevState, states);
+            tc.createStateMismatchError(invocation, simpleInvocation, prevState, expectedStatesDisjunction);
         }
     }
 
