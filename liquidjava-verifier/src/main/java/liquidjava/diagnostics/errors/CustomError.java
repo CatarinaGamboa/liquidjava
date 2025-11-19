@@ -1,7 +1,6 @@
 package liquidjava.diagnostics.errors;
 
 import spoon.reflect.cu.SourcePosition;
-import spoon.reflect.declaration.CtElement;
 
 /**
  * Custom error with an arbitrary message
@@ -14,15 +13,11 @@ public class CustomError extends LJError {
         super("Error", message, null, null, null);
     }
 
-    public CustomError(String message, SourcePosition pos) {
-        super("Error", message, null, pos, null);
+    public CustomError(String message, SourcePosition position) {
+        super("Error", message, null, position, null);
     }
 
-    public CustomError(String message, String detail, CtElement element) {
-        super("Error", message, detail, element.getPosition(), null);
-    }
-
-    public CustomError(String message, CtElement element) {
-        super("Error", message, null, element.getPosition(), null);
+    public CustomError(String message, SourcePosition position, String detail) {
+        super("Error", message, detail, position, null);
     }
 }

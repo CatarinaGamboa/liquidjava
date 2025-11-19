@@ -82,8 +82,8 @@ public abstract class TypeChecker extends CtScanner {
 
             // check if refinement is valid
             if (!p.getExpression().isBooleanExpression()) {
-                throw new InvalidRefinementError(element, "Refinement predicate must be a boolean expression",
-                        ref.get());
+                throw new InvalidRefinementError(element.getPosition(),
+                        "Refinement predicate must be a boolean expression", ref.get());
             }
             constr = Optional.of(p);
         }
@@ -115,7 +115,7 @@ public abstract class TypeChecker extends CtScanner {
                 CtLiteral<String> s = (CtLiteral<String>) ce;
                 String f = s.getValue();
                 if (Character.isUpperCase(f.charAt(0))) {
-                    throw new CustomError("State names must start with lowercase", s);
+                    throw new CustomError("State names must start with lowercase", s.getPosition());
                 }
             }
         }
@@ -152,7 +152,8 @@ public abstract class TypeChecker extends CtScanner {
         GhostDTO gd = RefinementsParser.getGhostDeclaration(string);
         if (!gd.paramTypes().isEmpty()) {
             throw new CustomError(
-                    "Ghost States have the class as parameter " + "by default, no other parameters are allowed", ann);
+                    "Ghost States have the class as parameter " + "by default, no other parameters are allowed",
+                    ann.getPosition());
         }
         // Set class as parameter of Ghost
         String qn = getQualifiedClassName(element);
@@ -224,8 +225,8 @@ public abstract class TypeChecker extends CtScanner {
                 a.parse(path);
                 // refinement alias must return a boolean expression
                 if (a.getExpression() != null && !a.getExpression().isBooleanExpression()) {
-                    throw new InvalidRefinementError(element, "Refinement alias must return a boolean expression",
-                            value);
+                    throw new InvalidRefinementError(element.getPosition(),
+                            "Refinement alias must return a boolean expression", value);
                 }
                 AliasWrapper aw = new AliasWrapper(a, factory, klass, path);
                 context.addAlias(aw);
@@ -295,16 +296,16 @@ public abstract class TypeChecker extends CtScanner {
         return vcChecker.canProcessSubtyping(prevState, expectedState, context.getGhostState(), p, factory);
     }
 
-    public void createError(CtElement element, Predicate expectedType, Predicate foundType) throws LJError {
-        vcChecker.raiseSubtypingError(element, expectedType, foundType);
+    public void createError(SourcePosition position, Predicate expectedType, Predicate foundType) throws LJError {
+        vcChecker.raiseSubtypingError(position, expectedType, foundType);
     }
 
-    public void createSameStateError(CtElement element, Predicate expectedType, String klass) throws LJError {
-        vcChecker.raiseSameStateError(element, expectedType, klass);
+    public void createSameStateError(SourcePosition position, Predicate expectedType, String klass) throws LJError {
+        vcChecker.raiseSameStateError(position, expectedType, klass);
     }
 
-    public void createStateMismatchError(CtElement element, String method, Predicate found, Predicate expected)
+    public void createStateMismatchError(SourcePosition position, String method, Predicate found, Predicate expected)
             throws LJError {
-        vcChecker.raiseStateMismatchError(element, method, found, expected);
+        vcChecker.raiseStateMismatchError(position, method, found, expected);
     }
 }

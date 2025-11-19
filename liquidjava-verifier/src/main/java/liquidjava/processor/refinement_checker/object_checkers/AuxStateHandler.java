@@ -65,7 +65,7 @@ public class AuxStateHandler {
             if (to != null) {
                 Predicate p = new Predicate(to, element);
                 if (!p.getExpression().isBooleanExpression()) {
-                    throw new InvalidRefinementError(element,
+                    throw new InvalidRefinementError(element.getPosition(),
                             "State refinement transition must be a boolean expression", to);
                 }
                 state.setTo(p);
@@ -200,7 +200,8 @@ public class AuxStateHandler {
             boolean isTo, String prefix) throws LJError {
         Predicate p = new Predicate(value, e, prefix);
         if (!p.getExpression().isBooleanExpression()) {
-            throw new InvalidRefinementError(e, "State refinement transition must be a boolean expression", value);
+            throw new InvalidRefinementError(e.getPosition(),
+                    "State refinement transition must be a boolean expression", value);
         }
         CtTypeReference<?> r = tc.getFactory().Type().createReference(targetClass);
         String nameOld = String.format(Formats.INSTANCE, Keys.THIS, tc.getContext().getCounter());
@@ -214,7 +215,7 @@ public class AuxStateHandler {
         c = c.changeOldMentions(nameOld, name);
         boolean ok = tc.checksStateSMT(new Predicate(), c.negate(), e.getPosition());
         if (ok) {
-            tc.createSameStateError(e, p, targetClass);
+            tc.createSameStateError(e.getPosition(), p, targetClass);
         }
         return c1;
     }
@@ -406,7 +407,7 @@ public class AuxStateHandler {
                 .changeOldMentions(vi.getName(), instanceName);
 
         if (!tc.checksStateSMT(prevState, expectState, fw.getPosition())) { // Invalid field transition
-            tc.createStateMismatchError(fw, fw.toString(), prevState, stateChange.getFrom());
+            tc.createStateMismatchError(fw.getPosition(), fw.toString(), prevState, stateChange.getFrom());
             return;
         }
 
@@ -485,10 +486,12 @@ public class AuxStateHandler {
             }
         }
         if (!found) { // Reaches the end of stateChange no matching states
-            Predicate expectedStatesDisjunction = stateChanges.stream().filter(ObjectState::hasFrom).map(ObjectState::getFrom)
+            Predicate expectedStatesDisjunction = stateChanges.stream().filter(ObjectState::hasFrom)
+                    .map(ObjectState::getFrom)
                     .reduce(Predicate.createLit("false", Types.BOOLEAN), Predicate::createDisjunction);
             String simpleInvocation = invocation.toString();
-            tc.createStateMismatchError(invocation, simpleInvocation, prevState, expectedStatesDisjunction);
+            tc.createStateMismatchError(invocation.getPosition(), simpleInvocation, prevState,
+                    expectedStatesDisjunction);
         }
     }
 

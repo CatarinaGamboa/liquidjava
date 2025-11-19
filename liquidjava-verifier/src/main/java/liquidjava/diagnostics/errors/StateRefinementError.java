@@ -2,7 +2,7 @@ package liquidjava.diagnostics.errors;
 
 import liquidjava.diagnostics.TranslationTable;
 import liquidjava.rj_language.ast.Expression;
-import spoon.reflect.declaration.CtElement;
+import spoon.reflect.cu.SourcePosition;
 
 /**
  * Error indicating that a state refinement transition was violated
@@ -14,10 +14,10 @@ public class StateRefinementError extends LJError {
     private final String expected;
     private final String found;
 
-    public StateRefinementError(CtElement element, Expression expected, Expression found,
+    public StateRefinementError(SourcePosition position, Expression expected, Expression found,
             TranslationTable translationTable) {
-        super("State Refinement Error", String.format("Expected state '%s' but found '%s'", expected.toSimplifiedString(), found.toSimplifiedString()), null,
-                element.getPosition(), translationTable);
+        super("State Refinement Error", String.format("Expected state %s but found %s", expected.toSimplifiedString(),
+                found.toSimplifiedString()), null, position, translationTable);
         this.expected = expected.toSimplifiedString();
         this.found = found.toSimplifiedString();
     }
