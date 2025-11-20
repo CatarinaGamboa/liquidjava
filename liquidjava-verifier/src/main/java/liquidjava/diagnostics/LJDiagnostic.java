@@ -31,7 +31,7 @@ public class LJDiagnostic extends RuntimeException {
     }
 
     public String getDetails() {
-        return "";
+        return ""; // to be overridden by subclasses
     }
 
     public ErrorPosition getPosition() {
