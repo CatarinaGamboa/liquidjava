@@ -74,8 +74,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                 String details = overloads.length == 0 ? null
                         : "Available constructors:\n  " + String.join("\n  ", overloads);
 
-                diagnostics.add(
-                        new ExternalMethodNotFoundWarning(method, message, details, method.getSignature(), prefix));
+                diagnostics.add(new ExternalMethodNotFoundWarning(method, message, details, method.getSignature(),
+                        prefix, overloads));
             }
         } else {
             if (!methodExists(targetType, method)) {
@@ -84,8 +84,8 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                 String[] overloads = getOverloads(targetType, method);
                 String details = overloads.length == 0 ? null
                         : "Available overloads:\n  " + String.join("\n  ", overloads);
-                diagnostics.add(
-                        new ExternalMethodNotFoundWarning(method, message, details, method.getSignature(), prefix));
+                diagnostics.add(new ExternalMethodNotFoundWarning(method, message, details, method.getSignature(),
+                        prefix, overloads));
                 return;
             }
         }

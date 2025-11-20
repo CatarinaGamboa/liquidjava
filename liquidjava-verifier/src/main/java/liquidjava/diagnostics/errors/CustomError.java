@@ -17,7 +17,7 @@ public class CustomError extends LJError {
         super("Error", message, null, position, null);
     }
 
-    public CustomError(String message, SourcePosition position, String detail) {
-        super("Error", message, detail, position, null);
+    public CustomError(String message, SourcePosition position, String details) {
+        super("Error", message, details, position, null);
     }
 }
