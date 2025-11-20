@@ -54,7 +54,12 @@ public class CommandLineLauncher {
         }
         launcher.getEnvironment().setNoClasspath(true);
         launcher.getEnvironment().setComplianceLevel(8);
-        launcher.run();
+
+        boolean buildSuccess = launcher.getModelBuilder().build();
+        if (!buildSuccess) {
+            diagnostics.add(new CustomError("Java compilation error detected. Skipping verification."));
+            return;
+        }
 
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);
