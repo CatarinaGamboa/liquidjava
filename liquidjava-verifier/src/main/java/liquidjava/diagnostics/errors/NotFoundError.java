@@ -1,7 +1,8 @@
 package liquidjava.diagnostics.errors;
 
 import liquidjava.diagnostics.TranslationTable;
-import spoon.reflect.declaration.CtElement;
+import liquidjava.utils.Utils;
+import spoon.reflect.cu.SourcePosition;
 
 /**
  * Error indicating that an element referenced in a refinement was not found
@@ -10,7 +11,21 @@ import spoon.reflect.declaration.CtElement;
  */
 public class NotFoundError extends LJError {
 
-    public NotFoundError(CtElement element, String message, TranslationTable translationTable) {
-        super("Not Found Error", message, "", element.getPosition(), translationTable);
+    private final String name;
+    private final String kind; // "Variable" or "Ghost"
+
+    public NotFoundError(SourcePosition position, String message, String name, String kind,
+            TranslationTable translationTable) {
+        super("Not Found Error", message, position, translationTable);
+        this.name = Utils.getSimpleName(name);
+        this.kind = kind;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getKind() {
+        return kind;
     }
 }

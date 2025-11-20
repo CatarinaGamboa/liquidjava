@@ -6,4 +6,6 @@ public final class Keys {
     public static final String THIS = "this";
     public static final String WILDCARD = "_";
     public static final String OLD = "old";
+    public static final String VARIABLE = "Variable";
+    public static final String GHOST = "Ghost";
 }

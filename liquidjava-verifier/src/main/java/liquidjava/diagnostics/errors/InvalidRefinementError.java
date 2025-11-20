@@ -1,6 +1,6 @@
 package liquidjava.diagnostics.errors;
 
-import spoon.reflect.declaration.CtElement;
+import spoon.reflect.cu.SourcePosition;
 
 /**
  * Error indicating that a refinement is invalid (e.g., not a boolean expression)
@@ -11,8 +11,8 @@ public class InvalidRefinementError extends LJError {
 
     private final String refinement;
 
-    public InvalidRefinementError(CtElement element, String message, String refinement) {
-        super("Invalid Refinement", message, "", element.getPosition(), null);
+    public InvalidRefinementError(SourcePosition position, String message, String refinement) {
+        super("Invalid Refinement", message, position, null);
         this.refinement = refinement;
     }
 

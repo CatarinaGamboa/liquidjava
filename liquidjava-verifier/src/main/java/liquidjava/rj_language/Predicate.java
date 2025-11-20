@@ -204,6 +204,19 @@ public class Predicate {
         return new Predicate(new BinaryExpression(c1.getExpression(), Ops.AND, c2.getExpression()));
     }
 
+    public static Predicate createDisjunction(Predicate c1, Predicate c2) {
+        // simplification: (false || x) = x, (true || x) = true
+        if (isBooleanLiteral(c1.getExpression(), false))
+            return c2;
+        if (isBooleanLiteral(c2.getExpression(), false))
+            return c1;
+        if (isBooleanLiteral(c1.getExpression(), true))
+            return c1;
+        if (isBooleanLiteral(c2.getExpression(), true))
+            return c2;
+        return new Predicate(new BinaryExpression(c1.getExpression(), Ops.OR, c2.getExpression()));
+    }
+
     public static Predicate createEquals(Predicate c1, Predicate c2) {
         return new Predicate(new BinaryExpression(c1.getExpression(), Ops.EQ, c2.getExpression()));
     }
