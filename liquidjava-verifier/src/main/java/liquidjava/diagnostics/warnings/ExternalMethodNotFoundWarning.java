@@ -13,8 +13,8 @@ public class ExternalMethodNotFoundWarning extends LJWarning {
     private final String className;
     private final String[] overloads;
 
-    public ExternalMethodNotFoundWarning(CtElement element, String message, String methodName,
-            String className, String[] overloads) {
+    public ExternalMethodNotFoundWarning(CtElement element, String message, String methodName, String className,
+            String[] overloads) {
         super(message, element.getPosition());
         this.methodName = methodName;
         this.className = className;
