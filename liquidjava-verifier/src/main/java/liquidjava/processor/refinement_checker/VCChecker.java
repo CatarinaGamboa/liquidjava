@@ -51,7 +51,7 @@ public class VCChecker {
             premises = premisesBeforeChange.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
             et = expectedType.changeStatesToRefinements(filtered, s).changeAliasToRefinement(context, f);
         } catch (Exception e) {
-            throw new RefinementError(element.getPosition(), expectedType.getExpression(), premises.simplify(), map);
+            throw new RefinementError(element.getPosition(), expectedType.simplify(), premises.simplify(), map);
         }
 
         try {
@@ -267,7 +267,7 @@ public class VCChecker {
     protected void raiseError(Exception e, SourcePosition position, Predicate found, Predicate expected,
             TranslationTable map) throws LJError {
         if (e instanceof TypeCheckError) {
-            throw new RefinementError(position, expected.getExpression(), found.simplify(), map);
+            throw new RefinementError(position, expected.simplify(), found.simplify(), map);
         } else if (e instanceof liquidjava.smt.errors.NotFoundError nfe) {
             throw new NotFoundError(position, e.getMessage(), nfe.getName(), nfe.getKind(), map);
         } else {
@@ -288,7 +288,7 @@ public class VCChecker {
         gatherVariables(found, lrv, mainVars);
         TranslationTable map = new TranslationTable();
         Predicate premises = joinPredicates(expected, mainVars, lrv, map).toConjunctions();
-        throw new RefinementError(position, expected.getExpression(), premises.simplify(), map);
+        throw new RefinementError(position, expected.simplify(), premises.simplify(), map);
     }
 
     protected void raiseSameStateError(SourcePosition position, Predicate expected, String klass) throws LJError {
