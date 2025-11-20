@@ -10,14 +10,10 @@ import spoon.reflect.cu.SourcePosition;
 public class CustomError extends LJError {
 
     public CustomError(String message) {
-        super("Error", message, null, null, null);
+        super("Error", message, null, null);
     }
 
     public CustomError(String message, SourcePosition position) {
-        super("Error", message, null, position, null);
-    }
-
-    public CustomError(String message, SourcePosition position, String details) {
-        super("Error", message, details, position, null);
+        super("Error", message, position, null);
     }
 }

@@ -10,15 +10,13 @@ public class LJDiagnostic extends RuntimeException {
 
     private final String title;
     private final String message;
-    private final String details;
     private final String file;
     private final ErrorPosition position;
     private final String accentColor;
 
-    public LJDiagnostic(String title, String message, String details, SourcePosition pos, String accentColor) {
+    public LJDiagnostic(String title, String message, SourcePosition pos, String accentColor) {
         this.title = title;
         this.message = message;
-        this.details = details;
         this.file = (pos != null && pos.getFile() != null) ? pos.getFile().getPath() : null;
         this.position = ErrorPosition.fromSpoonPosition(pos);
         this.accentColor = accentColor;
@@ -33,7 +31,7 @@ public class LJDiagnostic extends RuntimeException {
     }
 
     public String getDetails() {
-        return details;
+        return "";
     }
 
     public ErrorPosition getPosition() {
@@ -63,7 +61,8 @@ public class LJDiagnostic extends RuntimeException {
         }
 
         // details
-        if (details != null && !details.isEmpty()) {
+        String details = getDetails();
+        if (!details.isEmpty()) {
             sb.append(" --> ").append(String.join("\n     ", details.split("\n"))).append("\n");
         }
 
@@ -128,7 +127,6 @@ public class LJDiagnostic extends RuntimeException {
             return false;
         LJDiagnostic other = (LJDiagnostic) obj;
         return title.equals(other.title) && message.equals(other.message)
-                && ((details == null && other.details == null) || (details != null && details.equals(other.details)))
                 && ((file == null && other.file == null) || (file != null && file.equals(other.file)))
                 && ((position == null && other.position == null)
                         || (position != null && position.equals(other.position)));
@@ -138,7 +136,6 @@ public class LJDiagnostic extends RuntimeException {
     public int hashCode() {
         int result = title.hashCode();
         result = 31 * result + message.hashCode();
-        result = 31 * result + (details != null ? details.hashCode() : 0);
         result = 31 * result + (file != null ? file.hashCode() : 0);
         result = 31 * result + (position != null ? position.hashCode() : 0);
         return result;

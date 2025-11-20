@@ -17,7 +17,7 @@ public class StateRefinementError extends LJError {
     public StateRefinementError(SourcePosition position, Expression expected, Expression found,
             TranslationTable translationTable) {
         super("State Refinement Error", String.format("Expected state %s but found %s", expected.toSimplifiedString(),
-                found.toSimplifiedString()), null, position, translationTable);
+                found.toSimplifiedString()), position, translationTable);
         this.expected = expected.toSimplifiedString();
         this.found = found.toSimplifiedString();
     }

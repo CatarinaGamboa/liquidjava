@@ -9,7 +9,7 @@ import spoon.reflect.cu.SourcePosition;
  */
 public abstract class LJWarning extends LJDiagnostic {
 
-    public LJWarning(String message, String details, SourcePosition pos) {
-        super("Warning", message, details, pos, Colors.BOLD_YELLOW);
+    public LJWarning(String message, SourcePosition pos) {
+        super("Warning", message, pos, Colors.BOLD_YELLOW);
     }
 }

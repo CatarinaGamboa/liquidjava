@@ -16,7 +16,7 @@ public class SyntaxError extends LJError {
     }
 
     public SyntaxError(String message, SourcePosition pos, String refinement) {
-        super("Syntax Error", message, "", pos, null);
+        super("Syntax Error", message, pos, null);
         this.refinement = refinement;
     }
 

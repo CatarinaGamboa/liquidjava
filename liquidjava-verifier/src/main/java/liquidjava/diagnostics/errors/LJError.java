@@ -12,9 +12,9 @@ public abstract class LJError extends LJDiagnostic {
 
     private final TranslationTable translationTable;
 
-    public LJError(String title, String message, String details, SourcePosition pos,
+    public LJError(String title, String message, SourcePosition pos,
             TranslationTable translationTable) {
-        super(title, message, details, pos, Colors.BOLD_RED);
+        super(title, message, pos, Colors.BOLD_RED);
         this.translationTable = translationTable != null ? translationTable : new TranslationTable();
     }
 
