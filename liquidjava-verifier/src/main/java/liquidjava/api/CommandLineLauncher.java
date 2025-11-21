@@ -6,6 +6,7 @@ import java.util.List;
 
 import liquidjava.diagnostics.Diagnostics;
 import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.warnings.CustomWarning;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
@@ -54,7 +55,11 @@ public class CommandLineLauncher {
         }
         launcher.getEnvironment().setNoClasspath(true);
         launcher.getEnvironment().setComplianceLevel(8);
-        launcher.run();
+
+        boolean buildSuccess = launcher.getModelBuilder().build();
+        if (!buildSuccess) {
+            diagnostics.add(new CustomWarning("Java compilation error detected. Verification might be affected."));
+        }
 
         final Factory factory = launcher.getFactory();
         final ProcessingManager processingManager = new QueueProcessingManager(factory);
