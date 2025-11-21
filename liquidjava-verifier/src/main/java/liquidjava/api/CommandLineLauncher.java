@@ -58,7 +58,7 @@ public class CommandLineLauncher {
 
         boolean buildSuccess = launcher.getModelBuilder().build();
         if (!buildSuccess) {
-            diagnostics.add(new CustomWarning("Java compilation error detected"));
+            diagnostics.add(new CustomWarning("Java compilation error detected. Verification might be affected."));
         }
 
         final Factory factory = launcher.getFactory();
