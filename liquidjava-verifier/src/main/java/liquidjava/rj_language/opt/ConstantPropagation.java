@@ -44,23 +44,25 @@ public class ConstantPropagation {
         // lift unary origin
         if (exp instanceof UnaryExpression unary) {
             ValDerivationNode operand = propagateRecursive(unary.getChildren().get(0), subs);
-            unary.setChild(0, operand.getValue());
+            UnaryExpression cloned = (UnaryExpression) unary.clone();
+            cloned.setChild(0, operand.getValue());
 
-            DerivationNode origin = operand.getOrigin() != null ? new UnaryDerivationNode(operand, unary.getOp())
+            DerivationNode origin = operand.getOrigin() != null ? new UnaryDerivationNode(operand, cloned.getOp())
                     : null;
-            return new ValDerivationNode(unary, origin);
+            return new ValDerivationNode(cloned, origin);
         }
 
         // lift binary origin
         if (exp instanceof BinaryExpression binary) {
             ValDerivationNode left = propagateRecursive(binary.getFirstOperand(), subs);
             ValDerivationNode right = propagateRecursive(binary.getSecondOperand(), subs);
-            binary.setChild(0, left.getValue());
-            binary.setChild(1, right.getValue());
+            BinaryExpression cloned = (BinaryExpression) binary.clone();
+            cloned.setChild(0, left.getValue());
+            cloned.setChild(1, right.getValue());
 
             DerivationNode origin = (left.getOrigin() != null || right.getOrigin() != null)
-                    ? new BinaryDerivationNode(left, right, binary.getOperator()) : null;
-            return new ValDerivationNode(binary, origin);
+                    ? new BinaryDerivationNode(left, right, cloned.getOperator()) : null;
+            return new ValDerivationNode(cloned, origin);
         }
 
         // recursively propagate children

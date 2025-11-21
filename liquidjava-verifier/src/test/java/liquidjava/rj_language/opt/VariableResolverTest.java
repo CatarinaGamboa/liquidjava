@@ -108,17 +108,17 @@ class VariableResolverTest {
         assertTrue(result.isEmpty(), "Grouped single equality should not extract variable mapping");
     }
 
-   @Test
-   void testCircularDependency() {
-       // x == y && y == x should not extract anything due to circular dependency
-       Expression varX = new Var("x");
-       Expression varY = new Var("y");
+    @Test
+    void testCircularDependency() {
+        // x == y && y == x should not extract anything due to circular dependency
+        Expression varX = new Var("x");
+        Expression varY = new Var("y");
 
-       Expression xEqualsY = new BinaryExpression(varX, "==", varY);
-       Expression yEqualsX = new BinaryExpression(varY, "==", varX);
-       Expression conjunction = new BinaryExpression(xEqualsY, "&&", yEqualsX);
+        Expression xEqualsY = new BinaryExpression(varX, "==", varY);
+        Expression yEqualsX = new BinaryExpression(varY, "==", varX);
+        Expression conjunction = new BinaryExpression(xEqualsY, "&&", yEqualsX);
 
-       Map<String, Expression> result = VariableResolver.resolve(conjunction);
-       assertTrue(result.isEmpty(), "Circular dependency should not extract variable mappings");
-   }
+        Map<String, Expression> result = VariableResolver.resolve(conjunction);
+        assertTrue(result.isEmpty(), "Circular dependency should not extract variable mappings");
+    }
 }

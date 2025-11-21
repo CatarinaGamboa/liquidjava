@@ -416,6 +416,57 @@ class ExpressionSimplifierTest {
         assertEquals("y == x", resultExpr.getSecondOperand().toString(), "Right operand should be y == x");
     }
 
+    @Test
+    void testRealExpression() {
+        // Given: #a_5 == (-#fresh_4) && #fresh_4 == #x_2 / #y_3 && #x_2 == #x_0 && #x_0 == 6 && #y_3 == #y_1 && #y_1 ==
+        // 3
+        // Expected: #a_5 == -2
+        Expression varA5 = new Var("#a_5");
+        Expression varFresh4 = new Var("#fresh_4");
+        Expression varX2 = new Var("#x_2");
+        Expression varY3 = new Var("#y_3");
+        Expression varX0 = new Var("#x_0");
+        Expression varY1 = new Var("#y_1");
+        Expression six = new LiteralInt(6);
+        Expression three = new LiteralInt(3);
+        Expression fresh4EqualsX2DivY3 = new BinaryExpression(varFresh4, "==", new BinaryExpression(varX2, "/", varY3));
+        Expression x2EqualsX0 = new BinaryExpression(varX2, "==", varX0);
+        Expression x0Equals6 = new BinaryExpression(varX0, "==", six);
+        Expression y3EqualsY1 = new BinaryExpression(varY3, "==", varY1);
+        Expression y1Equals3 = new BinaryExpression(varY1, "==", three);
+        Expression negFresh4 = new UnaryExpression("-", varFresh4);
+        Expression a5EqualsNegFresh4 = new BinaryExpression(varA5, "==", negFresh4);
+        Expression firstAnd = new BinaryExpression(a5EqualsNegFresh4, "&&", fresh4EqualsX2DivY3);
+        Expression secondAnd = new BinaryExpression(x2EqualsX0, "&&", x0Equals6);
+        Expression thirdAnd = new BinaryExpression(y3EqualsY1, "&&", y1Equals3);
+        Expression firstBigAnd = new BinaryExpression(firstAnd, "&&", secondAnd);
+        Expression fullExpression = new BinaryExpression(firstBigAnd, "&&", thirdAnd);
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("#a_5 == -2", result.getValue().toString(), "Expected result to be #a_5 == -2");
+
+    }
+
+    @Test
+    void testTransitive() {
+        // Given: a == b && b == 1
+        // Expected: a == 1
+        Expression varA = new Var("a");
+        Expression varB = new Var("b");
+        Expression one = new LiteralInt(1);
+        Expression aEqualsB = new BinaryExpression(varA, "==", varB);
+        Expression bEquals1 = new BinaryExpression(varB, "==", one);
+        Expression fullExpression = new BinaryExpression(aEqualsB, "&&", bEquals1);
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("a == 1", result.getValue().toString(), "Expected result to be a == 1");
+
+    }
+
     /**
      * Helper method to compare two derivation nodes recursively
      */

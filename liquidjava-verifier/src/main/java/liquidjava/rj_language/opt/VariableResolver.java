@@ -13,7 +13,9 @@ public class VariableResolver {
 
     /**
      * Extracts variables with constant values from an expression
+     * 
      * @param exp
+     * 
      * @returns map from variable names to their values
      */
     public static Map<String, Expression> resolve(Expression exp) {
@@ -28,8 +30,10 @@ public class VariableResolver {
 
     /**
      * Counts occurrences of a variable in an expression
+     * 
      * @param exp
      * @param varName
+     * 
      * @return number of occurrences
      */
     private static int countOccurrences(Expression exp, String varName) {
@@ -47,6 +51,7 @@ public class VariableResolver {
 
     /**
      * Recursively extracts variable equalities from an expression (e.g. ... && x == 1 && y == 2 => map: x -> 1, y -> 2)
+     * 
      * @param exp
      * @param map
      */
@@ -71,7 +76,9 @@ public class VariableResolver {
 
     /**
      * Handles transitive variable equalities in the map (e.g. map: x -> y, y -> 1 => map: x -> 1, y -> 1)
+     * 
      * @param map
+     * 
      * @return new map with resolved values
      */
     private static Map<String, Expression> resolveTransitive(Map<String, Expression> map) {
@@ -85,9 +92,11 @@ public class VariableResolver {
     /**
      * Returns the value of a variable by looking up in the map recursively Uses the seen set to avoid circular
      * references (e.g. x -> y, y -> x) which would cause infinite recursion
+     * 
      * @param exp
      * @param map
      * @param seen
+     * 
      * @return resolved expression
      */
     private static Expression lookup(Expression exp, Map<String, Expression> map, Set<String> seen) {
