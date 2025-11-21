@@ -6,6 +6,7 @@ import java.util.List;
 
 import liquidjava.diagnostics.Diagnostics;
 import liquidjava.diagnostics.errors.CustomError;
+import liquidjava.diagnostics.warnings.CustomWarning;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
 import spoon.processing.ProcessingManager;
@@ -57,8 +58,7 @@ public class CommandLineLauncher {
 
         boolean buildSuccess = launcher.getModelBuilder().build();
         if (!buildSuccess) {
-            diagnostics.add(new CustomError("Java compilation error detected. Skipping verification."));
-            return;
+            diagnostics.add(new CustomWarning("Java compilation error detected"));
         }
 
         final Factory factory = launcher.getFactory();

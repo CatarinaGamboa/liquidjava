@@ -43,7 +43,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
             this.prefix = externalRefinements.get();
             if (!classExists(prefix)) {
                 String message = String.format("Could not find class '%s'", prefix);
-                diagnostics.add(new ExternalClassNotFoundWarning(intrface, message, prefix));
+                diagnostics.add(new ExternalClassNotFoundWarning(intrface.getPosition(), message, prefix));
                 return;
             }
             getRefinementFromAnnotation(intrface);
@@ -72,7 +72,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                         prefix);
                 String[] overloads = getOverloads(targetType, method);
                 diagnostics.add(
-                        new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix, overloads));
+                        new ExternalMethodNotFoundWarning(method.getPosition(), message, method.getSignature(), prefix, overloads));
             }
         } else {
             if (!methodExists(targetType, method)) {
@@ -80,7 +80,7 @@ public class ExternalRefinementTypeChecker extends TypeChecker {
                         method.getType().getSimpleName(), method.getSignature(), prefix);
                 String[] overloads = getOverloads(targetType, method);
                 diagnostics.add(
-                        new ExternalMethodNotFoundWarning(method, message, method.getSignature(), prefix, overloads));
+                        new ExternalMethodNotFoundWarning(method.getPosition(), message, method.getSignature(), prefix, overloads));
                 return;
             }
         }
