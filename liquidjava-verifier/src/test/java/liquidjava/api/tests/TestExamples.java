@@ -39,13 +39,13 @@ public class TestExamples {
 
         // verification should pass, check if any errors were found
         if (shouldPass(pathName) && diagnostics.foundError()) {
-            System.out.println("Error in: " + pathName + " --- should be correct but an error was found");
+            System.out.println("Error in: " + pathName + " --- should pass but an error was found");
             fail();
         }
         // verification should fail, check if it failed as expected (we assume each error test has exactly one error)
         else if (shouldFail(pathName)) {
             if (!diagnostics.foundError()) {
-                System.out.println("Error in: " + pathName + " --- should be an error but passed verification");
+                System.out.println("Error in: " + pathName + " --- should fail but no errors were found");
                 fail();
             } else {
                 // check if expected error was found

@@ -8,10 +8,18 @@ import java.util.stream.Stream;
 
 public class TestUtils {
 
+    /**
+     * Determines if the given path indicates that the test should pass
+     * @param path
+     */
     public static boolean shouldPass(String path) {
         return path.toLowerCase().contains("correct") || path.toLowerCase().contains("warning");
     }
 
+    /**
+     * Determines if the given path indicates that the test should fail
+     * @param path
+     */
     public static boolean shouldFail(String path) {
         return path.toLowerCase().contains("error");
     }
