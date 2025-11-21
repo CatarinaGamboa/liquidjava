@@ -12,25 +12,43 @@ import liquidjava.rj_language.ast.Var;
 public class VariableResolver {
 
     /**
-     * Extracts variables with constant values from an expression Returns a map from variable names to their values
+     * Extracts variables with constant values from an expression
+     * @param exp
+     * @returns map from variable names to their values
      */
     public static Map<String, Expression> resolve(Expression exp) {
-        // if the expression is just a single equality (not a conjunction) don't extract it
-        // this avoids creating tautologies like "1 == 1" after substitution, which are then simplified to "true"
-        if (exp instanceof BinaryExpression be) {
-            if ("==".equals(be.getOperator())) {
-                return new HashMap<>();
-            }
-        }
-
         Map<String, Expression> map = new HashMap<>();
         resolveRecursive(exp, map);
+
+        // filter out variables that only appear in their own definition
+        map.entrySet().removeIf(entry -> countOccurrences(exp, entry.getKey()) < 2);
+
         return resolveTransitive(map);
     }
 
     /**
+     * Counts occurrences of a variable in an expression
+     * @param exp
+     * @param varName
+     * @return number of occurrences
+     */
+    private static int countOccurrences(Expression exp, String varName) {
+        if (exp instanceof Var var && var.getName().equals(varName)) {
+            return 1;
+        }
+        if (exp instanceof BinaryExpression be) {
+            return countOccurrences(be.getFirstOperand(), varName) + countOccurrences(be.getSecondOperand(), varName);
+        }
+        if (exp.getChildren() != null) {
+            return exp.getChildren().stream().mapToInt(child -> countOccurrences(child, varName)).sum();
+        }
+        return 0;
+    }
+
+    /**
      * Recursively extracts variable equalities from an expression (e.g. ... && x == 1 && y == 2 => map: x -> 1, y -> 2)
-     * Modifies the given map in place
+     * @param exp
+     * @param map
      */
     private static void resolveRecursive(Expression exp, Map<String, Expression> map) {
         if (!(exp instanceof BinaryExpression be))
@@ -43,16 +61,18 @@ public class VariableResolver {
         } else if ("==".equals(op)) {
             Expression left = be.getFirstOperand();
             Expression right = be.getSecondOperand();
-            if (left instanceof Var && (right.isLiteral() || right instanceof Var)) {
-                map.put(((Var) left).getName(), right.clone());
-            } else if (right instanceof Var && left.isLiteral()) {
-                map.put(((Var) right).getName(), left.clone());
+            if (left instanceof Var var && right.isLiteral()) {
+                map.put(var.getName(), right.clone());
+            } else if (right instanceof Var var && left.isLiteral()) {
+                map.put(var.getName(), left.clone());
             }
         }
     }
 
     /**
      * Handles transitive variable equalities in the map (e.g. map: x -> y, y -> 1 => map: x -> 1, y -> 1)
+     * @param map
+     * @return new map with resolved values
      */
     private static Map<String, Expression> resolveTransitive(Map<String, Expression> map) {
         Map<String, Expression> result = new HashMap<>();
@@ -65,6 +85,10 @@ public class VariableResolver {
     /**
      * Returns the value of a variable by looking up in the map recursively Uses the seen set to avoid circular
      * references (e.g. x -> y, y -> x) which would cause infinite recursion
+     * @param exp
+     * @param map
+     * @param seen
+     * @return resolved expression
      */
     private static Expression lookup(Expression exp, Map<String, Expression> map, Set<String> seen) {
         if (!(exp instanceof Var))

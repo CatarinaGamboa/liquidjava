@@ -305,31 +305,6 @@ class ExpressionSimplifierTest {
     }
 
     @Test
-    void testSingleEqualityShouldNotSimplify() {
-        // Given: x == 1
-        // Expected: x == 1 (should not be simplified to "true")
-
-        Expression varX = new Var("x");
-        Expression one = new LiteralInt(1);
-        Expression xEquals1 = new BinaryExpression(varX, "==", one);
-
-        // When
-        ValDerivationNode result = ExpressionSimplifier.simplify(xEquals1);
-
-        // Then
-        assertNotNull(result, "Result should not be null");
-        assertEquals("x == 1", result.getValue().toString(),
-                "Single equality should not be simplified to a boolean literal");
-
-        // The result should be the original expression unchanged
-        assertTrue(result.getValue() instanceof BinaryExpression, "Result should still be a binary expression");
-        BinaryExpression resultExpr = (BinaryExpression) result.getValue();
-        assertEquals("==", resultExpr.getOperator(), "Operator should still be ==");
-        assertEquals("x", resultExpr.getFirstOperand().toString(), "Left operand should be x");
-        assertEquals("1", resultExpr.getSecondOperand().toString(), "Right operand should be 1");
-    }
-
-    @Test
     void testFixedPointSimplification() {
         // Given: x == -y && y == a / b && a == 6 && b == 3
         // Expected: x == -2
@@ -356,6 +331,89 @@ class ExpressionSimplifierTest {
         // Then
         assertNotNull(result, "Result should not be null");
         assertEquals("x == -2", result.getValue().toString(), "Expected result to be x == -2");
+    }
+
+    @Test
+    void testSingleEqualityShouldNotSimplify() {
+        // Given: x == 1
+        // Expected: x == 1 (should not be simplified to "true")
+
+        Expression varX = new Var("x");
+        Expression one = new LiteralInt(1);
+        Expression xEquals1 = new BinaryExpression(varX, "==", one);
+
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(xEquals1);
+
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("x == 1", result.getValue().toString(),
+                "Single equality should not be simplified to a boolean literal");
+
+        // The result should be the original expression unchanged
+        assertTrue(result.getValue() instanceof BinaryExpression, "Result should still be a binary expression");
+        BinaryExpression resultExpr = (BinaryExpression) result.getValue();
+        assertEquals("==", resultExpr.getOperator(), "Operator should still be ==");
+        assertEquals("x", resultExpr.getFirstOperand().toString(), "Left operand should be x");
+        assertEquals("1", resultExpr.getSecondOperand().toString(), "Right operand should be 1");
+    }
+
+    @Test
+    void testTwoEqualitiesShouldNotSimplify() {
+        // Given: x == 1 && y == 2
+        // Expected: x == 1 && y == 2 (should not be simplified to "true")
+
+        Expression varX = new Var("x");
+        Expression one = new LiteralInt(1);
+        Expression xEquals1 = new BinaryExpression(varX, "==", one);
+
+        Expression varY = new Var("y");
+        Expression two = new LiteralInt(2);
+        Expression yEquals2 = new BinaryExpression(varY, "==", two);
+
+        Expression fullExpression = new BinaryExpression(xEquals1, "&&", yEquals2);
+
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("x == 1 && y == 2", result.getValue().toString(),
+                "Two equalities should not be simplified to a boolean literal");
+
+        // The result should be the original expression unchanged
+        assertTrue(result.getValue() instanceof BinaryExpression, "Result should still be a binary expression");
+        BinaryExpression resultExpr = (BinaryExpression) result.getValue();
+        assertEquals("&&", resultExpr.getOperator(), "Operator should still be &&");
+        assertEquals("x == 1", resultExpr.getFirstOperand().toString(), "Left operand should be x == 1");
+        assertEquals("y == 2", resultExpr.getSecondOperand().toString(), "Right operand should be y == 2");
+    }
+
+    @Test
+    void testCircularDependencyShouldNotSimplify() {
+        // Given: x == y && y == x
+        // Expected: x == y && y == x (should not be simplified to "true")
+
+        Expression varX = new Var("x");
+        Expression varY = new Var("y");
+        Expression xEqualsY = new BinaryExpression(varX, "==", varY);
+        Expression yEqualsX = new BinaryExpression(varY, "==", varX);
+        Expression fullExpression = new BinaryExpression(xEqualsY, "&&", yEqualsX);
+
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("x == y && y == x", result.getValue().toString(),
+                "Circular dependency should not be simplified to a boolean literal");
+
+        // The result should be the original expression unchanged
+        assertTrue(result.getValue() instanceof BinaryExpression, "Result should still be a binary expression");
+        BinaryExpression resultExpr = (BinaryExpression) result.getValue();
+        assertEquals("&&", resultExpr.getOperator(), "Operator should still be &&");
+        assertEquals("x == y", resultExpr.getFirstOperand().toString(), "Left operand should be x == y");
+        assertEquals("y == x", resultExpr.getSecondOperand().toString(), "Right operand should be y == x");
     }
 
     /**
