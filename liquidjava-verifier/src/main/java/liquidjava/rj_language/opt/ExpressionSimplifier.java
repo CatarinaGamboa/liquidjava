@@ -34,11 +34,6 @@ public class ExpressionSimplifier {
             return current;
         }
 
-        // stop if simplified to 'true'
-        if (current != null && currExp instanceof LiteralBoolean && currExp.isBooleanTrue()) {
-            return current;
-        }
-
         // continue simplifying
         return simplifyToFixedPoint(fold, current, fold.getValue());
     }
