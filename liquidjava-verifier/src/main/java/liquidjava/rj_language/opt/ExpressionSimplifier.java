@@ -14,9 +14,33 @@ public class ExpressionSimplifier {
      * Returns a derivation node representing the tree of simplifications applied
      */
     public static ValDerivationNode simplify(Expression exp) {
-        ValDerivationNode prop = ConstantPropagation.propagate(exp);
+        ValDerivationNode fixedPoint = simplifyToFixedPoint(null, null, exp);
+        return simplifyDerivationTree(fixedPoint);
+    }
+
+    /**
+     * Recursively applies propagation and folding until the expression stops changing (fixed point) Stops early if the
+     * expression simplifies to 'true', which means we've simplified too much
+     */
+    private static ValDerivationNode simplifyToFixedPoint(ValDerivationNode current, ValDerivationNode previous,
+            Expression prevExp) {
+        // apply propagation and folding
+        ValDerivationNode prop = ConstantPropagation.propagate(prevExp);
         ValDerivationNode fold = ConstantFolding.fold(prop);
-        return simplifyDerivationTree(fold);
+        Expression currExp = fold.getValue();
+
+        // fixed point reached
+        if (current != null && currExp.equals(current.getValue())) {
+            return current;
+        }
+
+        // stop if simplified to 'true'
+        if (current != null && currExp instanceof LiteralBoolean && currExp.isBooleanTrue()) {
+            return current;
+        }
+
+        // continue simplifying
+        return simplifyToFixedPoint(fold, current, fold.getValue());
     }
 
     /**

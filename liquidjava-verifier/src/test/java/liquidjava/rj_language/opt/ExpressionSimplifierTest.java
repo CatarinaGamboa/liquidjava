@@ -305,7 +305,7 @@ class ExpressionSimplifierTest {
     }
 
     @Test
-    void testSingleEqualityNotSimplifiedToTrue() {
+    void testSingleEqualityShouldNotSimplify() {
         // Given: x == 1
         // Expected: x == 1 (should not be simplified to "true")
 
@@ -327,6 +327,35 @@ class ExpressionSimplifierTest {
         assertEquals("==", resultExpr.getOperator(), "Operator should still be ==");
         assertEquals("x", resultExpr.getFirstOperand().toString(), "Left operand should be x");
         assertEquals("1", resultExpr.getSecondOperand().toString(), "Right operand should be 1");
+    }
+
+    @Test
+    void testFixedPointSimplification() {
+        // Given: x == -y && y == a / b && a == 6 && b == 3
+        // Expected: x == -2
+        Expression varX = new Var("x");
+        Expression varY = new Var("y");
+        Expression varA = new Var("a");
+        Expression varB = new Var("b");
+
+        Expression aDivB = new BinaryExpression(varA, "/", varB);
+        Expression yEqualsADivB = new BinaryExpression(varY, "==", aDivB);
+        Expression negY = new UnaryExpression("-", varY);
+        Expression xEqualsNegY = new BinaryExpression(varX, "==", negY);
+        Expression six = new LiteralInt(6);
+        Expression aEquals6 = new BinaryExpression(varA, "==", six);
+        Expression three = new LiteralInt(3);
+        Expression bEquals3 = new BinaryExpression(varB, "==", three);
+        Expression firstAnd = new BinaryExpression(xEqualsNegY, "&&", yEqualsADivB);
+        Expression secondAnd = new BinaryExpression(aEquals6, "&&", bEquals3);
+        Expression fullExpression = new BinaryExpression(firstAnd, "&&", secondAnd);
+
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("x == -2", result.getValue().toString(), "Expected result to be x == -2");
     }
 
     /**
