@@ -65,6 +65,9 @@ public class TestExamples {
                     }
                 } else {
                     System.out.println("No expected error message found for: " + pathName);
+                    System.out.println("Please provide an expected error in " + (isDirectory
+                            ? "a .expected file in the directory" : "the first line of the test file as a comment"));
+                    fail();
                 }
             }
         }
