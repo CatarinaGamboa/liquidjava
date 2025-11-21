@@ -12,19 +12,19 @@ import spoon.reflect.cu.SourcePosition;
  */
 public class RefinementError extends LJError {
 
-    private final String expected;
+    private final ValDerivationNode expected;
     private final ValDerivationNode found;
 
-    public RefinementError(SourcePosition position, Expression expected, ValDerivationNode found,
+    public RefinementError(SourcePosition position, ValDerivationNode expected, ValDerivationNode found,
             TranslationTable translationTable) {
         super("Refinement Error",
-                String.format("%s is not a subtype of %s", found.getValue(), expected.toSimplifiedString()), position,
+                String.format("%s is not a subtype of %s", found.getValue(), expected.getValue()), position,
                 translationTable);
-        this.expected = expected.toSimplifiedString();
+        this.expected = expected;
         this.found = found;
     }
 
-    public String getExpected() {
+    public ValDerivationNode getExpected() {
         return expected;
     }
 
