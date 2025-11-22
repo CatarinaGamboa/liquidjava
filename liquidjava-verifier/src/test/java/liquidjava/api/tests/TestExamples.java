@@ -57,10 +57,11 @@ public class TestExamples {
                 }
                 LJError error = diagnostics.getErrors().iterator().next();
                 if (expected.isPresent()) {
-                    String expectedMsg = expected.get().toLowerCase();
-                    if (!error.getTitle().toLowerCase().equals(expectedMsg)) {
-                        System.out.println("Error in: " + pathName + " --- expected error: " + expectedMsg
-                                + ", but found: " + error.getTitle());
+                    String expectedError = expected.get();
+                    String foundError = error.getTitle();
+                    if (!foundError.equalsIgnoreCase(expectedError)) {
+                        System.out.println("Error in: " + pathName + " --- expected error: " + expectedError
+                                + ", but found: " + foundError);
                         fail();
                     }
                 } else {
