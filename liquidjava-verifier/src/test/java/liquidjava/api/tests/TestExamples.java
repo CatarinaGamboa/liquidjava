@@ -56,6 +56,10 @@ public class TestExamples {
                     fail();
                 }
                 LJError error = diagnostics.getErrors().iterator().next();
+                if (error.getPosition() == null) {
+                    System.out.println("Error in: " + pathName + " --- error has no position information");
+                    fail();
+                }
                 if (expected.isPresent()) {
                     String expectedMsg = expected.get().toLowerCase();
                     if (!error.getTitle().toLowerCase().equals(expectedMsg)) {
