@@ -46,23 +46,34 @@ public class ExpressionSimplifier {
         DerivationNode origin = node.getOrigin();
 
         // binary expression with &&
-        if (value instanceof BinaryExpression binExp) {
-            if ("&&".equals(binExp.getOperator()) && origin instanceof BinaryDerivationNode binOrigin) {
-                // recursively simplify children
-                ValDerivationNode leftSimplified = simplifyDerivationTree(binOrigin.getLeft());
-                ValDerivationNode rightSimplified = simplifyDerivationTree(binOrigin.getRight());
+        if (value instanceof BinaryExpression binExp && "&&".equals(binExp.getOperator())) {
+            ValDerivationNode leftSimplified;
+            ValDerivationNode rightSimplified;
 
-                // check if either side is redundant
-                if (isRedundant(leftSimplified.getValue()))
-                    return rightSimplified;
-                if (isRedundant(rightSimplified.getValue()))
-                    return leftSimplified;
-
-                // return the conjunction with simplified children
-                Expression newValue = new BinaryExpression(leftSimplified.getValue(), "&&", rightSimplified.getValue());
-                DerivationNode newOrigin = new BinaryDerivationNode(leftSimplified, rightSimplified, "&&");
-                return new ValDerivationNode(newValue, newOrigin);
+            // simplify children
+            if (origin instanceof BinaryDerivationNode binOrigin) {
+                leftSimplified = simplifyDerivationTree(binOrigin.getLeft());
+                rightSimplified = simplifyDerivationTree(binOrigin.getRight());
+            } else {
+                leftSimplified = simplifyDerivationTree(new ValDerivationNode(binExp.getFirstOperand(), null));
+                rightSimplified = simplifyDerivationTree(new ValDerivationNode(binExp.getSecondOperand(), null));
             }
+
+            // check if either side is redundant
+            if (isRedundant(leftSimplified.getValue()))
+                return rightSimplified;
+            if (isRedundant(rightSimplified.getValue()))
+                return leftSimplified;
+
+            // check if children are equal (x && x => x)
+            if (leftSimplified.getValue().toString().equals(rightSimplified.getValue().toString())) {
+                return leftSimplified;
+            }
+
+            // return the conjunction with simplified children
+            Expression newValue = new BinaryExpression(leftSimplified.getValue(), "&&", rightSimplified.getValue());
+            DerivationNode newOrigin = new BinaryDerivationNode(leftSimplified, rightSimplified, "&&");
+            return new ValDerivationNode(newValue, newOrigin);
         }
         // no simplification
         return node;

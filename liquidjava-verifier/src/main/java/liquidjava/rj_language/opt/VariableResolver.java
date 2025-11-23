@@ -20,33 +20,15 @@ public class VariableResolver {
      */
     public static Map<String, Expression> resolve(Expression exp) {
         Map<String, Expression> map = new HashMap<>();
+
+        // extract variable equalities recursively
         resolveRecursive(exp, map);
 
-        // filter out variables that only appear in their own definition
-        map.entrySet().removeIf(entry -> countOccurrences(exp, entry.getKey()) < 2);
+        // remove variables that were not used in the expression
+        map.entrySet().removeIf(entry -> !hasUsage(exp, entry.getKey()));
 
+        // transitively resolve variables
         return resolveTransitive(map);
-    }
-
-    /**
-     * Counts occurrences of a variable in an expression
-     * 
-     * @param exp
-     * @param varName
-     * 
-     * @return number of occurrences
-     */
-    private static int countOccurrences(Expression exp, String varName) {
-        if (exp instanceof Var var && var.getName().equals(varName)) {
-            return 1;
-        }
-        if (exp instanceof BinaryExpression be) {
-            return countOccurrences(be.getFirstOperand(), varName) + countOccurrences(be.getSecondOperand(), varName);
-        }
-        if (exp.getChildren() != null) {
-            return exp.getChildren().stream().mapToInt(child -> countOccurrences(child, varName)).sum();
-        }
-        return 0;
     }
 
     /**
@@ -113,5 +95,40 @@ public class VariableResolver {
 
         seen.add(name);
         return lookup(value, map, seen);
+    }
+
+    /**
+     * Checks if a variable is used in the expression (excluding its own definitions)
+     *
+     * @param exp
+     * @param name
+     *
+     * @return true if used, false otherwise
+     */
+    private static boolean hasUsage(Expression exp, String name) {
+        // exclude own definitions
+        if (exp instanceof BinaryExpression binary && "==".equals(binary.getOperator())) {
+            Expression left = binary.getFirstOperand();
+            Expression right = binary.getSecondOperand();
+            if (left instanceof Var v && v.getName().equals(name) && right.isLiteral())
+                return false;
+            if (right instanceof Var v && v.getName().equals(name) && left.isLiteral())
+                return false;
+        }
+
+        // usage found
+        if (exp instanceof Var var && var.getName().equals(name)) {
+            return true;
+        }
+
+        // recurse children
+        if (exp.hasChildren()) {
+            for (Expression child : exp.getChildren())
+                if (hasUsage(child, name))
+                    return true;
+        }
+
+        // usage not found
+        return false;
     }
 }

@@ -2,8 +2,11 @@ package liquidjava.rj_language.opt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
+
 import liquidjava.rj_language.ast.BinaryExpression;
 import liquidjava.rj_language.ast.Expression;
+import liquidjava.rj_language.ast.FunctionInvocation;
 import liquidjava.rj_language.ast.LiteralBoolean;
 import liquidjava.rj_language.ast.LiteralInt;
 import liquidjava.rj_language.ast.UnaryExpression;
@@ -389,6 +392,60 @@ class ExpressionSimplifierTest {
         assertEquals("y == 2", resultExpr.getSecondOperand().toString(), "Right operand should be y == 2");
     }
 
+    @Test
+    void testSameVarTwiceShouldSimplifyToSingle() {
+        // Given: x && x
+        // Expected: x
+        Expression varX = new Var("x");
+        Expression fullExpression = new BinaryExpression(varX, "&&", varX);
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("x", result.getValue().toString(),
+                "Same variable twice should be simplified to a single variable");
+    }
+
+    @Test
+    void testSameEqualityTwiceShouldSimplifyToSingle() {
+        // Given: x == 1 && x == 1
+        // Expected: x == 1
+        Expression varX = new Var("x");
+        Expression one = new LiteralInt(1);
+        Expression xEquals1First = new BinaryExpression(varX, "==", one);
+        Expression xEquals1Second = new BinaryExpression(varX, "==", one);
+        Expression fullExpression = new BinaryExpression(xEquals1First, "&&", xEquals1Second);
+
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("x == 1", result.getValue().toString(),
+                "Same equality twice should be simplified to a single equality");
+    }
+
+    @Test
+    void testSameExpressionTwiceShouldSimplifyToSingle() {
+        // Given: a + b == 1 && a + b == 1
+        // Expected: a + b == 1
+        Expression varA = new Var("a");
+        Expression varB = new Var("b");
+        Expression sum = new BinaryExpression(varA, "+", varB);
+        Expression one = new LiteralInt(1);
+        Expression sumEquals3First = new BinaryExpression(sum, "==", one);
+        Expression sumEquals3Second = new BinaryExpression(sum, "==", one);
+        Expression fullExpression = new BinaryExpression(sumEquals3First, "&&", sumEquals3Second);
+
+        // When
+        ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+
+        // Then
+        assertNotNull(result, "Result should not be null");
+        assertEquals("a + b == 1", result.getValue().toString(),
+                "Same expression twice should be simplified to a single equality");
+    }
+    
     @Test
     void testCircularDependencyShouldNotSimplify() {
         // Given: x == y && y == x
