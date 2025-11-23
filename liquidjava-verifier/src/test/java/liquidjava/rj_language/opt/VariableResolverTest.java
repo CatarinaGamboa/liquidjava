@@ -12,7 +12,6 @@ import liquidjava.rj_language.ast.GroupExpression;
 import liquidjava.rj_language.ast.LiteralInt;
 import liquidjava.rj_language.ast.UnaryExpression;
 import liquidjava.rj_language.ast.Var;
-import org.junit.jupiter.api.TestTemplate;
 
 class VariableResolverTest {
 

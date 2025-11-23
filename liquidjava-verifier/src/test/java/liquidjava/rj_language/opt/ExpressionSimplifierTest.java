@@ -2,11 +2,8 @@ package liquidjava.rj_language.opt;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.ArrayList;
-
 import liquidjava.rj_language.ast.BinaryExpression;
 import liquidjava.rj_language.ast.Expression;
-import liquidjava.rj_language.ast.FunctionInvocation;
 import liquidjava.rj_language.ast.LiteralBoolean;
 import liquidjava.rj_language.ast.LiteralInt;
 import liquidjava.rj_language.ast.UnaryExpression;
@@ -113,7 +110,7 @@ class ExpressionSimplifierTest {
 
         // Then
         assertNotNull(result, "Result should not be null");
-        assertTrue(result.getValue() instanceof LiteralBoolean, "Result should be a boolean");
+        assertInstanceOf(LiteralBoolean.class, result.getValue(), "Result should be a boolean");
         assertFalse(((LiteralBoolean) result.getValue()).isBooleanTrue(), "Expected result to befalse");
 
         // (y || true) && y == false => false || true = true
@@ -249,8 +246,8 @@ class ExpressionSimplifierTest {
         // Then
         assertNotNull(result, "Result should not be null");
         assertNotNull(result.getValue(), "Result value should not be null");
-        assertTrue(result.getValue() instanceof LiteralBoolean, "Result should be a boolean literal");
-        assertTrue(((LiteralBoolean) result.getValue()).isBooleanTrue(), "Expected result to be true");
+        assertInstanceOf(LiteralBoolean.class, result.getValue(), "Result should be a boolean literal");
+        assertTrue(result.getValue().isBooleanTrue(), "Expected result to be true");
 
         // 5 * 2 + 7 - 3
         ValDerivationNode val5 = new ValDerivationNode(new LiteralInt(5), new VarDerivationNode("a"));
@@ -311,6 +308,7 @@ class ExpressionSimplifierTest {
     void testFixedPointSimplification() {
         // Given: x == -y && y == a / b && a == 6 && b == 3
         // Expected: x == -2
+
         Expression varX = new Var("x");
         Expression varY = new Var("y");
         Expression varA = new Var("a");
@@ -354,7 +352,7 @@ class ExpressionSimplifierTest {
                 "Single equality should not be simplified to a boolean literal");
 
         // The result should be the original expression unchanged
-        assertTrue(result.getValue() instanceof BinaryExpression, "Result should still be a binary expression");
+        assertInstanceOf(BinaryExpression.class, result.getValue(), "Result should still be a binary expression");
         BinaryExpression resultExpr = (BinaryExpression) result.getValue();
         assertEquals("==", resultExpr.getOperator(), "Operator should still be ==");
         assertEquals("x", resultExpr.getFirstOperand().toString(), "Left operand should be x");
@@ -373,7 +371,6 @@ class ExpressionSimplifierTest {
         Expression varY = new Var("y");
         Expression two = new LiteralInt(2);
         Expression yEquals2 = new BinaryExpression(varY, "==", two);
-
         Expression fullExpression = new BinaryExpression(xEquals1, "&&", yEquals2);
 
         // When
@@ -385,7 +382,7 @@ class ExpressionSimplifierTest {
                 "Two equalities should not be simplified to a boolean literal");
 
         // The result should be the original expression unchanged
-        assertTrue(result.getValue() instanceof BinaryExpression, "Result should still be a binary expression");
+        assertInstanceOf(BinaryExpression.class, result.getValue(), "Result should still be a binary expression");
         BinaryExpression resultExpr = (BinaryExpression) result.getValue();
         assertEquals("&&", resultExpr.getOperator(), "Operator should still be &&");
         assertEquals("x == 1", resultExpr.getFirstOperand().toString(), "Left operand should be x == 1");
@@ -396,11 +393,14 @@ class ExpressionSimplifierTest {
     void testSameVarTwiceShouldSimplifyToSingle() {
         // Given: x && x
         // Expected: x
+
         Expression varX = new Var("x");
         Expression fullExpression = new BinaryExpression(varX, "&&", varX);
         // When
+
         ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
         // Then
+
         assertNotNull(result, "Result should not be null");
         assertEquals("x", result.getValue().toString(),
                 "Same variable twice should be simplified to a single variable");
@@ -410,6 +410,7 @@ class ExpressionSimplifierTest {
     void testSameEqualityTwiceShouldSimplifyToSingle() {
         // Given: x == 1 && x == 1
         // Expected: x == 1
+
         Expression varX = new Var("x");
         Expression one = new LiteralInt(1);
         Expression xEquals1First = new BinaryExpression(varX, "==", one);
@@ -429,6 +430,7 @@ class ExpressionSimplifierTest {
     void testSameExpressionTwiceShouldSimplifyToSingle() {
         // Given: a + b == 1 && a + b == 1
         // Expected: a + b == 1
+
         Expression varA = new Var("a");
         Expression varB = new Var("b");
         Expression sum = new BinaryExpression(varA, "+", varB);
@@ -466,7 +468,7 @@ class ExpressionSimplifierTest {
                 "Circular dependency should not be simplified to a boolean literal");
 
         // The result should be the original expression unchanged
-        assertTrue(result.getValue() instanceof BinaryExpression, "Result should still be a binary expression");
+        assertInstanceOf(BinaryExpression.class, result.getValue(), "Result should still be a binary expression");
         BinaryExpression resultExpr = (BinaryExpression) result.getValue();
         assertEquals("&&", resultExpr.getOperator(), "Operator should still be &&");
         assertEquals("x == y", resultExpr.getFirstOperand().toString(), "Left operand should be x == y");
@@ -475,9 +477,9 @@ class ExpressionSimplifierTest {
 
     @Test
     void testRealExpression() {
-        // Given: #a_5 == (-#fresh_4) && #fresh_4 == #x_2 / #y_3 && #x_2 == #x_0 && #x_0 == 6 && #y_3 == #y_1 && #y_1 ==
-        // 3
+        // Given: #a_5 == -#fresh_4 && #fresh_4 == #x_2 / #y_3 && #x_2 == #x_0 && #x_0 == 6 && #y_3 == #y_1 && #y_1 == 3
         // Expected: #a_5 == -2
+
         Expression varA5 = new Var("#a_5");
         Expression varFresh4 = new Var("#fresh_4");
         Expression varX2 = new Var("#x_2");
@@ -498,8 +500,10 @@ class ExpressionSimplifierTest {
         Expression thirdAnd = new BinaryExpression(y3EqualsY1, "&&", y1Equals3);
         Expression firstBigAnd = new BinaryExpression(firstAnd, "&&", secondAnd);
         Expression fullExpression = new BinaryExpression(firstBigAnd, "&&", thirdAnd);
+
         // When
         ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+
         // Then
         assertNotNull(result, "Result should not be null");
         assertEquals("#a_5 == -2", result.getValue().toString(), "Expected result to be #a_5 == -2");
@@ -510,18 +514,20 @@ class ExpressionSimplifierTest {
     void testTransitive() {
         // Given: a == b && b == 1
         // Expected: a == 1
+
         Expression varA = new Var("a");
         Expression varB = new Var("b");
         Expression one = new LiteralInt(1);
         Expression aEqualsB = new BinaryExpression(varA, "==", varB);
         Expression bEquals1 = new BinaryExpression(varB, "==", one);
         Expression fullExpression = new BinaryExpression(aEqualsB, "&&", bEquals1);
+
         // When
         ValDerivationNode result = ExpressionSimplifier.simplify(fullExpression);
+
         // Then
         assertNotNull(result, "Result should not be null");
         assertEquals("a == 1", result.getValue().toString(), "Expected result to be a == 1");
-
     }
 
     /**
@@ -531,25 +537,22 @@ class ExpressionSimplifierTest {
         if (expected == null && actual == null)
             return;
 
+        assertNotNull(expected);
         assertEquals(expected.getClass(), actual.getClass(), message + ": node types should match");
-        if (expected instanceof ValDerivationNode) {
-            ValDerivationNode expectedVal = (ValDerivationNode) expected;
+        if (expected instanceof ValDerivationNode expectedVal) {
             ValDerivationNode actualVal = (ValDerivationNode) actual;
             assertEquals(expectedVal.getValue().toString(), actualVal.getValue().toString(),
                     message + ": values should match");
             assertDerivationEquals(expectedVal.getOrigin(), actualVal.getOrigin(), message + " > origin");
-        } else if (expected instanceof BinaryDerivationNode) {
-            BinaryDerivationNode expectedBin = (BinaryDerivationNode) expected;
+        } else if (expected instanceof BinaryDerivationNode expectedBin) {
             BinaryDerivationNode actualBin = (BinaryDerivationNode) actual;
             assertEquals(expectedBin.getOp(), actualBin.getOp(), message + ": operators should match");
             assertDerivationEquals(expectedBin.getLeft(), actualBin.getLeft(), message + " > left");
             assertDerivationEquals(expectedBin.getRight(), actualBin.getRight(), message + " > right");
-        } else if (expected instanceof VarDerivationNode) {
-            VarDerivationNode expectedVar = (VarDerivationNode) expected;
+        } else if (expected instanceof VarDerivationNode expectedVar) {
             VarDerivationNode actualVar = (VarDerivationNode) actual;
             assertEquals(expectedVar.getVar(), actualVar.getVar(), message + ": variables should match");
-        } else if (expected instanceof UnaryDerivationNode) {
-            UnaryDerivationNode expectedUnary = (UnaryDerivationNode) expected;
+        } else if (expected instanceof UnaryDerivationNode expectedUnary) {
             UnaryDerivationNode actualUnary = (UnaryDerivationNode) actual;
             assertEquals(expectedUnary.getOp(), actualUnary.getOp(), message + ": operators should match");
             assertDerivationEquals(expectedUnary.getOperand(), actualUnary.getOperand(), message + " > operand");
