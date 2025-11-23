@@ -65,7 +65,12 @@ public class ExpressionSimplifier {
                 return leftSimplified;
 
             // collapse identical sides (x && x => x)
-            if (leftSimplified.getValue().toString().equals(rightSimplified.getValue().toString())) {
+            if (leftSimplified.getValue().equals(rightSimplified.getValue())) {
+                return leftSimplified;
+            }
+
+            // collapse symmetric equalities (e.g. x == y && y == x => x == y)
+            if (isSymmetricEquality(leftSimplified.getValue(), rightSimplified.getValue())) {
                 return leftSimplified;
             }
 
@@ -76,6 +81,19 @@ public class ExpressionSimplifier {
         }
         // no simplification
         return node;
+    }
+
+    private static boolean isSymmetricEquality(Expression left, Expression right) {
+        if (left instanceof BinaryExpression b1 && "==".equals(b1.getOperator()) && right instanceof BinaryExpression b2
+                && "==".equals(b2.getOperator())) {
+
+            Expression l1 = b1.getFirstOperand();
+            Expression r1 = b1.getSecondOperand();
+            Expression l2 = b2.getFirstOperand();
+            Expression r2 = b2.getSecondOperand();
+            return l1.equals(r2) && r1.equals(l2);
+        }
+        return false;
     }
 
     /**

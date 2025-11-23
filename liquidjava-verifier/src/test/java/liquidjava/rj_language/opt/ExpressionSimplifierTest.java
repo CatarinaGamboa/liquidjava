@@ -487,9 +487,9 @@ class ExpressionSimplifierTest {
     }
 
     @Test
-    void testCircularDependencyShouldNotSimplify() {
+    void testSymmetricEqualityShouldSimplify() {
         // Given: x == y && y == x
-        // Expected: x == y && y == x (should not be simplified to "true")
+        // Expected: x == y
 
         Expression varX = new Var("x");
         Expression varY = new Var("y");
@@ -502,15 +502,8 @@ class ExpressionSimplifierTest {
 
         // Then
         assertNotNull(result, "Result should not be null");
-        assertEquals("x == y && y == x", result.getValue().toString(),
-                "Circular dependency should not be simplified to a boolean literal");
-
-        // The result should be the original expression unchanged
-        assertInstanceOf(BinaryExpression.class, result.getValue(), "Result should still be a binary expression");
-        BinaryExpression resultExpr = (BinaryExpression) result.getValue();
-        assertEquals("&&", resultExpr.getOperator(), "Operator should still be &&");
-        assertEquals("x == y", resultExpr.getFirstOperand().toString(), "Left operand should be x == y");
-        assertEquals("y == x", resultExpr.getSecondOperand().toString(), "Right operand should be y == x");
+        assertEquals("x == y", result.getValue().toString(),
+                "Symmetric equality should be simplified to a single equality");
     }
 
     @Test
