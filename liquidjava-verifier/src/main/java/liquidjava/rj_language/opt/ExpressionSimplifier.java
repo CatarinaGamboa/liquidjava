@@ -28,7 +28,8 @@ public class ExpressionSimplifier {
         // apply propagation and folding
         ValDerivationNode prop = ConstantPropagation.propagate(prevExp, current);
         ValDerivationNode fold = ConstantFolding.fold(prop);
-        Expression currExp = fold.getValue();
+        ValDerivationNode simplified = simplifyValDerivationNode(fold);
+        Expression currExp = simplified.getValue();
 
         // fixed point reached
         if (current != null && currExp.equals(current.getValue())) {
@@ -36,7 +37,7 @@ public class ExpressionSimplifier {
         }
 
         // continue simplifying
-        return simplifyToFixedPoint(fold, current, fold.getValue());
+        return simplifyToFixedPoint(simplified, current, simplified.getValue());
     }
 
     /**
@@ -75,38 +76,7 @@ public class ExpressionSimplifier {
             DerivationNode newOrigin = new BinaryDerivationNode(leftSimplified, rightSimplified, "&&");
             return new ValDerivationNode(newValue, newOrigin);
         }
-
-        // simplify origin
-        DerivationNode simplifiedOrigin = simplifyDerivationNode(origin);
-        if (simplifiedOrigin != origin) {
-            return new ValDerivationNode(value, simplifiedOrigin);
-        }
-
         // no simplification
-        return node;
-    }
-
-    private static DerivationNode simplifyDerivationNode(DerivationNode node) {
-        if (node == null)
-            return null;
-        if (node instanceof ValDerivationNode val) {
-            return simplifyValDerivationNode(val);
-        }
-        if (node instanceof BinaryDerivationNode binary) {
-            ValDerivationNode left = simplifyValDerivationNode(binary.getLeft());
-            ValDerivationNode right = simplifyValDerivationNode(binary.getRight());
-            if (left != binary.getLeft() || right != binary.getRight()) {
-                return new BinaryDerivationNode(left, right, binary.getOp());
-            }
-            return binary;
-        }
-        if (node instanceof UnaryDerivationNode unary) {
-            ValDerivationNode operand = simplifyValDerivationNode(unary.getOperand());
-            if (operand != unary.getOperand()) {
-                return new UnaryDerivationNode(operand, unary.getOp());
-            }
-            return unary;
-        }
         return node;
     }
 

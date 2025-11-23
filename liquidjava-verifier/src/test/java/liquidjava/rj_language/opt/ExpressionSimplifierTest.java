@@ -308,6 +308,7 @@ class ExpressionSimplifierTest {
     void testFixedPointSimplification() {
         // Given: x == -y && y == a / b && a == 6 && b == 3
         // Expected: x == -2
+        
         Expression varX = new Var("x");
         Expression varY = new Var("y");
         Expression varA = new Var("a");
