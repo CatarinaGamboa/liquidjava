@@ -5,7 +5,6 @@ import liquidjava.rj_language.ast.Expression;
 import liquidjava.rj_language.ast.LiteralBoolean;
 import liquidjava.rj_language.opt.derivation_node.BinaryDerivationNode;
 import liquidjava.rj_language.opt.derivation_node.DerivationNode;
-import liquidjava.rj_language.opt.derivation_node.UnaryDerivationNode;
 import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 
 public class ExpressionSimplifier {
@@ -15,7 +14,7 @@ public class ExpressionSimplifier {
      * Returns a derivation node representing the tree of simplifications applied
      */
     public static ValDerivationNode simplify(Expression exp) {
-        ValDerivationNode fixedPoint = simplifyToFixedPoint(null, null, exp);
+        ValDerivationNode fixedPoint = simplifyToFixedPoint(null, exp);
         return simplifyValDerivationNode(fixedPoint);
     }
 
@@ -23,8 +22,7 @@ public class ExpressionSimplifier {
      * Recursively applies propagation and folding until the expression stops changing (fixed point) Stops early if the
      * expression simplifies to 'true', which means we've simplified too much
      */
-    private static ValDerivationNode simplifyToFixedPoint(ValDerivationNode current, ValDerivationNode previous,
-            Expression prevExp) {
+    private static ValDerivationNode simplifyToFixedPoint(ValDerivationNode current, Expression prevExp) {
         // apply propagation and folding
         ValDerivationNode prop = ConstantPropagation.propagate(prevExp, current);
         ValDerivationNode fold = ConstantFolding.fold(prop);
@@ -37,7 +35,7 @@ public class ExpressionSimplifier {
         }
 
         // continue simplifying
-        return simplifyToFixedPoint(simplified, current, simplified.getValue());
+        return simplifyToFixedPoint(simplified, simplified.getValue());
     }
 
     /**
