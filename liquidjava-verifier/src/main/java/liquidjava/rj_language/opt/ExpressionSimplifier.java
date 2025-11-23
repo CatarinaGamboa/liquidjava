@@ -5,6 +5,7 @@ import liquidjava.rj_language.ast.Expression;
 import liquidjava.rj_language.ast.LiteralBoolean;
 import liquidjava.rj_language.opt.derivation_node.BinaryDerivationNode;
 import liquidjava.rj_language.opt.derivation_node.DerivationNode;
+import liquidjava.rj_language.opt.derivation_node.UnaryDerivationNode;
 import liquidjava.rj_language.opt.derivation_node.ValDerivationNode;
 
 public class ExpressionSimplifier {
@@ -15,7 +16,7 @@ public class ExpressionSimplifier {
      */
     public static ValDerivationNode simplify(Expression exp) {
         ValDerivationNode fixedPoint = simplifyToFixedPoint(null, null, exp);
-        return simplifyDerivationTree(fixedPoint);
+        return simplifyValDerivationNode(fixedPoint);
     }
 
     /**
@@ -25,7 +26,7 @@ public class ExpressionSimplifier {
     private static ValDerivationNode simplifyToFixedPoint(ValDerivationNode current, ValDerivationNode previous,
             Expression prevExp) {
         // apply propagation and folding
-        ValDerivationNode prop = ConstantPropagation.propagate(prevExp);
+        ValDerivationNode prop = ConstantPropagation.propagate(prevExp, current);
         ValDerivationNode fold = ConstantFolding.fold(prop);
         Expression currExp = fold.getValue();
 
@@ -41,7 +42,7 @@ public class ExpressionSimplifier {
     /**
      * Recursively simplifies the derivation tree by removing redundant conjuncts
      */
-    private static ValDerivationNode simplifyDerivationTree(ValDerivationNode node) {
+    private static ValDerivationNode simplifyValDerivationNode(ValDerivationNode node) {
         Expression value = node.getValue();
         DerivationNode origin = node.getOrigin();
 
@@ -50,13 +51,12 @@ public class ExpressionSimplifier {
             ValDerivationNode leftSimplified;
             ValDerivationNode rightSimplified;
 
-            // simplify children
             if (origin instanceof BinaryDerivationNode binOrigin) {
-                leftSimplified = simplifyDerivationTree(binOrigin.getLeft());
-                rightSimplified = simplifyDerivationTree(binOrigin.getRight());
+                leftSimplified = simplifyValDerivationNode(binOrigin.getLeft());
+                rightSimplified = simplifyValDerivationNode(binOrigin.getRight());
             } else {
-                leftSimplified = simplifyDerivationTree(new ValDerivationNode(binExp.getFirstOperand(), null));
-                rightSimplified = simplifyDerivationTree(new ValDerivationNode(binExp.getSecondOperand(), null));
+                leftSimplified = simplifyValDerivationNode(new ValDerivationNode(binExp.getFirstOperand(), null));
+                rightSimplified = simplifyValDerivationNode(new ValDerivationNode(binExp.getSecondOperand(), null));
             }
 
             // check if either side is redundant
@@ -65,7 +65,7 @@ public class ExpressionSimplifier {
             if (isRedundant(rightSimplified.getValue()))
                 return leftSimplified;
 
-            // check if children are equal (x && x => x)
+            // collapse identical sides (x && x => x)
             if (leftSimplified.getValue().toString().equals(rightSimplified.getValue().toString())) {
                 return leftSimplified;
             }
@@ -75,7 +75,38 @@ public class ExpressionSimplifier {
             DerivationNode newOrigin = new BinaryDerivationNode(leftSimplified, rightSimplified, "&&");
             return new ValDerivationNode(newValue, newOrigin);
         }
+
+        // simplify origin
+        DerivationNode simplifiedOrigin = simplifyDerivationNode(origin);
+        if (simplifiedOrigin != origin) {
+            return new ValDerivationNode(value, simplifiedOrigin);
+        }
+
         // no simplification
+        return node;
+    }
+
+    private static DerivationNode simplifyDerivationNode(DerivationNode node) {
+        if (node == null)
+            return null;
+        if (node instanceof ValDerivationNode val) {
+            return simplifyValDerivationNode(val);
+        }
+        if (node instanceof BinaryDerivationNode binary) {
+            ValDerivationNode left = simplifyValDerivationNode(binary.getLeft());
+            ValDerivationNode right = simplifyValDerivationNode(binary.getRight());
+            if (left != binary.getLeft() || right != binary.getRight()) {
+                return new BinaryDerivationNode(left, right, binary.getOp());
+            }
+            return binary;
+        }
+        if (node instanceof UnaryDerivationNode unary) {
+            ValDerivationNode operand = simplifyValDerivationNode(unary.getOperand());
+            if (operand != unary.getOperand()) {
+                return new UnaryDerivationNode(operand, unary.getOp());
+            }
+            return unary;
+        }
         return node;
     }
 
