@@ -9,6 +9,7 @@ import liquidjava.diagnostics.errors.CustomError;
 import liquidjava.diagnostics.warnings.CustomWarning;
 import liquidjava.processor.RefinementProcessor;
 import spoon.Launcher;
+import spoon.compiler.Environment;
 import spoon.processing.ProcessingManager;
 import spoon.reflect.declaration.CtPackage;
 import spoon.reflect.factory.Factory;
@@ -53,12 +54,14 @@ public class CommandLineLauncher {
             }
             launcher.addInputResource(path);
         }
-        launcher.getEnvironment().setNoClasspath(true);
-        launcher.getEnvironment().setComplianceLevel(8);
+
+        Environment env = launcher.getEnvironment();
+        env.setNoClasspath(true);
+        env.setComplianceLevel(8);
 
         boolean buildSuccess = launcher.getModelBuilder().build();
-        if (!buildSuccess) {
-            diagnostics.add(new CustomWarning("Java compilation error detected. Verification might be affected."));
+        if (!buildSuccess && (env.getErrorCount() > 0 || env.getWarningCount() > 0)) {
+            diagnostics.add(new CustomWarning("Java compilation encountered issues. Verification may be affected."));
         }
 
         final Factory factory = launcher.getFactory();
