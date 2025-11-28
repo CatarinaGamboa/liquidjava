@@ -1,7 +1,6 @@
 package liquidjava.diagnostics;
 
 import static org.junit.Assert.assertTrue;
-import liquidjava.diagnostics.LJDiagnostic;
 import org.junit.Test;
 
 public class TestLJDiagnostic {
