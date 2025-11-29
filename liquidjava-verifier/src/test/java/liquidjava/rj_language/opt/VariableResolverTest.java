@@ -107,4 +107,39 @@ class VariableResolverTest {
         Map<String, Expression> result = VariableResolver.resolve(grouped);
         assertTrue(result.isEmpty(), "Grouped single equality should not extract variable mapping");
     }
+
+    @Test
+    void testCircularDependency() {
+        // x == y && y == x should not extract anything due to circular dependency
+        Expression varX = new Var("x");
+        Expression varY = new Var("y");
+
+        Expression xEqualsY = new BinaryExpression(varX, "==", varY);
+        Expression yEqualsX = new BinaryExpression(varY, "==", varX);
+        Expression conjunction = new BinaryExpression(xEqualsY, "&&", yEqualsX);
+
+        Map<String, Expression> result = VariableResolver.resolve(conjunction);
+        assertTrue(result.isEmpty(), "Circular dependency should not extract variable mappings");
+    }
+
+    @Test
+    void testUnusedEqualitiesShouldBeIgnored() {
+        // z > 0 && x == 1 && y == 2 && z == 3
+        Expression varX = new Var("x");
+        Expression varY = new Var("y");
+        Expression varZ = new Var("z");
+        Expression one = new LiteralInt(1);
+        Expression two = new LiteralInt(2);
+        Expression three = new LiteralInt(3);
+        Expression zero = new LiteralInt(0);
+        Expression zGreaterZero = new BinaryExpression(varZ, ">", zero);
+        Expression xEquals1 = new BinaryExpression(varX, "==", one);
+        Expression yEquals2 = new BinaryExpression(varY, "==", two);
+        Expression zEquals3 = new BinaryExpression(varZ, "==", three);
+        Expression conditions = new BinaryExpression(xEquals1, "&&", new BinaryExpression(yEquals2, "&&", zEquals3));
+        Expression fullExpr = new BinaryExpression(zGreaterZero, "&&", conditions);
+        Map<String, Expression> result = VariableResolver.resolve(fullExpr);
+        assertEquals(1, result.size(), "Should only extract used variable z");
+        assertEquals("3", result.get("z").toString());
+    }
 }

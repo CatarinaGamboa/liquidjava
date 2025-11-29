@@ -12,25 +12,30 @@ import liquidjava.rj_language.ast.Var;
 public class VariableResolver {
 
     /**
-     * Extracts variables with constant values from an expression Returns a map from variable names to their values
+     * Extracts variables with constant values from an expression
+     * 
+     * @param exp
+     * 
+     * @returns map from variable names to their values
      */
     public static Map<String, Expression> resolve(Expression exp) {
-        // if the expression is just a single equality (not a conjunction) don't extract it
-        // this avoids creating tautologies like "1 == 1" after substitution, which are then simplified to "true"
-        if (exp instanceof BinaryExpression be) {
-            if ("==".equals(be.getOperator())) {
-                return new HashMap<>();
-            }
-        }
-
         Map<String, Expression> map = new HashMap<>();
+
+        // extract variable equalities recursively
         resolveRecursive(exp, map);
+
+        // remove variables that were not used in the expression
+        map.entrySet().removeIf(entry -> !hasUsage(exp, entry.getKey()));
+
+        // transitively resolve variables
         return resolveTransitive(map);
     }
 
     /**
      * Recursively extracts variable equalities from an expression (e.g. ... && x == 1 && y == 2 => map: x -> 1, y -> 2)
-     * Modifies the given map in place
+     * 
+     * @param exp
+     * @param map
      */
     private static void resolveRecursive(Expression exp, Map<String, Expression> map) {
         if (!(exp instanceof BinaryExpression be))
@@ -43,16 +48,20 @@ public class VariableResolver {
         } else if ("==".equals(op)) {
             Expression left = be.getFirstOperand();
             Expression right = be.getSecondOperand();
-            if (left instanceof Var && (right.isLiteral() || right instanceof Var)) {
-                map.put(((Var) left).getName(), right.clone());
-            } else if (right instanceof Var && left.isLiteral()) {
-                map.put(((Var) right).getName(), left.clone());
+            if (left instanceof Var var && right.isLiteral()) {
+                map.put(var.getName(), right.clone());
+            } else if (right instanceof Var var && left.isLiteral()) {
+                map.put(var.getName(), left.clone());
             }
         }
     }
 
     /**
      * Handles transitive variable equalities in the map (e.g. map: x -> y, y -> 1 => map: x -> 1, y -> 1)
+     * 
+     * @param map
+     * 
+     * @return new map with resolved values
      */
     private static Map<String, Expression> resolveTransitive(Map<String, Expression> map) {
         Map<String, Expression> result = new HashMap<>();
@@ -65,6 +74,12 @@ public class VariableResolver {
     /**
      * Returns the value of a variable by looking up in the map recursively Uses the seen set to avoid circular
      * references (e.g. x -> y, y -> x) which would cause infinite recursion
+     * 
+     * @param exp
+     * @param map
+     * @param seen
+     * 
+     * @return resolved expression
      */
     private static Expression lookup(Expression exp, Map<String, Expression> map, Set<String> seen) {
         if (!(exp instanceof Var))
@@ -80,5 +95,40 @@ public class VariableResolver {
 
         seen.add(name);
         return lookup(value, map, seen);
+    }
+
+    /**
+     * Checks if a variable is used in the expression (excluding its own definitions)
+     *
+     * @param exp
+     * @param name
+     *
+     * @return true if used, false otherwise
+     */
+    private static boolean hasUsage(Expression exp, String name) {
+        // exclude own definitions
+        if (exp instanceof BinaryExpression binary && "==".equals(binary.getOperator())) {
+            Expression left = binary.getFirstOperand();
+            Expression right = binary.getSecondOperand();
+            if (left instanceof Var v && v.getName().equals(name) && right.isLiteral())
+                return false;
+            if (right instanceof Var v && v.getName().equals(name) && left.isLiteral())
+                return false;
+        }
+
+        // usage found
+        if (exp instanceof Var var && var.getName().equals(name)) {
+            return true;
+        }
+
+        // recurse children
+        if (exp.hasChildren()) {
+            for (Expression child : exp.getChildren())
+                if (hasUsage(child, name))
+                    return true;
+        }
+
+        // usage not found
+        return false;
     }
 }
