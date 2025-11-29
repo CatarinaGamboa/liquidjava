@@ -45,9 +45,10 @@ public class ConstantPropagation {
             if (value != null) {
                 // check if this variable has an origin from a previous pass
                 DerivationNode previousOrigin = varOrigins.get(name);
-                
+
                 // preserve origin if value came from previous derivation
-                DerivationNode origin = previousOrigin != null ? new VarDerivationNode(name, previousOrigin) : new VarDerivationNode(name);
+                DerivationNode origin = previousOrigin != null ? new VarDerivationNode(name, previousOrigin)
+                        : new VarDerivationNode(name);
                 return new ValDerivationNode(value.clone(), origin);
             }
 
@@ -93,11 +94,10 @@ public class ConstantPropagation {
         return new ValDerivationNode(exp, null);
     }
 
-
     /**
-     * Extracts the derivation nodes for variable values from the derivation tree
-     * This is so done so when we find "var == value" in the tree, we store the derivation of the value
-     * So it can be preserved when var is substituted in subsequent passes
+     * Extracts the derivation nodes for variable values from the derivation tree This is so done so when we find "var
+     * == value" in the tree, we store the derivation of the value So it can be preserved when var is substituted in
+     * subsequent passes
      */
     private static void extractVarOrigins(ValDerivationNode node, Map<String, DerivationNode> varOrigins) {
         if (node == null)
