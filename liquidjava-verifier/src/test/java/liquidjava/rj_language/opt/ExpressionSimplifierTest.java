@@ -335,35 +335,24 @@ class ExpressionSimplifierTest {
 
         // Compare derivation tree structure
 
-        // Origin of y (value 2) - right operand of result
-        ValDerivationNode originY = new ValDerivationNode(new LiteralInt(2), new VarDerivationNode("y"));
-        UnaryDerivationNode originNeg2 = new UnaryDerivationNode(originY, "-");
-        ValDerivationNode rightNode = new ValDerivationNode(new LiteralInt(-2), originNeg2);
+        // Build the derivation chain for the right side:
+        // 6 came from a, 3 came from b
+        ValDerivationNode val6FromA = new ValDerivationNode(new LiteralInt(6), new VarDerivationNode("a"));
+        ValDerivationNode val3FromB = new ValDerivationNode(new LiteralInt(3), new VarDerivationNode("b"));
 
-        // Origin of x - left operand of result
-        // 6 (from a) / 3 (from b) -> 2
-        ValDerivationNode val6 = new ValDerivationNode(new LiteralInt(6), new VarDerivationNode("a"));
-        ValDerivationNode val3 = new ValDerivationNode(new LiteralInt(3), new VarDerivationNode("b"));
-        BinaryDerivationNode divOp = new BinaryDerivationNode(val6, val3, "/");
-        ValDerivationNode val2FromDiv = new ValDerivationNode(new LiteralInt(2), divOp);
+        // 6 / 3 -> 2
+        BinaryDerivationNode divOrigin = new BinaryDerivationNode(val6FromA, val3FromB, "/");
 
-        // y == 2 (from y == 6 / 3)
-        ValDerivationNode valYNode = new ValDerivationNode(new Var("y"), null);
-        BinaryDerivationNode eqYOp = new BinaryDerivationNode(valYNode, val2FromDiv, "==");
-        ValDerivationNode yEq2 = new ValDerivationNode(new BinaryExpression(new Var("y"), "==", new LiteralInt(2)),
-                eqYOp);
+        // 2 came from y, and y's value came from 6 / 2
+        VarDerivationNode yChainedOrigin = new VarDerivationNode("y", divOrigin);
+        ValDerivationNode val2FromY = new ValDerivationNode(new LiteralInt(2), yChainedOrigin);
 
-        // x == -y
-        ValDerivationNode xEqNegY = new ValDerivationNode(
-                new BinaryExpression(new Var("x"), "==", new UnaryExpression("-", new Var("y"))), null);
+        // -2
+        UnaryDerivationNode negOrigin = new UnaryDerivationNode(val2FromY, "-");
+        ValDerivationNode rightNode = new ValDerivationNode(new LiteralInt(-2), negOrigin);
 
-        // x == -y && y == 2
-        BinaryDerivationNode andOp1 = new BinaryDerivationNode(xEqNegY, yEq2, "&&");
-        ValDerivationNode xEqNegYAndYEq2 = new ValDerivationNode(
-                new BinaryExpression(xEqNegY.getValue(), "&&", yEq2.getValue()), andOp1);
-
-        // Left node x has origin pointing to the previous simplification's tree
-        ValDerivationNode leftNode = new ValDerivationNode(new Var("x"), xEqNegYAndYEq2);
+        // Left node x has no origin
+        ValDerivationNode leftNode = new ValDerivationNode(new Var("x"), null);
 
         // Root equality
         BinaryDerivationNode rootOrigin = new BinaryDerivationNode(leftNode, rightNode, "==");
