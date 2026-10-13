@@ -332,9 +332,14 @@ public class RefinementTypeChecker extends TypeChecker {
                     Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(thisName)));
 
         } else if (fieldRead.getVariable().getSimpleName().equals("length")) {
-            String targetName = fieldRead.getTarget().toString();
-            fieldRead.putMetadata(Keys.REFINEMENT, Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
-                    BuiltinFunctionPredicate.length(targetName, fieldRead)));
+            // only a local variable or parameter can be named in a refinement; the length of any other array
+            // expression (e.g. grid[i], o.arr() or this.arr) is left unconstrained
+            CtExpression<?> target = fieldRead.getTarget();
+            Predicate lengthRefinement = new Predicate();
+            if (target instanceof CtVariableRead<?> && !(target instanceof CtFieldRead<?>))
+                lengthRefinement = Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
+                        BuiltinFunctionPredicate.length(target.toString(), fieldRead));
+            fieldRead.putMetadata(Keys.REFINEMENT, lengthRefinement);
         } else if (fieldRead.getVariable().getDeclaringType().getDeclaration() instanceof CtEnum) {
             // only enums declared in the analyzed sources can be translated to SMT
             String target = fieldRead.getVariable().getDeclaringType().getSimpleName();
