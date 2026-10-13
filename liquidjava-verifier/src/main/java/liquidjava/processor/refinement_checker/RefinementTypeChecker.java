@@ -677,7 +677,7 @@ public class RefinementTypeChecker extends TypeChecker {
         Set<String> names = new LinkedHashSet<>();
         for (CtAbstractInvocation<?> call : calls) {
             if (call instanceof CtInvocation<?> inv
-                    && context.getAllMethodsWithNameSize(inv.getExecutable().getSimpleName(), inv.getArguments().size())
+                    && context.getAllMethodsWithNameSize(inv.getExecutable().getSimpleName(), Utils.declaredArity(inv))
                             .stream().anyMatch(f -> f.getAllStates().stream().anyMatch(ObjectState::hasTo))) {
                 if (inv.getTarget()instanceof CtVariableAccess<?> target)
                     changed.add(target);

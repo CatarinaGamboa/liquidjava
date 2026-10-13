@@ -16,6 +16,11 @@ public class CorrectVarargsCall {
         return k;
     }
 
+    @Refinement("_ == 7")
+    static int seven(int... xs) {
+        return 7;
+    }
+
     CorrectVarargsCall(@Refinement("length(xs) > 1") int... xs) {
     }
 
@@ -30,6 +35,8 @@ public class CorrectVarargsCall {
         int h = pick(0);
         int i = pick(1, 2, 3);
         int j = count("a", "b") + 1;
+        @Refinement("_ == 8")
+        int k = seven(1, 2) + 1;
         new CorrectVarargsCall(1, 2);
     }
 }

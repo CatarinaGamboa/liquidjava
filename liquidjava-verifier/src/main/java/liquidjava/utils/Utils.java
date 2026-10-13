@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import liquidjava.utils.constants.Types;
+import spoon.reflect.code.CtAbstractInvocation;
 import spoon.reflect.code.CtBlock;
 import spoon.reflect.code.CtFor;
 import spoon.reflect.code.CtForEach;
@@ -18,6 +19,7 @@ import spoon.reflect.cu.SourcePosition;
 import spoon.reflect.declaration.CtAnnotation;
 import spoon.reflect.declaration.CtConstructor;
 import spoon.reflect.declaration.CtElement;
+import spoon.reflect.declaration.CtExecutable;
 import spoon.reflect.declaration.CtMethod;
 import spoon.reflect.factory.Factory;
 import spoon.reflect.reference.CtFieldReference;
@@ -54,6 +56,15 @@ public class Utils {
 
     public static String qualifyFieldName(CtFieldReference<?> field) {
         return "this#" + field.getDeclaringType().getQualifiedName() + "." + field.getSimpleName();
+    }
+
+    /**
+     * Number of parameters the invoked method declares, which differs from the number of arguments when a call spreads
+     * its varargs
+     */
+    public static int declaredArity(CtAbstractInvocation<?> invocation) {
+        CtExecutable<?> method = invocation.getExecutable().getExecutableDeclaration();
+        return method != null ? method.getParameters().size() : invocation.getExecutable().getParameters().size();
     }
 
     public static String getFile(CtElement element) {
