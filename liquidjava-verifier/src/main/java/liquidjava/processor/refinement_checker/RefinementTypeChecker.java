@@ -332,9 +332,14 @@ public class RefinementTypeChecker extends TypeChecker {
                     Predicate.createEquals(Predicate.createVar(Keys.WILDCARD), Predicate.createVar(thisName)));
 
         } else if (fieldRead.getVariable().getSimpleName().equals("length")) {
-            String targetName = fieldRead.getTarget().toString();
-            fieldRead.putMetadata(Keys.REFINEMENT, Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
-                    BuiltinFunctionPredicate.length(targetName, fieldRead)));
+            // only a local variable or parameter can be named in a refinement; the length of any other array
+            // expression (e.g. grid[i], o.arr() or this.arr) is left unconstrained
+            CtExpression<?> target = fieldRead.getTarget();
+            Predicate lengthRefinement = new Predicate();
+            if (target instanceof CtVariableRead<?> && !(target instanceof CtFieldRead<?>))
+                lengthRefinement = Predicate.createEquals(Predicate.createVar(Keys.WILDCARD),
+                        BuiltinFunctionPredicate.length(target.toString(), fieldRead));
+            fieldRead.putMetadata(Keys.REFINEMENT, lengthRefinement);
         } else if (fieldRead.getVariable().getDeclaringType().getDeclaration() instanceof CtEnum) {
             // only enums declared in the analyzed sources can be translated to SMT
             String target = fieldRead.getVariable().getDeclaringType().getSimpleName();
@@ -672,7 +677,7 @@ public class RefinementTypeChecker extends TypeChecker {
         Set<String> names = new LinkedHashSet<>();
         for (CtAbstractInvocation<?> call : calls) {
             if (call instanceof CtInvocation<?> inv
-                    && context.getAllMethodsWithNameSize(inv.getExecutable().getSimpleName(), inv.getArguments().size())
+                    && context.getAllMethodsWithNameSize(inv.getExecutable().getSimpleName(), Utils.declaredArity(inv))
                             .stream().anyMatch(f -> f.getAllStates().stream().anyMatch(ObjectState::hasTo))) {
                 if (inv.getTarget()instanceof CtVariableAccess<?> target)
                     changed.add(target);

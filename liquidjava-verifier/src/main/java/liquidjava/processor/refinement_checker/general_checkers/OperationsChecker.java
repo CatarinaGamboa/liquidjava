@@ -275,7 +275,8 @@ public class OperationsChecker {
 
             // Get function refinements with non_used variables
             String met = method.getParent(CtType.class).getQualifiedName(); // TODO check
-            RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(), met, inv.getArguments().size());
+            RefinedFunction fi = rtc.getContext().getFunction(method.getSimpleName(), met,
+                    method.getParameters().size());
             if (fi == null)
                 return getUnconstrainedInvocationVariable(inv);
             Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv); // TODO REVIEW!!
@@ -313,7 +314,7 @@ public class OperationsChecker {
             String typeNotParametrized = (i > 0) ? c.substring(0, i) : c;
             String methodInClassName = typeNotParametrized + "." + simpleName;
             RefinedFunction fi = rtc.getContext().getFunction(methodInClassName, typeNotParametrized,
-                    inv.getArguments().size());
+                    Utils.declaredArity(inv));
             if (fi == null)
                 return getUnconstrainedInvocationVariable(inv);
             Predicate innerRefs = fi.getRenamedRefinements(rtc.getContext(), inv); // TODO REVIEW!!

@@ -20,10 +20,12 @@ import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Formats;
 import liquidjava.utils.constants.Keys;
 import liquidjava.utils.constants.Types;
+import spoon.reflect.code.CtAbstractInvocation;
 import spoon.reflect.code.CtConstructorCall;
 import spoon.reflect.code.CtExpression;
 import spoon.reflect.code.CtFieldRead;
 import spoon.reflect.code.CtInvocation;
+import spoon.reflect.code.CtLiteral;
 import spoon.reflect.code.CtReturn;
 import spoon.reflect.code.CtVariableRead;
 import spoon.reflect.declaration.CtClass;
@@ -332,7 +334,7 @@ public class MethodsFunctionsChecker {
             f = rtc.getContext().getFunction(methodName, className, paramTypes);
         if (f == null)
             return new HashMap<>();
-        Map<String, String> map = mapInvocation(arguments, f);
+        Map<String, String> map = mapInvocation(invocation, arguments, f);
 
         String returnViName = prepareReturnInstance(invocation, f);
 
@@ -351,7 +353,7 @@ public class MethodsFunctionsChecker {
             return map;
         }
 
-        checkParameters(invocation, arguments, f, map);
+        checkParameters(invocation, f, map);
 
         if (target != null)
             AuxStateHandler.checkTargetChanges(rtc, f, target, map, invocation);
@@ -412,10 +414,18 @@ public class MethodsFunctionsChecker {
         invocation.putMetadata(Keys.REFINEMENT, methodRef);
     }
 
-    private Map<String, String> mapInvocation(List<CtExpression<?>> arguments, RefinedFunction f) {
+    private Map<String, String> mapInvocation(CtElement invocation, List<CtExpression<?>> arguments,
+            RefinedFunction f) {
         Map<String, String> mapInvocation = new HashMap<>();
         List<Variable> functionParams = f.getArguments();
-        for (int i = 0; i < arguments.size(); i++) {
+        int mapped = arguments.size();
+        if (spreadsVarargs(invocation, arguments, functionParams.size())) {
+            // the trailing arguments are packed into a new array, which is what the varargs parameter refers to
+            mapped = functionParams.size() - 1;
+            Variable varargs = functionParams.get(mapped);
+            mapInvocation.put(varargs.getName(), createVarargsArray(invocation, varargs, arguments.size() - mapped));
+        }
+        for (int i = 0; i < mapped; i++) {
             Variable fArg = functionParams.get(i);
             CtExpression<?> iArg = arguments.get(i);
             String invStr;
@@ -433,6 +443,36 @@ public class MethodsFunctionsChecker {
         return mapInvocation;
     }
 
+    /**
+     * Whether a call to a varargs method passes its trailing arguments individually (zero, one or several of them)
+     * instead of passing an array as the varargs parameter.
+     */
+    private boolean spreadsVarargs(CtElement invocation, List<CtExpression<?>> arguments, int paramCount) {
+        if (paramCount == 0 || !(invocation instanceof CtAbstractInvocation<?> inv))
+            return false;
+        CtExecutable<?> method = inv.getExecutable().getExecutableDeclaration();
+        if (method == null || method.getParameters().size() != paramCount)
+            return false;
+        CtParameter<?> last = method.getParameters().get(paramCount - 1);
+        if (!last.isVarArgs())
+            return false;
+        if (arguments.size() != paramCount)
+            return true;
+        CtExpression<?> lastArg = arguments.get(paramCount - 1);
+        if (lastArg instanceof CtLiteral<?> lit && lit.getValue() == null)
+            return false; // a null array
+        CtTypeReference<?> argType = lastArg.getType();
+        return argType == null || !argType.isSubtypeOf(last.getType());
+    }
+
+    private String createVarargsArray(CtElement invocation, Variable fArg, int length) {
+        String nVar = String.format(Formats.INSTANCE, fArg.getName(), rtc.getContext().getCounter());
+        Predicate lengthRef = Predicate.createEquals(Predicate.createInvocation("length", Predicate.createVar(nVar)),
+                Predicate.createLit(String.valueOf(length), Types.INT));
+        rtc.getContext().addInstanceToContext(nVar, fArg.getType(), lengthRef, invocation);
+        return nVar;
+    }
+
     private String createVariableRepresentingArgument(CtExpression<?> iArg, Variable fArg) {
         Predicate met = (Predicate) iArg.getMetadata(Keys.REFINEMENT);
         if (met == null)
@@ -444,11 +484,10 @@ public class MethodsFunctionsChecker {
         return nVar;
     }
 
-    private void checkParameters(CtElement invocation, List<CtExpression<?>> arguments, RefinedFunction f,
-            Map<String, String> map) throws LJError {
-        List<Variable> functionParams = f.getArguments();
-        for (int i = 0; i < arguments.size(); i++) {
-            Variable fArg = functionParams.get(i);
+    private void checkParameters(CtElement invocation, RefinedFunction f, Map<String, String> map) throws LJError {
+        for (Variable fArg : f.getArguments()) {
+            if (!map.containsKey(fArg.getName()))
+                continue;
             Predicate c = fArg.getMainRefinement();
             c = c.substituteVariable(fArg.getName(), map.get(fArg.getName()));
             List<String> vars = c.getVariableNames();
