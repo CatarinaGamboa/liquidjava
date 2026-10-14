@@ -76,7 +76,7 @@ public class OperationsChecker {
             return; // Operations in annotations are not handled here
 
         if (hasUnresolvedType(operator)) {
-            // an operand's type could not be resolved (e.g. its class is not on the classpath, #388): the value of a
+            // an operand's type could not be resolved (e.g. its class is not on the classpath): the value of a
             // comparison or logical operation is an unknown boolean, and any other operation is left unrefined
             if (!isBooleanOperator(operator.getKind()))
                 return;
@@ -150,7 +150,7 @@ public class OperationsChecker {
         String op = getOperatorFromKind(assignment.getKind());
         if (op == null) // x |= y, x <<= n, ...: no counterpart in the integer logic, so the new value is unknown
             return new Predicate();
-        if (hasUnresolvedType(assignment.getAssignment())) // the right-hand side has an unknown type (#388)
+        if (hasUnresolvedType(assignment.getAssignment())) // the right-hand side has an unknown type
             return new Predicate();
         Predicate left = getCurrentVariableValue(assignedName);
         Predicate right = getOperatorAssignmentRefinement(assignment.getAssignment());
@@ -205,7 +205,7 @@ public class OperationsChecker {
 
         CtTypeReference<?> type = ex.getType();
         if (type == null) {
-            // the operand's type could not be resolved (#389): a negation is still boolean, anything else is unrefined
+            // the operand's type could not be resolved: a negation is still boolean, anything else is unrefined
             if (operator.getKind() != UnaryOperatorKind.NOT)
                 return;
             type = operator.getFactory().Type().booleanPrimitiveType();
