@@ -317,7 +317,7 @@ public class RefinementTypeChecker extends TypeChecker {
     public <T> void visitCtFieldRead(CtFieldRead<T> fieldRead) {
         String fieldName = fieldRead.getVariable().getSimpleName();
         // fields live in the context under their qualified name only: a variable with the field's simple name is an
-        // unrelated local (#321), and the tracked value is that of this object, not of another one (#322)
+        // unrelated local, the tracked value is that of this object, not of another one
         if (Utils.accessesTrackedField(fieldRead)
                 && context.hasVariable(Utils.qualifyFieldName(fieldRead.getVariable()))) {
             String thisName = Utils.qualifyFieldName(fieldRead.getVariable());
