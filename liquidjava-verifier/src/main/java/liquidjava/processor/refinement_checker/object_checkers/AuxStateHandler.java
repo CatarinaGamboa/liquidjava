@@ -746,12 +746,13 @@ public class AuxStateHandler {
             return name;
         } else if (target2 instanceof CtConstructorCall<?> newCall
                 && newCall.getMetadata(Keys.RECEIVER)instanceof RefinedVariable receiver) {
+            // `new T(args).method()` already prepared: reuse its receiver instead of creating another one
             invocation.putMetadata(Keys.TARGET, receiver);
             return receiver.getName();
         } else if (target2 instanceof CtConstructorCall<?> newCall
                 && newCall.getMetadata(Keys.REFINEMENT)instanceof Predicate state) {
-            // `new T(args).method()`: the receiver is a fresh object in the state the constructor gives. Checked
-            // before the TARGET metadata, which a constructor with refined parameters sets to its (void) return value
+            // `new T(args).method()`: the receiver is a fresh object in the state the constructor gives. Must come
+            // before the TARGET case: a constructor with refined parameters puts its (void) return value in TARGET
             String name = String.format(Formats.FRESH, tc.getContext().getCounter());
             CtTypeReference<?> type = newCall.getType();
             RefinedVariable receiver = tc.getContext().addInstanceToContext(name, type,
@@ -762,8 +763,6 @@ public class AuxStateHandler {
             invocation.putMetadata(Keys.TARGET, receiver);
             return name;
         } else if (target2.getMetadata(Keys.TARGET) != null) {
-            // invocation is in
-            // who did put the metadata here then?
             VariableInstance target2Vi = (VariableInstance) target2.getMetadata(Keys.TARGET);
             Optional<Variable> v = target2Vi.getParent();
             invocation.putMetadata(Keys.TARGET, target2Vi);
