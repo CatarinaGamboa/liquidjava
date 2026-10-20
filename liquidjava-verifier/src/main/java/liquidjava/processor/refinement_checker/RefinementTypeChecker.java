@@ -700,22 +700,35 @@ public class RefinementTypeChecker extends TypeChecker {
      * the condition of an if, see visitCtIf). Re-assigning a variable in the body drops the conditions on it.
      */
     private void assumeLoopCondition(CtExpression<Boolean> condition) {
+        assumeCondition(condition, true);
+    }
+
+    /**
+     * Adds a path condition saying that {@code condition} evaluated to {@code holds}, on the values it was evaluated
+     * on. Returns the path variable, so the caller can remove it where the condition no longer applies, or null when
+     * nothing is assumed.
+     */
+    private RefinedVariable assumeCondition(CtExpression<Boolean> condition, boolean holds) {
         // conditions with side effects (e.g. (n = read()) > 0) are not encoded, so they assume nothing
         if (condition == null || !condition.getElements(new TypeFilter<>(CtVariableWrite.class)).isEmpty())
-            return;
+            return null;
         Predicate refs = getRefinement(condition);
         if (isUninformativeCondition(refs, condition))
-            return;
+            return null;
         String pathVarName = String.format(Formats.FRESH, context.getCounter());
         boolean valueIsCondition = refs.getVariableNames().contains(Keys.WILDCARD);
         refs = refs.substituteVariable(Keys.WILDCARD, pathVarName);
         refs = Predicate.createConjunction(refs, substituteAllVariablesForLastInstance(refs));
         if (valueIsCondition) {
             refs = Predicate.createConjunction(refs, Predicate.createEquals(Predicate.createVar(pathVarName),
-                    Predicate.createLit("true", Types.BOOLEAN)));
+                    Predicate.createLit(String.valueOf(holds), Types.BOOLEAN)));
+        } else if (!holds) {
+            refs = refs.negate();
         }
-        vcChecker.addPathVariable(
-                context.addInstanceToContext(pathVarName, factory.Type().BOOLEAN_PRIMITIVE, refs, condition));
+        RefinedVariable pathVar = context.addInstanceToContext(pathVarName, factory.Type().BOOLEAN_PRIMITIVE, refs,
+                condition);
+        vcChecker.addPathVariable(pathVar);
+        return pathVar;
     }
 
     @Override
@@ -728,11 +741,22 @@ public class RefinementTypeChecker extends TypeChecker {
 
     @Override
     public <T> void visitCtConditional(CtConditional<T> conditional) {
-        super.visitCtConditional(conditional);
+        // each branch is checked knowing which way the condition went, as the branches of an if
+        CtExpression<Boolean> condition = conditional.getCondition();
+        scan(condition);
+        scanAssuming(conditional.getThenExpression(), condition, true);
+        scanAssuming(conditional.getElseExpression(), condition, false);
         Predicate cond = getRefinement(conditional.getCondition());
         Predicate c = Predicate.createITE(cond, getRefinement(conditional.getThenExpression()),
                 getRefinement(conditional.getElseExpression()));
         conditional.putMetadata(Keys.REFINEMENT, c);
+    }
+
+    private void scanAssuming(CtExpression<?> branch, CtExpression<Boolean> condition, boolean holds) {
+        RefinedVariable pathVar = assumeCondition(condition, holds);
+        scan(branch);
+        if (pathVar != null)
+            vcChecker.removePathVariable(pathVar);
     }
 
     @Override
