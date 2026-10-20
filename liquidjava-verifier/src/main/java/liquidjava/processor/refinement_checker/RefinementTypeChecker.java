@@ -500,6 +500,10 @@ public class RefinementTypeChecker extends TypeChecker {
         }
 
         Predicate branchGuard = valueIsCondition ? Predicate.createVar(pathVarName) : expRefs;
+        // The joined instances are read after the if, where a variable's name stands for its latest instance; the
+        // guard must name the instances the condition read (`other == d` would otherwise compare the joined d)
+        Predicate joinGuard = valueIsCondition ? branchGuard : lastExpRefs;
+        keepFreshValues(joinGuard);
         Predicate thenRefs = valueIsCondition ? Predicate.createConjunction(expRefs, branchGuard) : branchGuard;
         Predicate elseRefs = valueIsCondition ? Predicate.createConjunction(expRefs, branchGuard.negate())
                 : branchGuard.negate();
@@ -547,8 +551,26 @@ public class RefinementTypeChecker extends TypeChecker {
             context.newRefinementToVariableInContext(pathVarName, thenCompletes ? thenRefs : elseRefs);
         }
         context.exitContext();
-        context.variablesCombineFromIf(branchGuard);
+        context.variablesCombineFromIf(joinGuard);
         context.variablesFinishIfCombination();
+    }
+
+    /**
+     * The fresh values a condition creates (such as a call's result) belong to the enclosing block, but the branch
+     * guard ends up in the joined instances of the variables changed in the if, which can outlive that block (an if
+     * nested in another if's branch). Keeps those values, and the fresh values their refinements use, in the context.
+     */
+    private void keepFreshValues(Predicate predicate) {
+        String freshPrefix = Formats.FRESH.substring(0, Formats.FRESH.indexOf('%'));
+        for (String name : predicate.getVariableNames()) {
+            if (!name.startsWith(freshPrefix))
+                continue;
+            RefinedVariable value = context.getVariableByName(name);
+            if (value != null && !context.getCtxInstanceVars().contains(value)) {
+                context.addInstanceVariable(value);
+                keepFreshValues(value.getRefinement());
+            }
+        }
     }
 
     /**
