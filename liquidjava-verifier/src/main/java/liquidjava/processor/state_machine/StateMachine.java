@@ -107,6 +107,11 @@ public record StateMachine(List<State> states, List<RefinedFunction> methods, Li
         return Optional.of(List.of());
     }
 
+    /** The transitions from a state where {@code call} is not allowed to states where it is */
+    public List<Transition> transitionsEnabling(RefinedFunction call) {
+        return transitions.stream().filter(t -> !allows(Set.of(t.from()), call) && allows(t.to(), call)).toList();
+    }
+
     /** The constructors that create the object in a state where {@code call} is allowed */
     public List<RefinedFunction> constructorsEnabling(RefinedFunction call) {
         return constructors.entrySet().stream().filter(e -> allows(e.getValue(), call)).map(Map.Entry::getKey).toList();

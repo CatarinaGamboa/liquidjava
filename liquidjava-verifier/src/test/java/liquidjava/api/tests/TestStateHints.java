@@ -78,6 +78,12 @@ class TestStateHints {
     }
 
     @Test
+    void unknownStateListsTheCallsThatLeadToTheExpectedState() {
+        assertHints("ErrorStateHintUnknownState.java", new Hint(Kind.REACHING_CALLS,
+                "The state of f is unknown here. To get it to open, use: f.open() (from created)"));
+    }
+
+    @Test
     void classWithoutStateSetKeepsTheGeneralHint() {
         assertHints("ErrorUnconstrainedStateRefinement.java", Hint.general(
                 "No state information is known for this object. Make sure its state is initialized and available at this point."));
