@@ -12,7 +12,11 @@ public record Hint(Kind kind, String message) {
 
     public enum Kind {
         /** A suggestion that does not come from a specific analysis */
-        GENERAL
+        GENERAL,
+        /** Calls to add before the failing call so the object reaches a state that allows it */
+        CALL_SEQUENCE,
+        /** The calls allowed in the object's current state */
+        AVAILABLE_CALLS
     }
 
     public static Hint general(String message) {

@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import liquidjava.diagnostics.errors.*;
 import liquidjava.diagnostics.DebugLog;
 import liquidjava.diagnostics.TranslationTable;
+import liquidjava.diagnostics.hints.Hint;
 import liquidjava.processor.VCImplication;
 import liquidjava.processor.context.*;
 import liquidjava.rj_language.Predicate;
@@ -436,11 +437,11 @@ public class VCChecker {
     }
 
     protected void throwStateRefinementError(SourcePosition position, SourcePosition declarationPosition,
-            Predicate found, Predicate expected, String customMessage) throws StateRefinementError {
+            Predicate found, Predicate expected, String customMessage, List<Hint> hints) throws StateRefinementError {
         TranslationTable map = new TranslationTable();
         VCImplication foundState = buildPremiseChain(map, expected, found);
         throw new StateRefinementError(position, declarationPosition, expected, foundState.simplify(), map,
-                customMessage);
+                customMessage, hints);
     }
 
     protected void throwStateConflictError(SourcePosition position, Predicate expected) throws StateConflictError {

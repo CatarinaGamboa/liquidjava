@@ -2,6 +2,8 @@ package liquidjava.diagnostics.errors;
 
 import static liquidjava.rj_language.opt.VCSimplificationUtils.isTrue;
 
+import java.util.List;
+
 import liquidjava.diagnostics.TranslationTable;
 import liquidjava.diagnostics.hints.Hint;
 import liquidjava.processor.VCImplication;
@@ -21,7 +23,7 @@ public class StateRefinementError extends LJError {
     private final SourcePosition declarationPosition;
 
     public StateRefinementError(SourcePosition position, SourcePosition declarationPosition, Predicate expected,
-            VCSimplificationResult found, TranslationTable translationTable, String customMessage) {
+            VCSimplificationResult found, TranslationTable translationTable, String customMessage, List<Hint> hints) {
         super("State Refinement Error",
                 String.format("found %s but expected %s",
                         found.getImplication().toPredicate().getExpression().toDisplayString(),
@@ -30,7 +32,8 @@ public class StateRefinementError extends LJError {
         this.declarationPosition = declarationPosition;
         this.expected = expected;
         this.found = found;
-        if (isTrue(found.getImplication().toPredicate().getExpression()))
+        hints.forEach(this::addHint);
+        if (hints.isEmpty() && isTrue(found.getImplication().toPredicate().getExpression()))
             addHint(Hint.general(
                     "No state information is known for this object. Make sure its state is initialized and available at this point."));
     }
