@@ -5,6 +5,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import liquidjava.diagnostics.TranslationTable;
+import liquidjava.diagnostics.hints.Hint;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.ast.Expression;
 import liquidjava.rj_language.ast.formatter.VariableFormatter;
@@ -46,7 +47,8 @@ public class RefinementError extends LJError {
             setCounterexampleStr("Counterexample: " + counterexampleString);
         }
         if (isTrue(found.getImplication().toPredicate().getExpression()))
-            setHint("Not enough information to prove the expected refinement. Add a refinement or condition to constrain it.");
+            addHint(Hint.general(
+                    "Not enough information to prove the expected refinement. Add a refinement or condition to constrain it."));
     }
 
     @Override

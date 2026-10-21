@@ -1,5 +1,6 @@
 package liquidjava.diagnostics.warnings;
 
+import liquidjava.diagnostics.hints.Hint;
 import spoon.reflect.cu.SourcePosition;
 
 /**
@@ -19,6 +20,8 @@ public class ExternalMethodNotFoundWarning extends LJWarning {
         this.signature = signature;
         this.className = className;
         this.overloads = overloads;
+        if (overloads.length > 0)
+            addHint(Hint.general(String.format("Available overloads:\n  %s", String.join("\n  ", overloads))));
     }
 
     public String getSignature() {
@@ -31,12 +34,5 @@ public class ExternalMethodNotFoundWarning extends LJWarning {
 
     public String[] getOverloads() {
         return overloads;
-    }
-
-    @Override
-    public String getHint() {
-        if (overloads.length == 0)
-            return null;
-        return String.format("Available overloads:\n  %s", String.join("\n  ", overloads));
     }
 }

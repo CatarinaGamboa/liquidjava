@@ -2,9 +2,13 @@ package liquidjava.diagnostics;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import liquidjava.diagnostics.hints.Hint;
 import spoon.reflect.cu.SourcePosition;
 
 public class LJDiagnostic extends RuntimeException {
@@ -15,7 +19,7 @@ public class LJDiagnostic extends RuntimeException {
     private final String customMessage;
     private String file;
     private SourcePosition position;
-    private String hint;
+    private final List<Hint> hints = new ArrayList<>();
     private String counterexample;
     private static final String PIPE = " | ";
 
@@ -40,8 +44,15 @@ public class LJDiagnostic extends RuntimeException {
         return customMessage;
     }
 
+    public List<Hint> getHints() {
+        return Collections.unmodifiableList(hints);
+    }
+
+    /** The messages of all hints, one per line, or {@code null} if there are none */
     public String getHint() {
-        return hint;
+        if (hints.isEmpty())
+            return null;
+        return hints.stream().map(Hint::message).collect(Collectors.joining("\n"));
     }
 
     public String getCounterexampleStr() {
@@ -71,8 +82,8 @@ public class LJDiagnostic extends RuntimeException {
         return accentColor;
     }
 
-    public void setHint(String hint) {
-        this.hint = hint;
+    public void addHint(Hint hint) {
+        hints.add(hint);
     }
 
     public void setCounterexampleStr(String counterexample) {
