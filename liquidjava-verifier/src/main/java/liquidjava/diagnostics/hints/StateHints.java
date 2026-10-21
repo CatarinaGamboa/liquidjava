@@ -44,15 +44,25 @@ public final class StateHints {
     public static List<Hint> forCall(StateMachine machine, RefinedFunction call, Set<State> current, String receiver) {
         if (!machine.models(call) || current.isEmpty() || machine.allows(current, call))
             return List.of(); // the machine cannot explain why the call failed
+        Set<State> goal = machine.statesAllowing(call);
+        if (goal.isEmpty())
+            return List.of();
+
         StateHints hints = new StateHints(machine, receiver);
-        return Stream.concat(hints.howToReach(current, call).stream(), hints.allowedCalls(current).stream()).toList();
+        return Stream.concat(hints.howToReach(current, call, goal).stream(), hints.allowedCalls(current).stream())
+                .toList();
     }
 
-    private List<Hint> howToReach(Set<State> current, RefinedFunction call) {
+    private List<Hint> howToReach(Set<State> current, RefinedFunction call, Set<State> goal) {
         Optional<List<List<RefinedFunction>>> search = machine.shortestPaths(current, call, MAX_SEQUENCES);
-        if (search.isEmpty() || search.get().isEmpty() || search.get().get(0).size() > MAX_SEQUENCE_LENGTH)
+        if (search.isEmpty())
             return List.of();
-        return search.get().stream().map(sequence -> callSequence(current, sequence)).toList();
+        List<List<RefinedFunction>> sequences = search.get();
+        if (sequences.isEmpty())
+            return machine.complete() && !isUnknown(current) ? List.of(unreachable(current, call, goal)) : List.of();
+        if (sequences.get(0).size() > MAX_SEQUENCE_LENGTH)
+            return List.of();
+        return sequences.stream().map(sequence -> callSequence(current, sequence)).toList();
     }
 
     private Hint callSequence(Set<State> current, List<RefinedFunction> sequence) {
@@ -64,14 +74,39 @@ public final class StateHints {
                 receiver, names(current), names(reached)));
     }
 
+    private Hint unreachable(Set<State> current, RefinedFunction call, Set<State> goal) {
+        if (current.size() > 1)
+            return new Hint(Kind.PATH_DEPENDENT_STATE, String.format(
+                    "%s can be in %s here, depending on the path taken, and no sequence of calls moves all of them to %s. "
+                            + "Make %s reach this line in the same state on every path",
+                    receiver, names(current), names(goal), receiver));
+        String message = String.format("No sequence of calls moves %s from %s to %s", receiver, names(current),
+                names(goal));
+        List<String> constructors = machine.constructorsEnabling(call).stream().map(StateHints::constructor).toList();
+        if (!constructors.isEmpty())
+            message += ". Create a new object instead with " + String.join(" or ", constructors);
+        return new Hint(Kind.UNREACHABLE_STATE, message);
+    }
+
     private List<Hint> allowedCalls(Set<State> current) {
         List<RefinedFunction> allowed = machine.allowedIn(current);
-        if (allowed.isEmpty())
-            return List.of();
-        List<String> signatures = allowed.stream().map(StateHints::signature).toList();
-        String others = machine.complete() ? "" : " (and possibly others)";
-        return List.of(new Hint(Kind.AVAILABLE_CALLS,
-                String.format("In state %s, %s can call: %s%s", names(current), receiver, list(signatures), others)));
+        if (!allowed.isEmpty()) {
+            List<String> signatures = allowed.stream().map(StateHints::signature).toList();
+            String others = machine.complete() ? "" : " (and possibly others)";
+            return List.of(new Hint(Kind.AVAILABLE_CALLS, String.format("In state %s, %s can call: %s%s",
+                    names(current), receiver, list(signatures), others)));
+        }
+        boolean noCallsInAnyState = current.stream().allMatch(s -> machine.allowedIn(Set.of(s)).isEmpty());
+        if (machine.complete() && noCallsInAnyState)
+            return List.of(new Hint(Kind.FINAL_STATE,
+                    String.format("%s is in state %s, where none of its methods with state refinements can be called",
+                            receiver, names(current))));
+        return List.of();
+    }
+
+    /** Whether nothing is known about the state of the receiver */
+    private boolean isUnknown(Set<State> current) {
+        return current.size() == machine.states().size();
     }
 
     private String call(RefinedFunction method) {
@@ -80,6 +115,10 @@ public final class StateHints {
 
     private static String signature(RefinedFunction method) {
         return Utils.getSimpleName(method.getName()) + parameters(method);
+    }
+
+    private static String constructor(RefinedFunction constructor) {
+        return "new " + Utils.getSimpleName(constructor.getTargetClass()) + parameters(constructor);
     }
 
     private static String parameters(RefinedFunction function) {
