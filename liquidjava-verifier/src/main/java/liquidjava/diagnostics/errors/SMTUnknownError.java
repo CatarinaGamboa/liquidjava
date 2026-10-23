@@ -1,5 +1,6 @@
 package liquidjava.diagnostics.errors;
 
+import liquidjava.diagnostics.hints.Hint;
 import spoon.reflect.cu.SourcePosition;
 
 /**
@@ -14,7 +15,7 @@ public class SMTUnknownError extends LJError {
         if (reason.startsWith(tacticFailure)) {
             reason = reason.substring(tacticFailure.length()).replace("(", "").replace(")", "");
         }
-        setHint("Reason: " + reason);
+        addHint(Hint.general("Reason: " + reason));
     }
 
     public void setDeclarationPosition(SourcePosition declarationPosition) {

@@ -1,6 +1,7 @@
 package liquidjava.rj_language.parsing;
 
 import liquidjava.diagnostics.errors.SyntaxError;
+import liquidjava.diagnostics.hints.Hint;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.processor.facade.GhostDTO;
 import liquidjava.rj_language.ast.Expression;
@@ -58,7 +59,8 @@ public class RefinementsParser {
         ParseTree tree = createParser(toParse, err).prog();
         if (err.getErrors() > 0) {
             SyntaxError e = new SyntaxError(errorMessage, toParse);
-            e.setHint(err.getHint());
+            if (err.getHint() != null)
+                e.addHint(Hint.general(err.getHint()));
             throw e;
         }
         return tree;

@@ -5,6 +5,7 @@ import java.util.Locale;
 
 import liquidjava.diagnostics.NameSuggester;
 import liquidjava.diagnostics.TranslationTable;
+import liquidjava.diagnostics.hints.Hint;
 import liquidjava.utils.Utils;
 import spoon.reflect.cu.SourcePosition;
 
@@ -32,7 +33,7 @@ public class NotFoundError extends LJError {
         this.name = Utils.getSimpleName(name);
         this.kind = kind;
         NameSuggester.findClosest(name, availableElements)
-                .ifPresent(match -> setHint(String.format("Did you mean '%s'?", match)));
+                .ifPresent(match -> addHint(Hint.general(String.format("Did you mean '%s'?", match))));
     }
 
     public String getName() {

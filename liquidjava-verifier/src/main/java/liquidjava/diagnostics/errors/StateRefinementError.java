@@ -3,6 +3,7 @@ package liquidjava.diagnostics.errors;
 import static liquidjava.rj_language.opt.VCSimplificationUtils.isTrue;
 
 import liquidjava.diagnostics.TranslationTable;
+import liquidjava.diagnostics.hints.Hint;
 import liquidjava.processor.VCImplication;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.opt.VCSimplificationResult;
@@ -30,7 +31,8 @@ public class StateRefinementError extends LJError {
         this.expected = expected;
         this.found = found;
         if (isTrue(found.getImplication().toPredicate().getExpression()))
-            setHint("No state information is known for this object. Make sure its state is initialized and available at this point.");
+            addHint(Hint.general(
+                    "No state information is known for this object. Make sure its state is initialized and available at this point."));
     }
 
     @Override
