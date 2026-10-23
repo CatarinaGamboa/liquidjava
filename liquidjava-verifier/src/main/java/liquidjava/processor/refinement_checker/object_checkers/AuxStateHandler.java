@@ -4,13 +4,20 @@ import java.lang.annotation.Annotation;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import liquidjava.diagnostics.DebugLog;
 import liquidjava.diagnostics.errors.IllegalConstructorTransitionError;
 import liquidjava.diagnostics.errors.InvalidRefinementError;
 import liquidjava.diagnostics.errors.LJError;
 import liquidjava.diagnostics.errors.SMTUnknownError;
+import liquidjava.diagnostics.hints.Hint;
+import liquidjava.diagnostics.hints.StateHints;
 import liquidjava.processor.context.*;
 import liquidjava.processor.refinement_checker.TypeChecker;
 import liquidjava.processor.refinement_checker.TypeCheckingUtils;
+import liquidjava.processor.state_machine.State;
+import liquidjava.processor.state_machine.StateMachine;
+import liquidjava.processor.state_machine.StateMachineBuilder;
+import liquidjava.processor.state_machine.StateSolver;
 import liquidjava.rj_language.Predicate;
 import liquidjava.utils.Utils;
 import liquidjava.utils.constants.Formats;
@@ -636,9 +643,49 @@ public class AuxStateHandler {
             SourcePosition declarationPosition = stateChanges.stream().filter(ObjectState::hasFrom)
                     .map(ObjectState::getFromPosition).filter(Objects::nonNull).findFirst()
                     .orElse(function.getPlacementInCode().getPosition());
+            List<Hint> hints = stateHints(tc, function, instanceName, prevState, invocation);
             tc.throwStateRefinementError(invocation.getPosition(), declarationPosition, prevState,
-                    expectedStatesDisjunction, message);
+                    expectedStatesDisjunction, message, hints);
         }
+    }
+
+    /**
+     * Hints on how to fix a call to {@code function} made in a state that does not allow it. They are best effort: if
+     * they cannot be computed, the error is reported without them
+     */
+    private static List<Hint> stateHints(TypeChecker tc, RefinedFunction function, String instanceName, Predicate state,
+            CtElement invocation) {
+        Optional<String> receiver = receiverOf(invocation);
+        if (receiver.isEmpty() || !StateMachineBuilder.canModel(function))
+            return List.of();
+        try {
+            StateSolver solver = new StateSolver(tc, invocation.getPosition());
+            Optional<StateMachine> machine = StateMachineBuilder.build(tc, solver, function.getTargetClass(),
+                    invocation);
+            if (machine.isEmpty())
+                return List.of();
+            Set<State> current = solver.possibleStates(machine.get().states(), state, instanceName);
+            return StateHints.forCall(machine.get(), function, current, receiver.get());
+        } catch (RuntimeException e) {
+            // a failure to compute hints must not replace the error being reported
+            DebugLog.warn("Could not compute state hints: " + e.getMessage());
+            return List.of();
+        }
+    }
+
+    /**
+     * The receiver of {@code invocation} as written in the code, if it names an object that calls can be added to: a
+     * variable, a field or {@code this}
+     */
+    private static Optional<String> receiverOf(CtElement invocation) {
+        if (!(invocation instanceof CtInvocation<?> call))
+            return Optional.empty();
+        CtExpression<?> target = call.getTarget();
+        if (target == null || target.isImplicit())
+            return Optional.of(Keys.THIS);
+        if (target instanceof CtVariableRead<?> || target instanceof CtThisAccess<?>)
+            return Optional.of(target.toString());
+        return Optional.empty();
     }
 
     private static Predicate checkOldMentions(Predicate transitionedState, String instanceName,
