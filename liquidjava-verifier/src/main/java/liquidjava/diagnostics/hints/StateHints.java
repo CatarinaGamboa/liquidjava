@@ -1,7 +1,10 @@
 package liquidjava.diagnostics.hints;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -12,6 +15,7 @@ import liquidjava.processor.context.RefinedFunction;
 import liquidjava.processor.context.Variable;
 import liquidjava.processor.state_machine.State;
 import liquidjava.processor.state_machine.StateMachine;
+import liquidjava.processor.state_machine.Transition;
 import liquidjava.utils.Utils;
 import spoon.reflect.reference.CtTypeReference;
 
@@ -49,8 +53,25 @@ public final class StateHints {
             return List.of();
 
         StateHints hints = new StateHints(machine, receiver);
+        if (hints.isUnknown(current))
+            return hints.reachingCalls(call, goal);
         return Stream.concat(hints.howToReach(current, call, goal).stream(), hints.allowedCalls(current).stream())
                 .toList();
+    }
+
+    /** Nothing is known about the receiver's state: list what leads to a state where {@code call} is allowed */
+    private List<Hint> reachingCalls(RefinedFunction call, Set<State> goal) {
+        Map<RefinedFunction, List<State>> sources = new LinkedHashMap<>();
+        for (Transition t : machine.transitionsEnabling(call))
+            sources.computeIfAbsent(t.method(), m -> new ArrayList<>()).add(t.from());
+        Stream<String> constructors = machine.constructorsEnabling(call).stream().map(StateHints::constructor);
+        Stream<String> calls = sources.entrySet().stream()
+                .map(e -> call(e.getKey()) + " (from " + names(e.getValue()) + ")");
+        List<String> ways = Stream.concat(constructors, calls).toList();
+        if (ways.isEmpty())
+            return List.of();
+        return List.of(new Hint(Kind.REACHING_CALLS, String.format(
+                "The state of %s is unknown here. To get it to %s, use: %s", receiver, names(goal), list(ways))));
     }
 
     private List<Hint> howToReach(Set<State> current, RefinedFunction call, Set<State> goal) {
@@ -59,7 +80,7 @@ public final class StateHints {
             return List.of();
         List<List<RefinedFunction>> sequences = search.get();
         if (sequences.isEmpty())
-            return machine.complete() && !isUnknown(current) ? List.of(unreachable(current, call, goal)) : List.of();
+            return machine.complete() ? List.of(unreachable(current, call, goal)) : List.of();
         if (sequences.get(0).size() > MAX_SEQUENCE_LENGTH)
             return List.of();
         return sequences.stream().map(sequence -> callSequence(current, sequence)).toList();
