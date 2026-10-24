@@ -20,4 +20,22 @@ public class ErrorIfReferenceComparison {
         }
         d.close(); // Expect: State Refinement Error
     }
+
+    static void closeTwiceAfterChangingCondition(boolean b) {
+        ErrorIfReferenceDoor d = new ErrorIfReferenceDoor();
+        if (b == true) {
+            d.close();
+        }
+        b = false;
+        d.close(); // Expect: State Refinement Error
+    }
+
+    static void closeTwiceAfterBareCondition(boolean b) {
+        ErrorIfReferenceDoor d = new ErrorIfReferenceDoor();
+        if (b) {
+            d.close();
+        }
+        b = false;
+        d.close(); // Expect: State Refinement Error
+    }
 }
