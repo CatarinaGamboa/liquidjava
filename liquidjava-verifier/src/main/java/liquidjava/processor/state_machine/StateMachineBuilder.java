@@ -105,11 +105,16 @@ public class StateMachineBuilder {
     private StateMachine build(String className, CtTypeReference<?> type) throws LJError {
         List<RefinedFunction> methods = new ArrayList<>();
         List<Transition> transitions = new ArrayList<>();
+        Map<RefinedFunction, Set<State>> constructors = new LinkedHashMap<>();
         boolean complete = !relatedClassChangesState(className, type);
         for (RefinedFunction function : tc.getContext().getCtxFunctions()) {
-            if (!className.equals(function.getTargetClass()) || !function.hasStateChange()
-                    || CtExecutableReference.CONSTRUCTOR_NAME.equals(function.getName()))
+            if (!className.equals(function.getTargetClass()) || !function.hasStateChange())
                 continue;
+            if (CtExecutableReference.CONSTRUCTOR_NAME.equals(function.getName())) {
+                Optional<Set<State>> created = createdStates(function);
+                created.ifPresent(s -> constructors.put(function, s));
+                continue;
+            }
             Optional<List<Transition>> calls = transitionsOf(function);
             if (calls.isPresent()) {
                 methods.add(function);
@@ -118,7 +123,7 @@ public class StateMachineBuilder {
                 complete = false;
             }
         }
-        return new StateMachine(states, methods, transitions, complete);
+        return new StateMachine(states, methods, transitions, constructors, complete);
     }
 
     /** Whether a superclass or subclass has state refinements of its own, which the machine does not include */
@@ -160,5 +165,15 @@ public class StateMachineBuilder {
             return Set.of(state);
         Predicate to = change.getTo().substituteVariable(Keys.THIS, AFTER).changeOldMentions(BEFORE, AFTER);
         return solver.possibleStates(states, Predicate.createConjunction(current, to), AFTER);
+    }
+
+    /** The states {@code constructor} can create the object in, or nothing if they depend on its arguments */
+    private Optional<Set<State>> createdStates(RefinedFunction constructor) throws LJError {
+        List<Predicate> toStates = constructor.getToStates();
+        if (!canModel(constructor) || toStates.isEmpty())
+            return Optional.empty();
+        Predicate to = toStates.get(0).substituteVariable(Keys.THIS, AFTER);
+        Set<State> created = solver.possibleStates(states, to, AFTER);
+        return created.isEmpty() ? Optional.empty() : Optional.of(created);
     }
 }

@@ -16,7 +16,15 @@ public record Hint(Kind kind, String message) {
         /** Calls to add before the failing call so the object reaches a state that allows it */
         CALL_SEQUENCE,
         /** The calls allowed in the object's current state */
-        AVAILABLE_CALLS
+        AVAILABLE_CALLS,
+        /** No sequence of calls brings the object to a state that allows the failing call */
+        UNREACHABLE_STATE,
+        /** The object's state depends on the path taken, and no sequence of calls works for all of them */
+        PATH_DEPENDENT_STATE,
+        /** The object is in a state where no call with a state refinement is allowed */
+        FINAL_STATE,
+        /** The object's state is unknown, so these are the calls that lead to a state that allows the failing call */
+        REACHING_CALLS
     }
 
     public static Hint general(String message) {

@@ -2,6 +2,7 @@ package liquidjava.processor.state_machine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -23,12 +24,14 @@ import liquidjava.processor.context.RefinedFunction;
  *            the methods whose transitions are all known, in declaration order
  * @param transitions
  *            the transitions of those methods
+ * @param constructors
+ *            the states each constructor can create the object in
  * @param complete
  *            whether every method that can change the state of the object is in {@code methods}; only then can the
  *            machine tell that a state cannot be reached or that no call is allowed
  */
 public record StateMachine(List<State> states, List<RefinedFunction> methods, List<Transition> transitions,
-        boolean complete) {
+        Map<RefinedFunction, Set<State>> constructors, boolean complete) {
 
     /** How many sets of states a search visits before giving up */
     private static final int MAX_SEARCHED = 1000;
@@ -37,6 +40,7 @@ public record StateMachine(List<State> states, List<RefinedFunction> methods, Li
         states = List.copyOf(states);
         methods = List.copyOf(methods);
         transitions = List.copyOf(transitions);
+        constructors = Collections.unmodifiableMap(new LinkedHashMap<>(constructors));
     }
 
     public boolean models(RefinedFunction method) {
@@ -58,6 +62,11 @@ public record StateMachine(List<State> states, List<RefinedFunction> methods, Li
     /** The methods that can be called when the object can be in any of {@code current} */
     public List<RefinedFunction> allowedIn(Set<State> current) {
         return methods.stream().filter(m -> allows(current, m)).toList();
+    }
+
+    /** The states where {@code method} can be called */
+    public Set<State> statesAllowing(RefinedFunction method) {
+        return ordered(transitions.stream().filter(t -> t.method().equals(method)).map(Transition::from).toList());
     }
 
     /** The states the object can be in after calling {@code method}, which must be allowed in all of {@code current} */
@@ -96,6 +105,16 @@ public record StateMachine(List<State> states, List<RefinedFunction> methods, Li
             level = next;
         }
         return Optional.of(List.of());
+    }
+
+    /** The transitions from a state where {@code call} is not allowed to states where it is */
+    public List<Transition> transitionsEnabling(RefinedFunction call) {
+        return transitions.stream().filter(t -> !allows(Set.of(t.from()), call) && allows(t.to(), call)).toList();
+    }
+
+    /** The constructors that create the object in a state where {@code call} is allowed */
+    public List<RefinedFunction> constructorsEnabling(RefinedFunction call) {
+        return constructors.entrySet().stream().filter(e -> allows(e.getValue(), call)).map(Map.Entry::getKey).toList();
     }
 
     /** {@code subset} in declaration order */

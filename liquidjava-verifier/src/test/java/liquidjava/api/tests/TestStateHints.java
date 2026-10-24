@@ -41,13 +41,46 @@ class TestStateHints {
     }
 
     @Test
+    void finalStateSuggestsCreatingANewObject() {
+        assertHints("ErrorStateHintFinalState.java", new Hint(Kind.UNREACHABLE_STATE,
+                "No sequence of calls moves f from closed to open. Create a new object instead with new ErrorStateHintFinalState()"),
+                new Hint(Kind.FINAL_STATE,
+                        "f is in state closed, where none of its methods with state refinements can be called"));
+    }
+
+    @Test
+    void transitionDependingOnArgumentsPreventsClaimingStateIsFinal() {
+        assertHints("ErrorStateHintIncomplete.java");
+    }
+
+    @Test
+    void subclassTransitionsPreventClaimingStateIsUnreachable() {
+        assertHints("ErrorStateHintSubclass.java");
+    }
+
+    @Test
+    void stateDependingOnThePathAsksForTheSameStateOnEveryPath() {
+        assertHints("ErrorStateHintPathDependent.java", new Hint(Kind.PATH_DEPENDENT_STATE,
+                "f can be in created or open here, depending on the path taken, and no sequence of calls moves all of them to open. "
+                        + "Make f reach this line in the same state on every path"));
+    }
+
+    @Test
     void callAllowedByDifferentRefinementsInEachStateIsNotSuggested() {
-        assertHints("ErrorStateHintSeveralRefinements.java");
+        assertHints("ErrorStateHintSeveralRefinements.java", new Hint(Kind.PATH_DEPENDENT_STATE,
+                "f can be in created or open here, depending on the path taken, and no sequence of calls moves all of them to open. "
+                        + "Make f reach this line in the same state on every path"));
     }
 
     @Test
     void receiverThatIsNotAVariableGetsNoHints() {
         assertHints("ErrorStateHintMethodCallReceiver.java");
+    }
+
+    @Test
+    void unknownStateListsTheCallsThatLeadToTheExpectedState() {
+        assertHints("ErrorStateHintUnknownState.java", new Hint(Kind.REACHING_CALLS,
+                "The state of f is unknown here. To get it to open, use: f.open() (from created)"));
     }
 
     @Test
