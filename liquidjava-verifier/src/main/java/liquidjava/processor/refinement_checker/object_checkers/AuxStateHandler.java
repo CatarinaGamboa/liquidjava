@@ -659,12 +659,11 @@ public class AuxStateHandler {
         if (receiver.isEmpty() || !StateMachineBuilder.canModel(function))
             return List.of();
         try {
-            StateSolver solver = new StateSolver(tc, invocation.getPosition());
-            Optional<StateMachine> machine = StateMachineBuilder.build(tc, solver, function.getTargetClass(),
-                    invocation);
+            Optional<StateMachine> machine = tc.getStateMachine(function.getTargetClass(), invocation);
             if (machine.isEmpty())
                 return List.of();
-            Set<State> current = solver.possibleStates(machine.get().states(), state, instanceName);
+            Set<State> current = new StateSolver(tc, invocation.getPosition()).possibleStates(machine.get().states(),
+                    state, instanceName);
             return StateHints.forCall(machine.get(), function, current, receiver.get());
         } catch (RuntimeException e) {
             // a failure to compute hints must not replace the error being reported
