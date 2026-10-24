@@ -232,6 +232,10 @@ public class MethodsFunctionsChecker {
                 .substituteVariable(Keys.WILDCARD, returnVarName).substituteVariable(Keys.THIS, returnVarName);
         Predicate cexpectedType = fi.getRefReturn().substituteVariable(Keys.WILDCARD, returnVarName)
                 .substituteVariable(Keys.THIS, returnVarName);
+        for (Variable parameter : lv)
+            if (parameter.getLastInstance().isPresent())
+                cexpectedType = cexpectedType.substituteVariable(parameter.getName(),
+                        parameter.getLastInstance().get().getName());
 
         rtc.getContext().addVarToContext(returnVarName, method.getType(), cretRef, ret);
         rtc.checkSMT(cexpectedType, ret, fi.getPlacementInCode().getAnnotationPosition(), fi.getMessage());

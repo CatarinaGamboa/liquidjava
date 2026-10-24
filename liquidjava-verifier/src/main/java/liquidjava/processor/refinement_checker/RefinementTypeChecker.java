@@ -491,20 +491,28 @@ public class RefinementTypeChecker extends TypeChecker {
                 || isUninformativeCondition(expRefs, exp);
         expRefs = expRefs.substituteVariable(Keys.WILDCARD, pathVarName);
         Predicate lastExpRefs = substituteAllVariablesForLastInstance(expRefs);
+        if (canCompleteNormally(ifElement.getThenStatement()) || ifElement.getElseStatement() == null
+                || canCompleteNormally(ifElement.getElseStatement()))
+            lastExpRefs = snapshotMutableParameters(lastExpRefs, exp);
         expRefs = Predicate.createConjunction(expRefs, lastExpRefs);
 
         // TODO Change in future
         if (expRefs.getVariableNames().contains("null")) {
             expRefs = new Predicate();
+            lastExpRefs = new Predicate();
             valueIsCondition = true;
         }
 
         Predicate branchGuard = valueIsCondition ? Predicate.createVar(pathVarName) : expRefs;
+        // The joined instances are read after the if, where a variable's name stands for its latest instance; the
+        // guard must name the instances the condition read (`other == d` would otherwise compare the joined d)
+        Predicate joinGuard = valueIsCondition ? branchGuard : lastExpRefs;
         Predicate thenRefs = valueIsCondition ? Predicate.createConjunction(expRefs, branchGuard) : branchGuard;
         Predicate elseRefs = valueIsCondition ? Predicate.createConjunction(expRefs, branchGuard.negate())
                 : branchGuard.negate();
         RefinedVariable freshRV = context.addInstanceToContext(pathVarName, factory.Type().BOOLEAN_PRIMITIVE, thenRefs,
                 exp);
+        keepFreshValues(joinGuard);
         vcChecker.addPathVariable(freshRV);
 
         context.variablesNewIfCombination();
@@ -540,15 +548,64 @@ public class RefinementTypeChecker extends TypeChecker {
         if (thenCompletes == elseCompletes) {
             // Reset the path variable's refinement to the original condition after the if,
             // so branch-local truth assertions (and any typestate they imply) don't leak past the join.
-            context.newRefinementToVariableInContext(pathVarName, expRefs);
+            context.newRefinementToVariableInContext(pathVarName, lastExpRefs);
             vcChecker.removePathVariable(freshRV);
         } else {
             // Keep the refinement of the only branch that reaches the code after the if.
             context.newRefinementToVariableInContext(pathVarName, thenCompletes ? thenRefs : elseRefs);
         }
         context.exitContext();
-        context.variablesCombineFromIf(branchGuard);
+        context.variablesCombineFromIf(joinGuard);
         context.variablesFinishIfCombination();
+    }
+
+    private Predicate snapshotMutableParameters(Predicate predicate, CtExpression<?> condition) {
+        // An unchanged parameter can keep its name; a later write must not change this guard's meaning.
+        CtExecutable<?> executable = condition.getParent(CtExecutable.class);
+        Set<CtVariable<?>> written = new LinkedHashSet<>();
+        if (executable != null)
+            for (CtVariableWrite<?> write : executable
+                    .getElements(new TypeFilter<CtVariableWrite<?>>(CtVariableWrite.class)))
+                if (write.getVariable().getDeclaration() != null)
+                    written.add(write.getVariable().getDeclaration());
+        Set<String> parameters = new LinkedHashSet<>();
+        for (CtVariableRead<?> read : condition.getElements(new TypeFilter<CtVariableRead<?>>(CtVariableRead.class)))
+            if (read.getVariable().getDeclaration()instanceof CtParameter<?> parameter && written.contains(parameter))
+                parameters.add(read.getVariable().getSimpleName());
+        for (String name : predicate.getVariableNames()) {
+            if (!parameters.contains(name) || !(context.getVariableByName(name)instanceof Variable variable)
+                    || variable.getLastInstance().isPresent())
+                continue;
+            String snapshot = String.format(Formats.INSTANCE, name, context.getCounter());
+            context.addInstanceToContext(snapshot, variable.getType(),
+                    variable.getMainRefinement().substituteVariable(name, snapshot), condition);
+            context.addRefinementInstanceToVariable(name, snapshot);
+            predicate = predicate.substituteVariable(name, snapshot);
+        }
+        return predicate;
+    }
+
+    /**
+     * The fresh values a condition creates (such as a call's result) belong to the enclosing block, but the branch
+     * guard ends up in the joined instances of the variables changed in the if, which can outlive that block (an if
+     * nested in another if's branch). Keeps those values, and the fresh values their refinements use, in the context.
+     */
+    private void keepFreshValues(Predicate predicate) {
+        keepFreshValues(predicate, new LinkedHashSet<>());
+    }
+
+    private void keepFreshValues(Predicate predicate, Set<String> visited) {
+        String freshPrefix = Formats.FRESH.substring(0, Formats.FRESH.indexOf('%'));
+        for (String name : predicate.getVariableNames()) {
+            if (!visited.add(name))
+                continue;
+            RefinedVariable value = context.getVariableByName(name);
+            if (value == null)
+                continue;
+            if (name.startsWith(freshPrefix))
+                context.addInstanceVariable(value);
+            keepFreshValues(value.getMainRefinement(), visited);
+        }
     }
 
     /**

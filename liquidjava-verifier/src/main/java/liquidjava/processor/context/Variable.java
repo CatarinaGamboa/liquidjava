@@ -156,6 +156,9 @@ public class Variable extends RefinedVariable {
             return Optional.empty();
         if (has(ifbeforeIndex) && !has(ifthenIndex) && !has(ifelseIndex))
             return Optional.empty();
+        if (has(ifbeforeIndex) && has(ifthenIndex) && get(ifbeforeIndex) == get(ifthenIndex)
+                && (!has(ifelseIndex) || get(ifbeforeIndex) == get(ifelseIndex)))
+            return Optional.empty();
 
         String nName = String.format("#%s_%d", super.getName(), counter);
         Predicate ref = new Predicate();
