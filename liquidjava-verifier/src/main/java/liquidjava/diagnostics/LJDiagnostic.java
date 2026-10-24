@@ -6,8 +6,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import liquidjava.diagnostics.categories.ErrorCategory;
 import liquidjava.diagnostics.hints.Hint;
 import spoon.reflect.cu.SourcePosition;
 
@@ -21,6 +23,7 @@ public class LJDiagnostic extends RuntimeException {
     private SourcePosition position;
     private final List<Hint> hints = new ArrayList<>();
     private String counterexample;
+    private ErrorCategory category;
     private static final String PIPE = " | ";
 
     public LJDiagnostic(String title, String message, SourcePosition pos, String accentColor, String customMessage) {
@@ -86,6 +89,14 @@ public class LJDiagnostic extends RuntimeException {
         hints.add(hint);
     }
 
+    public Optional<ErrorCategory> getCategory() {
+        return Optional.ofNullable(category);
+    }
+
+    public void setCategory(ErrorCategory category) {
+        this.category = category;
+    }
+
     public void setCounterexampleStr(String counterexample) {
         this.counterexample = counterexample;
     }
@@ -115,6 +126,10 @@ public class LJDiagnostic extends RuntimeException {
         if (hint != null && !hint.isBlank()) {
             sb.append(" --> ").append(String.join("\n     ", hint.split("\n"))).append("\n");
         }
+
+        // category
+        if (category != null)
+            sb.append(" --> Category: ").append(category.title()).append("\n");
 
         // location
         if (file != null && position != null) {
