@@ -2,6 +2,7 @@ package liquidjava.processor.refinement_checker;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -17,6 +18,9 @@ import liquidjava.processor.context.GhostState;
 import liquidjava.processor.context.RefinedVariable;
 import liquidjava.processor.facade.AliasDTO;
 import liquidjava.processor.facade.GhostDTO;
+import liquidjava.processor.state_machine.StateMachine;
+import liquidjava.processor.state_machine.StateMachineBuilder;
+import liquidjava.processor.state_machine.StateSolver;
 import liquidjava.rj_language.Predicate;
 import liquidjava.rj_language.parsing.RefinementsParser;
 import liquidjava.smt.SMTEvaluator;
@@ -49,6 +53,7 @@ public abstract class TypeChecker extends CtScanner {
     protected final Factory factory;
     protected final VCChecker vcChecker;
     private final Diagnostics diagnostics = Diagnostics.getInstance();
+    private final Map<String, Optional<StateMachine>> stateMachines = new HashMap<>();
 
     public TypeChecker(Context context, Factory factory) {
         this.context = context;
@@ -62,6 +67,18 @@ public abstract class TypeChecker extends CtScanner {
 
     public Factory getFactory() {
         return factory;
+    }
+
+    /**
+     * The state machine of {@code className}, built once per checker: the specifications it is built from are all known
+     * before a checker starts
+     */
+    public Optional<StateMachine> getStateMachine(String className, CtElement element) throws LJError {
+        if (!stateMachines.containsKey(className)) {
+            StateSolver solver = new StateSolver(this, element.getPosition());
+            stateMachines.put(className, StateMachineBuilder.build(this, solver, className, element));
+        }
+        return stateMachines.get(className);
     }
 
     @Override
